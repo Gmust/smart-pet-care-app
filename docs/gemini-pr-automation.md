@@ -18,7 +18,7 @@ The workflow file is `.github/workflows/gemini-pr-review.yml`.
 
 ## How to have Gemini update docs
 
-If the review says documentation is required, add the `gemini:docs` label to the PR.
+If the review says documentation is required, add the `gemini:docs` label to the PR. This label is typically added via the `.github/pull_request_template.md` checkbox.
 
 That triggers `.github/workflows/gemini-docs-update.yml`, which:
 

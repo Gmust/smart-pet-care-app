@@ -36,10 +36,19 @@ These rules apply to the React Native / Expo frontend in this repo (TypeScript s
   - spacing: `theme.spacing(n)`
   - radii: `theme.borderRadius.*`
   - text sizes: `theme.fontSize.*`
+  - shadows: `theme.shadows.*`
+  - fonts: `theme.fonts.*`
 - Avoid hard-coded colors/sizes unless there’s a strong reason (and document it).
 - Keep styles static (module scope) unless they truly depend on props; for prop-driven styling, minimize dynamic objects and keep them close to the usage.
 - Prefer style composition (`[styles.base, condition && styles.modifier]`) over deeply nested ternaries.
 - Don’t mix multiple styling systems in one component (keep it Unistyles-first).
+
+## UI Components (`src/shadecn/ui/`)
+
+- New reusable UI components (e.g., `Button`, `Dialog`, `Drawer`, `Input`) are located in `src/shadecn/ui/`.
+- These components follow a shadcn-like API and integrate with `react-native-unistyles` for styling.
+- When creating new UI components, consider if they fit into this pattern and contribute to the shared component library.
+- Ensure new components have clear props, are accessible, and handle various states (e.g., disabled, loading).
 
 ## Forms (`react-hook-form` + Zod)
 
