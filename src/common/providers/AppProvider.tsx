@@ -1,5 +1,6 @@
 import React, { ReactNode, useRef } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { PortalHost } from "@rn-primitives/portal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -16,12 +17,14 @@ export default function AppProvider({ children }: AppProviderProps) {
 
   return (
     <GestureHandlerRootView>
-      <QueryClientProvider client={new QueryClient()}>
-        {children}
-        <PortalHost />
-        <PortalHost name="dialog" />
-        <PortalHost name="popover" />
-      </QueryClientProvider>
+      <BottomSheetModalProvider>
+        <QueryClientProvider client={new QueryClient()}>
+          {children}
+          <PortalHost />
+          <PortalHost name="dialog" />
+          <PortalHost name="popover" />
+        </QueryClientProvider>
+      </BottomSheetModalProvider>
     </GestureHandlerRootView>
   );
 }

@@ -44,3 +44,9 @@ app-example
 # generated native folders
 /ios
 /android
+
+# gemini-cli settings
+.gemini/
+
+# GitHub App credentials
+gha-creds-*.json
