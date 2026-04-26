@@ -25,6 +25,11 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Team docs
+
+- PR review guidelines: `docs/pr-review.md`
+- Gemini PR automation: `docs/gemini-pr-automation.md`
+
 ## Get a fresh project
 
 When you're ready, run:

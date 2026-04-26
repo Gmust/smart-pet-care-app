@@ -1,7 +1,6 @@
 import { initReactI18next } from "react-i18next";
 
 import ukCommon from "@/locales/common/uk.json";
-import ukPets from "@/locales/pets/uk.json";
 
 import i18next from "i18next";
 
@@ -12,7 +11,7 @@ export enum Languages {
 export const languages = ["uk"] as const;
 export type Lang = (typeof languages)[number];
 
-const modules = ["common", "pets"] as const;
+const modules = ["common"] as const;
 
 export type I18nModule = (typeof modules)[number];
 
@@ -20,7 +19,6 @@ type TranslationJson = { [key: string]: string | TranslationJson | string[] };
 
 const ukResources = {
   common: ukCommon,
-  pets: ukPets,
 } as const satisfies Record<I18nModule, TranslationJson>;
 
 const resources: Record<Lang, Record<I18nModule, TranslationJson>> = {
