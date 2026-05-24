@@ -158,7 +158,7 @@ function Button({
   style,
   disabled,
   textStyle,
-  isLoading,
+  isLoading = false,
   dotted = false,
   ...props
 }: ButtonProps) {

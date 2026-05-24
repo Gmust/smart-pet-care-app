@@ -150,6 +150,7 @@ export function Chip({
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityState={{ disabled }}
       style={({ pressed }) => chipVariants.root(variant, tone, pressed && !disabled)}
     >
       <Text style={chipVariants.label(variant, tone)}>{label}</Text>
