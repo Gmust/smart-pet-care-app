@@ -1,95 +1,98 @@
-import React from "react";
-import { TextInput, TextStyle, View, ViewStyle } from "react-native";
-import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
+import { useState } from "react";
+import type { ReactNode } from "react";
+import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from "react-native";
+import { TextInput, View } from "react-native";
+import type { UnistylesVariants } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-type InputProps = React.ComponentProps<typeof TextInput> &
-  UnistylesVariants<typeof inputVariants> & {
-    leftSlot?: React.ReactNode;
-    rightSlot?: React.ReactNode;
-    containerStyle?: ViewStyle;
-    inputStyle?: TextStyle;
-  };
+import { Text } from "./text";
 
 const inputVariants = StyleSheet.create((theme) => ({
-  root: (focused: boolean = false, disabled: boolean = false) => ({
+  wrapper: {
+    gap: theme.spacing(1),
+  },
+  label: (error: boolean = false) => ({
+    fontFamily: theme.fonts.regular,
+    fontSize: theme.fontSize.sm,
+    color: error ? theme.palette.brand.danger : theme.palette.brand.textSecondary,
+  }),
+  root: (
+    focused: boolean = false,
+    error: boolean = false,
+    disabled: boolean = false,
+    hasValue: boolean = false
+  ) => ({
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing(3),
-    borderWidth: 1,
-    opacity: disabled ? 0.55 : 1,
+    borderWidth: theme.spacing(0.375),
+    borderStyle: "solid",
+    borderRadius: theme.borderRadius.lg,
+    paddingHorizontal: theme.spacing(3.5),
+    minHeight: theme.spacing(13),
+    backgroundColor: error
+      ? theme.palette.brand.dangerBg
+      : disabled
+        ? theme.palette.brand.surfaceSunken
+        : focused || hasValue
+          ? theme.palette.white
+          : theme.palette.brand.surfacePage,
+    borderColor: error
+      ? theme.palette.brand.danger
+      : focused
+        ? theme.palette.brand.primaryDefault
+        : theme.palette.brand.surfaceBorder,
+    opacity: disabled ? 0.5 : 1,
     variants: {
-      variant: {
-        default: {
-          borderColor: focused ? theme.palette.cyan[500] : theme.palette.slate[200],
-          backgroundColor: theme.palette.white,
-        },
-        filled: {
-          borderColor: focused ? theme.palette.cyan[500] : theme.palette.transparent,
-          backgroundColor: theme.palette.slate[100],
-        },
-        ghost: {
-          borderColor: focused ? theme.palette.cyan[500] : theme.palette.slate[700],
-          backgroundColor: theme.palette.transparent,
-        },
-      },
       size: {
-        sm: {
-          minHeight: theme.spacing(11),
-          borderRadius: theme.borderRadius.xl,
-          paddingHorizontal: theme.spacing(3.5),
-        },
-        md: {
-          minHeight: theme.spacing(13),
-          borderRadius: theme.borderRadius["2xl"],
-          paddingHorizontal: theme.spacing(4),
-        },
-        lg: {
-          minHeight: theme.spacing(15),
-          borderRadius: theme.borderRadius["3xl"],
-          paddingHorizontal: theme.spacing(5),
-        },
+        sm: { minHeight: theme.spacing(10), paddingHorizontal: theme.spacing(3) },
+        md: { minHeight: theme.spacing(13), paddingHorizontal: theme.spacing(3.5) },
+        lg: { minHeight: theme.spacing(15), paddingHorizontal: theme.spacing(4) },
       },
     },
   }),
-  input: {
+  input: (multiline: boolean = false) => ({
     flex: 1,
-    paddingVertical: 0,
-    fontFamily: theme.fonts.medium,
-    variants: {
-      variant: {
-        default: {
-          color: theme.palette.slate[950],
-        },
-        filled: {
-          color: theme.palette.slate[950],
-        },
-        ghost: {
-          color: theme.palette.white,
-        },
-      },
-      size: {
-        sm: {
-          fontSize: theme.fontSize.sm,
-        },
-        md: {
-          fontSize: theme.fontSize.base,
-        },
-        lg: {
-          fontSize: theme.fontSize.lg,
-        },
-      },
-    },
-  },
+    fontFamily: theme.fonts.regular,
+    fontSize: theme.fontSize.base,
+    color: theme.palette.brand.textPrimary,
+    paddingVertical: theme.spacing(3),
+    textAlignVertical: multiline ? "top" : "center",
+  }),
+  helperText: (error: boolean = false) => ({
+    fontFamily: theme.fonts.regular,
+    fontSize: theme.fontSize.xs,
+    color: error ? theme.palette.brand.danger : theme.palette.brand.textFaint,
+  }),
   slot: {
     justifyContent: "center",
     alignItems: "center",
   },
 }));
 
+type InputProps = Omit<TextInputProps, "size"> &
+  UnistylesVariants<typeof inputVariants> & {
+    showStatusIcon?: boolean;
+    showClearButton?: boolean;
+    onClear?: () => void;
+    leftIcon?: ReactNode;
+    rightIcon?: ReactNode;
+    label?: ReactNode;
+    helperText?: ReactNode;
+    error?: boolean;
+    containerStyle?: StyleProp<ViewStyle>;
+    inputStyle?: StyleProp<TextStyle>;
+    leftSlot?: ReactNode;
+    rightSlot?: ReactNode;
+  };
+
 function Input({
-  variant,
   size,
+  label,
+  helperText,
+  error = false,
   editable = true,
+  multiline = false,
+  value,
   onFocus,
   onBlur,
   containerStyle,
@@ -99,30 +102,43 @@ function Input({
   placeholderTextColor,
   ...props
 }: InputProps) {
-  inputVariants.useVariants({ variant, size });
+  inputVariants.useVariants({ size });
+  const { theme } = useUnistyles();
 
-  const [focused, setFocused] = React.useState(false);
+  const [focused, setFocused] = useState(false);
+
   const disabled = editable === false;
+  const hasValue = value != null && value.length > 0;
 
   return (
-    <View style={[inputVariants.root(focused, disabled), containerStyle]}>
-      {leftSlot ? <View style={inputVariants.slot}>{leftSlot}</View> : null}
-      <TextInput
-        {...props}
-        editable={editable}
-        onFocus={(event) => {
-          setFocused(true);
-          onFocus?.(event);
-        }}
-        onBlur={(event) => {
-          setFocused(false);
-          onBlur?.(event);
-        }}
-        placeholderTextColor={placeholderTextColor ?? (variant === "ghost" ? "#94a3b8" : "#64748b")}
-        selectionColor="#06b6d4"
-        style={[inputVariants.input, inputStyle]}
-      />
-      {rightSlot ? <View style={inputVariants.slot}>{rightSlot}</View> : null}
+    <View style={inputVariants.wrapper}>
+      {label != null ? <Text style={inputVariants.label(error)}>{label}</Text> : null}
+
+      <View style={[inputVariants.root(focused, error, disabled, hasValue), containerStyle]}>
+        {leftSlot ? <View style={inputVariants.slot}>{leftSlot}</View> : null}
+        <TextInput
+          {...props}
+          value={value}
+          editable={editable}
+          multiline={multiline}
+          onFocus={(event) => {
+            setFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setFocused(false);
+            onBlur?.(event);
+          }}
+          placeholderTextColor={placeholderTextColor ?? theme.palette.brand.textFaint}
+          selectionColor={theme.palette.brand.primaryDefault}
+          style={[inputVariants.input(multiline), inputStyle]}
+        />
+        {rightSlot ? <View style={inputVariants.slot}>{rightSlot}</View> : null}
+      </View>
+
+      {helperText != null ? (
+        <Text style={inputVariants.helperText(error)}>{helperText}</Text>
+      ) : null}
     </View>
   );
 }

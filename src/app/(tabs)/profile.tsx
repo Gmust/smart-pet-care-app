@@ -3,7 +3,10 @@ import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
+import { CatIcon } from "@/icons/pets";
+import Utensils from "@/icons/utensils";
 import { Button } from "@/shadecn/ui/button";
+import { Chip } from "@/shadecn/ui/chip";
 import {
   Dialog,
   DialogClose,
@@ -25,6 +28,7 @@ import {
 } from "@/shadecn/ui/drawer";
 import { Input } from "@/shadecn/ui/input";
 import { Text } from "@/shadecn/ui/text";
+import { palette } from "@/styles/palette";
 
 export default function ProfilePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -38,9 +42,14 @@ export default function ProfilePage() {
           Use the new drawer primitive for focused mobile actions and confirmation flows.
         </Text>
       </View>
+      <View>
+        <Chip label="Test" />
+        <CatIcon color={palette.amber[400]} />
+        <Utensils.Default color={palette.amber[400]} />
+      </View>
       <View style={styles.showcase}>
         <Text style={styles.showcaseLabel}>Input primitive</Text>
-        <Input size="md" variant="filled" placeholder="Pet nickname" />
+        <Input size="md" placeholder="Pet nickname" />
         <Button size="md" variant="primary" onPress={() => setIsDialogOpen(true)}>
           Open test dialog
         </Button>

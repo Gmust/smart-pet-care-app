@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { View, ViewProps } from "react-native";
+import type { ViewProps } from "react-native";
+import { View } from "react-native";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { StyleSheet } from "react-native-unistyles";
 import * as DialogPrimitive from "@rn-primitives/dialog";

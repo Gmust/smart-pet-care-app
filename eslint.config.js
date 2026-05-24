@@ -3,6 +3,7 @@ const { defineConfig } = require("eslint/config");
 const globals = require("globals");
 
 const { fixupConfigRules, fixupPluginRules } = require("@eslint/compat");
+const tsPlugin = require("@typescript-eslint/eslint-plugin");
 const tsParser = require("@typescript-eslint/parser");
 const react = require("eslint-plugin-react");
 const reactRefresh = require("eslint-plugin-react-refresh");
@@ -65,6 +66,7 @@ module.exports = defineConfig([
 
     plugins: {
       react: fixupPluginRules(react),
+      "@typescript-eslint": fixupPluginRules(tsPlugin),
       "react-refresh": reactRefresh,
       "react-hooks": fixupPluginRules(reactHooks),
       import: fixupPluginRules(_import),
@@ -73,6 +75,7 @@ module.exports = defineConfig([
 
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
+      "no-console": ["warn", { allow: ["warn", "error"] }],
 
       //Used across the codebase, heavily dependent
       "react-hooks/set-state-in-effect": "off",
@@ -96,6 +99,7 @@ module.exports = defineConfig([
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-unsafe-function-type": "error",
       "@typescript-eslint/no-wrapper-object-types": "error",
+      "@typescript-eslint/consistent-type-imports": ["error", { prefer: "type-imports" }],
 
       "simple-import-sort/imports": [
         "error",
@@ -111,6 +115,22 @@ module.exports = defineConfig([
         },
       ],
       "simple-import-sort/exports": "error",
+    },
+  },
+  {
+    files: ["src/shadecn/ui/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/styles/palette",
+              message: "Use the active Unistyles theme from StyleSheet.create/useUnistyles.",
+            },
+          ],
+        },
+      ],
     },
   },
 ]);

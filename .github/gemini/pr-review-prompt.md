@@ -12,6 +12,8 @@ Focus on:
 - performance issues
 - missing tests
 
+Use pnpm commands when suggesting validation steps for this repository.
+
 Also decide whether the PR requires documentation updates under `docs/`.
 
 Documentation is usually required when the PR changes:

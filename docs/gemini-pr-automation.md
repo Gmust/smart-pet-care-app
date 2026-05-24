@@ -1,24 +1,16 @@
 # Gemini PR Automation
 
-This repository includes a GitHub-based Gemini workflow for pull request review and documentation upkeep.
+This repository includes a GitHub-based Gemini workflow for pull request documentation upkeep.
 
 ## What runs automatically
 
-When a non-draft pull request is opened, reopened, marked ready for review, or updated:
+When a pull request has the `gemini:docs` label, the docs update workflow runs when the PR is labeled, reopened, marked ready for review, or updated with new commits.
 
-- GitHub Actions runs Gemini review
-- Gemini reviews only the PR diff
-- Gemini posts or updates a PR comment with:
-  - a verdict
-  - concrete findings
-  - whether documentation updates are required
-  - the recommended target path in `docs/`
-
-The workflow file is `.github/workflows/gemini-pr-review.yml`.
+The workflow file is `.github/workflows/gemini-docs-update.yml`.
 
 ## How to have Gemini update docs
 
-If the review says documentation is required, add the `gemini:docs` label to the PR. This label is typically added via the `.github/pull_request_template.md` checkbox.
+If documentation is required, add the `gemini:docs` label to the PR. This label is typically added after checking the documentation impact in `.github/pull_request_template.md`.
 
 That triggers `.github/workflows/gemini-docs-update.yml`, which:
 
@@ -41,25 +33,20 @@ The official Google action also recommends ignoring local Gemini state files:
 - `.gemini/`
 - `gha-creds-*.json`
 
-Then configure branch protection in GitHub:
-
-- require the `Gemini PR Review` workflow to pass before merge
-- keep human review required for final approval
+Then configure branch protection in GitHub to keep human review required for final approval.
 
 ## Expected team workflow
 
 1. Open or update a PR.
-2. Wait for the `Gemini PR Review` comment.
-3. Address any findings.
-4. If documentation is needed, either update `docs/` in the PR yourself or add the `gemini:docs` label.
-5. Complete human review and merge.
+2. If documentation is needed, either update `docs/` in the PR yourself or add the `gemini:docs` label.
+3. Wait for `Gemini Docs Update` to push any generated docs changes.
+4. Complete human review and merge.
 
 ## Repo context
 
 Gemini reads repository guidance from:
 
 - `GEMINI.md`
-- `.github/gemini/pr-review-prompt.md`
 - `.github/gemini/docs-update-prompt.md`
 
-Adjust these files if you want review or documentation behavior to change.
+Adjust these files if you want documentation behavior to change.

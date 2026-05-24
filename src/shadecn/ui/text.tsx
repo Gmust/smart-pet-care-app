@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Text as RNText, TextStyle } from "react-native";
+import type { TextStyle } from "react-native";
+import { Text as RNText } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import * as Slot from "@rn-primitives/slot";
 

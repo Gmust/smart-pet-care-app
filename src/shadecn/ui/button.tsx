@@ -1,176 +1,166 @@
 import React from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  PressableStateCallbackType,
-  StyleProp,
-  TextStyle,
-  View,
-} from "react-native";
-import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
+import type { PressableStateCallbackType, StyleProp, TextStyle } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
+import type { UnistylesVariants } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { Text, TextClassContext } from "./text";
 
-const buttonVariants = StyleSheet.create((theme) => ({
-  button: (disabled: boolean = false, pressed: boolean = false, isLoading: boolean = false) => ({
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: theme.borderRadius["2xl"],
-    gap: theme.spacing(2),
-    opacity: disabled || isLoading ? 0.4 : 1,
-    variants: {
-      variant: {
-        primary: {
-          backgroundColor: theme.palette.amber[400],
-        },
-        secondary: {},
-        positive: {},
-        negative: {},
-        icon: {
-          width: theme.spacing(6),
-          height: theme.spacing(6),
-          backgroundColor: "transparent",
-          padding: 0,
-          margin: 0,
-          opacity: pressed ? 0.7 : 1,
-        },
-        default: {
-          backgroundColor: "transparent",
-        },
-      },
-      size: {
-        icon: {
-          padding: 0,
-        },
-        xs: {
-          paddingHorizontal: theme.spacing(3.5),
-          height: theme.spacing(8),
-          borderRadius: theme.borderRadius.full,
-        },
-        sm: {
-          paddingHorizontal: theme.spacing(4),
-          height: theme.spacing(12),
-          borderRadius: theme.borderRadius.xl,
-        },
-        sm_md: {
-          paddingHorizontal: theme.spacing(4),
-          height: theme.spacing(10),
-          borderRadius: 14,
-        },
-        md: {
-          paddingHorizontal: theme.spacing(4),
-          height: theme.spacing(14),
-          borderRadius: theme.borderRadius["2xl"],
-        },
-        lg: {
-          paddingHorizontal: theme.spacing(6),
-          height: theme.spacing(11),
-        },
-        xl: {
-          paddingHorizontal: theme.spacing(7),
-          height: theme.spacing(12),
-        },
-      },
-    },
-  }),
-  text: {
-    fontFamily: theme.fonts.medium,
-    color: theme.palette.white,
-    variants: {
-      action: {
-        primary: {
-          color: theme.palette.white,
-        },
-        secondary: {
-          color: theme.palette.white,
-        },
-        positive: {
-          color: theme.palette.white,
-        },
-        negative: {
-          color: theme.palette.white,
-        },
-        black: {
-          color: theme.palette.white,
-        },
-        icon: {
-          color: theme.palette.white,
-        },
-        default: {
-          color: theme.palette.white,
-        },
-      },
-      variant: {
-        link: {},
-        outline: {},
-        solid: {
-          color: theme.palette.white,
-        },
-      },
-      size: {
-        icon: {
-          fontSize: theme.fontSize.sm,
-        },
-        xs: {
-          fontSize: theme.fontSize.xs,
-        },
-        sm: {
-          fontSize: theme.fontSize.sm,
-        },
-        sm_md: {
-          fontSize: theme.fontSize.xs,
-        },
-        md: {
-          fontSize: theme.fontSize.base,
-        },
-        lg: {
-          fontSize: theme.fontSize.lg,
-        },
-        xl: {
-          fontSize: theme.fontSize.xl,
-        },
-      },
-    },
-  },
-}));
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "text";
+export type ButtonSize = "sm" | "md" | "lg";
 
-const iconStyles = StyleSheet.create((theme) => ({
-  leftIcon: (iconOnly: boolean) => ({
-    marginRight: iconOnly ? 0 : theme.spacing(2),
-  }),
-  rightIcon: (iconOnly: boolean) => ({
-    marginLeft: iconOnly ? 0 : theme.spacing(2),
-  }),
-}));
+const buttonVariants = StyleSheet.create((theme) => {
+  const { brand } = theme.palette;
+
+  return {
+    button: (disabled: boolean = false, pressed: boolean = false, dotted: boolean = false) => ({
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: theme.spacing(2),
+      borderRadius: theme.borderRadius.lg,
+      variants: {
+        variant: {
+          primary: {
+            backgroundColor: disabled
+              ? brand.surfaceBorder
+              : pressed
+                ? brand.primaryDark
+                : brand.primaryDefault,
+            borderWidth: 0,
+          },
+          secondary: {
+            backgroundColor: disabled
+              ? brand.surfaceBorder
+              : pressed
+                ? brand.ok
+                : brand.primarySoft,
+            borderWidth: 0,
+          },
+          ghost: {
+            backgroundColor: pressed && !disabled ? brand.primarySoft : theme.palette.transparent,
+            borderWidth: theme.spacing(0.375),
+            borderStyle: dotted ? "dashed" : "solid",
+            borderColor: disabled
+              ? brand.surfaceBorder
+              : dotted
+                ? brand.textSecondary
+                : brand.primaryDefault,
+          },
+          danger: {
+            backgroundColor: disabled
+              ? brand.surfaceBorder
+              : pressed
+                ? brand.danger
+                : brand.dangerBg,
+            borderWidth: 0,
+          },
+          text: {
+            backgroundColor: theme.palette.transparent,
+            borderWidth: 0,
+          },
+        },
+        size: {
+          sm: { paddingHorizontal: theme.spacing(4), height: theme.spacing(10) },
+          md: { paddingHorizontal: theme.spacing(5), height: theme.spacing(13.5) },
+          lg: { paddingHorizontal: theme.spacing(6), height: theme.spacing(15) },
+        },
+      },
+    }),
+
+    text: (disabled: boolean = false, pressed: boolean = false, dotted: boolean = false) => ({
+      fontFamily: theme.fonts.semiBold,
+      variants: {
+        variant: {
+          primary: {
+            color: disabled ? brand.textFaint : pressed ? brand.primarySoft : brand.textOnDark,
+          },
+          secondary: {
+            color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.primaryDark,
+          },
+          ghost: {
+            color: disabled
+              ? brand.textFaint
+              : dotted
+                ? brand.textSecondary
+                : pressed
+                  ? brand.primaryDark
+                  : brand.primaryDefault,
+          },
+          danger: { color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.danger },
+          text: {
+            color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
+          },
+        },
+        size: {
+          sm: { fontSize: theme.fontSize.sm },
+          md: { fontSize: theme.fontSize.base },
+          lg: { fontSize: theme.fontSize.lg },
+        },
+      },
+    }),
+
+    iconColor: (disabled: boolean = false, pressed: boolean = false, dotted: boolean = false) => ({
+      variants: {
+        variant: {
+          primary: {
+            color: disabled ? brand.textFaint : pressed ? brand.primarySoft : brand.textOnDark,
+          },
+          secondary: {
+            color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.primaryDark,
+          },
+          ghost: {
+            color: disabled
+              ? brand.textFaint
+              : dotted
+                ? brand.textSecondary
+                : pressed
+                  ? brand.primaryDark
+                  : brand.primaryDefault,
+          },
+          danger: { color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.danger },
+          text: {
+            color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
+          },
+        },
+      },
+    }),
+  };
+});
 
 type ButtonProps = React.ComponentProps<typeof Pressable> &
   UnistylesVariants<typeof buttonVariants> & {
+    variant?: ButtonVariant;
+    size?: ButtonSize;
     icon?: React.ReactNode;
     iconPosition?: "left" | "right";
     textStyle?: StyleProp<TextStyle>;
     isLoading?: boolean;
+    dotted?: boolean;
   };
 
 function Button({
   ref,
-  variant,
-  size,
+  variant = "primary",
+  size = "md",
   icon,
   iconPosition = "left",
   onPress,
   style,
   disabled,
   textStyle,
-  isLoading,
+  isLoading = false,
+  dotted = false,
   ...props
 }: ButtonProps) {
   buttonVariants.useVariants({ size, variant });
 
-  const iconOnly = !!icon && !props.children;
-  const isDisabled = disabled || isLoading;
+  const isDisabled = !!(disabled || isLoading);
 
-  const renderChildren = (state: PressableStateCallbackType, textStyle?: StyleProp<TextStyle>) => {
+  const renderChildren = (
+    state: PressableStateCallbackType,
+    resolvedTextStyle: StyleProp<TextStyle>
+  ) => {
     if (!props.children) return null;
 
     if (typeof props.children === "function") {
@@ -179,37 +169,45 @@ function Button({
 
     return React.Children.map(props.children, (child) => {
       if (typeof child === "string") {
-        return <Text style={textStyle}>{child}</Text>;
+        return <Text style={resolvedTextStyle}>{child}</Text>;
       }
       return child;
     });
   };
 
   return (
-    <TextClassContext.Provider value={buttonVariants.text}>
+    <TextClassContext.Provider value={buttonVariants.text(isDisabled, false, dotted)}>
       <Pressable
         {...props}
         onPress={onPress}
         disabled={isDisabled}
-        style={(state) => [
-          buttonVariants.button(isDisabled ?? false, state.pressed, isLoading),
-          typeof style === "function" ? style(state) : style,
-        ]}
         ref={ref}
         role="button"
+        style={(state) => [
+          buttonVariants.button(isDisabled, state.pressed, dotted),
+          typeof style === "function" ? style(state) : style,
+        ]}
       >
-        {(state) => (
-          <>
-            {!!icon && iconPosition === "left" && (
-              <View style={iconStyles.leftIcon(iconOnly)}>{icon}</View>
-            )}
-            {renderChildren(state, textStyle)}
-            {!!icon && iconPosition === "right" && (
-              <View style={iconStyles.rightIcon(iconOnly)}>{icon}</View>
-            )}
-            {isLoading && <ActivityIndicator />}
-          </>
-        )}
+        {(state) => {
+          const resolvedTextStyle = [
+            buttonVariants.text(isDisabled, state.pressed, dotted),
+            textStyle,
+          ];
+          const iconColor = (
+            buttonVariants.iconColor(isDisabled, state.pressed, dotted) as { color: string }
+          ).color;
+          return (
+            <>
+              {!!icon && iconPosition === "left" && !isLoading && <View>{icon}</View>}
+              {isLoading ? (
+                <ActivityIndicator size="small" color={iconColor} />
+              ) : (
+                renderChildren(state, resolvedTextStyle)
+              )}
+              {!!icon && iconPosition === "right" && !isLoading && <View>{icon}</View>}
+            </>
+          );
+        }}
       </Pressable>
     </TextClassContext.Provider>
   );

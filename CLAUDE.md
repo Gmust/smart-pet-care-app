@@ -30,12 +30,17 @@ styles/           # Unistyles theme config (palette, theme, config)
 
 ## Commands
 
+Package manager: **pnpm** (with `node-linker=hoisted` in `.npmrc` for RN/Metro compatibility).
+
 ```bash
-npm run start       # Start Expo dev server
-npm run ios         # Run on iOS simulator
-npm run android     # Run on Android emulator
-npm run web         # Run in browser
-npm run lint        # ESLint
+pnpm start          # Start Expo dev server
+pnpm ios            # Run on iOS simulator
+pnpm android        # Run on Android emulator
+pnpm web            # Run in browser
+pnpm lint           # ESLint
+pnpm typecheck      # TypeScript check
+pnpm test           # Jest
+pnpm check          # Lint + typecheck
 ```
 
 ## Code Conventions
@@ -63,6 +68,8 @@ const styles = StyleSheet.create((theme) => ({
 ## Git Hooks
 
 - `pre-commit`: runs lint-staged (ESLint + Prettier on staged files)
+- `commit-msg`: validates Conventional Commit messages with commitlint
+- `pre-push`: runs `pnpm check`
 
 ## LLM Documentation References
 
