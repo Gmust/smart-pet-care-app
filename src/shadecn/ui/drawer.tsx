@@ -1,8 +1,9 @@
 import React from "react";
-import { Pressable, PressableProps, View, ViewProps } from "react-native";
+import type { PressableProps, ViewProps } from "react-native";
+import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetModal, BottomSheetView } from "@expo/ui/community/bottom-sheet";
 import * as Slot from "@rn-primitives/slot";
 
 import { Text } from "./text";
@@ -32,16 +33,7 @@ type DrawerCloseProps = PressableProps & {
 };
 
 type DrawerContentProps = React.PropsWithChildren<
-  Omit<
-    React.ComponentProps<typeof BottomSheetModal>,
-    | "children"
-    | "ref"
-    | "backdropComponent"
-    | "backgroundStyle"
-    | "handleIndicatorStyle"
-    | "handleStyle"
-    | "style"
-  > & {
+  Omit<React.ComponentProps<typeof BottomSheetModal>, "children" | "ref"> & {
     ref?: React.RefObject<BottomSheetModal | null>;
   }
 >;
@@ -114,7 +106,6 @@ function DrawerContent({
   enablePanDownToClose = true,
   index = 0,
   onDismiss,
-  topInset = 24,
   ...props
 }: DrawerContentProps) {
   const insets = useSafeAreaInsets();
@@ -139,36 +130,17 @@ function DrawerContent({
     modal.dismiss();
   }, [modalRef, open]);
 
-  const renderBackdrop = React.useCallback(
-    (backdropProps: React.ComponentProps<typeof BottomSheetBackdrop>) => (
-      <BottomSheetBackdrop
-        {...backdropProps}
-        appearsOnIndex={0}
-        disappearsOnIndex={-1}
-        opacity={0.28}
-        pressBehavior="close"
-      />
-    ),
-    []
-  );
-
   return (
     <BottomSheetModal
       {...props}
       ref={modalRef}
       index={index}
-      topInset={topInset}
       onDismiss={() => {
         setOpen(false);
         onDismiss?.();
       }}
       enableDynamicSizing={enableDynamicSizing}
       enablePanDownToClose={enablePanDownToClose}
-      backdropComponent={renderBackdrop}
-      backgroundStyle={styles.sheetBackground}
-      handleStyle={styles.handle}
-      handleIndicatorStyle={styles.handleIndicator}
-      style={styles.sheet}
     >
       <DrawerContext.Provider value={contextValue}>
         <BottomSheetView style={[styles.content, { paddingBottom: insets.bottom + 24 }]}>
@@ -196,27 +168,6 @@ function DrawerDescription({ style, ...props }: React.ComponentProps<typeof Text
 }
 
 const styles = StyleSheet.create((theme) => ({
-  sheet: {
-    shadowColor: theme.palette.black,
-    shadowOffset: { width: 0, height: -8 },
-    shadowOpacity: 0.16,
-    shadowRadius: 24,
-    elevation: 12,
-  },
-  sheetBackground: {
-    borderTopLeftRadius: theme.borderRadius["4xl"],
-    borderTopRightRadius: theme.borderRadius["4xl"],
-    backgroundColor: theme.palette.white,
-  },
-  handle: {
-    paddingTop: theme.spacing(2),
-  },
-  handleIndicator: {
-    width: theme.spacing(12),
-    height: theme.spacing(1.25),
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.palette.slate[300],
-  },
   content: {
     gap: theme.spacing(6),
     paddingHorizontal: theme.spacing(6),
@@ -244,6 +195,7 @@ const styles = StyleSheet.create((theme) => ({
 }));
 
 export {
+  BottomSheet,
   Drawer,
   DrawerClose,
   DrawerContent,

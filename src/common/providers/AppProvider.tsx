@@ -1,4 +1,5 @@
-import React, { ReactNode, useRef } from "react";
+import React, { useRef } from "react";
+import type { ReactNode } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { PortalHost } from "@rn-primitives/portal";

@@ -1,14 +1,8 @@
-import { Platform } from "react-native";
-
 import { palette } from "./palette";
 
 const BASE_SPACING = 4;
 const BASE_TEXT_SIZE = 16;
-const SYSTEM_FONT_FAMILY = Platform.select({
-  ios: "System",
-  android: "sans-serif",
-  default: "System",
-});
+const FONT_FAMILY = "Inter";
 
 const getTextSize = (s: number) => s * BASE_TEXT_SIZE;
 
@@ -20,15 +14,15 @@ export const theme = {
     dialog: "0px 4px 10px 0 rgba(0,0,0,0.35)",
   },
   fonts: {
-    thin: SYSTEM_FONT_FAMILY,
-    extraLight: SYSTEM_FONT_FAMILY,
-    light: SYSTEM_FONT_FAMILY,
-    regular: SYSTEM_FONT_FAMILY,
-    medium: SYSTEM_FONT_FAMILY,
-    semiBold: SYSTEM_FONT_FAMILY,
-    bold: SYSTEM_FONT_FAMILY,
-    extraBold: SYSTEM_FONT_FAMILY,
-    black: SYSTEM_FONT_FAMILY,
+    thin: FONT_FAMILY,
+    extraLight: FONT_FAMILY,
+    light: FONT_FAMILY,
+    regular: FONT_FAMILY,
+    medium: FONT_FAMILY,
+    semiBold: FONT_FAMILY,
+    bold: FONT_FAMILY,
+    extraBold: FONT_FAMILY,
+    black: FONT_FAMILY,
   },
   fontSize: {
     xs: getTextSize(0.75),

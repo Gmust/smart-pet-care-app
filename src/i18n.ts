@@ -1,6 +1,6 @@
 import { initReactI18next } from "react-i18next";
 
-import ukCommon from "@/locales/common/uk.json";
+import ukCommon from "@/common/locales/uk.json";
 
 import i18next from "i18next";
 

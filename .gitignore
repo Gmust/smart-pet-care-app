@@ -2,6 +2,7 @@
 
 # dependencies
 node_modules/
+.pnpm-store/
 
 .env
 # Expo
@@ -28,6 +29,7 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+pnpm-debug.*
 
 # macOS
 .DS_Store
@@ -50,3 +52,4 @@ app-example
 
 # GitHub App credentials
 gha-creds-*.json
+.compass/

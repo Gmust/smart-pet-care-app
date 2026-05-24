@@ -13,4 +13,5 @@ Rules:
 Before finishing:
 
 - Ensure the docs match the current branch state.
+- Use pnpm commands when documenting package scripts or validation steps.
 - Run `git status --short`.

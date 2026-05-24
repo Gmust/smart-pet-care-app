@@ -2,6 +2,38 @@ export const palette = {
   transparent: "transparent",
   black: "#000000",
   white: "#ffffff",
+
+  /**
+   * Brand / design-system tokens — sourced from the Figma "Full Design" file.
+   * These are semantic tokens that do not map exactly to any Tailwind shade.
+   */
+  brand: {
+    // Primary green palette
+    primaryDefault: "#2d5e4e", // --primary/default
+    primaryDark: "#1a3a2e", // --primary/dark
+    primarySoft: "#a3d9b8", // --primary/soft
+
+    // Status colours
+    ok: "#285a3f", // --status/ok
+    warn: "#c98a3e", // --status/warn
+    danger: "#b84a3e", // --status/danger
+    dangerBg: "#faeada", // --status/danger-bg
+
+    // Peach accent
+    peachDefault: "#7a3a1a", // --peach/default
+    peachSoft: "#fff8ec", // --peach/soft
+
+    // Surface layers
+    surfacePage: "#f5f1ea", // --surface/page (warm cream, default bg)
+    surfaceSunken: "#ede6da", // --surface/sunken (disabled / recessed bg)
+    surfaceBorder: "#d6d3c8", // --surface/border
+
+    // Text hierarchy
+    textPrimary: "#2d3b36", // --text/primary
+    textSecondary: "#8a9a93", // --text/secondary
+    textFaint: "#b8c3be", // --text/faint (placeholders, helper text)
+    textOnDark: "#f5f1ea", // --text/on-dark (labels on dark bg)
+  },
   slate: {
     "50": "#f8fafc",
     "100": "#f1f5f9",

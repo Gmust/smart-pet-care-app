@@ -5,8 +5,8 @@
 
 ## Validation
 
-- [ ] `npm run lint`
-- [ ] `npm run typecheck`
+- [ ] `pnpm lint`
+- [ ] `pnpm typecheck`
 - [ ] Screenshots or recording attached for UI changes
 
 ## Documentation Impact
