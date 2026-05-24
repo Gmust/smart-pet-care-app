@@ -47,6 +47,7 @@ These rules apply to the React Native / Expo frontend in this repo (TypeScript s
 
 - New reusable UI components (e.g., `Button`, `Dialog`, `Drawer`, `Input`) are located in `src/shadecn/ui/`.
 - These components follow a shadcn-like API and integrate with `react-native-unistyles` for styling.
+- Shared component and icon usage is documented in `docs/reusable-ui.md`.
 - When creating new UI components, consider if they fit into this pattern and contribute to the shared component library.
 - Ensure new components have clear props, are accessible, and handle various states (e.g., disabled, loading).
 
