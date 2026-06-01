@@ -1,19 +1,19 @@
-# Welcome to your Expo app 👋
+# Smart Pet Care App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Cross-platform Expo app for smart pet care workflows.
 
 ## Get started
 
 1. Install dependencies
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. Start the app
 
    ```bash
-   npx expo start
+   pnpm start
    ```
 
 In the output, you'll find options to open the app in a
@@ -24,6 +24,46 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## API docs and generated client
+
+The backend exposes Scalar docs at:
+
+```text
+https://smart-pet-care.duckdns.org/scalar/v1
+```
+
+Scalar loads the OpenAPI spec from:
+
+```text
+https://smart-pet-care.duckdns.org/openapi/v1.json
+```
+
+The app keeps a local copy at `docs/openapi.json`. Refresh it with backend basic auth credentials:
+
+```bash
+OPENAPI_USERNAME=admin OPENAPI_PASSWORD='petPass$' pnpm api:fetch
+```
+
+Generate the typed Axios + React Query client from `docs/openapi.json`:
+
+```bash
+pnpm api:generate
+```
+
+Refresh the spec and regenerate the client in one command:
+
+```bash
+OPENAPI_USERNAME=admin OPENAPI_PASSWORD='petPass$' pnpm api:update
+```
+
+Generated API code is written to:
+
+```text
+src/api/generated/index.ts
+```
+
+Do not edit generated files manually. Update the backend spec, refresh `docs/openapi.json`, then rerun generation.
 
 ## Team docs
 

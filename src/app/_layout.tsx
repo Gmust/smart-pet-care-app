@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StatusBar } from "react-native";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+import { Fraunces_700Bold } from "@expo-google-fonts/fraunces";
+import { NavigationBar } from "expo-navigation-bar";
 
 import AppProvider from "@/common/providers/AppProvider";
 
@@ -14,7 +16,9 @@ import isToday from "dayjs/plugin/isToday";
 import relativeTime from "dayjs/plugin/relativeTime";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 
 dayjs.extend(utc);
 dayjs.extend(duration);
@@ -27,7 +31,27 @@ configureReanimatedLogger({
   strict: false,
 });
 
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    Fraunces_700Bold,
+  });
+
+  useEffect(() => {
+    NavigationBar.setHidden(true);
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontError, fontsLoaded]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <AppProvider>
       <StatusBar hidden />

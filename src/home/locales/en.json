@@ -1,0 +1,14 @@
+{
+  "greetings": "Good {{daytime}}, {{username}}",
+  "healthPetCard": {
+    "title": "How {{petName}} is doing",
+    "signals": {
+      "weight": "Weight",
+      "appetite": "Appetite",
+      "activity": "Activity"
+    }
+  },
+  "aiInsight": {
+    "title": "AI insight"
+  }
+}

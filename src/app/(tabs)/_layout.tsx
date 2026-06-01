@@ -1,29 +1,24 @@
-import { palette } from "@/styles/palette";
+import { TabBar } from "@/common/components/tab-bar";
 
 import { Tabs } from "expo-router";
+import { useTranslation } from "react-i18next";
+
+const tabs = ["home", "pets", "activity", "profile"] as const;
 
 export default function TabLayout() {
+  const { t } = useTranslation(["common"]);
+
   return (
     <Tabs
+      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
-        tabBarActiveTintColor: palette.yellow[300],
-        tabBarInactiveTintColor: palette.gray[300],
         headerShown: false,
-        animation: "shift",
+        animation: "fade",
       }}
     >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Test 1",
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Test 2",
-        }}
-      />
+      {tabs.map((item) => (
+        <Tabs.Screen name={item} options={{ title: t(`navigationTabs.${item}`) }} />
+      ))}
     </Tabs>
   );
 }

@@ -1,0 +1,14 @@
+{
+  "navigationTabs": {
+    "home": "Home",
+    "pets": "Pets",
+    "activity": "Activity",
+    "profile": "Profile"
+  },
+  "daytimePeriods": {
+    "morning": "morning",
+    "afternoon": "afternoon",
+    "evening": "evening",
+    "night": "night"
+  }
+}
