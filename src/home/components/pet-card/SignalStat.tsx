@@ -3,11 +3,11 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
-import type { Signal } from "../types";
+import "@/styles/config";
+import type { Signal } from "../../types";
 
 type SignalStatProps = {
   signal: Signal;
-  /** First column omits the left divider. */
   first?: boolean;
 };
 
@@ -29,8 +29,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   colDivided: {
     borderLeftWidth: 1,
-    borderLeftColor: "rgba(255,255,255,0.14)",
-    paddingLeft: theme.spacing(3.5),
+    borderLeftColor: "rgba(245,241,234,0.12)",
+    paddingLeft: theme.spacing(3),
   },
   labelRow: {
     flexDirection: "row",
@@ -49,15 +49,14 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: "#f5c98a",
   },
   label: {
-    fontFamily: theme.fonts.medium,
+    fontFamily: theme.fonts.regular,
     fontSize: theme.fontSize.xs,
-    color: theme.palette.brand.textOnDark,
-    opacity: 0.7,
+    color: theme.palette.brand.textSecondary,
   },
   value: {
-    marginTop: theme.spacing(0.75),
+    marginTop: theme.spacing(1),
     fontFamily: theme.fonts.semiBold,
     fontSize: theme.fontSize.sm,
-    color: theme.palette.white,
+    color: theme.palette.brand.textOnDark,
   },
 }));

@@ -5,6 +5,7 @@ import { TextInput, View } from "react-native";
 import type { UnistylesVariants } from "react-native-unistyles";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import "@/styles/config";
 import { Text } from "./text";
 
 const inputVariants = StyleSheet.create((theme) => ({

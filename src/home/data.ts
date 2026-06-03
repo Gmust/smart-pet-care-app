@@ -8,7 +8,7 @@ import { UtensilsIcon } from "@/icons/utensils";
 
 import type {
   AiInsight,
-  HealthSummary,
+  PetHealth,
   PetSummary,
   QuickActionItem,
   Reminder,
@@ -25,20 +25,47 @@ export const activePet: PetSummary = {
   breed: "Domestic",
 };
 
-export const healthSummary = {
-  petName: "Miso",
-  score: 78,
-  status: "Stable — keep an eye on appetite",
-  trendLabel: "Stable",
-  signals: {
-    weight: { value: "4.1 kg", status: "warn" as const },
-    appetite: { value: "Low 3d", status: "warn" as const },
-    activity: { value: "Normal", status: "ok" as const },
+export const pets: PetHealth[] = [
+  {
+    id: "miso",
+    petName: "Miso",
+    score: 78,
+    status: "Stable — keep an eye on appetite",
+    trendLabel: "Stable",
+    signals: {
+      weight: { value: "4.1 kg", status: "warn" },
+      appetite: { value: "Low 3d", status: "warn" },
+      activity: { value: "Normal", status: "ok" },
+    },
   },
-};
+  {
+    id: "luna",
+    petName: "Luna",
+    score: 92,
+    status: "Thriving — great week overall",
+    trendLabel: "Rising",
+    signals: {
+      weight: { value: "3.6 kg", status: "ok" },
+      appetite: { value: "Healthy", status: "ok" },
+      activity: { value: "High", status: "ok" },
+    },
+  },
+  {
+    id: "biscuit",
+    petName: "Biscuit",
+    score: 64,
+    status: "Needs attention — low activity",
+    trendLabel: "Dipping",
+    signals: {
+      weight: { value: "6.2 kg", status: "warn" },
+      appetite: { value: "Normal", status: "ok" },
+      activity: { value: "Low 5d", status: "warn" },
+    },
+  },
+];
 
 export const aiInsight: AiInsight = {
-  timeAgo: "2h ago",
+  timeAgo: new Date(Date.now() - 2 * 60 * 60 * 1000),
   message: "Miso's appetite has dropped 28% this week. Consider a gentle check-in.",
 };
 

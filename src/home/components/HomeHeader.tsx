@@ -1,14 +1,14 @@
+import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { getDaytime } from "@/common/utils/getDaytime";
 import { BellIcon } from "@/icons/bell";
+import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import { IconButton } from "./icon-button";
-import { useTransition } from "react";
-import { useTranslation } from "react-i18next";
-import { getDaytime } from "@/common/utils/getDaytime";
+import "@/styles/config";
 
 type Props = {
   date: string;
@@ -24,9 +24,13 @@ export function HomeHeader({ date, username, onNotificationsPress }: Props) {
         <Text style={styles.date}>{date}</Text>
         <Text style={styles.message}>{t("greetings", { username, daytime: getDaytime() })}</Text>
       </View>
-      <IconButton accessibilityLabel="Notifications" onPress={onNotificationsPress}>
-        <BellIcon width={20} height={20} color={palette.brand.textPrimary} />
-      </IconButton>
+      <Button
+        accessibilityLabel="Notifications"
+        variant="icon"
+        size="icon"
+        icon={<BellIcon width={20} height={20} color={palette.brand.textPrimary} />}
+        onPress={onNotificationsPress}
+      />
     </View>
   );
 }

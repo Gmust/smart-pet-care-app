@@ -12,9 +12,7 @@
   "paths": {
     "/api/User": {
       "get": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "responses": {
           "200": {
             "description": "OK",
@@ -50,9 +48,7 @@
     },
     "/api/User/{id}": {
       "get": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "parameters": [
           {
             "name": "id",
@@ -108,9 +104,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "parameters": [
           {
             "name": "id",
@@ -186,9 +180,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "User"
-        ],
+        "tags": ["User"],
         "parameters": [
           {
             "name": "id",
@@ -229,9 +221,7 @@
     },
     "/api/reminders": {
       "get": {
-        "tags": [
-          "Reminder"
-        ],
+        "tags": ["Reminder"],
         "parameters": [
           {
             "name": "petId",
@@ -295,9 +285,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Reminder"
-        ],
+        "tags": ["Reminder"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -364,9 +352,7 @@
     },
     "/api/reminders/{id}": {
       "get": {
-        "tags": [
-          "Reminder"
-        ],
+        "tags": ["Reminder"],
         "parameters": [
           {
             "name": "id",
@@ -422,9 +408,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "Reminder"
-        ],
+        "tags": ["Reminder"],
         "parameters": [
           {
             "name": "id",
@@ -500,9 +484,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Reminder"
-        ],
+        "tags": ["Reminder"],
         "parameters": [
           {
             "name": "id",
@@ -540,9 +522,7 @@
     },
     "/api/reminders/{id}/runs": {
       "get": {
-        "tags": [
-          "Reminder"
-        ],
+        "tags": ["Reminder"],
         "parameters": [
           {
             "name": "id",
@@ -589,9 +569,7 @@
     },
     "/api/reminders/runs/{runId}/acknowledge": {
       "post": {
-        "tags": [
-          "Reminder"
-        ],
+        "tags": ["Reminder"],
         "parameters": [
           {
             "name": "runId",
@@ -629,9 +607,7 @@
     },
     "/api/dev/seed-pet": {
       "post": {
-        "tags": [
-          "Dev"
-        ],
+        "tags": ["Dev"],
         "responses": {
           "200": {
             "description": "OK"
@@ -641,9 +617,7 @@
     },
     "/api/Auth/register": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -710,9 +684,7 @@
     },
     "/api/Auth/login": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -779,9 +751,7 @@
     },
     "/api/Auth/refresh": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "responses": {
           "200": {
             "description": "OK",
@@ -828,33 +798,101 @@
     },
     "/api/Auth/logout": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/Auth/oauth/google": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/Auth/oauth/google/callback": {
       "get": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "parameters": [
           {
             "name": "code",
@@ -884,15 +922,33 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/Auth/oauth/google/mobile": {
       "post": {
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "requestBody": {
           "content": {
             "application/json": {
@@ -973,10 +1029,7 @@
             "type": "string"
           },
           "description": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "type": {
             "$ref": "#/components/schemas/ReminderType"
@@ -984,7 +1037,7 @@
           "days": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DayOfWeek"
+              "$ref": "#/components/schemas/DaysOfWeek"
             }
           },
           "isRepeatable": {
@@ -992,19 +1045,16 @@
           },
           "time": {
             "type": "string",
-            "format": "date-time"
+            "format": "time"
           },
           "endAt": {
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "format": "date-time"
           }
         }
       },
-      "DayOfWeek": {
-        "type": "integer"
+      "DaysOfWeek": {
+        "enum": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
       },
       "GoogleMobileRequest": {
         "type": "object",
@@ -1015,10 +1065,7 @@
         }
       },
       "LoginRequest": {
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "type": "object",
         "properties": {
           "email": {
@@ -1033,44 +1080,26 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "description": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "days": {
-            "type": [
-              "null",
-              "array"
-            ],
+            "type": ["null", "array"],
             "items": {
-              "$ref": "#/components/schemas/DayOfWeek"
+              "$ref": "#/components/schemas/DaysOfWeek"
             }
           },
           "isRepeatable": {
-            "type": [
-              "null",
-              "boolean"
-            ]
+            "type": ["null", "boolean"]
           },
           "time": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "format": "date-time"
+            "type": ["null", "string"],
+            "format": "time"
           },
           "endAt": {
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "format": "date-time"
           },
           "status": {
@@ -1089,28 +1118,16 @@
         "type": "object",
         "properties": {
           "displayName": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "firstName": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "lastName": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "phoneNumber": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
@@ -1118,47 +1135,26 @@
         "type": "object",
         "properties": {
           "type": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "title": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "status": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ],
+            "type": ["null", "integer", "string"],
             "format": "int32"
           },
           "detail": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "instance": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "RegisterRequest": {
-        "required": [
-          "email",
-          "password",
-          "passwordConfirm",
-          "termsAccepted"
-        ],
+        "required": ["email", "password", "passwordConfirm", "termsAccepted"],
         "type": "object",
         "properties": {
           "email": {
@@ -1193,10 +1189,7 @@
             "type": "string"
           },
           "description": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "type": {
             "$ref": "#/components/schemas/ReminderType"
@@ -1207,28 +1200,26 @@
           "days": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/DayOfWeek"
+              "$ref": "#/components/schemas/DaysOfWeek"
             }
           },
           "isRepeatable": {
             "type": "boolean"
+          },
+          "timeOfDay": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
           },
           "startAt": {
             "type": "string",
             "format": "date-time"
           },
           "nextTriggerAt": {
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "format": "date-time"
           },
           "endAt": {
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "format": "date-time"
           },
           "isSystemGenerated": {
@@ -1239,10 +1230,7 @@
             "format": "date-time"
           },
           "updatedAt": {
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "format": "date-time"
           }
         }
@@ -1263,27 +1251,18 @@
             "format": "date-time"
           },
           "sentAt": {
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "format": "date-time"
           },
           "completedAt": {
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "format": "date-time"
           },
           "status": {
             "$ref": "#/components/schemas/ReminderRunStatus"
           },
           "channel": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "createdAt": {
             "type": "string",
@@ -1292,13 +1271,21 @@
         }
       },
       "ReminderRunStatus": {
-        "type": "integer"
+        "enum": ["Pending", "Sent", "Delivered", "Failed", "Missed", "Completed", "Cancelled"]
       },
       "ReminderStatus": {
-        "type": "integer"
+        "enum": ["Active", "Completed", "Missed", "Cancelled"]
       },
       "ReminderType": {
-        "type": "integer"
+        "enum": [
+          "Feeding",
+          "Activity",
+          "Medication",
+          "Vaccination",
+          "ParasiteTreatment",
+          "VetVisit",
+          "Grooming"
+        ]
       },
       "UserResponseDto": {
         "type": "object",
@@ -1311,28 +1298,16 @@
             "type": "string"
           },
           "displayName": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "firstName": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "lastName": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "phoneNumber": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "termsAccepted": {
             "type": "boolean"
@@ -1342,10 +1317,7 @@
             "format": "date-time"
           },
           "updatedAt": {
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "format": "date-time"
           }
         }

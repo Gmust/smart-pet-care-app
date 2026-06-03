@@ -1,5 +1,5 @@
-import { IconProps } from "@/icons/icons";
-import { StyledSvg as Svg, Path } from "@/icons/StyledSvg";
+import type { IconProps } from "@/icons/icons";
+import { Path, StyledSvg as Svg } from "@/icons/StyledSvg";
 
 export const Chevron = ({ style, color = "#000", ...props }: IconProps) => {
   return (

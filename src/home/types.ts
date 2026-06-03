@@ -34,12 +34,22 @@ export type TimelineEvent = {
   dot: TimelineDot;
 };
 
-export type HealthSummary = {
+export type HealthSignal = {
+  value: string;
+  status: SignalStatus;
+};
+
+export type PetHealth = {
+  id: string;
   petName: string;
   score: number;
   status: string;
   trendLabel: string;
-  signals: Signal[];
+  signals: {
+    weight: HealthSignal;
+    appetite: HealthSignal;
+    activity: HealthSignal;
+  };
 };
 
 export type PetSummary = {
@@ -48,6 +58,6 @@ export type PetSummary = {
 };
 
 export type AiInsight = {
-  timeAgo: string;
+  timeAgo: Date;
   message: string;
 };

@@ -9,6 +9,61 @@
     }
   },
   "aiInsight": {
-    "title": "AI insight"
+    "title": "AI insight",
+    "askAssistantBtn": "Ask assistant",
+    "dismissBtn": "Dismiss"
+  },
+  "addPet": {
+    "title": "Add a new pet",
+    "subtitle": "Track another companion"
+  },
+  "sectionLabel": {
+    "remindersAmount": {
+      "title": "Today · {{remindersAmount}} reminders",
+      "action": "See all"
+    },
+    "quickActions": {
+      "title": "Quick actions"
+    },
+    "recentEvents": {
+      "title": "Recent",
+      "action": "Open timeline"
+    }
+  },
+  "reminders": {
+    "chipLabels": {
+      "done": "Done",
+      "next": "Next up",
+      "pending": "Pending"
+    }
+  },
+  "mockStatus": {
+    "ready": "Mock home data is ready.",
+    "assistantOpened": "Assistant opened with Miso's appetite insight.",
+    "insightDismissed": "AI insight dismissed for now.",
+    "petAdded": "{{petName}} was added to the mock carousel.",
+    "quickAction": "{{label}} started with mock data.",
+    "reminderDone": "{{title}} marked done.",
+    "reminderReopened": "{{title}} moved back to pending.",
+    "notifications": "{{count}} active reminders need attention.",
+    "seeAllReminders": "Showing {{count}} mock reminders for today.",
+    "timelineOpened": "Timeline opened in mock mode."
+  },
+  "mockPets": {
+    "newPetStatus": "New profile ready for tracking",
+    "newPetTrend": "New",
+    "signals": {
+      "appetite": "Healthy",
+      "activity": "Fresh"
+    }
+  },
+  "mockEvents": {
+    "justNow": "Just now",
+    "assistant": {
+      "title": "Asked assistant about appetite"
+    },
+    "quickAction": {
+      "title": "{{label}} started"
+    }
   }
 }

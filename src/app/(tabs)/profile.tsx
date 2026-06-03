@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useAppToast } from "@/common/hooks/use-app-toast";
 import { CatIcon } from "@/icons/pets";
 import Utensils from "@/icons/utensils";
 import { Button } from "@/shadecn/ui/button";
@@ -30,8 +31,11 @@ import { Input } from "@/shadecn/ui/input";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
+import "@/styles/config";
+
 export default function ProfilePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { showError, showInfo, showSuccess, showWarning } = useAppToast();
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -53,6 +57,43 @@ export default function ProfilePage() {
         <Button size="md" variant="primary" onPress={() => setIsDialogOpen(true)}>
           Open test dialog
         </Button>
+      </View>
+      <View style={styles.showcase}>
+        <Text style={styles.showcaseLabel}>Toast primitive</Text>
+        <View style={styles.toastGrid}>
+          <Button
+            size="sm"
+            variant="secondary"
+            style={styles.toastButton}
+            onPress={() => showSuccess("Bella's feeding schedule was updated.")}
+          >
+            Success
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            style={styles.toastButton}
+            onPress={() => showInfo("Vet visit details synced across devices.")}
+          >
+            Info
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            style={styles.toastButton}
+            onPress={() => showWarning("Medication reminder is due in 15 minutes.")}
+          >
+            Warning
+          </Button>
+          <Button
+            size="sm"
+            variant="danger"
+            style={styles.toastButton}
+            onPress={() => showError("Could not save the profile test change.")}
+          >
+            Error
+          </Button>
+        </View>
       </View>
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
@@ -111,7 +152,7 @@ const styles = StyleSheet.create((theme) => ({
   screen: {
     flex: 1,
     gap: theme.spacing(6),
-    backgroundColor: theme.palette.slate[950],
+    backgroundColor: theme.palette.brand.surfacePage,
     paddingHorizontal: theme.spacing(5),
     paddingTop: theme.spacing(8),
   },
@@ -145,6 +186,15 @@ const styles = StyleSheet.create((theme) => ({
   },
   showcase: {
     gap: theme.spacing(2),
+  },
+  toastGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing(2),
+  },
+  toastButton: {
+    minWidth: theme.spacing(24),
+    flexGrow: 1,
   },
   showcaseLabel: {
     fontFamily: theme.fonts.bold,

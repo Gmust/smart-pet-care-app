@@ -4,6 +4,8 @@ import { Text as RNText } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import * as Slot from "@rn-primitives/slot";
 
+import "@/styles/config";
+
 const TextClassContext = React.createContext<TextStyle | undefined>(undefined);
 
 type TextProps = React.ComponentProps<typeof RNText> & {

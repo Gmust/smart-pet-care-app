@@ -42,6 +42,9 @@ pnpm-debug.*
 # typescript
 *.tsbuildinfo
 
+# generated API client (run `pnpm api:generate`)
+src/api/generated/
+
 app-example
 
 # generated native folders

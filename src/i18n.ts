@@ -1,8 +1,9 @@
 import { initReactI18next } from "react-i18next";
 
-import i18next from "i18next";
 import enCommon from "@/common/locales/en.json";
 import enHome from "@/home/locales/en.json";
+
+import i18next from "i18next";
 
 export enum Languages {
   en = "en",

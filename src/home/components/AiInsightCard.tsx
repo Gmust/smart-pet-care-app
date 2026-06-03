@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -6,7 +7,9 @@ import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
+import "@/styles/config";
 import type { AiInsight } from "../types";
+import dayjs from "dayjs";
 
 type AiInsightCardProps = {
   insight: AiInsight;
@@ -15,17 +18,35 @@ type AiInsightCardProps = {
 };
 
 export function AiInsightCard({ insight, onAsk, onDismiss }: AiInsightCardProps) {
+  const { t } = useTranslation(["home"]);
+
   return (
     <View style={styles.card}>
       <View style={styles.icon}>
         <HeartPulseIcon width={18} height={18} color={palette.brand.textOnDark} />
       </View>
       <View style={styles.body}>
-        <Text style={styles.eyebrow}>AI insight · {insight.timeAgo}</Text>
+        <View style={styles.insightContainer}>
+          <Text style={styles.eyebrow}>{t("aiInsight.title")}</Text>
+          <View style={styles.dot} />
+          <Text style={styles.eyebrow}>{dayjs(insight.timeAgo).fromNow()}</Text>
+        </View>
         <Text style={styles.text}>{insight.message}</Text>
         <View style={styles.actions}>
-          <Chip label="Ask assistant" tone="peach" variant="ghost" size="sm" onPress={onAsk} />
-          <Chip label="Dismiss" tone="neutral" variant="ghost" size="sm" onPress={onDismiss} />
+          <Chip
+            label={t("aiInsight.askAssistantBtn")}
+            tone="peach"
+            variant="ghost"
+            size="sm"
+            onPress={onAsk}
+          />
+          <Chip
+            label={t("aiInsight.dismissBtn")}
+            tone="neutral"
+            variant="ghost"
+            size="sm"
+            onPress={onDismiss}
+          />
         </View>
       </View>
     </View>
@@ -33,6 +54,16 @@ export function AiInsightCard({ insight, onAsk, onDismiss }: AiInsightCardProps)
 }
 
 const styles = StyleSheet.create((theme) => ({
+  dot: {
+    width: theme.spacing(1.5),
+    height: theme.spacing(1.5),
+    borderRadius: theme.borderRadius.full,
+  },
+  insightContainer: {
+    flexDirection: "row",
+    alignContent: "center",
+    gap: theme.spacing(2),
+  },
   card: {
     flexDirection: "row",
     gap: theme.spacing(3),

@@ -4,10 +4,11 @@ import { ActivityIndicator, Pressable, View } from "react-native";
 import type { UnistylesVariants } from "react-native-unistyles";
 import { StyleSheet } from "react-native-unistyles";
 
+import "@/styles/config";
 import { Text, TextClassContext } from "./text";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "text";
-export type ButtonSize = "sm" | "md" | "lg";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "text" | "icon";
+export type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 const buttonVariants = StyleSheet.create((theme) => {
   const { brand } = theme.palette;
@@ -59,11 +60,22 @@ const buttonVariants = StyleSheet.create((theme) => {
             backgroundColor: theme.palette.transparent,
             borderWidth: 0,
           },
+          icon: {
+            backgroundColor: pressed && !disabled ? brand.surfaceSunken : theme.palette.white,
+            borderWidth: 1,
+            borderColor: disabled ? brand.surfaceBorder : brand.surfaceBorder,
+          },
         },
         size: {
           sm: { paddingHorizontal: theme.spacing(4), height: theme.spacing(10) },
           md: { paddingHorizontal: theme.spacing(5), height: theme.spacing(13.5) },
           lg: { paddingHorizontal: theme.spacing(6), height: theme.spacing(15) },
+          icon: {
+            width: theme.spacing(9),
+            height: theme.spacing(9),
+            paddingHorizontal: 0,
+            borderRadius: theme.borderRadius.full,
+          },
         },
       },
     }),
@@ -91,11 +103,15 @@ const buttonVariants = StyleSheet.create((theme) => {
           text: {
             color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
           },
+          icon: {
+            color: disabled ? brand.textFaint : brand.textPrimary,
+          },
         },
         size: {
           sm: { fontSize: theme.fontSize.sm },
           md: { fontSize: theme.fontSize.base },
           lg: { fontSize: theme.fontSize.lg },
+          icon: { fontSize: theme.fontSize.base },
         },
       },
     }),
@@ -121,6 +137,9 @@ const buttonVariants = StyleSheet.create((theme) => {
           danger: { color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.danger },
           text: {
             color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
+          },
+          icon: {
+            color: disabled ? brand.textFaint : brand.textPrimary,
           },
         },
       },

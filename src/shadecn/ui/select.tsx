@@ -1,13 +1,13 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import * as SelectPrimitive from "@rn-primitives/select";
 
 import { Chevron } from "@/icons/arrows";
-import { palette } from "@/styles/palette";
 
+import "@/styles/config";
 import { Text } from "./text";
 
 type Option = SelectPrimitive.Option;
@@ -19,8 +19,10 @@ const SelectWidthContext = createContext<{
 
 function Select({ children, ...props }: SelectPrimitive.RootProps) {
   const [width, setWidth] = useState(0);
+  const contextValue = useMemo(() => ({ width, setWidth }), [width]);
+
   return (
-    <SelectWidthContext.Provider value={{ width, setWidth }}>
+    <SelectWidthContext.Provider value={contextValue}>
       <View style={{ alignSelf: "flex-start" }}>
         <SelectPrimitive.Root {...props}>{children}</SelectPrimitive.Root>
       </View>
@@ -40,6 +42,9 @@ function SelectTrigger({
   style?: StyleProp<ViewStyle>;
 }) {
   const { setWidth } = useContext(SelectWidthContext);
+  const { theme } = useUnistyles();
+  const triggerChildren = typeof children === "function" ? null : children;
+
   return (
     <SelectPrimitive.Trigger
       onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}
@@ -50,8 +55,8 @@ function SelectTrigger({
       ]}
       {...props}
     >
-      {children}
-      <Chevron color={palette.brand.textPrimary} style={styles.chevron} />
+      {triggerChildren}
+      <Chevron color={theme.palette.brand.textPrimary} style={styles.chevron} />
     </SelectPrimitive.Trigger>
   );
 }
@@ -76,14 +81,18 @@ function SelectContent({
   ref?: React.RefObject<SelectPrimitive.ContentRef>;
 }) {
   const { width } = useContext(SelectWidthContext);
+  const contentStyle = typeof style === "function" ? undefined : style;
+  const mergedContentStyle = [
+    styles.content,
+    width > 0 ? { width } : undefined,
+    contentStyle,
+  ].filter(Boolean) as unknown as ViewStyle;
+
   return (
     <SelectPortal>
       <SelectPrimitive.Overlay style={StyleSheet.absoluteFill}>
         <Animated.View entering={overlayEntering} exiting={overlayExiting}>
-          <SelectPrimitive.Content
-            style={[styles.content, width > 0 && { width }, style]}
-            {...props}
-          >
+          <SelectPrimitive.Content style={mergedContentStyle} {...props}>
             <SelectPrimitive.Viewport>{children}</SelectPrimitive.Viewport>
           </SelectPrimitive.Content>
         </Animated.View>
@@ -108,6 +117,8 @@ function SelectItem({
 }: SelectPrimitive.ItemProps & {
   ref?: React.RefObject<SelectPrimitive.ItemRef>;
 }) {
+  const itemChildren = typeof children === "function" ? null : children;
+
   return (
     <SelectPrimitive.Item
       style={(state) => [
@@ -118,7 +129,7 @@ function SelectItem({
       {...props}
     >
       <SelectPrimitive.ItemText style={styles.itemText} />
-      {children}
+      {itemChildren}
     </SelectPrimitive.Item>
   );
 }

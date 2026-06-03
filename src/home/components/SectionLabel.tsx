@@ -3,6 +3,8 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
+import "@/styles/config";
+
 type SectionLabelProps = {
   title: string;
   action?: string;
@@ -31,11 +33,13 @@ const styles = StyleSheet.create((theme) => ({
   },
   title: {
     fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.base,
-    color: theme.palette.brand.textPrimary,
+    fontSize: theme.fontSize.xs,
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    color: theme.palette.brand.textSecondary,
   },
   action: {
-    fontFamily: theme.fonts.medium,
+    fontFamily: theme.fonts.semiBold,
     fontSize: theme.fontSize.sm,
     color: theme.palette.brand.primaryDefault,
   },

@@ -1,42 +1,53 @@
-import { View } from "react-native";
+import { useTranslation } from "react-i18next";
+import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
+import "@/styles/config";
 import type { Reminder, ReminderStatus, ReminderTone } from "../types";
 
-const { brand } = palette;
-
 const toneColors: Record<ReminderTone, { bg: string; fg: string }> = {
-  primary: { bg: brand.primarySoft, fg: brand.primaryDark },
-  peach: { bg: brand.peachSoft, fg: brand.peachDefault },
-  warn: { bg: brand.peachSoft, fg: brand.warn },
+  primary: { bg: palette.brand.primarySoft, fg: palette.brand.primaryDark },
+  peach: { bg: palette.brand.peachSoft, fg: palette.brand.peachDefault },
+  warn: { bg: palette.brand.peachSoft, fg: palette.brand.warn },
 };
 
 function StatusChip({ status }: { status: ReminderStatus }) {
+  const { t } = useTranslation(["home"]);
+
   switch (status) {
     case "done":
-      return <Chip label="Done" tone="ok" size="sm" />;
+      return <Chip label={t("reminders.chipLabels.done")} tone="ok" size="sm" />;
     case "next":
-      return <Chip label="Next up" tone="primary" size="sm" />;
+      return <Chip label={t("reminders.chipLabels.next")} tone="primary" size="sm" />;
     case "pending":
     default:
-      return <Chip label="Pending" tone="neutral" variant="ghost" size="sm" />;
+      return (
+        <Chip label={t("reminders.chipLabels.pending")} tone="neutral" variant="ghost" size="sm" />
+      );
   }
 }
 
 type ReminderRowProps = {
   reminder: Reminder;
+  onPress?: () => void;
 };
 
-export function ReminderRow({ reminder }: ReminderRowProps) {
+export function ReminderRow({ reminder, onPress }: ReminderRowProps) {
   const { icon: IconComponent, tone, title, time, status } = reminder;
   const colors = toneColors[tone];
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${title}, ${time}`}
+      accessibilityState={{ selected: status === "done" }}
+      onPress={onPress}
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+    >
       <View style={styles.row}>
         <View style={[styles.icon, { backgroundColor: colors.bg }]}>
           <IconComponent width={18} height={18} color={colors.fg} />
@@ -47,7 +58,7 @@ export function ReminderRow({ reminder }: ReminderRowProps) {
         </View>
         <StatusChip status={status} />
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -58,6 +69,9 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.palette.brand.surfaceBorder,
     padding: theme.spacing(3),
+  },
+  cardPressed: {
+    backgroundColor: theme.palette.brand.surfaceSunken,
   },
   row: {
     flexDirection: "row",
