@@ -1,41 +1,43 @@
 import { initReactI18next } from "react-i18next";
 
-import ukCommon from "@/common/locales/uk.json";
+import enCommon from "@/common/locales/en.json";
+import enHome from "@/home/locales/en.json";
 
 import i18next from "i18next";
 
 export enum Languages {
-  uk = "uk",
+  en = "en",
 }
 
-export const languages = ["uk"] as const;
+export const languages = ["en"] as const;
 export type Lang = (typeof languages)[number];
 
-const modules = ["common"] as const;
+const modules = ["common", "home"] as const;
 
 export type I18nModule = (typeof modules)[number];
 
 type TranslationJson = { [key: string]: string | TranslationJson | string[] };
 
-const ukResources = {
-  common: ukCommon,
+const enResources = {
+  common: enCommon,
+  home: enHome,
 } as const satisfies Record<I18nModule, TranslationJson>;
 
 const resources: Record<Lang, Record<I18nModule, TranslationJson>> = {
-  uk: ukResources,
+  en: enResources,
 };
 
 declare module "i18next" {
   interface CustomTypeOptions {
     defaultNS: "common";
-    resources: typeof ukResources;
+    resources: typeof enResources;
   }
 }
 
 i18next.use(initReactI18next).init({
   resources,
-  lng: Languages.uk,
-  fallbackLng: Languages.uk,
+  lng: Languages.en,
+  fallbackLng: Languages.en,
   defaultNS: "common",
   fallbackNS: "common",
   ns: modules,

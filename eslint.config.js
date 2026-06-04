@@ -67,6 +67,7 @@ module.exports = defineConfig([
     plugins: {
       react: fixupPluginRules(react),
       "@typescript-eslint": fixupPluginRules(tsPlugin),
+      "react-compiler": fixupPluginRules(reactCompiler),
       "react-refresh": reactRefresh,
       "react-hooks": fixupPluginRules(reactHooks),
       import: fixupPluginRules(_import),
@@ -85,9 +86,14 @@ module.exports = defineConfig([
       "react/prop-types": 0,
       "react/react-in-jsx-scope": "off",
       "react/jsx-uses-react": "off",
+      "react/jsx-no-constructed-context-values": "error",
+      "react/no-unstable-nested-components": ["warn", { allowAsProps: true }],
+      "react-compiler/react-compiler": "error",
 
       "import/no-named-as-default-member": "off",
       "import/default": "off",
+      "import/no-cycle": "warn",
+      "import/no-duplicates": "error",
       "import/no-unused-modules": "off",
 
       "@typescript-eslint/no-unused-vars": [

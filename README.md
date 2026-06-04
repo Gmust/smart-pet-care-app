@@ -1,19 +1,29 @@
-# Welcome to your Expo app 👋
+# Smart Pet Care App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Cross-platform Expo app for smart pet care workflows.
 
 ## Get started
 
 1. Install dependencies
 
    ```bash
-   npm install
+   pnpm install
    ```
 
-2. Start the app
+2. Set up environment variables
 
    ```bash
-   npx expo start
+   cp .env.example .env
+   ```
+
+   Set `EXPO_PUBLIC_API_URL` to the backend host the app should call (e.g.
+   `https://smart-pet-care.duckdns.org`). Without it, API requests use relative
+   URLs and fail. See [Environment variables](#environment-variables) for the full list.
+
+3. Start the app
+
+   ```bash
+   pnpm start
    ```
 
 In the output, you'll find options to open the app in a
@@ -24,6 +34,71 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Environment variables
+
+Configured via `.env` (gitignored). Copy `.env.example` to get started.
+
+| Variable                                | Used by          | Purpose                                                                        |
+| --------------------------------------- | ---------------- | ------------------------------------------------------------------------------ |
+| `EXPO_PUBLIC_API_URL`                   | App runtime      | Backend host the app calls. Set in `src/api/config.ts` as the axios `baseURL`. |
+| `OPENAPI_USERNAME` / `OPENAPI_PASSWORD` | `pnpm api:fetch` | Basic-auth creds for the spec endpoint (maintainer-only).                      |
+| `OPENAPI_URL`                           | `pnpm api:fetch` | Optional override for the spec URL.                                            |
+
+`EXPO_PUBLIC_*` variables are inlined by Expo at build time and shipped in the client bundle — never put secrets in them.
+
+## API docs and generated client
+
+The backend exposes Scalar docs at:
+
+```text
+https://smart-pet-care.duckdns.org/scalar/v1
+```
+
+Scalar loads the OpenAPI spec from:
+
+```text
+https://smart-pet-care.duckdns.org/openapi/v1.json
+```
+
+The app keeps a local copy at `docs/openapi.json`. Refresh it with backend basic auth credentials:
+
+```bash
+pnpm api:fetch   # reads OPENAPI_USERNAME / OPENAPI_PASSWORD from .env
+```
+
+Generate the typed Axios + React Query client from `docs/openapi.json`:
+
+```bash
+pnpm api:generate
+```
+
+Refresh the spec and regenerate the client in one command:
+
+```bash
+pnpm api:update   # reads OPENAPI_USERNAME / OPENAPI_PASSWORD from .env
+```
+
+Generated API code is written to:
+
+```text
+src/api/generated/index.ts
+```
+
+### The generated client is not committed
+
+`src/api/generated/` is gitignored. It is **regenerated automatically on `pnpm install`**
+(via the `postinstall` script) from the committed `docs/openapi.json` spec, so a fresh
+clone produces the client without any credentials. You only need `api:fetch` credentials
+to pull a newer spec.
+
+If the generated client is ever missing (e.g. install ran without devDependencies), recreate it with:
+
+```bash
+pnpm api:generate
+```
+
+Do not edit generated files manually. Update the backend spec, refresh `docs/openapi.json`, then rerun generation.
 
 ## Team docs
 

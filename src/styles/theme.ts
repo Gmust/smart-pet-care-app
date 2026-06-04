@@ -3,6 +3,7 @@ import { palette } from "./palette";
 const BASE_SPACING = 4;
 const BASE_TEXT_SIZE = 16;
 const FONT_FAMILY = "Inter";
+const DISPLAY_FONT_FAMILY = "Fraunces_700Bold";
 
 const getTextSize = (s: number) => s * BASE_TEXT_SIZE;
 
@@ -14,6 +15,7 @@ export const theme = {
     dialog: "0px 4px 10px 0 rgba(0,0,0,0.35)",
   },
   fonts: {
+    display: DISPLAY_FONT_FAMILY,
     thin: FONT_FAMILY,
     extraLight: FONT_FAMILY,
     light: FONT_FAMILY,

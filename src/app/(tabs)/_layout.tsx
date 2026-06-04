@@ -1,29 +1,37 @@
-import { palette } from "@/styles/palette";
+import { useTranslation } from "react-i18next";
+import { View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+
+import { Fab } from "@/common/components/fab";
+import { TabBar } from "@/common/components/tab-bar";
 
 import { Tabs } from "expo-router";
 
+const tabs = ["home", "pets", "activity", "profile"] as const;
+
 export default function TabLayout() {
+  const { t } = useTranslation(["common"]);
+
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: palette.yellow[300],
-        tabBarInactiveTintColor: palette.gray[300],
-        headerShown: false,
-        animation: "shift",
-      }}
-    >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Test 1",
+    <View style={styles.root}>
+      <Tabs
+        tabBar={(props) => <TabBar {...props} />}
+        screenOptions={{
+          headerShown: false,
+          animation: "fade",
         }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Test 2",
-        }}
-      />
-    </Tabs>
+      >
+        {tabs.map((item) => (
+          <Tabs.Screen key={item} name={item} options={{ title: t(`navigationTabs.${item}`) }} />
+        ))}
+      </Tabs>
+      <Fab />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

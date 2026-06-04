@@ -6,12 +6,15 @@ export const palette = {
     primaryDefault: "#2d5e4e",
     primaryDark: "#1a3a2e",
     primarySoft: "#a3d9b8",
+    primaryXsoft: "#e1f5ee",
+    toast: "#e2a04f",
     ok: "#285a3f",
     warn: "#c98a3e",
     danger: "#b84a3e",
     dangerBg: "#faeada",
     peachDefault: "#7a3a1a",
     peachSoft: "#fff8ec",
+    peachIconBg: "#fff2d3",
     surfacePage: "#f5f1ea",
     surfaceSunken: "#ede6da",
     surfaceBorder: "#d6d3c8",
@@ -20,6 +23,20 @@ export const palette = {
     textFaint: "#b8c3be",
     textOnDark: "#f5f1ea",
   },
+  // Deep, muted, earthy surfaces for pet cards — all dark enough to carry the
+  // cream `textOnDark` text. Index 0 is the brand forest green (default).
+  petCard: [
+    "#1a3a2e", // forest green (brand)
+    "#1f3d3a", // pine / teal-green
+    "#1d3b4a", // deep teal-blue
+    "#24344f", // indigo slate
+    "#3a2f4d", // muted plum
+    "#4a2c3a", // mulberry
+    "#532e2a", // dark terracotta
+    "#4a3826", // coffee / umber
+    "#3a3f23", // dark olive
+    "#2c3a3f", // charcoal teal
+  ],
   slate: {
     "50": "#f8fafc",
     "100": "#f1f5f9",

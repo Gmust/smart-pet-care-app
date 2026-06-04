@@ -3,7 +3,7 @@ import type { PressableProps, ViewProps } from "react-native";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
-import BottomSheet, { BottomSheetModal, BottomSheetView } from "@expo/ui/community/bottom-sheet";
+import BottomSheet, { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import * as Slot from "@rn-primitives/slot";
 
 import { Text } from "./text";
