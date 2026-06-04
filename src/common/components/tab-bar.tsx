@@ -9,8 +9,6 @@ import { CatIcon } from "@/icons/pets";
 import { UserIcon } from "@/icons/user";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
-
 const ACTIVE_COLOR = palette.brand.primaryDefault;
 const INACTIVE_COLOR = palette.brand.textSecondary;
 

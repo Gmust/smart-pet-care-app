@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import "@/styles/config";
 import { quickActions } from "../data";
 import type { TimelineEvent } from "../types";
 import { QuickAction } from "./QuickAction";

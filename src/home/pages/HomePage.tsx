@@ -6,7 +6,6 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
-import "@/styles/config";
 import { HeaderSection } from "../components/HeaderSection";
 import { InsightSection } from "../components/InsightSection";
 import { PetOverviewSection } from "../components/PetOverviewSection";

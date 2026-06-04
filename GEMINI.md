@@ -45,7 +45,8 @@ pnpm check          # Lint + typecheck
 
 ## Code Conventions
 
-- File names: `kebab-case.tsx`
+- Directory names: kebab-case
+- File names: `PascalCase.tsx`
 - Components: PascalCase, one per file
 - Hooks: `use-*` filename, `use*` export
 - Styles: defined with `StyleSheet.create` from `react-native-unistyles`, colocated in component file or `styles/` directory

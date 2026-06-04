@@ -3,8 +3,6 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
-import "@/styles/config";
-
 type SectionLabelProps = {
   title: string;
   action?: string;

@@ -6,8 +6,6 @@ import { PlusIcon } from "@/icons/plus";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
-
 type AddPetCardProps = {
   onPress?: () => void;
 };

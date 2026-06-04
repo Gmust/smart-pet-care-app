@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 
 import { Fab } from "@/common/components/fab";
 import { TabBar } from "@/common/components/tab-bar";
 
-import "@/styles/config";
 import { Tabs } from "expo-router";
 
 const tabs = ["home", "pets", "activity", "profile"] as const;
@@ -13,7 +13,7 @@ export default function TabLayout() {
   const { t } = useTranslation(["common"]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.root}>
       <Tabs
         tabBar={(props) => <TabBar {...props} />}
         screenOptions={{
@@ -29,3 +29,9 @@ export default function TabLayout() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

@@ -4,7 +4,6 @@ import { StyleSheet } from "react-native-unistyles";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
 import type { TimelineDot, TimelineEvent } from "../types";
 
 const dotColors: Record<TimelineDot, string> = {

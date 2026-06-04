@@ -7,8 +7,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { StyleSheet } from "react-native-unistyles";
 
-import "@/styles/config";
-
 type SlideProps = {
   animationValue: SharedValue<number>;
   children: ReactNode;

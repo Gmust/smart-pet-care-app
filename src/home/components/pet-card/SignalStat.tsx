@@ -3,7 +3,6 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
-import "@/styles/config";
 import type { Signal } from "../../types";
 
 type SignalStatProps = {

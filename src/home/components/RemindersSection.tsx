@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import "@/styles/config";
 import { reminders } from "../data";
 import type { ReminderStatus } from "../types";
 import { ReminderRow } from "./ReminderRow";

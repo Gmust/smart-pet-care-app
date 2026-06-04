@@ -8,8 +8,6 @@ import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
-
 type Props = {
   date: string;
   username: string;
@@ -18,6 +16,7 @@ type Props = {
 
 export function HomeHeader({ date, username, onNotificationsPress }: Props) {
   const { t } = useTranslation(["home"]);
+
   return (
     <View style={styles.root}>
       <View>

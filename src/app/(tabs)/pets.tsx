@@ -6,8 +6,6 @@ import { CatIcon } from "@/icons/pets";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
-
 export default function PetsScreen() {
   return (
     <SafeAreaView style={styles.screen}>

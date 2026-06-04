@@ -9,8 +9,6 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
-
 const DOT_SIZE = 7;
 const DOT_ACTIVE_WIDTH = 18;
 

@@ -2,7 +2,6 @@ import { View } from "react-native";
 import type { SharedValue } from "react-native-reanimated";
 import { StyleSheet } from "react-native-unistyles";
 
-import "@/styles/config";
 import { Dot } from "./Dot";
 
 type DotsIndicatorProps = {

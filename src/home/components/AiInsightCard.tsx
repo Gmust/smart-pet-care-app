@@ -7,7 +7,6 @@ import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
 import type { AiInsight } from "../types";
 import dayjs from "dayjs";
 

@@ -6,8 +6,6 @@ import type { Option } from "@/shadecn/ui/select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shadecn/ui/select";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
-
 const MOCK_PETS: Option[] = [
   { value: "miso", label: "Miso · Domestic" },
   { value: "luna", label: "Luna · British Shorthair" },

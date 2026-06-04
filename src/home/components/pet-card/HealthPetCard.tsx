@@ -7,7 +7,6 @@ import { HeartPulseIcon } from "@/icons/heart";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
 import { SignalStat } from "./SignalStat";
 
 type SignalStatus = "ok" | "warn";

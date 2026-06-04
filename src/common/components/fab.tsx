@@ -22,7 +22,6 @@ import { PlusIcon } from "@/icons/plus";
 import { UtensilsCrossedIcon } from "@/icons/utensils";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
 import type { FabActionTone } from "./fab-menu-item";
 import { FabMenuItem } from "./fab-menu-item";
 import * as Haptics from "expo-haptics";

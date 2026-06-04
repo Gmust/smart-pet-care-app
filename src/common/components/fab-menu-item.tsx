@@ -4,8 +4,6 @@ import { StyleSheet } from "react-native-unistyles";
 import type { Icon } from "@/icons/icons";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
-
 export type FabActionTone = "primary" | "peach" | "neutral";
 
 const toneColors: Record<FabActionTone, { bg: string; fg: string }> = {

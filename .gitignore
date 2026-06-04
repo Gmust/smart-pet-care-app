@@ -54,6 +54,12 @@ app-example
 # gemini-cli settings
 .gemini/
 
+# Claude Code settings
+.claude/
+
+# Codex — personal hooks (machine-specific paths)
+.codex/
+
 # GitHub App credentials
 gha-creds-*.json
 .compass/

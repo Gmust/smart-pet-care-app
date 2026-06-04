@@ -6,7 +6,6 @@ import { StyleSheet } from "react-native-unistyles";
 import BottomSheet, { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import * as Slot from "@rn-primitives/slot";
 
-import "@/styles/config";
 import { Text } from "./text";
 
 type DrawerContextValue = {

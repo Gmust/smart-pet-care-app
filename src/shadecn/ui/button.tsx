@@ -4,7 +4,6 @@ import { ActivityIndicator, Pressable, View } from "react-native";
 import type { UnistylesVariants } from "react-native-unistyles";
 import { StyleSheet } from "react-native-unistyles";
 
-import "@/styles/config";
 import { Text, TextClassContext } from "./text";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "text" | "icon";

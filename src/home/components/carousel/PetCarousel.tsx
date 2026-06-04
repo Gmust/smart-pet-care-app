@@ -6,7 +6,6 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
 import type { PetHealth } from "../../types";
 import { AddPetCard } from "../pet-card/AddPetCard";
 import { HealthPetCard } from "../pet-card/HealthPetCard";

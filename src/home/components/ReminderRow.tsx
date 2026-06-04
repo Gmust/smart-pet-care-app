@@ -6,7 +6,6 @@ import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
 import type { Reminder, ReminderStatus, ReminderTone } from "../types";
 
 const toneColors: Record<ReminderTone, { bg: string; fg: string }> = {

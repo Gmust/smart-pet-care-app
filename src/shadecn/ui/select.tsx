@@ -7,7 +7,6 @@ import * as SelectPrimitive from "@rn-primitives/select";
 
 import { Chevron } from "@/icons/arrows";
 
-import "@/styles/config";
 import { Text } from "./text";
 
 type Option = SelectPrimitive.Option;

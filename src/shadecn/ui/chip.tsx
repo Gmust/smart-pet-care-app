@@ -1,8 +1,6 @@
 import { Pressable, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import "@/styles/config";
-
 export type ChipTone = "neutral" | "primary" | "ok" | "peach" | "warn" | "danger";
 export type ChipVariant = "default" | "ghost";
 type ChipToneKey = ChipTone | `ghost-${ChipTone}`;

@@ -8,7 +8,6 @@ import * as DialogPrimitive from "@rn-primitives/dialog";
 
 import { hexToRGBA } from "@/common/utils/colors";
 
-import "@/styles/config";
 import { Text } from "./text";
 import { BlurView } from "expo-blur";
 

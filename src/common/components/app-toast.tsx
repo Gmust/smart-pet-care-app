@@ -4,8 +4,6 @@ import type { ToastConfig, ToastConfigParams } from "react-native-toast-message"
 import { StyleSheet } from "react-native-unistyles";
 import { Ionicons } from "@expo/vector-icons";
 
-import "@/styles/config";
-
 export type AppToastVariant = "success" | "error" | "warning" | "info";
 
 type IoniconName = ComponentProps<typeof Ionicons>["name"];

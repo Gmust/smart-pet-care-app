@@ -31,8 +31,6 @@ import { Input } from "@/shadecn/ui/input";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import "@/styles/config";
-
 export default function ProfilePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { showError, showInfo, showSuccess, showWarning } = useAppToast();
