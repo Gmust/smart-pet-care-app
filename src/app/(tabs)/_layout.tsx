@@ -1,3 +1,6 @@
+// eslint-disable-next-line simple-import-sort/imports
+import "@/styles/config";
+
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";

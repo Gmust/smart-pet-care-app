@@ -13,7 +13,9 @@ expo-env.d.ts
 
 graphify-out
 
-.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 # Native
 .kotlin/
 *.orig.*
