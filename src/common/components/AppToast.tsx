@@ -4,6 +4,10 @@ import type { ToastConfig, ToastConfigParams } from "react-native-toast-message"
 import { StyleSheet } from "react-native-unistyles";
 import { Ionicons } from "@expo/vector-icons";
 
+import { palette } from "@/styles/palette";
+
+import { hexToRGBA } from "../utils/colors";
+
 export type AppToastVariant = "success" | "error" | "warning" | "info";
 
 type IoniconName = ComponentProps<typeof Ionicons>["name"];
@@ -15,19 +19,12 @@ const ICON: Record<AppToastVariant, IoniconName> = {
   info: "information-circle",
 };
 
-const ACCENT: Record<AppToastVariant, string> = {
-  success: "#a3d9b8",
-  error: "#ef4444",
-  warning: "#fcd34d",
-  info: "#7dd3fc",
-};
-
 function ThemedToast({
   variant,
   text1,
   text2,
 }: { variant: AppToastVariant } & ToastConfigParams<unknown>) {
-  const tone = ACCENT[variant];
+  const tone = palette.toastAccent[variant];
 
   return (
     <View style={styles.container}>
@@ -70,7 +67,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.spacing(4.5),
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.10)",
+    backgroundColor: hexToRGBA(theme.palette.white, 0.1),
   },
   textWrap: {
     flex: 1,

@@ -18,11 +18,26 @@
     "open": "Open quick actions",
     "close": "Close quick actions",
     "actions": {
-      "reminder": { "title": "Reminder", "subtitle": "Feed, med, vet" },
-      "feeding": { "title": "Log feeding", "subtitle": "Quick meal log" },
-      "symptom": { "title": "Log symptom", "subtitle": "Health note" },
-      "health": { "title": "Health record", "subtitle": "Vet, vaccine" },
-      "activity": { "title": "Log activity", "subtitle": "Walk, play, train" }
+      "reminder": {
+        "title": "Reminder",
+        "subtitle": "Feed, med, vet"
+      },
+      "feeding": {
+        "title": "Log feeding",
+        "subtitle": "Quick meal log"
+      },
+      "symptom": {
+        "title": "Log symptom",
+        "subtitle": "Health note"
+      },
+      "health": {
+        "title": "Health record",
+        "subtitle": "Vet, vaccine"
+      },
+      "activity": {
+        "title": "Log activity",
+        "subtitle": "Walk, play, train"
+      }
     }
   }
 }

@@ -2,8 +2,8 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { Fab } from "@/common/components/fab";
-import { TabBar } from "@/common/components/tab-bar";
+import { Fab } from "@/common/components/Fab";
+import { TabBar } from "@/common/components/TabBar";
 
 import { Tabs } from "expo-router";
 
