@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { hexToRGBA } from "@/common/utils/colors";
 import { SquareActivityIcon } from "@/icons/activity";
 import { HeartPulseIcon } from "@/icons/heart";
 import { Text } from "@/shadecn/ui/text";
@@ -106,7 +107,7 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing(1.25),
-    backgroundColor: "rgba(163,217,184,0.14)",
+    backgroundColor: hexToRGBA(theme.palette.brand.primarySoft, 0.14),
     borderRadius: theme.borderRadius.full,
     paddingHorizontal: theme.spacing(2.75),
     paddingVertical: theme.spacing(1.25),
@@ -148,6 +149,6 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: theme.spacing(2),
     paddingTop: theme.spacing(3.5),
     borderTopWidth: 1,
-    borderTopColor: "rgba(245,241,234,0.12)",
+    borderTopColor: hexToRGBA(theme.palette.brand.textOnDark, 0.12),
   },
 }));

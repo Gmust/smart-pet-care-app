@@ -77,6 +77,12 @@ const styles = StyleSheet.create((theme) => ({
 - **Unistyles**: https://www.unistyl.es/llms-full.txt
 - **Expo**: https://docs.expo.dev/llms-full.txt
 
+## Documentation Automation
+
+- Follow `docs/documentation-rules.md` when writing or updating docs.
+- Keep automated docs changes minimal, scoped to the PR, and grounded in repository files.
+- Do not edit generated files such as `src/api/generated/`.
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.

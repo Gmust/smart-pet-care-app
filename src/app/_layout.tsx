@@ -1,4 +1,7 @@
-import React, { useEffect } from "react";
+// eslint-disable-next-line simple-import-sort/imports
+import "@/i18n";
+
+import { useEffect } from "react";
 import { StatusBar } from "react-native";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 import { Fraunces_700Bold } from "@expo-google-fonts/fraunces";
@@ -6,7 +9,6 @@ import { Fraunces_700Bold } from "@expo-google-fonts/fraunces";
 import AppProvider from "@/common/providers/AppProvider";
 
 import "@/styles/config";
-import "@/i18n";
 import "dayjs/locale/en.js";
 import "dayjs/locale/ru.js";
 import "dayjs/locale/uk.js";

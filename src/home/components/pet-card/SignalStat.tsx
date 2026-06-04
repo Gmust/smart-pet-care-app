@@ -1,6 +1,7 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { hexToRGBA } from "@/common/utils/colors";
 import { Text } from "@/shadecn/ui/text";
 
 import type { Signal } from "../../types";
@@ -28,7 +29,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   colDivided: {
     borderLeftWidth: 1,
-    borderLeftColor: "rgba(245,241,234,0.12)",
+    borderLeftColor: hexToRGBA(theme.palette.brand.textOnDark, 0.12),
     paddingLeft: theme.spacing(3),
   },
   labelRow: {
@@ -45,7 +46,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.primarySoft,
   },
   dotWarn: {
-    backgroundColor: "#f5c98a",
+    backgroundColor: theme.palette.brand.warnSoft,
   },
   label: {
     fontFamily: theme.fonts.regular,

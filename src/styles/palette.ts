@@ -10,6 +10,7 @@ export const palette = {
     toast: "#e2a04f",
     ok: "#285a3f",
     warn: "#c98a3e",
+    warnSoft: "#f5c98a",
     danger: "#b84a3e",
     dangerBg: "#faeada",
     peachDefault: "#7a3a1a",
@@ -22,6 +23,13 @@ export const palette = {
     textSecondary: "#8a9a93",
     textFaint: "#b8c3be",
     textOnDark: "#f5f1ea",
+  },
+  // Accent colors for toast icons, keyed by toast variant.
+  toastAccent: {
+    success: "#a3d9b8",
+    error: "#ef4444",
+    warning: "#fcd34d",
+    info: "#7dd3fc",
   },
   // Deep, muted, earthy surfaces for pet cards — all dark enough to carry the
   // cream `textOnDark` text. Index 0 is the brand forest green (default).

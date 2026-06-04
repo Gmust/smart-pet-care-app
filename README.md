@@ -102,8 +102,7 @@ Do not edit generated files manually. Update the backend spec, refresh `docs/ope
 
 ## Team docs
 
-- PR review guidelines: `docs/pr-review.md`
-- Gemini PR automation: `docs/gemini-pr-automation.md`
+- Claude/Compass PR automation: `docs/claude-pr-automation.md`
 
 ## Get a fresh project
 

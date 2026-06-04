@@ -22,8 +22,9 @@ import { PlusIcon } from "@/icons/plus";
 import { UtensilsCrossedIcon } from "@/icons/utensils";
 import { palette } from "@/styles/palette";
 
-import type { FabActionTone } from "./fab-menu-item";
-import { FabMenuItem } from "./fab-menu-item";
+import { hexToRGBA } from "../utils/colors";
+import type { FabActionTone } from "./FabMenuItem";
+import { FabMenuItem } from "./FabMenuItem";
 import * as Haptics from "expo-haptics";
 
 type FabActionId = "reminder" | "feeding" | "symptom" | "health" | "activity";
@@ -138,9 +139,7 @@ const styles = StyleSheet.create((theme) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    // Dimming baked into the color so the FadeIn/FadeOut layout animation
-    // owns `opacity` without conflict (primaryDark #1a3a2e @ 18%).
-    backgroundColor: "rgba(26,58,46,0.18)",
+    backgroundColor: hexToRGBA(theme.palette.brand.primaryDark, 0.18),
   },
   sheet: {
     position: "absolute",

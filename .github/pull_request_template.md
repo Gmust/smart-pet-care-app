@@ -19,7 +19,7 @@ If docs are required, note the target file:
 
 `docs/...`
 
-If you want Gemini to write the docs update for this PR, add the `gemini:docs` label.
+Compass updates documentation automatically for pull requests from this repository.
 
 ## Risk Notes
 

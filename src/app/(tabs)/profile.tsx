@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 
-import { useAppToast } from "@/common/hooks/use-app-toast";
 import { CatIcon } from "@/icons/pets";
 import Utensils from "@/icons/utensils";
 import { Button } from "@/shadecn/ui/button";
@@ -33,7 +33,6 @@ import { palette } from "@/styles/palette";
 
 export default function ProfilePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { showError, showInfo, showSuccess, showWarning } = useAppToast();
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -63,7 +62,13 @@ export default function ProfilePage() {
             size="sm"
             variant="secondary"
             style={styles.toastButton}
-            onPress={() => showSuccess("Bella's feeding schedule was updated.")}
+            onPress={() =>
+              Toast.show({
+                type: "success",
+                text1: "Saved",
+                text2: "Bella's feeding schedule was updated.",
+              })
+            }
           >
             Success
           </Button>
@@ -71,7 +76,13 @@ export default function ProfilePage() {
             size="sm"
             variant="ghost"
             style={styles.toastButton}
-            onPress={() => showInfo("Vet visit details synced across devices.")}
+            onPress={() =>
+              Toast.show({
+                type: "info",
+                text1: "Update",
+                text2: "Vet visit details synced across devices.",
+              })
+            }
           >
             Info
           </Button>
@@ -79,7 +90,13 @@ export default function ProfilePage() {
             size="sm"
             variant="ghost"
             style={styles.toastButton}
-            onPress={() => showWarning("Medication reminder is due in 15 minutes.")}
+            onPress={() =>
+              Toast.show({
+                type: "warning",
+                text1: "Reminder",
+                text2: "Medication reminder is due in 15 minutes.",
+              })
+            }
           >
             Warning
           </Button>
@@ -87,7 +104,13 @@ export default function ProfilePage() {
             size="sm"
             variant="danger"
             style={styles.toastButton}
-            onPress={() => showError("Could not save the profile test change.")}
+            onPress={() =>
+              Toast.show({
+                type: "error",
+                text1: "Needs attention",
+                text2: "Could not save the profile test change.",
+              })
+            }
           >
             Error
           </Button>

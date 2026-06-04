@@ -1,0 +1,339 @@
+{
+  "module": "frontend",
+  "summary": "Smart Pet Care is a cross-platform React Native / Expo mobile app for managing pet health, reminders, and activity. It provides a tab-based UI with a Home dashboard (pet health carousel, AI insight card, today's reminders, quick-action shortcuts, and a recent-events timeline), placeholder Pets and Activity screens, and a Profile screen that demos UI primitives. The app talks to a backend REST API via an auto-generated, typed Axios + React Query client built from an OpenAPI spec. Authentication (register, login, Google OAuth, refresh, logout), user management, and reminder CRUD are all covered by the API contract. The UI design system is built on react-native-unistyles with a custom theme, and includes Button, Chip, Input, Select, Dialog, Drawer, Toast, FAB, TabBar, and a suite of SVG icon components.",
+  "techStack": [
+    "TypeScript",
+    "React Native",
+    "Expo / Expo Router",
+    "React Query (@tanstack/react-query)",
+    "Axios",
+    "react-native-unistyles",
+    "react-i18next / i18next",
+    "dayjs",
+    "react-native-reanimated",
+    "react-native-reanimated-carousel",
+    "@gorhom/bottom-sheet",
+    "@rn-primitives/dialog",
+    "@rn-primitives/select",
+    "@rn-primitives/portal",
+    "react-native-svg",
+    "react-native-toast-message",
+    "expo-router",
+    "expo-haptics",
+    "expo-blur",
+    "expo-font",
+    "expo-splash-screen"
+  ],
+  "capabilities": [
+    {
+      "name": "Axios base URL configuration",
+      "kind": "config",
+      "paths": [
+        "src/api/config.ts"
+      ],
+      "documented": true
+    },
+    {
+      "name": "React Query client setup",
+      "kind": "service",
+      "paths": [
+        "src/api/queryClient.ts"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Root app layout with font loading, splash screen, providers, and navigation stack",
+      "kind": "screen",
+      "paths": [
+        "src/app/_layout.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Tab navigation layout (Home, Pets, Activity, Profile) with FAB",
+      "kind": "screen",
+      "paths": [
+        "src/app/(tabs)/_layout.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Home screen – pet health carousel, AI insight, reminders, quick actions, timeline",
+      "kind": "screen",
+      "paths": [
+        "src/app/(tabs)/home.tsx",
+        "src/home/pages/HomePage.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Pets screen (placeholder)",
+      "kind": "screen",
+      "paths": [
+        "src/app/(tabs)/pets.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Activity screen (placeholder)",
+      "kind": "screen",
+      "paths": [
+        "src/app/(tabs)/activity.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Profile screen with UI primitive showcase (toast, dialog, drawer, input, chip)",
+      "kind": "screen",
+      "paths": [
+        "src/app/(tabs)/profile.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Root redirect to home tab",
+      "kind": "screen",
+      "paths": [
+        "src/app/index.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Global app providers (QueryClient, GestureHandler, BottomSheetModal, Portal, Toast)",
+      "kind": "service",
+      "paths": [
+        "src/common/providers/AppProvider.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Floating Action Button (FAB) with animated menu of quick-action items",
+      "kind": "lib",
+      "paths": [
+        "src/common/components/Fab.tsx",
+        "src/common/components/FabMenuItem.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Custom tab bar component",
+      "kind": "lib",
+      "paths": [
+        "src/common/components/TabBar.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Toast notification system (success, error, warning, info variants)",
+      "kind": "lib",
+      "paths": [
+        "src/common/components/AppToast.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "i18n internationalisation setup (English, common + home namespaces)",
+      "kind": "config",
+      "paths": [
+        "src/i18n.ts"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Unistyles theme and design-token configuration",
+      "kind": "config",
+      "paths": [
+        "src/styles/config.ts",
+        "src/styles/theme.ts",
+        "src/styles/palette.ts"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Pet health data models (PetHealth, Reminder, AiInsight, TimelineEvent, etc.)",
+      "kind": "model",
+      "paths": [
+        "src/home/types.ts"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Home page mock data (pets, reminders, quick actions, timeline events, AI insight)",
+      "kind": "lib",
+      "paths": [
+        "src/home/data.ts"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Pet health carousel with animated slides and dot indicator",
+      "kind": "lib",
+      "paths": [
+        "src/home/components/carousel/PetCarousel.tsx",
+        "src/home/components/carousel/PetCarouselSlide.tsx",
+        "src/home/components/carousel/DotsIndicator.tsx",
+        "src/home/components/carousel/Dot.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "HealthPetCard – per-pet health score and signal stats card",
+      "kind": "lib",
+      "paths": [
+        "src/home/components/pet-card/HealthPetCard.tsx",
+        "src/home/components/pet-card/SignalStat.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "AddPetCard – CTA card in carousel to add a new pet",
+      "kind": "lib",
+      "paths": [
+        "src/home/components/pet-card/AddPetCard.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "AI insight card with ask-assistant and dismiss actions",
+      "kind": "lib",
+      "paths": [
+        "src/home/components/AiInsightCard.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Today's reminders list with status toggle (done / pending / next)",
+      "kind": "lib",
+      "paths": [
+        "src/home/components/RemindersSection.tsx",
+        "src/home/components/ReminderRow.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Quick actions grid (log meal, note symptom, upload vet file, set reminder)",
+      "kind": "lib",
+      "paths": [
+        "src/home/components/QuickActionsSection.tsx",
+        "src/home/components/QuickAction.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Recent events timeline",
+      "kind": "lib",
+      "paths": [
+        "src/home/components/TimelineSection.tsx",
+        "src/home/components/TimelineRow.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Home header with greeting and notifications button",
+      "kind": "lib",
+      "paths": [
+        "src/home/components/HomeHeader.tsx",
+        "src/home/components/HeaderSection.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Pet switcher dropdown (Select primitive)",
+      "kind": "lib",
+      "paths": [
+        "src/home/components/PetSwitcher.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Button UI primitive (variants: primary, secondary, ghost, danger, text, icon)",
+      "kind": "lib",
+      "paths": [
+        "src/shadecn/ui/button.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Chip UI primitive (tone and variant system)",
+      "kind": "lib",
+      "paths": [
+        "src/shadecn/ui/chip.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Dialog UI primitive (animated, portal-based)",
+      "kind": "lib",
+      "paths": [
+        "src/shadecn/ui/dialog.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Drawer / bottom-sheet UI primitive (Gorhom BottomSheetModal wrapper)",
+      "kind": "lib",
+      "paths": [
+        "src/shadecn/ui/drawer.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Input UI primitive (label, helper text, error state, slots)",
+      "kind": "lib",
+      "paths": [
+        "src/shadecn/ui/input.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Select / dropdown UI primitive",
+      "kind": "lib",
+      "paths": [
+        "src/shadecn/ui/select.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Text UI primitive with theme context",
+      "kind": "lib",
+      "paths": [
+        "src/shadecn/ui/text.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "SVG icon library (activity, bell, briefcase-medical, calendar-heart, fish, hand, heart, home, pets, plus, stethoscope, syringe, thermometer, user, utensils, arrows)",
+      "kind": "lib",
+      "paths": [
+        "src/icons/StyledSvg.tsx",
+        "src/icons/icons.d.ts",
+        "src/icons/activity/index.tsx",
+        "src/icons/bell/index.tsx",
+        "src/icons/pets/index.ts",
+        "src/icons/utensils/index.tsx",
+        "src/icons/heart/index.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Shared utilities (color interpolation, hex-to-rgba, daytime label)",
+      "kind": "lib",
+      "paths": [
+        "src/common/utils/colors.ts",
+        "src/common/utils/getDaytime.ts"
+      ],
+      "documented": false
+    }
+  ],
+  "docGaps": [
+    "React Query client configuration (stale time, retry policy)",
+    "Generated API client usage and structure (src/api/generated/ is gitignored and undocumented beyond generation instructions)",
+    "UI primitive components (Button, Chip, Dialog, Drawer, Input, Select) – no usage or API docs",
+    "FAB quick-action menu – available actions and extensibility not documented",
+    "i18n setup and how to add new languages or namespaces",
+    "Unistyles theme tokens and design system palette – no developer reference",
+    "Home page sections and mock-data wiring – not documented",
+    "Pet carousel and health card components",
+    "Icon library catalogue – no visual or usage reference"
+  ]
+}
