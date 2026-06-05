@@ -32,16 +32,8 @@ function ThemedToast({
         <Ionicons name={ICON[variant]} size={20} color={tone} />
       </View>
       <View style={styles.textWrap}>
-        {!!text1 && (
-          <Text style={styles.title} numberOfLines={1}>
-            {text1}
-          </Text>
-        )}
-        {!!text2 && (
-          <Text style={styles.message} numberOfLines={2}>
-            {text2}
-          </Text>
-        )}
+        {!!text1 && <Text style={styles.title}>{text1}</Text>}
+        {!!text2 && <Text style={styles.message}>{text2}</Text>}
       </View>
     </View>
   );
@@ -71,9 +63,11 @@ const styles = StyleSheet.create((theme) => ({
   },
   textWrap: {
     flex: 1,
+    flexShrink: 1,
   },
   title: {
     color: theme.palette.brand.textOnDark,
+    flexShrink: 1,
     fontFamily: theme.fonts.semiBold,
     fontSize: theme.fontSize.sm,
     lineHeight: theme.textSizing(1.25),
@@ -81,6 +75,7 @@ const styles = StyleSheet.create((theme) => ({
   message: {
     color: theme.palette.brand.textOnDark,
     opacity: 0.72,
+    flexShrink: 1,
     fontFamily: theme.fonts.regular,
     fontSize: theme.fontSize.xs,
     lineHeight: theme.textSizing(1.1),

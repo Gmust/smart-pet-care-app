@@ -26,143 +26,117 @@
   ],
   "capabilities": [
     {
-      "name": "Axios base URL configuration",
+      "name": "Axios base URL configuration and auth interceptor bootstrap",
       "kind": "config",
-      "paths": [
-        "src/api/config.ts"
-      ],
+      "paths": ["src/api/config.ts"],
+      "documented": true
+    },
+    {
+      "name": "Axios auth interceptors (Bearer token injection and 401 sign-out handler)",
+      "kind": "service",
+      "paths": ["src/api/interceptors.ts"],
+      "documented": true
+    },
+    {
+      "name": "Session persistence in OS keychain via expo-secure-store",
+      "kind": "service",
+      "paths": ["src/api/tokenStorage.ts"],
       "documented": true
     },
     {
       "name": "React Query client setup",
       "kind": "service",
-      "paths": [
-        "src/api/queryClient.ts"
-      ],
-      "documented": false
+      "paths": ["src/api/queryClient.ts"],
+      "documented": true
     },
     {
       "name": "Root app layout with font loading, splash screen, providers, and navigation stack",
       "kind": "screen",
-      "paths": [
-        "src/app/_layout.tsx"
-      ],
+      "paths": ["src/app/_layout.tsx"],
       "documented": false
     },
     {
       "name": "Tab navigation layout (Home, Pets, Activity, Profile) with FAB",
       "kind": "screen",
-      "paths": [
-        "src/app/(tabs)/_layout.tsx"
-      ],
+      "paths": ["src/app/(tabs)/_layout.tsx"],
       "documented": false
     },
     {
       "name": "Home screen – pet health carousel, AI insight, reminders, quick actions, timeline",
       "kind": "screen",
-      "paths": [
-        "src/app/(tabs)/home.tsx",
-        "src/home/pages/HomePage.tsx"
-      ],
+      "paths": ["src/app/(tabs)/home.tsx", "src/home/pages/HomePage.tsx"],
       "documented": false
     },
     {
       "name": "Pets screen (placeholder)",
       "kind": "screen",
-      "paths": [
-        "src/app/(tabs)/pets.tsx"
-      ],
+      "paths": ["src/app/(tabs)/pets.tsx"],
       "documented": false
     },
     {
       "name": "Activity screen (placeholder)",
       "kind": "screen",
-      "paths": [
-        "src/app/(tabs)/activity.tsx"
-      ],
+      "paths": ["src/app/(tabs)/activity.tsx"],
       "documented": false
     },
     {
       "name": "Profile screen with UI primitive showcase (toast, dialog, drawer, input, chip)",
       "kind": "screen",
-      "paths": [
-        "src/app/(tabs)/profile.tsx"
-      ],
+      "paths": ["src/app/(tabs)/profile.tsx"],
       "documented": false
     },
     {
       "name": "Root redirect to home tab",
       "kind": "screen",
-      "paths": [
-        "src/app/index.tsx"
-      ],
+      "paths": ["src/app/index.tsx"],
       "documented": false
     },
     {
       "name": "Global app providers (QueryClient, GestureHandler, BottomSheetModal, Portal, Toast)",
       "kind": "service",
-      "paths": [
-        "src/common/providers/AppProvider.tsx"
-      ],
+      "paths": ["src/common/providers/AppProvider.tsx"],
       "documented": false
     },
     {
       "name": "Floating Action Button (FAB) with animated menu of quick-action items",
       "kind": "lib",
-      "paths": [
-        "src/common/components/Fab.tsx",
-        "src/common/components/FabMenuItem.tsx"
-      ],
+      "paths": ["src/common/components/Fab.tsx", "src/common/components/FabMenuItem.tsx"],
       "documented": false
     },
     {
       "name": "Custom tab bar component",
       "kind": "lib",
-      "paths": [
-        "src/common/components/TabBar.tsx"
-      ],
+      "paths": ["src/common/components/TabBar.tsx"],
       "documented": false
     },
     {
       "name": "Toast notification system (success, error, warning, info variants)",
       "kind": "lib",
-      "paths": [
-        "src/common/components/AppToast.tsx"
-      ],
+      "paths": ["src/common/components/AppToast.tsx"],
       "documented": false
     },
     {
       "name": "i18n internationalisation setup (English, common + home namespaces)",
       "kind": "config",
-      "paths": [
-        "src/i18n.ts"
-      ],
+      "paths": ["src/i18n.ts"],
       "documented": false
     },
     {
       "name": "Unistyles theme and design-token configuration",
       "kind": "config",
-      "paths": [
-        "src/styles/config.ts",
-        "src/styles/theme.ts",
-        "src/styles/palette.ts"
-      ],
+      "paths": ["src/styles/config.ts", "src/styles/theme.ts", "src/styles/palette.ts"],
       "documented": false
     },
     {
       "name": "Pet health data models (PetHealth, Reminder, AiInsight, TimelineEvent, etc.)",
       "kind": "model",
-      "paths": [
-        "src/home/types.ts"
-      ],
+      "paths": ["src/home/types.ts"],
       "documented": false
     },
     {
       "name": "Home page mock data (pets, reminders, quick actions, timeline events, AI insight)",
       "kind": "lib",
-      "paths": [
-        "src/home/data.ts"
-      ],
+      "paths": ["src/home/data.ts"],
       "documented": false
     },
     {
@@ -188,26 +162,19 @@
     {
       "name": "AddPetCard – CTA card in carousel to add a new pet",
       "kind": "lib",
-      "paths": [
-        "src/home/components/pet-card/AddPetCard.tsx"
-      ],
+      "paths": ["src/home/components/pet-card/AddPetCard.tsx"],
       "documented": false
     },
     {
       "name": "AI insight card with ask-assistant and dismiss actions",
       "kind": "lib",
-      "paths": [
-        "src/home/components/AiInsightCard.tsx"
-      ],
+      "paths": ["src/home/components/AiInsightCard.tsx"],
       "documented": false
     },
     {
       "name": "Today's reminders list with status toggle (done / pending / next)",
       "kind": "lib",
-      "paths": [
-        "src/home/components/RemindersSection.tsx",
-        "src/home/components/ReminderRow.tsx"
-      ],
+      "paths": ["src/home/components/RemindersSection.tsx", "src/home/components/ReminderRow.tsx"],
       "documented": false
     },
     {
@@ -222,83 +189,61 @@
     {
       "name": "Recent events timeline",
       "kind": "lib",
-      "paths": [
-        "src/home/components/TimelineSection.tsx",
-        "src/home/components/TimelineRow.tsx"
-      ],
+      "paths": ["src/home/components/TimelineSection.tsx", "src/home/components/TimelineRow.tsx"],
       "documented": false
     },
     {
       "name": "Home header with greeting and notifications button",
       "kind": "lib",
-      "paths": [
-        "src/home/components/HomeHeader.tsx",
-        "src/home/components/HeaderSection.tsx"
-      ],
+      "paths": ["src/home/components/HomeHeader.tsx", "src/home/components/HeaderSection.tsx"],
       "documented": false
     },
     {
       "name": "Pet switcher dropdown (Select primitive)",
       "kind": "lib",
-      "paths": [
-        "src/home/components/PetSwitcher.tsx"
-      ],
+      "paths": ["src/home/components/PetSwitcher.tsx"],
       "documented": false
     },
     {
       "name": "Button UI primitive (variants: primary, secondary, ghost, danger, text, icon)",
       "kind": "lib",
-      "paths": [
-        "src/shadecn/ui/button.tsx"
-      ],
+      "paths": ["src/shadecn/ui/button.tsx"],
       "documented": false
     },
     {
       "name": "Chip UI primitive (tone and variant system)",
       "kind": "lib",
-      "paths": [
-        "src/shadecn/ui/chip.tsx"
-      ],
+      "paths": ["src/shadecn/ui/chip.tsx"],
       "documented": false
     },
     {
       "name": "Dialog UI primitive (animated, portal-based)",
       "kind": "lib",
-      "paths": [
-        "src/shadecn/ui/dialog.tsx"
-      ],
+      "paths": ["src/shadecn/ui/dialog.tsx"],
       "documented": false
     },
     {
       "name": "Drawer / bottom-sheet UI primitive (Gorhom BottomSheetModal wrapper)",
       "kind": "lib",
-      "paths": [
-        "src/shadecn/ui/drawer.tsx"
-      ],
+      "paths": ["src/shadecn/ui/drawer.tsx"],
       "documented": false
     },
     {
       "name": "Input UI primitive (label, helper text, error state, slots)",
       "kind": "lib",
-      "paths": [
-        "src/shadecn/ui/input.tsx"
-      ],
+      "paths": ["src/shadecn/ui/input.tsx"],
       "documented": false
     },
     {
       "name": "Select / dropdown UI primitive",
       "kind": "lib",
-      "paths": [
-        "src/shadecn/ui/select.tsx"
-      ],
+      "paths": ["src/shadecn/ui/select.tsx"],
       "documented": false
     },
     {
       "name": "Text UI primitive with theme context",
       "kind": "lib",
-      "paths": [
-        "src/shadecn/ui/text.tsx"
-      ],
+      "paths": ["src/shadecn/ui/text.tsx"],
       "documented": false
     },
     {
@@ -318,15 +263,11 @@
     {
       "name": "Shared utilities (color interpolation, hex-to-rgba, daytime label)",
       "kind": "lib",
-      "paths": [
-        "src/common/utils/colors.ts",
-        "src/common/utils/getDaytime.ts"
-      ],
+      "paths": ["src/common/utils/colors.ts", "src/common/utils/getDaytime.ts"],
       "documented": false
     }
   ],
   "docGaps": [
-    "React Query client configuration (stale time, retry policy)",
     "Generated API client usage and structure (src/api/generated/ is gitignored and undocumented beyond generation instructions)",
     "UI primitive components (Button, Chip, Dialog, Drawer, Input, Select) – no usage or API docs",
     "FAB quick-action menu – available actions and extensibility not documented",

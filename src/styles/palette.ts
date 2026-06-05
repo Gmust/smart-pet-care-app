@@ -20,6 +20,7 @@ export const palette = {
     surfaceSunken: "#ede6da",
     surfaceBorder: "#d6d3c8",
     textPrimary: "#2d3b36",
+    textBody: "#4a5651",
     textSecondary: "#8a9a93",
     textFaint: "#b8c3be",
     textOnDark: "#f5f1ea",

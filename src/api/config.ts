@@ -1,3 +1,4 @@
+import { registerAuthInterceptors } from "./interceptors";
 import axios from "axios";
 
 // Expo inlines EXPO_PUBLIC_* env vars at build time. Set in your .env (see .env.example).
@@ -13,3 +14,6 @@ if (!baseURL) {
 // relative paths like `/api/reminders`, so configuring the default baseURL here
 // applies to every request.
 axios.defaults.baseURL = baseURL;
+
+// Attach the Bearer-token request interceptor and the 401 handler exactly once.
+registerAuthInterceptors();
