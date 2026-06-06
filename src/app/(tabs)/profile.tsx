@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useAuth } from "@/auth/hooks/useAuth";
 import { CatIcon } from "@/icons/pets";
 import Utensils from "@/icons/utensils";
 import { Button } from "@/shadecn/ui/button";
@@ -31,8 +32,17 @@ import { Input } from "@/shadecn/ui/input";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
+import { useRouter } from "expo-router";
+
 export default function ProfilePage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.replace("/(auth)/welcome");
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -156,7 +166,7 @@ export default function ProfilePage() {
             </Text>
           </View>
           <DrawerFooter>
-            <Button size="md" variant="primary">
+            <Button size="md" variant="primary" onPress={handleSignOut}>
               Sign out
             </Button>
             <DrawerClose asChild>

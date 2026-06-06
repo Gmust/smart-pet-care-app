@@ -1,64 +1,105 @@
 {
   "module": "frontend",
-  "summary": "Smart Pet Care is a cross-platform React Native / Expo mobile app for managing pet health, reminders, and activity. It provides a tab-based UI with a Home dashboard (pet health carousel, AI insight card, today's reminders, quick-action shortcuts, and a recent-events timeline), placeholder Pets and Activity screens, and a Profile screen that demos UI primitives. The app talks to a backend REST API via an auto-generated, typed Axios + React Query client built from an OpenAPI spec. Authentication (register, login, Google OAuth, refresh, logout), user management, and reminder CRUD are all covered by the API contract. The UI design system is built on react-native-unistyles with a custom theme, and includes Button, Chip, Input, Select, Dialog, Drawer, Toast, FAB, TabBar, and a suite of SVG icon components.",
+  "summary": "Smart Pet Care is a cross-platform React Native / Expo mobile app (iOS, Android, web) for managing pet health and care workflows. It provides email and Google OAuth authentication, a home dashboard with pet health cards, reminders, a care timeline, AI insights, and quick-action shortcuts. All HTTP traffic goes through a global axios instance configured with a JWT bearer-token interceptor and a 401 sign-out handler; the typed API client is auto-generated from an OpenAPI spec. UI is built with react-native-unistyles, shadcn-style primitive components (Button, Chip, Dialog, Drawer, Input, Select), and react-native-reanimated animations.",
   "techStack": [
     "TypeScript",
     "React Native",
     "Expo / Expo Router",
-    "React Query (@tanstack/react-query)",
     "Axios",
+    "TanStack React Query",
+    "TanStack Form",
+    "Zod",
     "react-native-unistyles",
-    "react-i18next / i18next",
-    "dayjs",
     "react-native-reanimated",
-    "react-native-reanimated-carousel",
     "@gorhom/bottom-sheet",
-    "@rn-primitives/dialog",
-    "@rn-primitives/select",
-    "@rn-primitives/portal",
-    "react-native-svg",
-    "react-native-toast-message",
-    "expo-router",
-    "expo-haptics",
-    "expo-blur",
-    "expo-font",
-    "expo-splash-screen"
+    "@rn-primitives",
+    "@react-native-google-signin/google-signin",
+    "expo-secure-store",
+    "i18next / react-i18next",
+    "dayjs"
   ],
   "capabilities": [
     {
-      "name": "Axios base URL configuration",
-      "kind": "config",
+      "name": "Email register / login (JWT)",
+      "kind": "service",
       "paths": [
-        "src/api/config.ts"
+        "src/auth/pages/AuthPage.tsx",
+        "src/auth/components/EmailAuthForm.tsx",
+        "src/auth/schemas/auth.schema.ts"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Google OAuth mobile sign-in",
+      "kind": "service",
+      "paths": [
+        "src/auth/components/GoogleAuthButton.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Auth session management (persist, restore, sign-out)",
+      "kind": "service",
+      "paths": [
+        "src/auth/context/AuthContext.tsx",
+        "src/api/tokenStorage.ts"
       ],
       "documented": true
     },
     {
-      "name": "React Query client setup",
-      "kind": "service",
+      "name": "Axios base URL and JWT bearer-token interceptor",
+      "kind": "lib",
+      "paths": [
+        "src/api/config.ts",
+        "src/api/interceptors.ts"
+      ],
+      "documented": true
+    },
+    {
+      "name": "401 unauthorised handler wired to sign-out",
+      "kind": "lib",
+      "paths": [
+        "src/api/interceptors.ts",
+        "src/auth/context/AuthContext.tsx"
+      ],
+      "documented": true
+    },
+    {
+      "name": "Secure token storage (expo-secure-store)",
+      "kind": "lib",
+      "paths": [
+        "src/api/tokenStorage.ts"
+      ],
+      "documented": true
+    },
+    {
+      "name": "React Query client singleton",
+      "kind": "lib",
       "paths": [
         "src/api/queryClient.ts"
       ],
-      "documented": false
+      "documented": true
     },
     {
-      "name": "Root app layout with font loading, splash screen, providers, and navigation stack",
+      "name": "Welcome / onboarding screen",
       "kind": "screen",
       "paths": [
-        "src/app/_layout.tsx"
+        "src/app/(auth)/welcome.tsx",
+        "src/auth/pages/WelcomePage.tsx"
       ],
       "documented": false
     },
     {
-      "name": "Tab navigation layout (Home, Pets, Activity, Profile) with FAB",
+      "name": "Sign-in / register screen",
       "kind": "screen",
       "paths": [
-        "src/app/(tabs)/_layout.tsx"
+        "src/app/(auth)/sign-in.tsx",
+        "src/auth/pages/AuthPage.tsx"
       ],
       "documented": false
     },
     {
-      "name": "Home screen – pet health carousel, AI insight, reminders, quick actions, timeline",
+      "name": "Home dashboard screen",
       "kind": "screen",
       "paths": [
         "src/app/(tabs)/home.tsx",
@@ -67,15 +108,53 @@
       "documented": false
     },
     {
-      "name": "Pets screen (placeholder)",
+      "name": "Pet health overview carousel",
       "kind": "screen",
       "paths": [
-        "src/app/(tabs)/pets.tsx"
+        "src/home/components/carousel/PetCarousel.tsx",
+        "src/home/components/pet-card/HealthPetCard.tsx",
+        "src/home/components/PetOverviewSection.tsx"
       ],
       "documented": false
     },
     {
-      "name": "Activity screen (placeholder)",
+      "name": "Today's reminders list",
+      "kind": "screen",
+      "paths": [
+        "src/home/components/RemindersSection.tsx",
+        "src/home/components/ReminderRow.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Recent care timeline",
+      "kind": "screen",
+      "paths": [
+        "src/home/components/TimelineSection.tsx",
+        "src/home/components/TimelineRow.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "AI insight card",
+      "kind": "screen",
+      "paths": [
+        "src/home/components/AiInsightCard.tsx",
+        "src/home/components/InsightSection.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Quick actions panel",
+      "kind": "screen",
+      "paths": [
+        "src/home/components/QuickActionsSection.tsx",
+        "src/home/components/QuickAction.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Activity screen (stub)",
       "kind": "screen",
       "paths": [
         "src/app/(tabs)/activity.tsx"
@@ -83,7 +162,15 @@
       "documented": false
     },
     {
-      "name": "Profile screen with UI primitive showcase (toast, dialog, drawer, input, chip)",
+      "name": "Pets screen (stub)",
+      "kind": "screen",
+      "paths": [
+        "src/app/(tabs)/pets.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Profile screen (sign-out, UI primitives showcase)",
       "kind": "screen",
       "paths": [
         "src/app/(tabs)/profile.tsx"
@@ -91,23 +178,7 @@
       "documented": false
     },
     {
-      "name": "Root redirect to home tab",
-      "kind": "screen",
-      "paths": [
-        "src/app/index.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Global app providers (QueryClient, GestureHandler, BottomSheetModal, Portal, Toast)",
-      "kind": "service",
-      "paths": [
-        "src/common/providers/AppProvider.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Floating Action Button (FAB) with animated menu of quick-action items",
+      "name": "Floating action button (FAB) with quick-log menu",
       "kind": "lib",
       "paths": [
         "src/common/components/Fab.tsx",
@@ -116,7 +187,7 @@
       "documented": false
     },
     {
-      "name": "Custom tab bar component",
+      "name": "Custom tab bar",
       "kind": "lib",
       "paths": [
         "src/common/components/TabBar.tsx"
@@ -124,7 +195,7 @@
       "documented": false
     },
     {
-      "name": "Toast notification system (success, error, warning, info variants)",
+      "name": "Toast notifications",
       "kind": "lib",
       "paths": [
         "src/common/components/AppToast.tsx"
@@ -132,121 +203,7 @@
       "documented": false
     },
     {
-      "name": "i18n internationalisation setup (English, common + home namespaces)",
-      "kind": "config",
-      "paths": [
-        "src/i18n.ts"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Unistyles theme and design-token configuration",
-      "kind": "config",
-      "paths": [
-        "src/styles/config.ts",
-        "src/styles/theme.ts",
-        "src/styles/palette.ts"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Pet health data models (PetHealth, Reminder, AiInsight, TimelineEvent, etc.)",
-      "kind": "model",
-      "paths": [
-        "src/home/types.ts"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Home page mock data (pets, reminders, quick actions, timeline events, AI insight)",
-      "kind": "lib",
-      "paths": [
-        "src/home/data.ts"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Pet health carousel with animated slides and dot indicator",
-      "kind": "lib",
-      "paths": [
-        "src/home/components/carousel/PetCarousel.tsx",
-        "src/home/components/carousel/PetCarouselSlide.tsx",
-        "src/home/components/carousel/DotsIndicator.tsx",
-        "src/home/components/carousel/Dot.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "HealthPetCard – per-pet health score and signal stats card",
-      "kind": "lib",
-      "paths": [
-        "src/home/components/pet-card/HealthPetCard.tsx",
-        "src/home/components/pet-card/SignalStat.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "AddPetCard – CTA card in carousel to add a new pet",
-      "kind": "lib",
-      "paths": [
-        "src/home/components/pet-card/AddPetCard.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "AI insight card with ask-assistant and dismiss actions",
-      "kind": "lib",
-      "paths": [
-        "src/home/components/AiInsightCard.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Today's reminders list with status toggle (done / pending / next)",
-      "kind": "lib",
-      "paths": [
-        "src/home/components/RemindersSection.tsx",
-        "src/home/components/ReminderRow.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Quick actions grid (log meal, note symptom, upload vet file, set reminder)",
-      "kind": "lib",
-      "paths": [
-        "src/home/components/QuickActionsSection.tsx",
-        "src/home/components/QuickAction.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Recent events timeline",
-      "kind": "lib",
-      "paths": [
-        "src/home/components/TimelineSection.tsx",
-        "src/home/components/TimelineRow.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Home header with greeting and notifications button",
-      "kind": "lib",
-      "paths": [
-        "src/home/components/HomeHeader.tsx",
-        "src/home/components/HeaderSection.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Pet switcher dropdown (Select primitive)",
-      "kind": "lib",
-      "paths": [
-        "src/home/components/PetSwitcher.tsx"
-      ],
-      "documented": false
-    },
-    {
-      "name": "Button UI primitive (variants: primary, secondary, ghost, danger, text, icon)",
+      "name": "Button primitive",
       "kind": "lib",
       "paths": [
         "src/shadecn/ui/button.tsx"
@@ -254,7 +211,7 @@
       "documented": false
     },
     {
-      "name": "Chip UI primitive (tone and variant system)",
+      "name": "Chip primitive",
       "kind": "lib",
       "paths": [
         "src/shadecn/ui/chip.tsx"
@@ -262,7 +219,7 @@
       "documented": false
     },
     {
-      "name": "Dialog UI primitive (animated, portal-based)",
+      "name": "Dialog primitive",
       "kind": "lib",
       "paths": [
         "src/shadecn/ui/dialog.tsx"
@@ -270,7 +227,7 @@
       "documented": false
     },
     {
-      "name": "Drawer / bottom-sheet UI primitive (Gorhom BottomSheetModal wrapper)",
+      "name": "Drawer / bottom-sheet primitive",
       "kind": "lib",
       "paths": [
         "src/shadecn/ui/drawer.tsx"
@@ -278,7 +235,7 @@
       "documented": false
     },
     {
-      "name": "Input UI primitive (label, helper text, error state, slots)",
+      "name": "Input primitive",
       "kind": "lib",
       "paths": [
         "src/shadecn/ui/input.tsx"
@@ -286,7 +243,7 @@
       "documented": false
     },
     {
-      "name": "Select / dropdown UI primitive",
+      "name": "Select primitive",
       "kind": "lib",
       "paths": [
         "src/shadecn/ui/select.tsx"
@@ -294,29 +251,53 @@
       "documented": false
     },
     {
-      "name": "Text UI primitive with theme context",
+      "name": "Field error display",
       "kind": "lib",
       "paths": [
-        "src/shadecn/ui/text.tsx"
+        "src/shadecn/ui/field-error.tsx"
       ],
       "documented": false
     },
     {
-      "name": "SVG icon library (activity, bell, briefcase-medical, calendar-heart, fish, hand, heart, home, pets, plus, stethoscope, syringe, thermometer, user, utensils, arrows)",
+      "name": "Agreements / terms dialog",
+      "kind": "lib",
+      "paths": [
+        "src/auth/components/AgreementsDialog.tsx"
+      ],
+      "documented": false
+    },
+    {
+      "name": "Design system theme and palette",
+      "kind": "config",
+      "paths": [
+        "src/styles/theme.ts",
+        "src/styles/palette.ts",
+        "src/styles/config.ts"
+      ],
+      "documented": false
+    },
+    {
+      "name": "i18n setup (en locale, auth / common / home namespaces)",
+      "kind": "lib",
+      "paths": [
+        "src/i18n.ts",
+        "src/auth/locales/en.json",
+        "src/common/locales/en.json",
+        "src/home/locales/en.json"
+      ],
+      "documented": false
+    },
+    {
+      "name": "SVG icon library",
       "kind": "lib",
       "paths": [
         "src/icons/StyledSvg.tsx",
-        "src/icons/icons.d.ts",
-        "src/icons/activity/index.tsx",
-        "src/icons/bell/index.tsx",
-        "src/icons/pets/index.ts",
-        "src/icons/utensils/index.tsx",
-        "src/icons/heart/index.tsx"
+        "src/icons/icons.d.ts"
       ],
       "documented": false
     },
     {
-      "name": "Shared utilities (color interpolation, hex-to-rgba, daytime label)",
+      "name": "Shared utilities (color helpers, daytime label)",
       "kind": "lib",
       "paths": [
         "src/common/utils/colors.ts",
@@ -326,14 +307,13 @@
     }
   ],
   "docGaps": [
-    "React Query client configuration (stale time, retry policy)",
-    "Generated API client usage and structure (src/api/generated/ is gitignored and undocumented beyond generation instructions)",
-    "UI primitive components (Button, Chip, Dialog, Drawer, Input, Select) – no usage or API docs",
-    "FAB quick-action menu – available actions and extensibility not documented",
-    "i18n setup and how to add new languages or namespaces",
-    "Unistyles theme tokens and design system palette – no developer reference",
-    "Home page sections and mock-data wiring – not documented",
-    "Pet carousel and health card components",
-    "Icon library catalogue – no visual or usage reference"
+    "Google OAuth configuration (EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID, EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID env vars) is not documented in README or api.md",
+    "Auth flow screens (welcome, sign-in, register) have no developer documentation",
+    "Home dashboard sections (pet health cards, reminders, timeline, AI insight, quick actions) are undocumented",
+    "FAB and its quick-log action menu are undocumented",
+    "shadcn-style UI primitive components (Button, Chip, Dialog, Drawer, Input, Select) lack usage documentation",
+    "Unistyles theme / design token system is undocumented",
+    "Silent token refresh flow is noted as not yet implemented but not tracked in any public doc",
+    "i18n / localisation setup is undocumented"
   ]
 }

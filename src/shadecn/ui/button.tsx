@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { Text, TextClassContext } from "./text";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "text" | "icon";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "text" | "link" | "icon";
 export type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 const buttonVariants = StyleSheet.create((theme) => {
@@ -59,6 +59,10 @@ const buttonVariants = StyleSheet.create((theme) => {
             backgroundColor: theme.palette.transparent,
             borderWidth: 0,
           },
+          link: {
+            backgroundColor: theme.palette.transparent,
+            borderWidth: 0,
+          },
           icon: {
             backgroundColor: pressed && !disabled ? brand.surfaceSunken : theme.palette.white,
             borderWidth: 1,
@@ -102,6 +106,10 @@ const buttonVariants = StyleSheet.create((theme) => {
           text: {
             color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
           },
+          link: {
+            color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
+            textDecorationLine: "underline",
+          },
           icon: {
             color: disabled ? brand.textFaint : brand.textPrimary,
           },
@@ -135,6 +143,9 @@ const buttonVariants = StyleSheet.create((theme) => {
           },
           danger: { color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.danger },
           text: {
+            color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
+          },
+          link: {
             color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
           },
           icon: {

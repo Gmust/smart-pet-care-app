@@ -1,5 +1,6 @@
 import { initReactI18next } from "react-i18next";
 
+import enAuth from "@/auth/locales/en.json";
 import enCommon from "@/common/locales/en.json";
 import enHome from "@/home/locales/en.json";
 
@@ -12,7 +13,7 @@ export enum Languages {
 export const languages = ["en"] as const;
 export type Lang = (typeof languages)[number];
 
-const modules = ["common", "home"] as const;
+const modules = ["common", "home", "auth"] as const;
 
 export type I18nModule = (typeof modules)[number];
 
@@ -21,6 +22,7 @@ type TranslationJson = { [key: string]: string | TranslationJson | string[] };
 const enResources = {
   common: enCommon,
   home: enHome,
+  auth: enAuth,
 } as const satisfies Record<I18nModule, TranslationJson>;
 
 const resources: Record<Lang, Record<I18nModule, TranslationJson>> = {

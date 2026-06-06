@@ -6,6 +6,7 @@ import { StatusBar } from "react-native";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 import { Fraunces_700Bold } from "@expo-google-fonts/fraunces";
 
+import { AuthProvider } from "@/auth/context/AuthContext";
 import AppProvider from "@/common/providers/AppProvider";
 
 import "@/styles/config";
@@ -57,8 +58,10 @@ export default function RootLayout() {
 
   return (
     <AppProvider>
-      <StatusBar hidden />
-      <RootNavigator />
+      <AuthProvider>
+        <StatusBar hidden />
+        <RootNavigator />
+      </AuthProvider>
     </AppProvider>
   );
 }
@@ -67,6 +70,7 @@ function RootNavigator() {
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#001433" } }}>
       <Stack.Screen name="index" />
+      <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
     </Stack>
   );

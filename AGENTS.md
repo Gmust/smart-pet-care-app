@@ -9,7 +9,7 @@ Cross-platform mobile app (iOS, Android, Web) built with Expo and React Native. 
 - **Framework**: Expo ~54 / React Native 0.81 (New Architecture enabled)
 - **Navigation**: Expo Router (file-based, typed routes)
 - **State/Data**: TanStack React Query
-- **Forms**: React Hook Form + Zod
+- **Forms**: TanStack Form + Zod
 - **Styling**: react-native-unistyles
 - **HTTP**: Axios
 - **Language**: TypeScript (strict)
@@ -48,7 +48,8 @@ pnpm check          # Lint + typecheck
 - Directory names: kebab-case
 - File names: `PascalCase.tsx`
 - Components: PascalCase, one per file
-- Hooks: `use-*` filename, `use*` export
+- Hooks: camelCase filename (`useAuth.ts`), `use*` export
+- Schemas: `*.schema.ts` filename (e.g. `auth.schema.ts`), named exports
 - Styles: defined with `StyleSheet.create` from `react-native-unistyles`, colocated in component file or `styles/` directory
 - Imports: sorted via `eslint-plugin-simple-import-sort`
 - No default exports for utilities/hooks — named exports only
