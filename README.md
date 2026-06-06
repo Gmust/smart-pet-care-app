@@ -42,6 +42,9 @@ Configured via `.env` (gitignored). Copy `.env.example` to get started.
 | Variable                                | Used by          | Purpose                                                                        |
 | --------------------------------------- | ---------------- | ------------------------------------------------------------------------------ |
 | `EXPO_PUBLIC_API_URL`                   | App runtime      | Backend host the app calls. Set in `src/api/config.ts` as the axios `baseURL`. |
+| `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`      | App runtime      | Google OAuth Web client ID (all three client IDs must be in the same Google Cloud project). |
+| `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`      | App runtime      | Google OAuth iOS client ID.                                                    |
+| `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`  | App runtime      | Google OAuth Android client ID.                                                |
 | `OPENAPI_USERNAME` / `OPENAPI_PASSWORD` | `pnpm api:fetch` | Basic-auth creds for the spec endpoint (maintainer-only).                      |
 | `OPENAPI_URL`                           | `pnpm api:fetch` | Optional override for the spec URL.                                            |
 
@@ -102,6 +105,7 @@ Do not edit generated files manually. Update the backend spec, refresh `docs/ope
 
 ## Team docs
 
+- API layer: `docs/api.md`
 - Claude/Compass PR automation: `docs/claude-pr-automation.md`
 
 ## Get a fresh project
