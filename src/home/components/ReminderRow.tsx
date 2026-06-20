@@ -22,6 +22,8 @@ function StatusChip({ status }: { status: ReminderStatus }) {
       return <Chip label={t("reminders.chipLabels.done")} tone="ok" size="sm" />;
     case "next":
       return <Chip label={t("reminders.chipLabels.next")} tone="primary" size="sm" />;
+    case "overdue":
+      return <Chip label={t("reminders.chipLabels.overdue")} tone="danger" size="sm" />;
     case "pending":
     default:
       return (
@@ -38,6 +40,7 @@ type ReminderRowProps = {
 export function ReminderRow({ reminder, onPress }: ReminderRowProps) {
   const { icon: IconComponent, tone, title, time, status } = reminder;
   const colors = toneColors[tone];
+  const isOverdue = status === "overdue";
 
   return (
     <Pressable
@@ -45,7 +48,11 @@ export function ReminderRow({ reminder, onPress }: ReminderRowProps) {
       accessibilityLabel={`${title}, ${time}`}
       accessibilityState={{ selected: status === "done" }}
       onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      style={({ pressed }) => [
+        styles.card,
+        isOverdue && styles.cardOverdue,
+        pressed && styles.cardPressed,
+      ]}
     >
       <View style={styles.row}>
         <View style={[styles.icon, { backgroundColor: colors.bg }]}>
@@ -53,7 +60,7 @@ export function ReminderRow({ reminder, onPress }: ReminderRowProps) {
         </View>
         <View style={styles.text}>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.time}>{time}</Text>
+          <Text style={[styles.time, isOverdue && styles.timeOverdue]}>{time}</Text>
         </View>
         <StatusChip status={status} />
       </View>
@@ -68,6 +75,10 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.palette.brand.surfaceBorder,
     padding: theme.spacing(3),
+  },
+  cardOverdue: {
+    borderColor: theme.palette.brand.danger,
+    backgroundColor: theme.palette.brand.dangerBg,
   },
   cardPressed: {
     backgroundColor: theme.palette.brand.surfaceSunken,
@@ -97,5 +108,9 @@ const styles = StyleSheet.create((theme) => ({
     fontFamily: theme.fonts.regular,
     fontSize: theme.fontSize.xs,
     color: theme.palette.brand.textSecondary,
+  },
+  timeOverdue: {
+    fontFamily: theme.fonts.medium,
+    color: theme.palette.brand.danger,
   },
 }));

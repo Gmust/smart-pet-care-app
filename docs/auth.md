@@ -2,7 +2,7 @@
 
 ## Overview
 
-The app uses email/password and Google OAuth for authentication. Session material (JWT access token, expiry) is persisted in the OS keychain via `expo-secure-store` and restored on app launch.
+The app uses email/password and Google OAuth for authentication. Session material (JWT access token, refresh token, expiry) is persisted in the OS keychain via `expo-secure-store` and restored on app launch.
 
 ## Auth Context & Hooks
 
@@ -24,11 +24,11 @@ const { status, session, isAuthenticated, signIn, signOut } = useAuth();
 
 Google OAuth requires three client IDs from the same Google Cloud project. **All three MUST be configured** for native sign-in to work.
 
-| Variable                               | Required | Description                                          |
-| -------------------------------------- | -------- | ---------------------------------------------------- |
-| `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`     | Yes      | Web client ID (audience the backend validates).      |
-| `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`     | Yes      | iOS client ID.                                       |
-| `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID` | Yes      | Android client ID.                                   |
+| Variable                               | Required | Description                                     |
+| -------------------------------------- | -------- | ----------------------------------------------- |
+| `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`     | Yes      | Web client ID (audience the backend validates). |
+| `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`     | Yes      | iOS client ID.                                  |
+| `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID` | Yes      | Android client ID.                              |
 
 The native client IDs are matched by Google automatically via package name + SHA-1 (Android) or bundle ID (iOS), so they are not passed to `GoogleSignin.signIn()`; the backend validates the `idToken`'s audience against the Web client ID.
 
@@ -42,11 +42,17 @@ await POST /api/Auth/login   // or POST /api/Auth/register
 await POST /api/Auth/oauth/google/mobile  // Google OAuth
 ```
 
-Both return an `AuthResponse` with `accessToken`, optional `id`, optional `email`, and optional `expiresAtUtc`. The session is passed to `AuthProvider.signIn()` and persisted to secure storage.
+Both return an `AuthResponse` with `accessToken`, `refreshToken`, optional `id`, optional `email`, and optional `expiresAtUtc`. The session is passed to `AuthProvider.signIn()` and persisted to secure storage.
+
+## Refresh Flow
+
+When a request returns `401`, the response interceptor asks `AuthProvider` to call `POST /api/Auth/refresh` with the stored refresh token. If the backend returns a new `AuthResponse`, the app persists the rotated tokens and retries the failed request once.
+
+On app launch, an expired access token is also refreshed silently when a refresh token is available. If refresh fails, the stored session is cleared and the user returns to the auth flow.
 
 ## Sign-out
 
-Calling `signOut()` clears the secure-store session and updates auth context. This triggers the response interceptor's 401 handler to also call `signOut()` if a request fails with an invalid token.
+Calling `signOut()` clears the secure-store session and updates auth context. The response interceptor calls `signOut()` only when silent refresh is unavailable or fails.
 
 ## Email Authentication
 

@@ -8,6 +8,7 @@ export interface AuthSession {
   id: string | null;
   email: string | null;
   accessToken: string;
+  refreshToken: string | null;
   expiresAtUtc: string | null;
 }
 

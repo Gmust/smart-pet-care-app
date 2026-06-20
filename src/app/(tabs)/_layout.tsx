@@ -9,13 +9,14 @@ import { useAuth } from "@/auth/hooks/useAuth";
 import { Fab } from "@/common/components/Fab";
 import { TabBar } from "@/common/components/TabBar";
 
-import { Redirect, Tabs } from "expo-router";
+import { Redirect, Tabs, usePathname } from "expo-router";
 
 const tabs = ["home", "pets", "activity", "profile"] as const;
 
 export default function TabLayout() {
   const { t } = useTranslation(["common"]);
   const { status } = useAuth();
+  const pathname = usePathname();
 
   if (status === "loading") {
     return null;
@@ -37,8 +38,9 @@ export default function TabLayout() {
         {tabs.map((item) => (
           <Tabs.Screen key={item} name={item} options={{ title: t(`navigationTabs.${item}`) }} />
         ))}
+        <Tabs.Screen name="pet-profile" options={{ href: null }} />
       </Tabs>
-      <Fab />
+      {pathname.endsWith("/home") && <Fab />}
     </View>
   );
 }

@@ -47,6 +47,9 @@ pnpm-debug.*
 # generated API client (run `pnpm api:generate`)
 src/api/generated/
 
+# fetched OpenAPI spec (run `pnpm api:fetch`)
+docs/openapi.json
+
 app-example
 
 # generated native folders

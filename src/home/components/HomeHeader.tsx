@@ -8,19 +8,19 @@ import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
+import dayjs from "dayjs";
+
 type Props = {
-  date: string;
   username: string;
-  onNotificationsPress?: () => void;
 };
 
-export function HomeHeader({ date, username, onNotificationsPress }: Props) {
+export function HomeHeader({ username }: Props) {
   const { t } = useTranslation(["home"]);
 
   return (
     <View style={styles.root}>
       <View>
-        <Text style={styles.date}>{date}</Text>
+        <Text style={styles.date}>{dayjs().format("dddd · MMM D")}</Text>
         <Text style={styles.message}>{t("greetings", { username, daytime: getDaytime() })}</Text>
       </View>
       <Button
@@ -28,7 +28,7 @@ export function HomeHeader({ date, username, onNotificationsPress }: Props) {
         variant="icon"
         size="icon"
         icon={<BellIcon width={20} height={20} color={palette.brand.textPrimary} />}
-        onPress={onNotificationsPress}
+        onPress={() => {}}
       />
     </View>
   );
@@ -39,6 +39,7 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
+    maxWidth: "90%",
   },
   date: {
     fontFamily: theme.fonts.medium,

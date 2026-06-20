@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -5,11 +6,12 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
 import type { AuthResponse } from "@/api/generated";
-import { usePostApiAuthLogin, usePostApiAuthRegister } from "@/api/generated";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
 
+import { useLoginMutation } from "../queries/useLoginMutation";
+import { useRegisterMutation } from "../queries/useRegisterMutation";
 import { loginSchema, registerSchema } from "../schemas/auth.schema";
 import type { AuthMode } from "../types";
 import { getProblemMessage } from "../utils/auth-errors";
@@ -24,10 +26,10 @@ export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: Email
   const { t } = useTranslation(["auth"]);
   const isRegister = mode === "register";
 
-  const { mutateAsync: register } = usePostApiAuthRegister();
-  const { mutateAsync: login } = usePostApiAuthLogin();
+  const { mutateAsync: register } = useRegisterMutation();
+  const { mutateAsync: login } = useLoginMutation();
 
-  const schema = isRegister ? registerSchema : loginSchema;
+  const schema = useMemo(() => (isRegister ? registerSchema(t) : loginSchema(t)), [isRegister, t]);
 
   const form = useForm({
     defaultValues: {
@@ -40,12 +42,10 @@ export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: Email
       try {
         if (isRegister) {
           const response = await register({
-            data: {
-              email: value.email,
-              password: value.password,
-              passwordConfirm: value.passwordConfirm,
-              termsAccepted: termsPreAccepted,
-            },
+            email: value.email,
+            password: value.password,
+            passwordConfirm: value.passwordConfirm,
+            termsAccepted: termsPreAccepted,
           });
           Toast.show({
             type: "success",
@@ -53,20 +53,18 @@ export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: Email
             text2: t("auth:success.accountCreatedBody"),
           });
           await new Promise((resolve) => setTimeout(resolve, 350));
-          onAuthenticated(response.data);
+          onAuthenticated(response);
           return;
         }
 
-        const response = await login({
-          data: { email: value.email, password: value.password },
-        });
+        const response = await login({ email: value.email, password: value.password });
         Toast.show({
           type: "success",
           text1: t("auth:success.welcomeBackTitle"),
           text2: t("auth:success.welcomeBackBody"),
         });
         await new Promise((resolve) => setTimeout(resolve, 350));
-        onAuthenticated(response.data);
+        onAuthenticated(response);
       } catch (error) {
         const message = getProblemMessage(
           error,

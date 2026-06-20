@@ -8,9 +8,9 @@ import {
 } from "@react-native-google-signin/google-signin";
 
 import type { AuthResponse } from "@/api/generated";
-import { usePostApiAuthOauthGoogleMobile } from "@/api/generated";
 import { Button } from "@/shadecn/ui/button";
 
+import { useGoogleMobileAuthMutation } from "../queries/useGoogleMobileAuthMutation";
 import { getProblemMessage } from "../utils/auth-errors";
 
 // The id_token's audience is the Web client ID — this is what the backend
@@ -31,7 +31,7 @@ interface GoogleAuthButtonProps {
 
 export function GoogleAuthButton({ onAuthenticated }: GoogleAuthButtonProps) {
   const { t } = useTranslation(["auth"]);
-  const googleMobileMutation = usePostApiAuthOauthGoogleMobile();
+  const googleMobileMutation = useGoogleMobileAuthMutation();
 
   const isConfigured = Boolean(webClientId);
 
@@ -56,8 +56,8 @@ export function GoogleAuthButton({ onAuthenticated }: GoogleAuthButtonProps) {
         return;
       }
 
-      const result = await googleMobileMutation.mutateAsync({ data: { idToken } });
-      onAuthenticated(result.data);
+      const result = await googleMobileMutation.mutateAsync({ idToken });
+      onAuthenticated(result);
     } catch (error) {
       if (isErrorWithCode(error)) {
         // Cancelled / already in progress are not real errors — stay silent.

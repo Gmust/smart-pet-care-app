@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { hexToRGBA } from "@/common/utils/colors";
@@ -8,34 +8,25 @@ import { HeartPulseIcon } from "@/icons/heart";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
+import type { PetHealth } from "../../types";
 import { SignalStat } from "./SignalStat";
-
-type SignalStatus = "ok" | "warn";
-
-type HealthSignal = { value: string; status: SignalStatus };
+import { useRouter } from "expo-router";
 
 type Props = {
-  petName: string;
-  score: number;
-  status: string;
-  trendLabel: string;
-  signals: {
-    weight: HealthSignal;
-    appetite: HealthSignal;
-    activity: HealthSignal;
-  };
+  pet: PetHealth;
   backgroundColor?: string;
 };
 
-export function HealthPetCard({
-  petName,
-  score,
-  status,
-  trendLabel,
-  signals,
-  backgroundColor,
-}: Props) {
+export function HealthPetCard({ pet, backgroundColor }: Props) {
   const { t } = useTranslation(["home"]);
+
+  const router = useRouter();
+
+  const { id, petName, score, status, trendLabel, signals } = pet;
+
+  const handleOpenPet = (petId: string) => {
+    router.push({ pathname: "/(tabs)/pet-profile", params: { petId } });
+  };
 
   const signalItems = [
     { key: "weight", label: t("healthPetCard.signals.weight"), ...signals.weight },
@@ -44,7 +35,10 @@ export function HealthPetCard({
   ];
 
   return (
-    <View style={[styles.card, backgroundColor ? { backgroundColor } : null]}>
+    <Pressable
+      style={[styles.card, backgroundColor ? { backgroundColor } : null]}
+      onPress={() => handleOpenPet(id)}
+    >
       <View style={styles.top}>
         <View style={styles.headerRow}>
           <HeartPulseIcon width={16} height={16} color={palette.brand.textSecondary} />
@@ -73,7 +67,7 @@ export function HealthPetCard({
           />
         ))}
       </View>
-    </View>
+    </Pressable>
   );
 }
 

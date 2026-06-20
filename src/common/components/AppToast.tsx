@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
-import { Text, View } from "react-native";
-import type { ToastConfig, ToastConfigParams } from "react-native-toast-message";
+import { Pressable, Text, View } from "react-native";
+import Toast, { type ToastConfig, type ToastConfigParams } from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -8,7 +8,7 @@ import { palette } from "@/styles/palette";
 
 import { hexToRGBA } from "../utils/colors";
 
-export type AppToastVariant = "success" | "error" | "warning" | "info";
+type AppToastVariant = "success" | "error" | "warning" | "info";
 
 type IoniconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -27,7 +27,7 @@ function ThemedToast({
   const tone = palette.toastAccent[variant];
 
   return (
-    <View style={styles.container}>
+    <Pressable accessibilityRole="button" onPress={() => Toast.hide()} style={styles.container}>
       <View style={styles.badge}>
         <Ionicons name={ICON[variant]} size={20} color={tone} />
       </View>
@@ -35,7 +35,7 @@ function ThemedToast({
         {!!text1 && <Text style={styles.title}>{text1}</Text>}
         {!!text2 && <Text style={styles.message}>{text2}</Text>}
       </View>
-    </View>
+    </Pressable>
   );
 }
 
