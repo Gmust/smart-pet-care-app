@@ -20,6 +20,9 @@ import { HeartPulseIcon } from "@/icons/heart";
 import type { Icon } from "@/icons/icons";
 import { PlusIcon } from "@/icons/plus";
 import { UtensilsCrossedIcon } from "@/icons/utensils";
+import { CreatePetDrawer } from "@/pets/components/CreatePetDrawer";
+import { usePetsQuery } from "@/pets/queries/usePetsQuery";
+import { CreateReminderDrawer } from "@/reminders/components/CreateReminderDrawer";
 import { palette } from "@/styles/palette";
 
 import { hexToRGBA } from "../utils/colors";
@@ -50,8 +53,13 @@ type FabProps = {
 export function Fab({ onAction }: FabProps) {
   const { t } = useTranslation(["common"]);
   const insets = useSafeAreaInsets();
+  const { data: pets } = usePetsQuery();
   const [open, setOpen] = useState(false);
+  const [isReminderOpen, setIsReminderOpen] = useState(false);
+  const [isCreatePetOpen, setIsCreatePetOpen] = useState(false);
   const rotation = useSharedValue(0);
+
+  const hasPets = (pets?.length ?? 0) > 0;
 
   const toggle = (next: boolean) => {
     setOpen(next);
@@ -59,12 +67,27 @@ export function Fab({ onAction }: FabProps) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
+  const handleFabPress = () => {
+    // Quick actions all require a pet, so until one exists the FAB routes
+    // straight to pet creation instead of opening the actions menu.
+    if (!hasPets) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setIsCreatePetOpen(true);
+      return;
+    }
+
+    toggle(!open);
+  };
+
   const iconStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
   }));
 
-  const handleAction = (id: string) => {
+  const handleAction = (id: FabActionId) => {
     toggle(false);
+    if (id === "reminder") {
+      setIsReminderOpen(true);
+    }
     onAction?.(id);
   };
 
@@ -103,9 +126,9 @@ export function Fab({ onAction }: FabProps) {
 
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={open ? t("fab.close") : t("fab.open")}
+        accessibilityLabel={!hasPets ? t("fab.addPet") : open ? t("fab.close") : t("fab.open")}
         accessibilityState={{ expanded: open }}
-        onPress={() => toggle(!open)}
+        onPress={handleFabPress}
         style={({ pressed }) => [
           styles.fab,
           { bottom: bottomOffset },
@@ -116,6 +139,9 @@ export function Fab({ onAction }: FabProps) {
           <PlusIcon width={24} height={24} color={palette.brand.textOnDark} />
         </Animated.View>
       </Pressable>
+
+      <CreateReminderDrawer isOpen={isReminderOpen} setIsOpen={setIsReminderOpen} />
+      <CreatePetDrawer isOpen={isCreatePetOpen} setIsOpen={setIsCreatePetOpen} />
     </View>
   );
 }

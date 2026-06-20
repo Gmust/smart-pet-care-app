@@ -1,77 +1,86 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { reminders } from "../data";
-import type { ReminderStatus } from "../types";
+import { useGetReminders } from "@/reminders/queries/useGetReminders";
+import { Text } from "@/shadecn/ui/text";
+
+import { RemindersSectionSkeleton } from "../skeletons/HomePageSkeleton";
+import { toReminderGroups } from "../utils/homeMappers";
 import { ReminderRow } from "./ReminderRow";
 import { SectionLabel } from "./SectionLabel";
 
-type RemindersSectionProps = {
-  onActiveCountChange: (count: number) => void;
-  onStatusChange: (message: string) => void;
-};
+type ReminderGroupKey = "overdue" | "today" | "tomorrow" | "soon" | "nextWeek" | "later";
 
-export function RemindersSection({ onActiveCountChange, onStatusChange }: RemindersSectionProps) {
+export function RemindersSection() {
   const { t } = useTranslation(["home"]);
-  const [todayReminders, setTodayReminders] = useState(reminders);
+  const { data: reminders, isLoading } = useGetReminders();
+  const groups = useMemo(() => toReminderGroups(reminders ?? []), [reminders]);
 
-  const activeReminderCount = useMemo(
-    () => todayReminders.filter((reminder) => reminder.status !== "done").length,
-    [todayReminders]
-  );
+  const reminderGroupTitle: Record<ReminderGroupKey, string> = {
+    later: t("reminders.groups.later"),
+    nextWeek: t("reminders.groups.nextWeek"),
+    overdue: t("reminders.groups.overdue"),
+    soon: t("reminders.groups.soon"),
+    today: t("reminders.groups.today"),
+    tomorrow: t("reminders.groups.tomorrow"),
+  };
 
-  useEffect(() => {
-    onActiveCountChange(activeReminderCount);
-  }, [activeReminderCount, onActiveCountChange]);
-
-  const handleReminderPress = useCallback(
-    (id: string) => {
-      setTodayReminders((current) =>
-        current.map((reminder) => {
-          if (reminder.id !== id) {
-            return reminder;
-          }
-
-          const nextStatus: ReminderStatus = reminder.status === "done" ? "pending" : "done";
-          onStatusChange(
-            nextStatus === "done"
-              ? t("mockStatus.reminderDone", { title: reminder.title })
-              : t("mockStatus.reminderReopened", { title: reminder.title })
-          );
-          return { ...reminder, status: nextStatus };
-        })
-      );
-    },
-    [onStatusChange, t]
-  );
+  const handleReminderPress = useCallback((id: string) => {
+    // TODO(api): call reminder acknowledgement from a mutation hook.
+    void id;
+  }, []);
 
   const handleSeeAllReminders = useCallback(() => {
-    onStatusChange(t("mockStatus.seeAllReminders", { count: todayReminders.length }));
-  }, [onStatusChange, t, todayReminders.length]);
+    // TODO(navigation): route to full reminders screen when it exists.
+  }, []);
 
   return (
     <>
       <SectionLabel
-        title={t("sectionLabel.remindersAmount.title", { remindersAmount: activeReminderCount })}
+        title={t("sectionLabel.remindersAmount.title")}
         action={t("sectionLabel.remindersAmount.action")}
         onActionPress={handleSeeAllReminders}
       />
-      <View style={styles.stack}>
-        {todayReminders.map((reminder) => (
-          <ReminderRow
-            key={reminder.id}
-            reminder={reminder}
-            onPress={() => handleReminderPress(reminder.id)}
-          />
-        ))}
+      <View style={styles.groups}>
+        {isLoading ? (
+          <RemindersSectionSkeleton />
+        ) : (
+          groups.map((group) => (
+            <View key={group.key} style={styles.group}>
+              <Text style={styles.groupTitle}>{reminderGroupTitle[group.key]}</Text>
+              <View style={styles.stack}>
+                {group.reminders.map((reminder) => (
+                  <ReminderRow
+                    key={reminder.id}
+                    reminder={reminder}
+                    onPress={() => handleReminderPress(reminder.id)}
+                  />
+                ))}
+              </View>
+            </View>
+          ))
+        )}
       </View>
     </>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  groups: {
+    gap: theme.spacing(4),
+  },
+  group: {
+    gap: theme.spacing(2),
+  },
+  groupTitle: {
+    fontFamily: theme.fonts.semiBold,
+    fontSize: theme.fontSize.xs,
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    color: theme.palette.brand.textSecondary,
+  },
   stack: {
     gap: theme.spacing(2),
   },

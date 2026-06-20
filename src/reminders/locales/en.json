@@ -1,0 +1,48 @@
+{
+  "validation": {
+    "petRequired": "Choose which pet this reminder is for.",
+    "titleRequired": "Give the reminder a title.",
+    "typeRequired": "Pick a reminder type.",
+    "daysRequired": "Select at least one day.",
+    "timeInvalid": "Enter a time in HH:mm format.",
+    "timePast": "Choose a time that is later than now.",
+    "endAtInvalid": "Enter a valid end date."
+  },
+  "successMessage": "Reminder created successfully!",
+  "createReminderDrawer": {
+    "title": "Create new Reminder",
+    "fields": {
+      "pet": "Pet",
+      "title": "Title",
+      "type": "Type",
+      "days": "Repeat on",
+      "repeat": "Repeating reminder",
+      "time": "Time"
+    },
+    "placeholders": {
+      "pet": "Select a pet",
+      "title": "e.g. Morning feeding",
+      "type": "Select a type",
+      "time": "HH:mm"
+    },
+    "submit": "Create reminder"
+  },
+  "days": {
+    "Monday": "Mon",
+    "Tuesday": "Tue",
+    "Wednesday": "Wed",
+    "Thursday": "Thu",
+    "Friday": "Fri",
+    "Saturday": "Sat",
+    "Sunday": "Sun"
+  },
+  "types": {
+    "Feeding": "Feeding",
+    "Activity": "Activity",
+    "Medication": "Medication",
+    "Vaccination": "Vaccination",
+    "ParasiteTreatment": "Parasite treatment",
+    "VetVisit": "Vet visit",
+    "Grooming": "Grooming"
+  }
+}

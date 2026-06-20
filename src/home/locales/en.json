@@ -19,22 +19,27 @@
   },
   "sectionLabel": {
     "remindersAmount": {
-      "title": "Today · {{remindersAmount}} reminders",
+      "title": "Reminders",
       "action": "See all"
     },
     "quickActions": {
       "title": "Quick actions"
-    },
-    "recentEvents": {
-      "title": "Recent",
-      "action": "Open timeline"
     }
   },
   "reminders": {
     "chipLabels": {
       "done": "Done",
       "next": "Next up",
-      "pending": "Pending"
+      "pending": "Pending",
+      "overdue": "Overdue"
+    },
+    "groups": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "soon": "In a few days",
+      "nextWeek": "Next week",
+      "later": "Later"
     }
   },
   "mockStatus": {
@@ -46,8 +51,7 @@
     "reminderDone": "{{title}} marked done.",
     "reminderReopened": "{{title}} moved back to pending.",
     "notifications": "{{count}} active reminders need attention.",
-    "seeAllReminders": "Showing {{count}} mock reminders for today.",
-    "timelineOpened": "Timeline opened in mock mode."
+    "seeAllReminders": "Showing {{count}} mock reminders for today."
   },
   "mockPets": {
     "newPetStatus": "New profile ready for tracking",

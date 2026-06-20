@@ -1,0 +1,82 @@
+{
+  "validation": {
+    "nameRequired": "Give your pet a name.",
+    "speciesRequired": "Pick a species.",
+    "birthDateInvalid": "Enter a valid birth date.",
+    "weightInvalid": "Enter a weight greater than 0."
+  },
+  "successMessage": "Pet added successfully!",
+  "updateSuccessMessage": "Pet updated successfully!",
+  "deleteSuccessMessage": "Pet deleted successfully!",
+  "petListPage": {
+    "title": "My pets",
+    "companions_one": "{{count}} companion",
+    "companions_other": "{{count}} companions",
+    "emptyState": "No pets yet",
+    "addPet": "Add a new pet"
+  },
+  "petProfilePage": {
+    "actions": {
+      "open": "Open pet actions",
+      "close": "Close pet actions",
+      "edit": "Edit pet",
+      "delete": "Delete pet"
+    },
+    "deleteDialog": {
+      "title": "Delete pet?",
+      "description": "This will permanently remove {{name}} from your pets.",
+      "confirm": "Delete pet",
+      "cancel": "Cancel"
+    }
+  },
+  "createPetDrawer": {
+    "title": "Add a new Pet",
+    "fields": {
+      "name": "Name",
+      "species": "Species",
+      "breed": "Breed",
+      "birthDate": "Birth date",
+      "weight": "Weight (kg)",
+      "sex": "Sex",
+      "allergies": "Allergies",
+      "chronicConditions": "Chronic conditions",
+      "behavioralNotes": "Behavioral notes"
+    },
+    "placeholders": {
+      "name": "e.g. Miso",
+      "species": "Select a species",
+      "breed": "e.g. British Shorthair",
+      "birthDate": "Select a date",
+      "weight": "e.g. 3.8",
+      "sex": "Select",
+      "allergies": "Anything they react to",
+      "chronicConditions": "Ongoing health conditions",
+      "behavioralNotes": "Quirks, training notes, temperament"
+    },
+    "submit": "Add pet"
+  },
+  "editPetDrawer": {
+    "title": "Edit pet info",
+    "submit": "Save changes"
+  },
+  "petListCard": {
+    "accessibilityLabel": "View {{name}}",
+    "statusOk": "Ok",
+    "noVetVisit": "No vet visit",
+    "lastActivityPlaceholder": "Untracked",
+    "viewInfo": "View info",
+    "assessment": "Assessment"
+  },
+  "species": {
+    "Dog": "Dog",
+    "Cat": "Cat",
+    "Bird": "Bird",
+    "Rabbit": "Rabbit",
+    "Other": "Other"
+  },
+  "sex": {
+    "Unknown": "Unknown",
+    "Male": "Male",
+    "Female": "Female"
+  }
+}

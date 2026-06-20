@@ -46,6 +46,7 @@ type TabBarProps = {
 
 export function TabBar({ state, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();
+  const activeRouteName = state.routes[state.index]?.name;
 
   return (
     <View
@@ -59,7 +60,10 @@ export function TabBar({ state, navigation }: TabBarProps) {
             return null;
           }
 
-          const isFocused = state.index === index;
+          const isFocused =
+            state.index === index || (route.name === "pets" && activeRouteName === "pet-profile");
+          const shouldNavigateToTab =
+            !isFocused || (route.name === "pets" && activeRouteName === "pet-profile");
           const color = isFocused ? ACTIVE_COLOR : INACTIVE_COLOR;
           const Glyph = meta.icon;
 
@@ -70,7 +74,7 @@ export function TabBar({ state, navigation }: TabBarProps) {
               canPreventDefault: true,
             });
 
-            if (!isFocused && !event.defaultPrevented) {
+            if (shouldNavigateToTab && !event.defaultPrevented) {
               navigation.navigate(route.name);
             }
           };

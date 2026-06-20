@@ -1,9 +1,9 @@
 import type { Icon } from "@/icons/icons";
 
-export type SignalStatus = "ok" | "warn";
+type SignalStatus = "ok" | "warn";
 export type ReminderTone = "primary" | "peach" | "warn";
-export type ReminderStatus = "done" | "next" | "pending";
-export type TimelineDot = "ok" | "warn" | "primary";
+export type ReminderStatus = "done" | "next" | "pending" | "overdue";
+export type ReminderGroupKey = "overdue" | "today" | "tomorrow" | "soon" | "nextWeek" | "later";
 
 export type Signal = {
   label: string;
@@ -20,21 +20,12 @@ export type Reminder = {
   status: ReminderStatus;
 };
 
-export type QuickActionItem = {
-  id: string;
-  icon: Icon;
-  label: string;
+export type ReminderGroup = {
+  key: ReminderGroupKey;
+  reminders: Reminder[];
 };
 
-export type TimelineEvent = {
-  id: string;
-  icon: Icon;
-  title: string;
-  meta: string;
-  dot: TimelineDot;
-};
-
-export type HealthSignal = {
+type HealthSignal = {
   value: string;
   status: SignalStatus;
 };
@@ -50,11 +41,6 @@ export type PetHealth = {
     appetite: HealthSignal;
     activity: HealthSignal;
   };
-};
-
-export type PetSummary = {
-  name: string;
-  breed: string;
 };
 
 export type AiInsight = {

@@ -28,6 +28,6 @@ export function PetCarouselSlide({ animationValue, children }: SlideProps) {
 const styles = StyleSheet.create((theme) => ({
   slide: {
     flex: 1,
-    paddingHorizontal: theme.spacing(1.5),
+    paddingHorizontal: theme.spacing(5),
   },
 }));

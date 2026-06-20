@@ -16,7 +16,8 @@ type AiInsightCardProps = {
   onDismiss?: () => void;
 };
 
-export function AiInsightCard({ insight, onAsk, onDismiss }: AiInsightCardProps) {
+//TODO add real data
+export function AiInsightCard({ onAsk, onDismiss }: AiInsightCardProps) {
   const { t } = useTranslation(["home"]);
 
   return (
@@ -28,9 +29,9 @@ export function AiInsightCard({ insight, onAsk, onDismiss }: AiInsightCardProps)
         <View style={styles.insightContainer}>
           <Text style={styles.eyebrow}>{t("aiInsight.title")}</Text>
           <View style={styles.dot} />
-          <Text style={styles.eyebrow}>{dayjs(insight.timeAgo).fromNow()}</Text>
+          <Text style={styles.eyebrow}>{dayjs(new Date()).fromNow()}</Text>
         </View>
-        <Text style={styles.text}>{insight.message}</Text>
+        <Text style={styles.text}>Test ai reposnse</Text>
         <View style={styles.actions}>
           <Chip
             label={t("aiInsight.askAssistantBtn")}

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 import Toast from "react-native-toast-message";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { PortalHost } from "@rn-primitives/portal";
@@ -15,15 +16,17 @@ interface AppProviderProps {
 export default function AppProvider({ children }: AppProviderProps) {
   return (
     <GestureHandlerRootView>
-      <BottomSheetModalProvider>
-        <QueryClientProvider client={queryClient}>
-          {children}
-          <PortalHost />
-          <PortalHost name="dialog" />
-          <PortalHost name="popover" />
-        </QueryClientProvider>
-      </BottomSheetModalProvider>
-      <Toast config={toastConfig} />
+      <KeyboardProvider>
+        <BottomSheetModalProvider>
+          <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        </BottomSheetModalProvider>
+        <PortalHost />
+        <PortalHost name="dialog" />
+        <PortalHost name="popover" />
+        <PortalHost name="select" />
+        <PortalHost name="dropdown" />
+        <Toast config={toastConfig} />
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

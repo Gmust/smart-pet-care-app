@@ -14,9 +14,13 @@
   "actions": {
     "close": "Close"
   },
+  "errors": {
+    "somethingWentWrong": "Something went wrong"
+  },
   "fab": {
     "open": "Open quick actions",
     "close": "Close quick actions",
+    "addPet": "Add your first pet",
     "actions": {
       "reminder": {
         "title": "Reminder",

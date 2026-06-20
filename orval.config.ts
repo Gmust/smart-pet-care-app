@@ -3,7 +3,7 @@ export default {
     input: "docs/openapi.json",
     output: {
       target: "src/api/generated/index.ts",
-      client: "react-query",
+      client: "axios",
       httpClient: "axios",
     },
   },

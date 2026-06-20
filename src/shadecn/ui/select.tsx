@@ -16,13 +16,17 @@ const SelectWidthContext = createContext<{
   setWidth: (w: number) => void;
 }>({ width: 0, setWidth: () => {} });
 
-function Select({ children, ...props }: SelectPrimitive.RootProps) {
+function Select({
+  children,
+  containerStyle,
+  ...props
+}: SelectPrimitive.RootProps & { containerStyle?: StyleProp<ViewStyle> }) {
   const [width, setWidth] = useState(0);
   const contextValue = useMemo(() => ({ width, setWidth }), [width]);
 
   return (
     <SelectWidthContext.Provider value={contextValue}>
-      <View style={{ alignSelf: "flex-start" }}>
+      <View style={[styles.root, containerStyle]}>
         <SelectPrimitive.Root {...props}>{children}</SelectPrimitive.Root>
       </View>
     </SelectWidthContext.Provider>
@@ -74,9 +78,11 @@ const overlayExiting = FadeOut.duration(120);
 
 function SelectContent({
   children,
+  portalHost,
   style,
   ...props
 }: SelectPrimitive.ContentProps & {
+  portalHost?: SelectPrimitive.PortalProps["hostName"];
   ref?: React.RefObject<SelectPrimitive.ContentRef>;
 }) {
   const { width } = useContext(SelectWidthContext);
@@ -88,7 +94,7 @@ function SelectContent({
   ].filter(Boolean) as unknown as ViewStyle;
 
   return (
-    <SelectPortal>
+    <SelectPortal hostName={portalHost}>
       <SelectPrimitive.Overlay style={StyleSheet.absoluteFill}>
         <Animated.View entering={overlayEntering} exiting={overlayExiting}>
           <SelectPrimitive.Content style={mergedContentStyle} {...props}>
@@ -143,13 +149,17 @@ function SelectSeparator({
 }
 
 const styles = StyleSheet.create((theme) => ({
+  root: {
+    alignSelf: "flex-start",
+  },
   trigger: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
     gap: theme.spacing(2.5),
     backgroundColor: theme.palette.white,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
+    borderCurve: "continuous",
     borderWidth: 1,
     borderColor: theme.palette.brand.surfaceBorder,
     paddingVertical: theme.spacing(1.5),
@@ -177,7 +187,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   content: {
     backgroundColor: theme.palette.white,
-    borderRadius: theme.borderRadius["2xl"],
+    borderRadius: theme.borderRadius.lg,
+    borderCurve: "continuous",
     borderWidth: 1,
     borderColor: theme.palette.brand.surfaceBorder,
     overflow: "hidden",

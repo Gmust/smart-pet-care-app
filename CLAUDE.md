@@ -32,11 +32,13 @@ styles/           # Unistyles theme config (palette, theme, config)
 
 Package manager: **pnpm** (with `node-linker=hoisted` in `.npmrc` for RN/Metro compatibility).
 
+Development target: **Android app**. Do not run `pnpm web` for validation or UI checks unless the user explicitly asks for web.
+
 ```bash
 pnpm start          # Start Expo dev server
 pnpm ios            # Run on iOS simulator
 pnpm android        # Run on Android emulator
-pnpm web            # Run in browser
+pnpm web            # Run in browser (do not use for default validation)
 pnpm lint           # ESLint
 pnpm typecheck      # TypeScript check
 pnpm test           # Jest

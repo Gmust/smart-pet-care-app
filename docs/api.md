@@ -27,7 +27,7 @@ The generated client (`src/api/generated/`) calls axios with relative paths (e.g
 
 **Request interceptor** — reads the in-memory `currentAccessToken` and sets `Authorization: Bearer <token>` on every outgoing request. The token is kept in memory (not read from SecureStore per-request) so the interceptor stays synchronous.
 
-**Response interceptor** — on a `401` response, calls `onUnauthorized()` which triggers `AuthProvider.signOut`, clearing the session and redirecting to the auth flow.
+**Response interceptor** — on a `401` response, asks `AuthProvider` to refresh the session with the stored refresh token. If refresh succeeds, the original request is retried once with the new access token. If refresh fails or no refresh token is available, `onUnauthorized()` triggers `AuthProvider.signOut`, clearing the session and redirecting to the auth flow.
 
 ### Wiring auth state into interceptors
 
@@ -36,7 +36,7 @@ The generated client (`src/api/generated/`) calls axios with relative paths (e.g
 ```ts
 import { setAuthToken, setUnauthorizedHandler } from "@/api/interceptors";
 
-// After sign-in:
+// After sign-in or refresh:
 setAuthToken(session.accessToken);
 setUnauthorizedHandler(signOut);
 
@@ -47,7 +47,7 @@ setUnauthorizedHandler(null);
 
 This avoids a circular import between the API layer and the auth context.
 
-> **Refresh flow**: Silent token refresh on 401 is not yet implemented. When the backend exposes a mobile-friendly `/api/Auth/refresh` endpoint (token in body rather than httpOnly cookie), the response interceptor should attempt one silent refresh and retry before calling `onUnauthorized`.
+The refresh handler is also registered from `AuthProvider` via `setRefreshAuthSessionHandler()`, so the API layer can retry expired-token requests without importing auth context code.
 
 ## Session Storage
 
@@ -56,6 +56,7 @@ This avoids a circular import between the API layer and the auth context.
 | SecureStore key         | Value                                |
 | ----------------------- | ------------------------------------ |
 | `spc.auth.accessToken`  | JWT access token                     |
+| `spc.auth.refreshToken` | Refresh token used for silent renews |
 | `spc.auth.expiresAtUtc` | ISO 8601 expiry timestamp (optional) |
 
 ```ts
