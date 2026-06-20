@@ -76,4 +76,4 @@ The client is provided at the root of the tree via `AppProvider`.
 
 ## Generated API Client
 
-`src/api/generated/` contains a typed Axios + React Query client auto-generated from the OpenAPI spec (`docs/openapi.json`). **Do not edit files in `src/api/generated/` by hand** — regenerate them from the spec instead.
+`src/api/generated/` contains a typed Axios client auto-generated from the OpenAPI spec (`docs/openapi.json`). **Do not edit files in `src/api/generated/` by hand** — regenerate them from the spec instead.

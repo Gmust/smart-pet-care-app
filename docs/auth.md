@@ -38,8 +38,8 @@ Both email and Google flows call the same backend endpoint:
 
 ```ts
 // Email sign-in/register
-(await POST) / api / Auth / login; // or POST /api/Auth/register
-(await POST) / api / Auth / oauth / google / mobile; // Google OAuth
+await POST /api/Auth/login   // or POST /api/Auth/register
+await POST /api/Auth/oauth/google/mobile  // Google OAuth
 ```
 
 Both return an `AuthResponse` with `accessToken`, `refreshToken`, optional `id`, optional `email`, and optional `expiresAtUtc`. The session is passed to `AuthProvider.signIn()` and persisted to secure storage.
