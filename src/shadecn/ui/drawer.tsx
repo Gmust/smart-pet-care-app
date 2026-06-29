@@ -26,9 +26,17 @@ type DrawerContextValue = {
   modalRef: React.RefObject<BottomSheetModal | null>;
   /** When true, header/footer render edge fades over the scrollable content. */
   scrollable?: boolean;
+  externalActivity?: {
+    suspend: () => Promise<void>;
+    resume: () => void;
+  };
 };
 
 const DrawerContext = React.createContext<DrawerContextValue | null>(null);
+
+export function useDrawerExternalActivity() {
+  return React.useContext(DrawerContext)?.externalActivity;
+}
 
 type DrawerProps = React.PropsWithChildren<{
   open?: boolean;
@@ -167,6 +175,25 @@ function DrawerContent({
 }: DrawerContentProps) {
   const insets = useSafeAreaInsets();
   const { modalRef, open, setOpen } = useDrawerContext("DrawerContent");
+  const externalActivityDismissRef = React.useRef<(() => void) | null>(null);
+
+  const suspendForExternalActivity = React.useCallback(() => {
+    const modal = modalRef.current;
+    if (!modal || !open) {
+      return Promise.resolve();
+    }
+
+    return new Promise<void>((resolve) => {
+      externalActivityDismissRef.current = resolve;
+      modal.dismiss();
+    });
+  }, [modalRef, open]);
+
+  const resumeAfterExternalActivity = React.useCallback(() => {
+    if (open) {
+      modalRef.current?.present();
+    }
+  }, [modalRef, open]);
 
   const renderBackdrop = React.useCallback(
     (backdropProps: BottomSheetBackdropProps) => (
@@ -181,23 +208,29 @@ function DrawerContent({
     [backdropPressBehavior]
   );
   const contextValue = React.useMemo(
-    () => ({ open, setOpen, modalRef, scrollable }),
-    [modalRef, open, setOpen, scrollable]
+    () => ({
+      open,
+      setOpen,
+      modalRef,
+      scrollable,
+      externalActivity: {
+        suspend: suspendForExternalActivity,
+        resume: resumeAfterExternalActivity,
+      },
+    }),
+    [modalRef, open, resumeAfterExternalActivity, scrollable, setOpen, suspendForExternalActivity]
   );
 
   React.useEffect(() => {
     const modal = modalRef.current;
-
     if (!modal) {
       return;
     }
-
     if (open) {
       modal.present();
-      return;
+    } else {
+      modal.dismiss();
     }
-
-    modal.dismiss();
   }, [modalRef, open]);
 
   return (
@@ -207,6 +240,12 @@ function DrawerContent({
       index={index}
       backdropComponent={renderBackdrop}
       onDismiss={() => {
+        const resolveExternalActivityDismiss = externalActivityDismissRef.current;
+        if (resolveExternalActivityDismiss) {
+          externalActivityDismissRef.current = null;
+          resolveExternalActivityDismiss();
+          return;
+        }
         setOpen(false);
         onDismiss?.();
       }}

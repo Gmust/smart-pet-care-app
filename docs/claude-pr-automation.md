@@ -1,6 +1,7 @@
-# Claude/Compass PR Automation
+# Compass PR Automation
 
-The Compass workflows use Claude through `AI_PROVIDER=claude` and the `ANTHROPIC_API_KEY` repository secret.
+The `Compass Docs` workflow uses Gemini through `AI_PROVIDER=gemini`, the
+`gemini-2.5-flash` model, and the `GEMINI_API_KEY` repository secret.
 
 ## Documentation Updates
 

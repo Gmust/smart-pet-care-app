@@ -27,9 +27,9 @@ jobs:
 
       - name: Update docs with Compass
         env:
-          AI_PROVIDER: claude
-          ANTHROPIC_MODEL: claude-haiku-4-5-20251001
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AI_PROVIDER: gemini
+          GEMINI_MODEL: gemini-2.5-flash
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           npx compass-sync@1.0.0 docs \
             --base ${{ github.event.pull_request.base.sha }} \

@@ -19,7 +19,7 @@ export function HomeHeader({ username }: Props) {
 
   return (
     <View style={styles.root}>
-      <View>
+      <View style={styles.greetings}>
         <Text style={styles.date}>{dayjs().format("dddd · MMM D")}</Text>
         <Text style={styles.message}>{t("greetings", { username, daytime: getDaytime() })}</Text>
       </View>
@@ -39,12 +39,15 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    maxWidth: "90%",
+    maxWidth: "100%",
   },
   date: {
     fontFamily: theme.fonts.medium,
     fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
+  },
+  greetings: {
+    maxWidth: "90%",
   },
   message: {
     marginTop: theme.spacing(1),
