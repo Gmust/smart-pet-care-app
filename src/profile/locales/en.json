@@ -1,0 +1,67 @@
+{
+  "validation": {
+    "displayNameTooLong": "Keep your name under 80 characters.",
+    "phoneNumberInvalid": "Enter a valid phone number."
+  },
+  "updateSuccessMessage": "Profile updated successfully!",
+  "deleteSuccessMessage": "Your account has been deleted.",
+  "profilePage": {
+    "eyebrow": "Account",
+    "fallbackName": "Your profile",
+    "editProfile": "Edit profile",
+    "sections": {
+      "details": "Account details",
+      "manage": "Manage account"
+    },
+    "fields": {
+      "phoneNumber": "Phone number",
+      "memberSince": "Member since"
+    },
+    "empty": {
+      "phoneNumber": "Not added",
+      "memberSince": "Unknown"
+    },
+    "menu": {
+      "signOut": "Sign out",
+      "signOutDescription": "Leave this device",
+      "deleteAccount": "Delete account",
+      "deleteAccountDescription": "Permanently remove your data"
+    },
+    "signOutDrawer": {
+      "title": "Leave this device?",
+      "description": "You will be signed out on this device only. Your pets and schedules will stay synced to your account.",
+      "cardTitle": "Before you go",
+      "cardDescription": "Make sure your recent care logs are synced before switching accounts.",
+      "confirm": "Sign out",
+      "cancel": "Cancel"
+    },
+    "deleteDialog": {
+      "title": "Delete account?",
+      "description": "This will permanently remove your account and all of your pets. This action cannot be undone.",
+      "confirm": "Delete account",
+      "cancel": "Cancel"
+    }
+  },
+  "editSelectionDialog": {
+    "title": "What would you like to do?",
+    "profileInfoBtn": "Update profile info",
+    "newAvatarBtn": "Set new avatar"
+  },
+  "setNewAvatarDrawer": {
+    "title": "Set new avatar",
+    "saveBtn": "Save new avatar",
+    "successMessage": "Avatar updated successfully!"
+  },
+  "editProfileDrawer": {
+    "title": "Edit profile",
+    "fields": {
+      "displayName": "Display name",
+      "phoneNumber": "Phone number"
+    },
+    "placeholders": {
+      "displayName": "e.g. Alex Morgan",
+      "phoneNumber": "e.g. +1 555 123 4567"
+    },
+    "submit": "Save changes"
+  }
+}

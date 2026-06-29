@@ -56,6 +56,7 @@ pnpm check          # Lint + typecheck
 - Imports: sorted via `eslint-plugin-simple-import-sort`
 - No default exports for utilities/hooks — named exports only
 - Components may use default exports (Expo Router requirement for pages)
+- No single-use helper/mapper functions. If a transform is called from only one place, inline it at the call site. Extract a function only when reused (2+ call sites).
 
 ## Unistyles
 

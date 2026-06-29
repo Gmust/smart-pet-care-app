@@ -43,5 +43,8 @@
         "subtitle": "Walk, play, train"
       }
     }
+  },
+  "imagePicker": {
+    "title": "Add Photo"
   }
 }

@@ -1,15 +1,19 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 import type { ViewProps } from "react-native";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Ionicons } from "@expo/vector-icons";
 import * as DialogPrimitive from "@rn-primitives/dialog";
 
 import { hexToRGBA } from "@/common/utils/colors";
 
-import { Text } from "./text";
 import { BlurView } from "expo-blur";
+
+export type DialogHandler = {
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+};
 
 const Dialog = DialogPrimitive.Root;
 
@@ -105,19 +109,21 @@ function DialogDescription({
 
 function DialogCloseButton({
   style,
+  size = 22,
   ...props
 }: DialogPrimitive.CloseProps & {
   ref?: React.RefObject<DialogPrimitive.CloseRef>;
-  crossColor?: string;
+  size?: number;
 }) {
-  const { t } = useTranslation();
+  const { theme } = useUnistyles();
 
   return (
     <DialogPrimitive.Close
       style={(state) => [styles.close, typeof style === "function" ? style(state) : style]}
+      accessibilityLabel="Close"
       {...props}
     >
-      <Text style={styles.closeText}>{t("actions.close")}</Text>
+      <Ionicons name="close" size={size} color={theme.palette.slate[600]} />
     </DialogPrimitive.Close>
   );
 }
@@ -132,7 +138,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(4),
     borderRadius: theme.borderRadius["3xl"],
     backgroundColor: theme.palette.white,
-    padding: theme.spacing(6),
+    padding: theme.spacing(8),
   },
   header: { gap: theme.spacing(1.5), textAlign: "center" },
   footer: { gap: theme.spacing(2) },
@@ -147,19 +153,10 @@ const styles = StyleSheet.create((theme) => ({
   description: { color: theme.palette.black },
   close: {
     position: "absolute",
-    top: theme.spacing(-8),
+    top: theme.spacing(3),
+    right: theme.spacing(3),
     zIndex: 50,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing(2),
-    alignSelf: "center",
     outlineWidth: 0,
-  },
-  closeText: {
-    fontFamily: theme.fonts.bold,
-    fontSize: theme.fontSize.sm,
-    textTransform: "uppercase",
-    color: theme.palette.cyan[500],
   },
 }));
 
