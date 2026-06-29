@@ -30,6 +30,31 @@ if (!spec.openapi || !spec.paths) {
   process.exit(1);
 }
 
+if (!spec.components?.securitySchemes?.Bearer) {
+  console.error(`Response from ${url} does not define the Bearer security scheme.`);
+  process.exit(1);
+}
+
+spec.security = [{ Bearer: [] }];
+
+const publicOperations = [
+  ["/api/auth/register", "post"],
+  ["/api/auth/login", "post"],
+  ["/api/auth/refresh", "post"],
+  ["/api/auth/oauth/google", "get"],
+  ["/api/auth/oauth/google/callback", "get"],
+  ["/api/auth/oauth/google/mobile", "post"],
+];
+
+for (const [path, method] of publicOperations) {
+  const operation = spec.paths[path]?.[method];
+  if (!operation) {
+    console.error(`Response from ${url} does not define ${method.toUpperCase()} ${path}.`);
+    process.exit(1);
+  }
+  operation.security = [];
+}
+
 await mkdir(dirname(outputPath), { recursive: true });
 await writeFile(`${outputPath}`, `${JSON.stringify(spec, null, 2)}\n`);
 

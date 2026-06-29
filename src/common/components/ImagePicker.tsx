@@ -1,4 +1,5 @@
 import { type ReactNode, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -12,6 +13,8 @@ export type ImagePickerValue = {
   uri: string;
   mimeType?: string | null;
   fileName?: string | null;
+  width?: number;
+  height?: number;
 };
 
 type ImagePickerProps = {
@@ -39,6 +42,7 @@ export function ImagePicker({
   allowsEditing = true,
   quality = 0.8,
 }: ImagePickerProps) {
+  const { t } = useTranslation(["common"]);
   const drawerExternalActivity = useDrawerExternalActivity();
 
   const pick = useCallback(async () => {
@@ -65,7 +69,13 @@ export function ImagePicker({
       if (result.canceled) return;
 
       const asset = result.assets[0];
-      onChange({ uri: asset.uri, mimeType: asset.mimeType, fileName: asset.fileName });
+      onChange({
+        uri: asset.uri,
+        mimeType: asset.mimeType,
+        fileName: asset.fileName,
+        width: asset.width,
+        height: asset.height,
+      });
     } finally {
       onBlur?.();
       drawerExternalActivity?.resume();
@@ -87,7 +97,7 @@ export function ImagePicker({
         ) : (
           <View style={styles.placeholder}>
             {typeof placeholder === "string" || !placeholder ? (
-              <Text style={styles.placeholderText}>{placeholder ?? "Add photo"}</Text>
+              <Text style={styles.placeholderText}>{placeholder ?? t("imagePicker.title")}</Text>
             ) : (
               placeholder
             )}

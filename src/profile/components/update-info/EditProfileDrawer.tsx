@@ -42,6 +42,7 @@ export const EditProfileDrawer = ({ isOpen, setIsOpen }: Props) => {
           displayName: value.displayName || null,
           phoneNumber: value.phoneNumber || null,
         });
+        form.reset(value);
         Toast.show({ type: "success", text1: t("profile:updateSuccessMessage") });
         setIsOpen(false);
       } catch (e) {
@@ -52,7 +53,16 @@ export const EditProfileDrawer = ({ isOpen, setIsOpen }: Props) => {
   });
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer
+      open={isOpen}
+      onOpenChange={(open) => {
+        form.reset({
+          displayName: profile?.displayName ?? "",
+          phoneNumber: profile?.phoneNumber ?? "",
+        });
+        setIsOpen(open);
+      }}
+    >
       <DrawerContent
         scrollable
         snapPoints={["70%"]}

@@ -36,7 +36,7 @@ export function ProfileMenuRow({
       <View style={[styles.iconWrap, isDanger && styles.iconWrapDanger]}>{icon}</View>
       <View style={styles.copy}>
         <Text style={[styles.label, isDanger && styles.labelDanger]}>{label}</Text>
-        {description ? <Text style={styles.description}>{description}</Text> : null}
+        {!!description && <Text style={styles.description}>{description}</Text>}
       </View>
       <ChevronRightIcon
         width={18}

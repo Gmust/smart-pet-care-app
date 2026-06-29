@@ -20,9 +20,22 @@ export const useUpdateAvatar = () => {
     mutationFn: async (image: ImagePickerValue): Promise<UserResponseDto> => {
       const sourceUri = /^\w+:\/\//.test(image.uri) ? image.uri : `file://${image.uri}`;
 
-      const rendered = await ImageManipulator.manipulate(sourceUri)
-        .resize({ width: AVATAR_MAX_SIZE })
-        .renderAsync();
+      // Resize the longer edge to AVATAR_MAX_SIZE and let the other edge scale
+      // proportionally, but only when it actually exceeds the cap — never upscale.
+      // Falls back to capping width when dimensions are unknown.
+      const manipulator = ImageManipulator.manipulate(sourceUri);
+      const { width, height } = image;
+      if (width && height) {
+        if (Math.max(width, height) > AVATAR_MAX_SIZE) {
+          manipulator.resize(
+            width >= height ? { width: AVATAR_MAX_SIZE } : { height: AVATAR_MAX_SIZE }
+          );
+        }
+      } else {
+        manipulator.resize({ width: AVATAR_MAX_SIZE });
+      }
+
+      const rendered = await manipulator.renderAsync();
       const resized = await rendered.saveAsync({ compress: 0.7, format: SaveFormat.JPEG });
 
       const file = asFormFile({

@@ -175,18 +175,30 @@ function DrawerContent({
 }: DrawerContentProps) {
   const insets = useSafeAreaInsets();
   const { modalRef, open, setOpen } = useDrawerContext("DrawerContent");
-  const externalActivityDismissRef = React.useRef<(() => void) | null>(null);
+  const externalActivityDismissRef = React.useRef<{
+    promise: Promise<void>;
+    resolve: () => void;
+  } | null>(null);
 
   const suspendForExternalActivity = React.useCallback(() => {
+    const pendingDismiss = externalActivityDismissRef.current;
+    if (pendingDismiss) {
+      return pendingDismiss.promise;
+    }
+
     const modal = modalRef.current;
     if (!modal || !open) {
       return Promise.resolve();
     }
 
-    return new Promise<void>((resolve) => {
-      externalActivityDismissRef.current = resolve;
-      modal.dismiss();
+    const resolver: { current: () => void } = { current: () => undefined };
+    const promise = new Promise<void>((resolve) => {
+      resolver.current = resolve;
     });
+    externalActivityDismissRef.current = { promise, resolve: resolver.current };
+    modal.dismiss();
+
+    return promise;
   }, [modalRef, open]);
 
   const resumeAfterExternalActivity = React.useCallback(() => {
@@ -240,10 +252,10 @@ function DrawerContent({
       index={index}
       backdropComponent={renderBackdrop}
       onDismiss={() => {
-        const resolveExternalActivityDismiss = externalActivityDismissRef.current;
-        if (resolveExternalActivityDismiss) {
+        const externalActivityDismiss = externalActivityDismissRef.current;
+        if (externalActivityDismiss) {
           externalActivityDismissRef.current = null;
-          resolveExternalActivityDismiss();
+          externalActivityDismiss.resolve();
           return;
         }
         setOpen(false);

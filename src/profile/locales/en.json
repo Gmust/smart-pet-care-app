@@ -43,7 +43,7 @@
     }
   },
   "editSelectionDialog": {
-    "title": "Select what do you want to do?",
+    "title": "What would you like to do?",
     "profileInfoBtn": "Update profile info",
     "newAvatarBtn": "Set new avatar"
   },

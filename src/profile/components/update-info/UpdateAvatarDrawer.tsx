@@ -27,12 +27,13 @@ export const UpdateAvatarDrawer = ({ isOpen, setIsOpen }: Props) => {
 
   const form = useForm({
     defaultValues,
-    validators: { onSubmit: setNewAvatarSchema },
+    validators: { onSubmit: setNewAvatarSchema, onChange: setNewAvatarSchema },
     onSubmit: async ({ value }) => {
       if (!value.file) return;
       try {
         await updateAvatar(value.file);
         Toast.show({ type: "success", text1: t("setNewAvatarDrawer.successMessage") });
+        form.reset();
         setIsOpen(false);
       } catch (e) {
         console.error(e);
@@ -42,7 +43,13 @@ export const UpdateAvatarDrawer = ({ isOpen, setIsOpen }: Props) => {
   });
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) form.reset();
+        setIsOpen(open);
+      }}
+    >
       <DrawerContent
         scrollable
         snapPoints={["45%"]}

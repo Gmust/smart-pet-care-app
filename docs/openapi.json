@@ -1382,7 +1382,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/api/auth/login": {
@@ -1449,7 +1450,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/api/auth/refresh": {
@@ -1516,7 +1518,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/api/auth/logout": {
@@ -1593,7 +1596,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/api/auth/oauth/google/callback": {
@@ -1649,7 +1653,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/api/auth/oauth/google/mobile": {
@@ -1699,7 +1704,8 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": []
       }
     }
   },
@@ -2213,6 +2219,11 @@
     },
     {
       "name": "Auth"
+    }
+  ],
+  "security": [
+    {
+      "Bearer": []
     }
   ]
 }
