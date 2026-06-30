@@ -33,7 +33,12 @@ export function PetProfilePageActions({
 
   if (disabled) {
     return (
-      <Button variant="icon" size="icon" accessibilityLabel={t("petProfilePage.actions.open")}>
+      <Button
+        variant="icon"
+        size="icon"
+        accessibilityLabel={t("petProfilePage.actions.open")}
+        disabled={disabled}
+      >
         <EllipsisIcon width={16} height={16} color={palette.brand.textBody} />
       </Button>
     );

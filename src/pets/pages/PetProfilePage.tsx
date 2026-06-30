@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -10,7 +10,7 @@ import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import { DeletePetConfirmation } from "../components/actions/DeletePetConfitmation";
+import { DeletePetConfirmation } from "../components/actions/DeletePetConfirmation";
 import { EditPetDrawer } from "../components/actions/EditPetDrawer";
 import { PetProfilePageActions } from "../components/actions/PetProfilePageActions";
 import { UploadPetPhotoDrawer } from "../components/actions/UploadPetPhotoDrawer";
@@ -188,12 +188,9 @@ export default function PetProfilePage() {
                   <SectionHeader label={t("petProfilePage.notes.title")} compact />
                   <CirclePlusIcon width={20} height={20} color={palette.brand.textSecondary} />
                 </View>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={t("petProfilePage.notes.manageA11y")}
-                >
+                <Button variant="text" accessibilityLabel={t("petProfilePage.notes.manageA11y")}>
                   <Text style={styles.manageText}>{t("petProfilePage.notes.manage")}</Text>
-                </Pressable>
+                </Button>
               </View>
 
               <View style={styles.listCard}>

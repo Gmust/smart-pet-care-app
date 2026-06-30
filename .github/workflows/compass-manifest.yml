@@ -2,12 +2,11 @@ name: Compass Manifest
 
 on:
   pull_request:
-    types: [opened, synchronize]
-  push:
-    branches: [main]
+    types: [labeled]
 
 jobs:
   manifest:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.label.name == 'compass'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -24,8 +23,9 @@ jobs:
 
       - name: Generate manifest
         env:
-          AI_PROVIDER: claude
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AI_PROVIDER: gemini
+          GEMINI_MODEL: gemini-2.5-flash
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: npx compass-sync@1.0.0 manifest --local
 
       - name: Commit manifest

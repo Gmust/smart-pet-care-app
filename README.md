@@ -106,7 +106,7 @@ Do not edit generated files manually. Update the backend spec, refresh `docs/ope
 ## Team docs
 
 - API layer: `docs/api.md`
-- Claude/Compass PR automation: `docs/claude-pr-automation.md`
+- Compass PR automation: `docs/compass-pr-automation.md`
 
 ## Get a fresh project
 
