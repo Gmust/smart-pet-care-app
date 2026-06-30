@@ -3,8 +3,10 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { EllipsisIcon } from "@/icons/ellipsis";
+import { ImageEdit } from "@/icons/image-edit";
 import { PencilLineIcon } from "@/icons/pencil-line";
 import { TriangleAlertIcon } from "@/icons/triangle-alert";
+import { Button } from "@/shadecn/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,26 +16,26 @@ import {
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import { RoundButton } from "./RoundButton";
-
 type PetProfilePageActionsProps = {
   disabled?: boolean;
   onEdit: () => void;
+  onChangePhoto: () => void;
   onDelete: () => void;
 };
 
 export function PetProfilePageActions({
   disabled = false,
   onEdit,
+  onChangePhoto,
   onDelete,
 }: PetProfilePageActionsProps) {
   const { t } = useTranslation("pets");
 
   if (disabled) {
     return (
-      <RoundButton accessibilityLabel={t("petProfilePage.actions.open")}>
+      <Button variant="icon" size="icon" accessibilityLabel={t("petProfilePage.actions.open")}>
         <EllipsisIcon width={16} height={16} color={palette.brand.textBody} />
-      </RoundButton>
+      </Button>
     );
   }
 
@@ -53,6 +55,16 @@ export function PetProfilePageActions({
             <PencilLineIcon width={18} height={18} color={palette.brand.primaryDefault} />
           </View>
           <Text style={styles.itemText}>{t("petProfilePage.actions.edit")}</Text>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          accessibilityLabel={t("petProfilePage.actions.changePhoto")}
+          onPress={onChangePhoto}
+        >
+          <View style={styles.itemIcon}>
+            <ImageEdit width={18} height={18} color={palette.brand.primaryDefault} />
+          </View>
+          <Text style={styles.itemText}>{t("petProfilePage.actions.changePhoto")}</Text>
         </DropdownMenuItem>
 
         <DropdownMenuItem

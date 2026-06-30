@@ -20,7 +20,7 @@ import { HeartPulseIcon } from "@/icons/heart";
 import type { Icon } from "@/icons/icons";
 import { PlusIcon } from "@/icons/plus";
 import { UtensilsCrossedIcon } from "@/icons/utensils";
-import { CreatePetDrawer } from "@/pets/components/CreatePetDrawer";
+import { CreatePetDrawer } from "@/pets/components/actions/CreatePetDrawer";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { CreateReminderDrawer } from "@/reminders/components/CreateReminderDrawer";
 import { palette } from "@/styles/palette";

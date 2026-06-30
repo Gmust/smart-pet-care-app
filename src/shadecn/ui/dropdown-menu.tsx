@@ -12,7 +12,7 @@ const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
 
-const overlayEntering = FadeIn.duration(150);
+const overlayEntering = FadeIn.duration(100);
 const overlayExiting = FadeOut.duration(120);
 
 function DropdownMenuContent({
