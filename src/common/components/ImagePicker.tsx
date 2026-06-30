@@ -25,6 +25,7 @@ type ImagePickerProps = {
   placeholder?: ReactNode;
   error?: boolean;
   disabled?: boolean;
+  shape?: "circle" | "square";
   aspect?: [number, number];
   allowsEditing?: boolean;
   quality?: number;
@@ -38,6 +39,7 @@ export function ImagePicker({
   placeholder,
   error = false,
   disabled = false,
+  shape = "circle",
   aspect = [1, 1],
   allowsEditing = true,
   quality = 0.8,
@@ -89,7 +91,12 @@ export function ImagePicker({
       <Pressable
         onPress={pick}
         disabled={disabled}
-        style={[styles.box, error && styles.boxError, disabled && styles.boxDisabled]}
+        style={[
+          styles.box,
+          shape === "square" && styles.boxSquare,
+          !!error && styles.boxError,
+          disabled && styles.boxDisabled,
+        ]}
         accessibilityRole="button"
       >
         {value ? (
@@ -137,6 +144,12 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.palette.brand.surfaceBorder,
     backgroundColor: theme.palette.brand.surfaceSunken,
+  },
+  boxSquare: {
+    width: "100%",
+    height: undefined,
+    aspectRatio: 16 / 9,
+    borderRadius: theme.borderRadius["2xl"],
   },
   boxError: {
     borderColor: theme.palette.brand.danger,

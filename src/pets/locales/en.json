@@ -16,10 +16,47 @@
     "addPet": "Add a new pet"
   },
   "petProfilePage": {
+    "goBack": "Go back",
+    "notFound": "Pet not found",
+    "tabs": {
+      "overview": "Overview",
+      "activity": "Activity",
+      "health": "Health",
+      "reminders": "Reminders"
+    },
+    "basics": {
+      "title": "Basics",
+      "species": "Species",
+      "breed": "Breed",
+      "birthday": "Birthday",
+      "sex": "Sex",
+      "weight": "Weight"
+    },
+    "fallbacks": {
+      "notAdded": "Not added",
+      "speciesUnknown": "Unknown",
+      "breedUnknown": "Breed unknown"
+    },
+    "weightValue": "{{value}} kg",
+    "notes": {
+      "title": "Notes",
+      "manage": "Manage",
+      "manageA11y": "Manage notes",
+      "empty": "No notes yet"
+    },
+    "flags": {
+      "allergies": "Allergies",
+      "chronicCondition": "Chronic condition"
+    },
+    "noteTitles": {
+      "chronicConditions": "Chronic conditions",
+      "behavioralNotes": "Behavioral notes"
+    },
     "actions": {
       "open": "Open pet actions",
       "close": "Close pet actions",
       "edit": "Edit pet",
+      "changePhoto": "Set pet photo",
       "delete": "Delete pet"
     },
     "deleteDialog": {
@@ -58,6 +95,11 @@
   "editPetDrawer": {
     "title": "Edit pet info",
     "submit": "Save changes"
+  },
+  "uploadPhotoDrawer": {
+    "title": "Set pet photo",
+    "saveBtn": "Save photo",
+    "successMessage": "Pet photo updated successfully!"
   },
   "petListCard": {
     "accessibilityLabel": "View {{name}}",

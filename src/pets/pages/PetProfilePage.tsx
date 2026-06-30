@@ -2,112 +2,90 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 
-import type { PetResponseDto } from "@/api/generated";
 import { Chevron } from "@/icons/arrows";
 import { CirclePlusIcon } from "@/icons/circle-plus";
 import { Button } from "@/shadecn/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shadecn/ui/dialog";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import { EditPetDrawer } from "../components/EditPetDrawer";
+import { DeletePetConfirmation } from "../components/actions/DeletePetConfitmation";
+import { EditPetDrawer } from "../components/actions/EditPetDrawer";
+import { PetProfilePageActions } from "../components/actions/PetProfilePageActions";
+import { UploadPetPhotoDrawer } from "../components/actions/UploadPetPhotoDrawer";
 import { FlagChip } from "../components/FlagChip";
 import { InfoRow } from "../components/InfoRow";
 import { NoteRow } from "../components/NoteRow";
-import { PetProfilePageActions } from "../components/PetProfilePageActions";
 import { PetSpeciesImage } from "../components/PetSpeciesImage";
-import { RoundButton } from "../components/RoundButton";
 import { SectionHeader } from "../components/SectionHeader";
-import useDeletePetMutation from "../queries/useDeletePet";
 import { usePetQuery } from "../queries/usePetQuery";
-import {
-  PetProfileHeroSkeleton,
-  PetProfilePageSkeleton,
-} from "../skeletons/PetProfilePageSkeleton";
+import { PetProfilePageSkeleton } from "../skeletons/PetProfilePageSkeleton";
 import type { PetFlag, PetNote } from "../types";
 import dayjs from "dayjs";
 import { useLocalSearchParams, useRouter } from "expo-router";
-
-const formatDate = (value: string | null | undefined): string => {
-  if (!value) {
-    return "Not added";
-  }
-
-  const date = dayjs(value);
-  return date.isValid() ? date.format("MMM D, YYYY") : value;
-};
-
-const formatWeight = (pet: PetResponseDto): string => {
-  if (pet.weightKg === null || pet.weightKg === undefined) {
-    return "Not added";
-  }
-
-  return `${pet.weightKg} kg`;
-};
-
-const getFlags = (pet: PetResponseDto): PetFlag[] => {
-  const flags: PetFlag[] = [];
-
-  if (pet.allergies) {
-    flags.push({ id: "allergies", label: "Allergies", tone: "warn" });
-  }
-
-  if (pet.chronicConditions) {
-    flags.push({ id: "chronic-conditions", label: "Chronic condition", tone: "warn" });
-  }
-
-  if (!flags.length && pet.species) {
-    flags.push({ id: "species", label: pet.species, tone: "ok" });
-  }
-
-  return flags;
-};
-
-const getNotes = (pet: PetResponseDto): PetNote[] => {
-  const notes: PetNote[] = [];
-
-  if (pet.allergies) {
-    notes.push({ id: "allergies", title: "Allergies", preview: pet.allergies });
-  }
-
-  if (pet.chronicConditions) {
-    notes.push({
-      id: "chronic-conditions",
-      title: "Chronic conditions",
-      preview: pet.chronicConditions,
-    });
-  }
-
-  if (pet.behavioralNotes) {
-    notes.push({ id: "behavioral-notes", title: "Behavioral notes", preview: pet.behavioralNotes });
-  }
-
-  return notes;
-};
 
 export default function PetProfilePage() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation(["pets", "common"]);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { petId } = useLocalSearchParams<{ petId?: string }>();
   const { data: pet, isLoading: isPetLoading } = usePetQuery(petId);
-  const { mutateAsync: deletePet, isPending: isPetDeleting } = useDeletePetMutation();
   const petName = pet?.name;
-  const flags = pet ? getFlags(pet) : [];
-  const notes = pet ? getNotes(pet) : [];
+
+  const tabs = [
+    t("petProfilePage.tabs.overview"),
+    t("petProfilePage.tabs.activity"),
+    t("petProfilePage.tabs.health"),
+    t("petProfilePage.tabs.reminders"),
+  ];
+
+  const flags: PetFlag[] = [];
+  const notes: PetNote[] = [];
+  if (pet) {
+    if (pet.allergies) {
+      flags.push({ id: "allergies", label: t("petProfilePage.flags.allergies"), tone: "warn" });
+      notes.push({
+        id: "allergies",
+        title: t("petProfilePage.flags.allergies"),
+        preview: pet.allergies,
+      });
+    }
+    if (pet.chronicConditions) {
+      flags.push({
+        id: "chronic-conditions",
+        label: t("petProfilePage.flags.chronicCondition"),
+        tone: "warn",
+      });
+      notes.push({
+        id: "chronic-conditions",
+        title: t("petProfilePage.noteTitles.chronicConditions"),
+        preview: pet.chronicConditions,
+      });
+    }
+    if (pet.behavioralNotes) {
+      notes.push({
+        id: "behavioral-notes",
+        title: t("petProfilePage.noteTitles.behavioralNotes"),
+        preview: pet.behavioralNotes,
+      });
+    }
+    if (!flags.length && pet.species) {
+      flags.push({ id: "species", label: pet.species, tone: "ok" });
+    }
+  }
+
+  const birthDate = pet?.birthDate ? dayjs(pet.birthDate) : null;
+  const birthdayValue = birthDate?.isValid()
+    ? birthDate.format("MMM D, YYYY")
+    : t("petProfilePage.fallbacks.notAdded");
+
+  const weightValue = !pet?.weightKg
+    ? t("petProfilePage.fallbacks.notAdded")
+    : t("petProfilePage.weightValue", { value: pet?.weightKg });
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -126,146 +104,126 @@ export default function PetProfilePage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeletePet = async () => {
-    if (!pet?.id) {
-      Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
-      return;
-    }
-
-    try {
-      await deletePet(pet.id);
-      Toast.show({ type: "success", text1: t("pets:deleteSuccessMessage") });
-      setIsDeleteDialogOpen(false);
-      router.replace("/(tabs)/pets");
-    } catch (e) {
-      console.error(e);
-      Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
-    }
-  };
+  if (isPetLoading) {
+    return <PetProfilePageSkeleton />;
+  }
 
   return (
-    <View style={styles.screen}>
-      <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
-        <RoundButton accessibilityLabel="Go back" onPress={handleBack}>
-          <Chevron width={9} height={16} color={palette.brand.textBody} />
-        </RoundButton>
-        <Text style={styles.topBarTitle}>{petName}</Text>
-        <PetProfilePageActions
-          disabled={!pet}
-          onEdit={handleOpenEdit}
-          onDelete={handleOpenDeleteDialog}
-        />
-      </View>
+    <>
+      <View style={styles.screen}>
+        <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
+          <Button
+            size="icon"
+            variant="icon"
+            accessibilityLabel={t("petProfilePage.goBack")}
+            onPress={handleBack}
+          >
+            <Chevron width={9} height={16} color={palette.brand.textBody} />
+          </Button>
+          <Text style={styles.topBarTitle}>{petName}</Text>
+          <PetProfilePageActions
+            disabled={!pet}
+            onEdit={handleOpenEdit}
+            onChangePhoto={() => setIsPhotoOpen(true)}
+            onDelete={handleOpenDeleteDialog}
+          />
+        </View>
 
+        {pet ? (
+          <View style={styles.hero}>
+            {pet.photoUrl ? (
+              <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} variant="hero" />
+            ) : (
+              <PetSpeciesImage species={pet.species} variant="hero" />
+            )}
+            <View style={styles.flagRow}>
+              {flags.map((flag) => (
+                <FlagChip key={flag.id} flag={flag} />
+              ))}
+            </View>
+          </View>
+        ) : (
+          <View style={[styles.hero, styles.heroEmpty]}>
+            <Text style={styles.emptyText}>{t("petProfilePage.notFound")}</Text>
+          </View>
+        )}
+
+        <View style={styles.segmentedTabs}>
+          {tabs.map((label, index) => (
+            <View key={label} style={[styles.segmentTab, index === 0 && styles.segmentTabActive]}>
+              <Text style={[styles.segmentText, index === 0 && styles.segmentTextActive]}>
+                {label}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={styles.content}
+        >
+          {!!pet && (
+            <>
+              <SectionHeader label={t("petProfilePage.basics.title")} />
+              <View style={styles.listCard}>
+                <InfoRow
+                  label={t("petProfilePage.basics.species")}
+                  value={pet.species ?? t("petProfilePage.fallbacks.speciesUnknown")}
+                />
+                <InfoRow
+                  label={t("petProfilePage.basics.breed")}
+                  value={pet.breed ?? t("petProfilePage.fallbacks.breedUnknown")}
+                />
+                <InfoRow label={t("petProfilePage.basics.birthday")} value={birthdayValue} />
+                <InfoRow
+                  label={t("petProfilePage.basics.sex")}
+                  value={pet.sex ?? t("sex.Unknown")}
+                />
+                <InfoRow label={t("petProfilePage.basics.weight")} value={weightValue} />
+              </View>
+
+              <View style={styles.notesHeader}>
+                <View style={styles.notesLabelRow}>
+                  <SectionHeader label={t("petProfilePage.notes.title")} compact />
+                  <CirclePlusIcon width={20} height={20} color={palette.brand.textSecondary} />
+                </View>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t("petProfilePage.notes.manageA11y")}
+                >
+                  <Text style={styles.manageText}>{t("petProfilePage.notes.manage")}</Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.listCard}>
+                {notes.length ? (
+                  notes.map((note) => <NoteRow key={note.id} note={note} />)
+                ) : (
+                  <View style={styles.emptyCard}>
+                    <Text style={styles.emptyText}>{t("petProfilePage.notes.empty")}</Text>
+                  </View>
+                )}
+              </View>
+            </>
+          )}
+        </ScrollView>
+      </View>
       {!!pet && <EditPetDrawer pet={pet} isOpen={isEditOpen} setIsOpen={setIsEditOpen} />}
 
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("pets:petProfilePage.deleteDialog.title")}</DialogTitle>
-            <DialogDescription style={styles.deleteDialogDescription}>
-              {t("pets:petProfilePage.deleteDialog.description", { name: petName })}
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogFooter>
-            <Button
-              variant="danger"
-              size="md"
-              isLoading={isPetDeleting}
-              disabled={isPetDeleting}
-              onPress={handleDeletePet}
-            >
-              {t("pets:petProfilePage.deleteDialog.confirm")}
-            </Button>
-
-            <DialogClose asChild>
-              <Button variant="ghost" size="md" disabled={isPetDeleting}>
-                {t("pets:petProfilePage.deleteDialog.cancel")}
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {isPetLoading ? (
-        <View style={styles.hero}>
-          <PetProfileHeroSkeleton />
-        </View>
-      ) : pet ? (
-        <View style={styles.hero}>
-          {pet.photoUrl ? (
-            <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} variant="hero" />
-          ) : (
-            <PetSpeciesImage species={pet.species} variant="hero" />
-          )}
-          <View style={styles.flagRow}>
-            {flags.map((flag) => (
-              <FlagChip key={flag.id} flag={flag} />
-            ))}
-          </View>
-        </View>
-      ) : (
-        <View style={[styles.hero, styles.heroEmpty]}>
-          <Text style={styles.emptyText}>{isPetLoading ? "Loading pet" : "Pet not found"}</Text>
-        </View>
+      {!!pet?.id && (
+        <UploadPetPhotoDrawer petId={pet.id} isOpen={isPhotoOpen} setIsOpen={setIsPhotoOpen} />
       )}
 
-      <View style={styles.segmentedTabs}>
-        {["Overview", "Activity", "Health", "Reminders"].map((label, index) => (
-          <View key={label} style={[styles.segmentTab, index === 0 && styles.segmentTabActive]}>
-            <Text style={[styles.segmentText, index === 0 && styles.segmentTextActive]}>
-              {label}
-            </Text>
-          </View>
-        ))}
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentInsetAdjustmentBehavior="automatic"
-        contentContainerStyle={styles.content}
-      >
-        {isPetLoading && <PetProfilePageSkeleton />}
-
-        {!!pet && (
-          <>
-            <SectionHeader label="Basics" />
-            <View style={styles.listCard}>
-              <InfoRow label="Species" value={pet.species ?? "Unknown"} />
-              <InfoRow label="Breed" value={pet.breed ?? "Breed unknown"} />
-              <InfoRow label="Birthday" value={formatDate(pet.birthDate)} />
-              <InfoRow label="Sex" value={pet.sex ?? "Unknown"} />
-              <InfoRow label="Weight" value={formatWeight(pet)} />
-            </View>
-          </>
-        )}
-
-        {!isPetLoading && (
-          <View style={styles.notesHeader}>
-            <View style={styles.notesLabelRow}>
-              <SectionHeader label="Notes" compact />
-              <CirclePlusIcon width={20} height={20} color={palette.brand.textSecondary} />
-            </View>
-            <Pressable accessibilityRole="button" accessibilityLabel="Manage notes">
-              <Text style={styles.manageText}>Manage</Text>
-            </Pressable>
-          </View>
-        )}
-
-        {!!pet && (
-          <View style={styles.listCard}>
-            {notes.length ? (
-              notes.map((note) => <NoteRow key={note.id} note={note} />)
-            ) : (
-              <View style={styles.emptyCard}>
-                <Text style={styles.emptyText}>No notes yet</Text>
-              </View>
-            )}
-          </View>
-        )}
-      </ScrollView>
-    </View>
+      {!!pet && (
+        <DeletePetConfirmation
+          petId={pet.id ?? ""}
+          petName={petName ?? ""}
+          isOpen={isDeleteDialogOpen}
+          setIsOpen={setIsDeleteDialogOpen}
+        />
+      )}
+    </>
   );
 }
 
@@ -281,13 +239,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2.5),
     paddingHorizontal: theme.spacing(4),
     paddingBottom: theme.spacing(2),
-  },
-  deleteDialogDescription: {
-    textAlign: "center",
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.45,
-    color: theme.palette.brand.textBody,
   },
   topBarTitle: {
     flex: 1,

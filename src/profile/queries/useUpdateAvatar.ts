@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { postApiProfileAvatar } from "@/api";
-import type { UserResponseDto } from "@/api/generated";
 import { asFormFile } from "@/api/rnFormFile";
 import type { ImagePickerValue } from "@/common/components/ImagePicker";
+import { toSourceUri } from "@/common/utils/toSourceUri";
 
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 
@@ -17,8 +17,8 @@ export const useUpdateAvatar = () => {
 
   return useMutation({
     mutationKey: ["update-avatar"],
-    mutationFn: async (image: ImagePickerValue): Promise<UserResponseDto> => {
-      const sourceUri = /^\w+:\/\//.test(image.uri) ? image.uri : `file://${image.uri}`;
+    mutationFn: async (image: ImagePickerValue) => {
+      const sourceUri = toSourceUri(image.uri);
 
       // Resize the longer edge to AVATAR_MAX_SIZE and let the other edge scale
       // proportionally, but only when it actually exceeds the cap — never upscale.

@@ -1,11 +1,15 @@
+import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
-import { Sex } from "@/api/generated";
+import { type PetResponseDto, Sex } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
+import { useUpdatePetMutation } from "@/pets/queries/useUpdatePetMutation";
+import type { CreatePetForm } from "@/pets/schemas/create-pet.schema";
+import { createPetSchema } from "@/pets/schemas/create-pet.schema";
 import { Button } from "@/shadecn/ui/button";
 import {
   Drawer,
@@ -21,12 +25,11 @@ import { Input } from "@/shadecn/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shadecn/ui/select";
 import { Text } from "@/shadecn/ui/text";
 
-import { useCreatePetMutation } from "../queries/useCreatePetMutation";
-import { type CreatePetForm, createPetSchema } from "../schemas/create-pet.schema";
 import dayjs from "dayjs";
 
 type Props = {
   isOpen: boolean;
+  pet: PetResponseDto;
   setIsOpen: (open: boolean) => void;
 };
 
@@ -34,22 +37,23 @@ const SPECIES = ["Dog", "Cat", "Bird", "Rabbit", "Other"] as const;
 const SEX_OPTIONS: Sex[] = [Sex.Unknown, Sex.Male, Sex.Female];
 const SELECT_PORTAL_HOST = "select";
 
-const defaultValues: CreatePetForm = {
-  name: "",
-  species: "",
-  breed: "",
-  birthDate: null,
-  weightKg: "",
-  sex: Sex.Unknown,
-  allergies: "",
-  chronicConditions: "",
-  behavioralNotes: "",
-};
+const getPetFormValues = (pet: PetResponseDto): CreatePetForm => ({
+  name: pet.name ?? "",
+  species: pet.species ?? "",
+  breed: pet.breed ?? "",
+  birthDate: pet.birthDate ?? null,
+  weightKg: pet.weightKg !== null && pet.weightKg !== undefined ? String(pet.weightKg) : "",
+  sex: pet.sex ?? Sex.Unknown,
+  allergies: pet.allergies ?? "",
+  chronicConditions: pet.chronicConditions ?? "",
+  behavioralNotes: pet.behavioralNotes ?? "",
+});
 
-export const CreatePetDrawer = ({ isOpen, setIsOpen }: Props) => {
+export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
   const { t } = useTranslation(["pets", "common"]);
+  const { mutateAsync: updatePet, isPending: isPetUpdating } = useUpdatePetMutation();
 
-  const { mutateAsync: createPet, isPending: isPetCreating } = useCreatePetMutation();
+  const defaultValues = useMemo(() => getPetFormValues(pet), [pet]);
 
   const speciesLabel = (value: string) => {
     const known = SPECIES.find((species) => species === value);
@@ -60,10 +64,14 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen }: Props) => {
     defaultValues,
     validators: { onChange: createPetSchema(t), onSubmit: createPetSchema(t) },
     onSubmit: async ({ value }) => {
+      if (!pet.id) {
+        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+        return;
+      }
+
       try {
-        await createPet(value);
-        Toast.show({ type: "success", text1: t("pets:successMessage") });
-        form.reset();
+        await updatePet({ id: pet.id, payload: value });
+        Toast.show({ type: "success", text1: t("pets:updateSuccessMessage") });
         setIsOpen(false);
       } catch (e) {
         console.error(e);
@@ -71,6 +79,12 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen }: Props) => {
       }
     },
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      form.reset(defaultValues);
+    }
+  }, [defaultValues, form, isOpen]);
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -83,7 +97,7 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen }: Props) => {
         <DrawerCloseButton />
 
         <DrawerHeader style={styles.header}>
-          <DrawerTitle style={styles.title}>{t("pets:createPetDrawer.title")}</DrawerTitle>
+          <DrawerTitle style={styles.title}>{t("pets:editPetDrawer.title")}</DrawerTitle>
         </DrawerHeader>
 
         <DrawerScrollView
@@ -278,11 +292,11 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen }: Props) => {
                 size="lg"
                 variant="primary"
                 style={styles.submitButton}
-                disabled={!canSubmit || isPetCreating}
-                isLoading={isSubmitting || isPetCreating}
+                disabled={!canSubmit || isPetUpdating}
+                isLoading={isSubmitting || isPetUpdating}
                 onPress={() => form.handleSubmit()}
               >
-                {t("pets:createPetDrawer.submit")}
+                {t("pets:editPetDrawer.submit")}
               </Button>
             )}
           </form.Subscribe>

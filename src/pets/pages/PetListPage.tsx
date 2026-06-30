@@ -9,7 +9,7 @@ import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import { CreatePetDrawer } from "../components/CreatePetDrawer";
+import { CreatePetDrawer } from "../components/actions/CreatePetDrawer";
 import { PetListCard } from "../components/PetListCard";
 import { usePetsQuery } from "../queries/usePetsQuery";
 import { PetListPageSkeleton, PetListSubtitleSkeleton } from "../skeletons/PetListPageSkeleton";

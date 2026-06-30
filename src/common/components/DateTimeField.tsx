@@ -1,8 +1,9 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Pressable, View } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { Platform, Pressable, View } from "react-native";
+import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
+import { useDrawerExternalActivity } from "@/shadecn/ui/drawer";
 import { Input } from "@/shadecn/ui/input";
 
 type DateTimeMode = "date" | "time";
@@ -38,21 +39,37 @@ export function DateTimeField({
   onBlur,
 }: DateTimeFieldProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const externalActivity = useDrawerExternalActivity();
 
-  const handleSelect = (selectedDate: Date) => {
-    setIsOpen(false);
-    onChange(selectedDate);
-    onBlur?.();
-  };
+  const open = async () => {
+    if (disabled) return;
 
-  const handleDismiss = () => {
-    setIsOpen(false);
-    onBlur?.();
+    if (Platform.OS === "android") {
+      // Suspend the enclosing drawer (gorhom sheet) so the native picker
+      // dialog doesn't fight it for window focus and remount/close the sheet.
+      await externalActivity?.suspend();
+      DateTimePickerAndroid.open({
+        mode,
+        value: value ?? new Date(),
+        is24Hour,
+        minimumDate,
+        maximumDate,
+        onChange: (event, selectedDate) => {
+          if (event.type === "set" && selectedDate) onChange(selectedDate);
+          onBlur?.();
+          externalActivity?.resume();
+        },
+      });
+      return;
+    }
+
+    // iOS renders the picker inline within the sheet — no suspend needed.
+    setIsOpen(true);
   };
 
   return (
     <View>
-      <Pressable onPress={() => !disabled && setIsOpen(true)}>
+      <Pressable onPress={open}>
         <View pointerEvents="none">
           <Input
             label={label}
@@ -71,8 +88,11 @@ export function DateTimeField({
           is24Hour={is24Hour}
           minimumDate={minimumDate}
           maximumDate={maximumDate}
-          onValueChange={(_event, selectedDate) => handleSelect(selectedDate)}
-          onDismiss={handleDismiss}
+          onValueChange={(event, selectedDate) => {
+            setIsOpen(false);
+            if (selectedDate) onChange(selectedDate);
+            onBlur?.();
+          }}
         />
       ) : null}
     </View>

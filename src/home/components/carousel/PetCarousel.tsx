@@ -4,7 +4,7 @@ import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { StyleSheet } from "react-native-unistyles";
 
-import { CreatePetDrawer } from "@/pets/components/CreatePetDrawer";
+import { CreatePetDrawer } from "@/pets/components/actions/CreatePetDrawer";
 import { palette } from "@/styles/palette";
 
 import type { PetHealth } from "../../types";
