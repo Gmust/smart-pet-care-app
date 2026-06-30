@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 
-import useDeletePet from "@/pets/queries/useDeletePet";
+import { useDeletePet } from "@/pets/queries/useDeletePet";
 import { Button } from "@/shadecn/ui/button";
 import type { DialogHandler } from "@/shadecn/ui/dialog";
 import {

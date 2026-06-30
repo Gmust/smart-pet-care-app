@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { deleteApiPetsId } from "@/api";
 
-export default () => {
+export const useDeletePet = () => {
   const queryClient = useQueryClient();
 
   return useMutation({

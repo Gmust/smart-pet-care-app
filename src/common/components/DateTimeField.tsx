@@ -69,7 +69,7 @@ export function DateTimeField({
 
   return (
     <View>
-      <Pressable onPress={open}>
+      <Pressable onPress={open} disabled={disabled}>
         <View pointerEvents="none">
           <Input
             label={label}
