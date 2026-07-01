@@ -2,3 +2,6 @@ allowBuilds:
   esbuild: false
   msgpackr-extract: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - expo-constants@56.0.19
+  - expo-notifications@56.0.19

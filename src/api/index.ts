@@ -31,4 +31,6 @@ export const {
   postApiReminders,
   postApiRemindersRunsRunIdAcknowledge,
   patchApiPetsIdPhoto,
+  deleteApiNotificationsDeviceTokenToken,
+  postApiNotificationsDeviceToken,
 } = getSmartPetCareAPI(api);

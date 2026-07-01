@@ -5,14 +5,7 @@ import { StethoscopeIcon } from "@/icons/stethoscope";
 import { SyringeIcon } from "@/icons/syringe";
 import { UtensilsIcon } from "@/icons/utensils";
 
-import type {
-  PetHealth,
-  Reminder,
-  ReminderGroup,
-  ReminderGroupKey,
-  ReminderStatus as HomeReminderStatus,
-  ReminderTone,
-} from "../types";
+import type { PetHealth, Reminder, ReminderGroup, ReminderGroupKey, ReminderTone } from "../types";
 
 const getPetScore = (pet: PetResponseDto): number => {
   if (pet.allergies || pet.chronicConditions) {
@@ -70,19 +63,12 @@ const isReminderOverdue = (reminder: ReminderResponseDto): boolean => {
   return new Date(reminder.nextTriggerAt).getTime() < Date.now();
 };
 
-const getReminderStatus = (reminder: ReminderResponseDto): HomeReminderStatus => {
+const getReminderStatus = (reminder: ReminderResponseDto): ReminderStatus => {
   if (isReminderOverdue(reminder)) {
-    return "overdue";
+    return ReminderStatus.Missed;
   }
 
-  switch (reminder.status) {
-    case ReminderStatus.Completed:
-      return "done";
-    case ReminderStatus.Active:
-      return "next";
-    default:
-      return "pending";
-  }
+  return reminder.status ?? ReminderStatus.Active;
 };
 
 const getReminderIcon = (type: ReminderResponseDto["type"]) => {
@@ -144,14 +130,16 @@ const calendarDayOffset = (target: Date): number =>
   Math.round((startOfDay(target) - startOfDay(new Date())) / MS_PER_DAY);
 
 const getReminderGroupKey = (reminder: ReminderResponseDto): ReminderGroupKey => {
+  // No next trigger means the reminder is finished (completed/missed, non-repeatable)
+  // and will not fire again, so it belongs in the historical "passed" group.
   if (!reminder.nextTriggerAt) {
-    return "later";
+    return "passed";
   }
 
   const trigger = new Date(reminder.nextTriggerAt);
 
   if (Number.isNaN(trigger.getTime())) {
-    return "later";
+    return "passed";
   }
 
   const offset = calendarDayOffset(trigger);
@@ -182,6 +170,7 @@ const GROUP_ORDER: readonly ReminderGroupKey[] = [
   "soon",
   "nextWeek",
   "later",
+  "passed",
 ];
 
 const getTriggerTimestamp = (reminder: ReminderResponseDto): number => {

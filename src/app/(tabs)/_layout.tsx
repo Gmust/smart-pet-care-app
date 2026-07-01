@@ -39,6 +39,7 @@ export default function TabLayout() {
           <Tabs.Screen key={item} name={item} options={{ title: t(`navigationTabs.${item}`) }} />
         ))}
         <Tabs.Screen name="pet-profile" options={{ href: null }} />
+        <Tabs.Screen name="reminders" options={{ href: null }} />
       </Tabs>
       {pathname.endsWith("/home") && <Fab />}
     </View>

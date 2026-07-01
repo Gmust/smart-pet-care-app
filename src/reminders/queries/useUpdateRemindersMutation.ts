@@ -1,16 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { postApiReminders } from "@/api";
-import type { CreateReminderDto } from "@/api/generated";
+import { patchApiRemindersId } from "@/api";
+import type { PatchReminderDto } from "@/api/generated";
 import { getUtcOffsetMinutes } from "@/common/utils/getUtcOffsetMinutes";
 
-export const useCreateRemindersMutation = () => {
+export const useUpdateRemindersMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["create-reminder"],
-    mutationFn: async (payload: CreateReminderDto) => {
-      const { data } = await postApiReminders({
+    mutationKey: ["update-reminder"],
+    mutationFn: async ({ id, payload }: { id: string; payload: PatchReminderDto }) => {
+      const { data } = await patchApiRemindersId(id, {
         ...payload,
         utcOffsetMinutes: getUtcOffsetMinutes(),
       });

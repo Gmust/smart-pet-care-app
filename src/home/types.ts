@@ -1,9 +1,16 @@
+import type { ReminderStatus } from "@/api";
 import type { Icon } from "@/icons/icons";
 
 type SignalStatus = "ok" | "warn";
 export type ReminderTone = "primary" | "peach" | "warn";
-export type ReminderStatus = "done" | "next" | "pending" | "overdue";
-export type ReminderGroupKey = "overdue" | "today" | "tomorrow" | "soon" | "nextWeek" | "later";
+export type ReminderGroupKey =
+  | "overdue"
+  | "today"
+  | "tomorrow"
+  | "soon"
+  | "nextWeek"
+  | "later"
+  | "passed";
 
 export type Signal = {
   label: string;

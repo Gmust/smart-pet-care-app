@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -25,12 +26,15 @@ import { Switch } from "@/shadecn/ui/switch";
 import { Text } from "@/shadecn/ui/text";
 
 import { useCreateRemindersMutation } from "../queries/useCreateRemindersMutation";
+import { useGetReminderById } from "../queries/useGetReminderById";
+import { useUpdateRemindersMutation } from "../queries/useUpdateRemindersMutation";
 import { type CreateReminderForm, createReminderSchema } from "../schemas/create-reminder.schema";
 import { ReminderPetSelectSkeleton } from "../skeletons/CreateReminderDrawerSkeleton";
 
 type Props = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  reminderId?: string;
 };
 
 const DAY_ORDER: DaysOfWeek[] = [
@@ -72,20 +76,45 @@ const defaultValues: CreateReminderForm = {
   endAt: null,
 };
 
-export const CreateReminderDrawer = ({ isOpen, setIsOpen }: Props) => {
+export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) => {
   const { t } = useTranslation(["reminders", "common"]);
   const { data: pets, isLoading: isPetsLoading } = usePetsQuery();
 
+  const isEditMode = reminderId != null;
+
+  const { data: reminder } = useGetReminderById(reminderId, isOpen && isEditMode);
+
   const { mutateAsync: createReminder, isPending: isReminderCreating } =
     useCreateRemindersMutation();
+  const { mutateAsync: updateReminder, isPending: isReminderUpdating } =
+    useUpdateRemindersMutation();
+
+  const isReminderSaving = isReminderCreating || isReminderUpdating;
 
   const form = useForm({
     defaultValues,
     validators: { onChange: createReminderSchema(t), onSubmit: createReminderSchema(t) },
     onSubmit: async ({ value }) => {
       try {
-        await createReminder(value);
-        Toast.show({ type: "success", text1: t("reminders:successMessage") });
+        if (isEditMode && reminderId) {
+          await updateReminder({
+            id: reminderId,
+            payload: {
+              title: value.title,
+              description: value.description ?? null,
+              days: value.days,
+              isRepeatable: value.isRepeatable,
+              time: value.time,
+              endAt: value.endAt ?? null,
+            },
+          });
+        } else {
+          await createReminder(value);
+        }
+        Toast.show({
+          type: "success",
+          text1: t(isEditMode ? "reminders:updateSuccessMessage" : "reminders:successMessage"),
+        });
         form.reset();
         setIsOpen(false);
       } catch (e) {
@@ -94,6 +123,21 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen }: Props) => {
       }
     },
   });
+
+  useEffect(() => {
+    if (!isEditMode || !reminder) return;
+    const timeMatch = reminder.timeOfDay?.match(/\d{2}:\d{2}/);
+    form.reset({
+      petId: reminder.petId ?? "",
+      title: reminder.title ?? "",
+      description: reminder.description ?? null,
+      type: reminder.type ?? ReminderType.Feeding,
+      days: reminder.days ?? [],
+      isRepeatable: reminder.isRepeatable ?? false,
+      time: timeMatch?.[0] ?? "",
+      endAt: reminder.endAt ?? null,
+    });
+  }, [isEditMode, reminder, form]);
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
@@ -108,7 +152,11 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen }: Props) => {
 
         <DrawerHeader style={styles.header}>
           <DrawerTitle style={styles.title}>
-            {t("reminders:createReminderDrawer.title")}
+            {t(
+              isEditMode
+                ? "reminders:editReminderDrawer.title"
+                : "reminders:createReminderDrawer.title"
+            )}
           </DrawerTitle>
         </DrawerHeader>
 
@@ -128,6 +176,7 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen }: Props) => {
                   ) : (
                     <Select
                       containerStyle={styles.selectContainer}
+                      disabled={isEditMode}
                       value={
                         selected?.id != null
                           ? { value: selected.id, label: selected.name ?? "" }
@@ -177,6 +226,7 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen }: Props) => {
                 <Text style={styles.label}>{t("reminders:createReminderDrawer.fields.type")}</Text>
                 <Select
                   containerStyle={styles.selectContainer}
+                  disabled={isEditMode}
                   value={{
                     value: field.state.value,
                     label: t(`reminders:types.${field.state.value}`),
@@ -280,11 +330,15 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen }: Props) => {
               <Button
                 size="lg"
                 variant="primary"
-                disabled={!canSubmit || isReminderCreating}
-                isLoading={isSubmitting || isReminderCreating}
+                disabled={!canSubmit || isReminderSaving}
+                isLoading={isSubmitting || isReminderSaving}
                 onPress={() => form.handleSubmit()}
               >
-                {t("reminders:createReminderDrawer.submit")}
+                {t(
+                  isEditMode
+                    ? "reminders:editReminderDrawer.submit"
+                    : "reminders:createReminderDrawer.submit"
+                )}
               </Button>
             )}
           </form.Subscribe>
