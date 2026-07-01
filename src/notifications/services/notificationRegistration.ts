@@ -13,7 +13,11 @@ export const ANDROID_NOTIFICATION_CHANNEL_ID = "default";
 export const registerAndroidDeviceToken = async (token: string): Promise<void> => {
   const previousToken = await getStoredDeviceToken();
   if (previousToken && previousToken !== token) {
-    await deleteApiNotificationsDeviceTokenToken(previousToken);
+    try {
+      await deleteApiNotificationsDeviceTokenToken(previousToken);
+    } catch (error) {
+      console.error("Failed to delete the previous Android notification token.", error);
+    }
   }
 
   await postApiNotificationsDeviceToken({

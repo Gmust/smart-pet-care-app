@@ -64,11 +64,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     signOutPromiseRef.current = (async () => {
       refreshPromiseRef.current = null;
-      try {
-        await unregisterStoredDeviceToken();
-      } catch (error) {
+      unregisterStoredDeviceToken().catch((error: unknown) => {
         console.error("Failed to clean up notifications during sign-out.", error);
-      }
+      });
       await clearStoredSession();
       applySession(null);
     })().finally(() => {

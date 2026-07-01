@@ -54,6 +54,7 @@ const mockedSetStoredDeviceToken = jest.mocked(setStoredDeviceToken);
 describe("Android notification token registration", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockedDeleteDeviceToken.mockReset();
     mockedNotifications.setNotificationChannelAsync.mockResolvedValue(null);
     mockedNotifications.requestPermissionsAsync.mockResolvedValue({
       canAskAgain: false,
@@ -163,6 +164,22 @@ describe("Android notification token registration", () => {
       platform: DevicePlatform.Android,
       token: "rotated-token",
     });
+  });
+
+  it("registers a rotated token when deleting the previous token fails", async () => {
+    const consoleError = jest.spyOn(console, "error").mockImplementation();
+    mockedGetStoredDeviceToken.mockResolvedValue("previous-token");
+    mockedDeleteDeviceToken.mockRejectedValue(new Error("offline"));
+
+    await registerAndroidDeviceToken("rotated-token");
+
+    expect(mockedPostDeviceToken).toHaveBeenCalledWith({
+      platform: DevicePlatform.Android,
+      token: "rotated-token",
+    });
+    expect(mockedSetStoredDeviceToken).toHaveBeenCalledWith("rotated-token");
+    expect(consoleError).toHaveBeenCalled();
+    consoleError.mockRestore();
   });
 
   it("unregisters and clears a stored token when permission is revoked", async () => {

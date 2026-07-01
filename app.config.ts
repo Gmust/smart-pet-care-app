@@ -6,6 +6,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   slug: config.slug ?? "smart-pet-care-app",
   android: {
     ...config.android,
-    googleServicesFile: process.env.GOOGLE_SERVICES_JSON,
+    ...(process.env.GOOGLE_SERVICES_JSON
+      ? { googleServicesFile: process.env.GOOGLE_SERVICES_JSON }
+      : {}),
   },
 });
