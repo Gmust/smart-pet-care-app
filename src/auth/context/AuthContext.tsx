@@ -9,6 +9,8 @@ import {
   setUnauthorizedHandler,
 } from "@/api/interceptors";
 import { clearStoredSession, getStoredSession, setStoredSession } from "@/api/tokenStorage";
+import { NotificationProvider } from "@/notifications/providers/NotificationProvider";
+import { unregisterStoredDeviceToken } from "@/notifications/services/notificationRegistration";
 
 import type { AuthContextValue, AuthSession, AuthStatus } from "../types";
 import dayjs from "dayjs";
@@ -46,6 +48,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const currentSessionRef = useRef<AuthSession | null>(null);
   const refreshPromiseRef = useRef<Promise<string | null> | null>(null);
+  const signOutPromiseRef = useRef<Promise<void> | null>(null);
 
   const applySession = useCallback((next: AuthSession | null) => {
     currentSessionRef.current = next;
@@ -54,10 +57,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setStatus(next ? "authenticated" : "unauthenticated");
   }, []);
 
-  const signOut = useCallback(async () => {
-    refreshPromiseRef.current = null;
-    await clearStoredSession();
-    applySession(null);
+  const signOut = useCallback(() => {
+    if (signOutPromiseRef.current) {
+      return signOutPromiseRef.current;
+    }
+
+    signOutPromiseRef.current = (async () => {
+      refreshPromiseRef.current = null;
+      unregisterStoredDeviceToken().catch((error: unknown) => {
+        console.error("Failed to clean up notifications during sign-out.", error);
+      });
+      await clearStoredSession();
+      applySession(null);
+    })().finally(() => {
+      signOutPromiseRef.current = null;
+    });
+
+    return signOutPromiseRef.current;
   }, [applySession]);
 
   const signIn = useCallback(
@@ -175,5 +191,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     [status, session, signIn, signOut]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      <NotificationProvider isAuthenticated={status === "authenticated"}>
+        {children}
+      </NotificationProvider>
+    </AuthContext.Provider>
+  );
 }

@@ -1,18 +1,13 @@
 import type { PetResponseDto, ReminderResponseDto } from "@/api/generated";
 import { ReminderStatus, ReminderType } from "@/api/generated";
+import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
 import { BellIcon } from "@/icons/bell";
 import { StethoscopeIcon } from "@/icons/stethoscope";
 import { SyringeIcon } from "@/icons/syringe";
 import { UtensilsIcon } from "@/icons/utensils";
 
-import type {
-  PetHealth,
-  Reminder,
-  ReminderGroup,
-  ReminderGroupKey,
-  ReminderStatus as HomeReminderStatus,
-  ReminderTone,
-} from "../types";
+import type { ReminderGroupKey } from "../components/RemindersSection";
+import type { PetHealth, Reminder, ReminderTone } from "../types";
 
 const getPetScore = (pet: PetResponseDto): number => {
   if (pet.allergies || pet.chronicConditions) {
@@ -44,19 +39,18 @@ export const toPetHealth = (pet: PetResponseDto): PetHealth => {
   };
 };
 
-const getReminderTone = (type: ReminderResponseDto["type"]): ReminderTone => {
-  switch (type) {
-    case ReminderType.Medication:
-    case ReminderType.Vaccination:
-    case ReminderType.ParasiteTreatment:
-    case ReminderType.VetVisit:
-      return "warn";
-    case ReminderType.Feeding:
-      return "peach";
-    default:
-      return "primary";
-  }
+const REMINDER_TONE: Record<ReminderType, ReminderTone> = {
+  [ReminderType.Medication]: "warn",
+  [ReminderType.Vaccination]: "warn",
+  [ReminderType.ParasiteTreatment]: "warn",
+  [ReminderType.VetVisit]: "warn",
+  [ReminderType.Feeding]: "peach",
+  [ReminderType.Grooming]: "primary",
+  [ReminderType.Activity]: "primary",
 };
+
+const getReminderTone = (type: ReminderResponseDto["type"]): ReminderTone =>
+  type ? REMINDER_TONE[type] : "primary";
 
 const isReminderOverdue = (reminder: ReminderResponseDto): boolean => {
   if (reminder.status === ReminderStatus.Missed) {
@@ -70,19 +64,12 @@ const isReminderOverdue = (reminder: ReminderResponseDto): boolean => {
   return new Date(reminder.nextTriggerAt).getTime() < Date.now();
 };
 
-const getReminderStatus = (reminder: ReminderResponseDto): HomeReminderStatus => {
+const getReminderStatus = (reminder: ReminderResponseDto): ReminderStatus => {
   if (isReminderOverdue(reminder)) {
-    return "overdue";
+    return ReminderStatus.Missed;
   }
 
-  switch (reminder.status) {
-    case ReminderStatus.Completed:
-      return "done";
-    case ReminderStatus.Active:
-      return "next";
-    default:
-      return "pending";
-  }
+  return reminder.status ?? ReminderStatus.Active;
 };
 
 const getReminderIcon = (type: ReminderResponseDto["type"]) => {
@@ -116,23 +103,8 @@ const formatReminderTime = (reminder: ReminderResponseDto): string => {
   }
 
   // Fallback to the recurring time-of-day (HH:MM:SS), trimmed to hours and minutes.
-  const timeMatch = reminder.timeOfDay?.match(/(\d{1,2}):(\d{2})/);
-
-  if (timeMatch) {
-    return `${timeMatch[1].padStart(2, "0")}:${timeMatch[2]}`;
-  }
-
-  return "No time";
+  return extractTimeOfDay(reminder.timeOfDay) ?? "No time";
 };
-
-const toHomeReminder = (reminder: ReminderResponseDto): Reminder => ({
-  id: reminder.id ?? reminder.title ?? "reminder",
-  icon: getReminderIcon(reminder.type),
-  tone: getReminderTone(reminder.type),
-  title: reminder.title ?? "Untitled reminder",
-  time: formatReminderTime(reminder),
-  status: getReminderStatus(reminder),
-});
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -144,14 +116,16 @@ const calendarDayOffset = (target: Date): number =>
   Math.round((startOfDay(target) - startOfDay(new Date())) / MS_PER_DAY);
 
 const getReminderGroupKey = (reminder: ReminderResponseDto): ReminderGroupKey => {
+  // No next trigger means the reminder is finished (completed/missed, non-repeatable)
+  // and will not fire again, so it belongs in the historical "passed" group.
   if (!reminder.nextTriggerAt) {
-    return "later";
+    return "passed";
   }
 
   const trigger = new Date(reminder.nextTriggerAt);
 
   if (Number.isNaN(trigger.getTime())) {
-    return "later";
+    return "passed";
   }
 
   const offset = calendarDayOffset(trigger);
@@ -182,6 +156,7 @@ const GROUP_ORDER: readonly ReminderGroupKey[] = [
   "soon",
   "nextWeek",
   "later",
+  "passed",
 ];
 
 const getTriggerTimestamp = (reminder: ReminderResponseDto): number => {
@@ -194,6 +169,8 @@ const getTriggerTimestamp = (reminder: ReminderResponseDto): number => {
   return Number.isNaN(trigger) ? Number.POSITIVE_INFINITY : trigger;
 };
 
+export type ReminderGroup = { key: ReminderGroupKey; reminders: Reminder[] };
+
 export const toReminderGroups = (reminders: ReminderResponseDto[]): ReminderGroup[] => {
   const buckets = new Map<ReminderGroupKey, Reminder[]>();
 
@@ -204,7 +181,14 @@ export const toReminderGroups = (reminders: ReminderResponseDto[]): ReminderGrou
   for (const reminder of ordered) {
     const key = getReminderGroupKey(reminder);
     const bucket = buckets.get(key) ?? [];
-    bucket.push(toHomeReminder(reminder));
+    bucket.push({
+      id: reminder.id ?? "",
+      icon: getReminderIcon(reminder.type),
+      tone: getReminderTone(reminder.type),
+      title: reminder.title ?? "",
+      time: formatReminderTime(reminder),
+      status: getReminderStatus(reminder),
+    });
     buckets.set(key, bucket);
   }
 

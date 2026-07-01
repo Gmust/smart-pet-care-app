@@ -1,0 +1,39 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">MISO paw logo</title>
+  <desc id="desc">Minimal paw print logo with mint heart and MISO wordmark.</desc>
+
+  <rect width="1024" height="1024" fill="#FAF8F2"/>
+
+  <!-- Paw toes -->
+  <ellipse cx="318" cy="352" rx="52" ry="74" transform="rotate(-22 318 352)" fill="#2D5E4E"/>
+  <ellipse cx="443" cy="282" rx="58" ry="83" transform="rotate(-7 443 282)" fill="#2D5E4E"/>
+  <ellipse cx="581" cy="282" rx="58" ry="83" transform="rotate(7 581 282)" fill="#2D5E4E"/>
+  <ellipse cx="706" cy="352" rx="52" ry="74" transform="rotate(22 706 352)" fill="#2D5E4E"/>
+
+  <!-- Main paw pad -->
+  <path d="M512 424
+           C590 424 667 500 674 605
+           C680 688 625 741 559 728
+           C534 723 520 704 512 690
+           C504 704 490 723 465 728
+           C399 741 344 688 350 605
+           C357 500 434 424 512 424Z"
+        fill="#1A3A2E"/>
+
+  <!-- Heart accent -->
+  <path d="M512 637
+           C498 613 442 586 452 535
+           C459 501 501 489 512 522
+           C523 489 565 501 572 535
+           C582 586 526 613 512 637Z"
+        fill="#A3D9BB"/>
+
+  <!-- Wordmark -->
+  <text x="512" y="815"
+        text-anchor="middle"
+        font-family="Inter, Montserrat, Arial, sans-serif"
+        font-size="104"
+        font-weight="700"
+        letter-spacing="34"
+        fill="#1A3A2E">MISO</text>
+</svg>

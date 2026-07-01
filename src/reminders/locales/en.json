@@ -8,7 +8,59 @@
     "timePast": "Choose a time that is later than now.",
     "endAtInvalid": "Enter a valid end date."
   },
+  "addReminder": "Add reminder",
+  "remindersPage": {
+    "title": "Reminders",
+    "subtitle_one": "{{count}} reminder",
+    "subtitle_other": "{{count}} reminders",
+    "goBack": "Go back",
+    "create": "New reminder",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "missed": "Missed"
+    },
+    "groups": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "soon": "In a few days",
+      "nextWeek": "Next week",
+      "later": "Later",
+      "passed": "Passed"
+    },
+    "empty": {
+      "all": "No reminders yet",
+      "allHint": "Create your first reminder to stay on top of feeding, meds and vet visits.",
+      "filtered": "Nothing matches this filter",
+      "filteredHint": "Try a different filter to see more reminders."
+    }
+  },
   "successMessage": "Reminder created successfully!",
+  "updateSuccessMessage": "Reminder updated successfully!",
+  "deleteSuccessMessage": "Reminder deleted.",
+  "actionsDrawer": {
+    "title": "Reminder actions",
+    "edit": "Edit reminder",
+    "changeStatus": "Change status",
+    "delete": "Delete reminder"
+  },
+  "editReminderDrawer": {
+    "title": "Edit Reminder",
+    "submit": "Save changes"
+  },
+  "statusPrompt": {
+    "title": "How did it go?",
+    "subtitle": "Set a status for this reminder.",
+    "successMessage": "Status updated.",
+    "status": {
+      "Active": "Keep active",
+      "Completed": "Mark completed",
+      "Missed": "Mark missed",
+      "Cancelled": "Cancel reminder"
+    }
+  },
   "createReminderDrawer": {
     "title": "Create new Reminder",
     "fields": {

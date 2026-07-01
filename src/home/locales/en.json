@@ -28,10 +28,10 @@
   },
   "reminders": {
     "chipLabels": {
-      "done": "Done",
-      "next": "Next up",
-      "pending": "Pending",
-      "overdue": "Overdue"
+      "Completed": "Done",
+      "Active": "Next up",
+      "Cancelled": "Cancelled",
+      "Missed": "Missed"
     },
     "groups": {
       "overdue": "Overdue",
@@ -39,7 +39,8 @@
       "tomorrow": "Tomorrow",
       "soon": "In a few days",
       "nextWeek": "Next week",
-      "later": "Later"
+      "later": "Later",
+      "passed": "Passed"
     }
   },
   "mockStatus": {

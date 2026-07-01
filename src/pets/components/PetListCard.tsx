@@ -60,7 +60,9 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
       <View style={styles.content}>
         <View style={styles.info}>
           <View style={styles.headerRow}>
-            <Text style={styles.name}>{pet.name}</Text>
+            <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+              {pet.name}
+            </Text>
             <View style={[styles.statusChip, statusStyle]}>
               <StatusIcon width={14} height={14} color={statusTextStyle.color} />
               {/* TODO add status when backend would be ready */}

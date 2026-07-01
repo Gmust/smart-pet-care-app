@@ -54,8 +54,8 @@ export function DateTimeField({
         is24Hour,
         minimumDate,
         maximumDate,
-        onChange: (event, selectedDate) => {
-          if (event.type === "set" && selectedDate) onChange(selectedDate);
+        onValueChange: (event, selectedDate) => {
+          if (selectedDate) onChange(selectedDate);
           onBlur?.();
           externalActivity?.resume();
         },
