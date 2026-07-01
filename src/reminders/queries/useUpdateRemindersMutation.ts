@@ -10,9 +10,15 @@ export const useUpdateRemindersMutation = () => {
   return useMutation({
     mutationKey: ["update-reminder"],
     mutationFn: async ({ id, payload }: { id: string; payload: PatchReminderDto }) => {
+      const hasScheduleFields =
+        payload.time !== undefined ||
+        payload.days !== undefined ||
+        payload.isRepeatable !== undefined ||
+        payload.endAt !== undefined;
+
       const { data } = await patchApiRemindersId(id, {
         ...payload,
-        utcOffsetMinutes: getUtcOffsetMinutes(),
+        ...(hasScheduleFields ? { utcOffsetMinutes: getUtcOffsetMinutes() } : {}),
       });
       return data;
     },

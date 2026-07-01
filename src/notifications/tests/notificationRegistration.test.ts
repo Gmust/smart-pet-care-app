@@ -38,7 +38,7 @@ jest.mock("@/api/generated", () => ({
   DevicePlatform: { Android: "Android", iOS: "iOS" },
 }));
 
-jest.mock("./notificationTokenStorage", () => ({
+jest.mock("../services/notificationTokenStorage", () => ({
   clearStoredDeviceToken: jest.fn(),
   getStoredDeviceToken: jest.fn(),
   setStoredDeviceToken: jest.fn(),
@@ -180,14 +180,14 @@ describe("Android notification token registration", () => {
     expect(mockedClearStoredDeviceToken).toHaveBeenCalledTimes(1);
   });
 
-  it("clears the local token when backend deletion fails", async () => {
+  it("retains the local token when backend deletion fails", async () => {
     const consoleError = jest.spyOn(console, "error").mockImplementation();
     mockedGetStoredDeviceToken.mockResolvedValue("offline-token");
     mockedDeleteDeviceToken.mockRejectedValue(new Error("offline"));
 
     await unregisterStoredDeviceToken();
 
-    expect(mockedClearStoredDeviceToken).toHaveBeenCalledTimes(1);
+    expect(mockedClearStoredDeviceToken).not.toHaveBeenCalled();
     expect(consoleError).toHaveBeenCalled();
     consoleError.mockRestore();
   });

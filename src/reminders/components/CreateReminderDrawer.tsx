@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -7,6 +7,7 @@ import { useForm } from "@tanstack/react-form";
 
 import { DaysOfWeek, ReminderType } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
+import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
@@ -89,6 +90,8 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
   const { mutateAsync: updateReminder, isPending: isReminderUpdating } =
     useUpdateRemindersMutation();
 
+  const hasHydratedForm = useRef(false);
+
   const isReminderSaving = isReminderCreating || isReminderUpdating;
 
   const form = useForm({
@@ -125,8 +128,9 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
   });
 
   useEffect(() => {
-    if (!isEditMode || !reminder) return;
-    const timeMatch = reminder.timeOfDay?.match(/\d{2}:\d{2}/);
+    if (!isEditMode || !reminder || hasHydratedForm.current) return;
+    hasHydratedForm.current = true;
+
     form.reset({
       petId: reminder.petId ?? "",
       title: reminder.title ?? "",
@@ -134,7 +138,7 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
       type: reminder.type ?? ReminderType.Feeding,
       days: reminder.days ?? [],
       isRepeatable: reminder.isRepeatable ?? false,
-      time: timeMatch?.[0] ?? "",
+      time: extractTimeOfDay(reminder.timeOfDay) ?? "",
       endAt: reminder.endAt ?? null,
     });
   }, [isEditMode, reminder, form]);

@@ -21,6 +21,7 @@ export function ReminderStatusPrompt() {
 
     handledIdRef.current = request.identifier;
     setReminderId(nextReminderId);
+    void Notifications.clearLastNotificationResponseAsync();
   }, [lastResponse]);
 
   if (!reminderId) return null;

@@ -3,14 +3,6 @@ import type { Icon } from "@/icons/icons";
 
 type SignalStatus = "ok" | "warn";
 export type ReminderTone = "primary" | "peach" | "warn";
-export type ReminderGroupKey =
-  | "overdue"
-  | "today"
-  | "tomorrow"
-  | "soon"
-  | "nextWeek"
-  | "later"
-  | "passed";
 
 export type Signal = {
   label: string;
@@ -25,11 +17,6 @@ export type Reminder = {
   title: string;
   time: string;
   status: ReminderStatus;
-};
-
-export type ReminderGroup = {
-  key: ReminderGroupKey;
-  reminders: Reminder[];
 };
 
 type HealthSignal = {

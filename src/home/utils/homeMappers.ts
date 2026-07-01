@@ -1,11 +1,13 @@
 import type { PetResponseDto, ReminderResponseDto } from "@/api/generated";
 import { ReminderStatus, ReminderType } from "@/api/generated";
+import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
 import { BellIcon } from "@/icons/bell";
 import { StethoscopeIcon } from "@/icons/stethoscope";
 import { SyringeIcon } from "@/icons/syringe";
 import { UtensilsIcon } from "@/icons/utensils";
 
-import type { PetHealth, Reminder, ReminderGroup, ReminderGroupKey, ReminderTone } from "../types";
+import type { ReminderGroupKey } from "../components/RemindersSection";
+import type { PetHealth, Reminder, ReminderTone } from "../types";
 
 const getPetScore = (pet: PetResponseDto): number => {
   if (pet.allergies || pet.chronicConditions) {
@@ -37,19 +39,18 @@ export const toPetHealth = (pet: PetResponseDto): PetHealth => {
   };
 };
 
-const getReminderTone = (type: ReminderResponseDto["type"]): ReminderTone => {
-  switch (type) {
-    case ReminderType.Medication:
-    case ReminderType.Vaccination:
-    case ReminderType.ParasiteTreatment:
-    case ReminderType.VetVisit:
-      return "warn";
-    case ReminderType.Feeding:
-      return "peach";
-    default:
-      return "primary";
-  }
+const REMINDER_TONE: Record<ReminderType, ReminderTone> = {
+  [ReminderType.Medication]: "warn",
+  [ReminderType.Vaccination]: "warn",
+  [ReminderType.ParasiteTreatment]: "warn",
+  [ReminderType.VetVisit]: "warn",
+  [ReminderType.Feeding]: "peach",
+  [ReminderType.Grooming]: "primary",
+  [ReminderType.Activity]: "primary",
 };
+
+const getReminderTone = (type: ReminderResponseDto["type"]): ReminderTone =>
+  type ? REMINDER_TONE[type] : "primary";
 
 const isReminderOverdue = (reminder: ReminderResponseDto): boolean => {
   if (reminder.status === ReminderStatus.Missed) {
@@ -102,23 +103,8 @@ const formatReminderTime = (reminder: ReminderResponseDto): string => {
   }
 
   // Fallback to the recurring time-of-day (HH:MM:SS), trimmed to hours and minutes.
-  const timeMatch = reminder.timeOfDay?.match(/(\d{1,2}):(\d{2})/);
-
-  if (timeMatch) {
-    return `${timeMatch[1].padStart(2, "0")}:${timeMatch[2]}`;
-  }
-
-  return "No time";
+  return extractTimeOfDay(reminder.timeOfDay) ?? "No time";
 };
-
-const toHomeReminder = (reminder: ReminderResponseDto): Reminder => ({
-  id: reminder.id ?? reminder.title ?? "reminder",
-  icon: getReminderIcon(reminder.type),
-  tone: getReminderTone(reminder.type),
-  title: reminder.title ?? "Untitled reminder",
-  time: formatReminderTime(reminder),
-  status: getReminderStatus(reminder),
-});
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -183,6 +169,8 @@ const getTriggerTimestamp = (reminder: ReminderResponseDto): number => {
   return Number.isNaN(trigger) ? Number.POSITIVE_INFINITY : trigger;
 };
 
+export type ReminderGroup = { key: ReminderGroupKey; reminders: Reminder[] };
+
 export const toReminderGroups = (reminders: ReminderResponseDto[]): ReminderGroup[] => {
   const buckets = new Map<ReminderGroupKey, Reminder[]>();
 
@@ -193,7 +181,14 @@ export const toReminderGroups = (reminders: ReminderResponseDto[]): ReminderGrou
   for (const reminder of ordered) {
     const key = getReminderGroupKey(reminder);
     const bucket = buckets.get(key) ?? [];
-    bucket.push(toHomeReminder(reminder));
+    bucket.push({
+      id: reminder.id ?? "",
+      icon: getReminderIcon(reminder.type),
+      tone: getReminderTone(reminder.type),
+      title: reminder.title ?? "",
+      time: formatReminderTime(reminder),
+      status: getReminderStatus(reminder),
+    });
     buckets.set(key, bucket);
   }
 

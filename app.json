@@ -13,7 +13,6 @@
       "deploymentTarget": "16.4"
     },
     "android": {
-      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#FAF8F2",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

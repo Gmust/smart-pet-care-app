@@ -5,6 +5,7 @@ import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 
 import { ReminderStatus } from "@/api/generated";
+import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
 import { Button, type ButtonVariant } from "@/shadecn/ui/button";
 import {
   Drawer,
@@ -47,11 +48,12 @@ export const ReminderStatusDrawer = ({
     try {
       await updateReminder({ id: reminderId, payload: { status } });
       Toast.show({ type: "success", text1: t("reminders:statusPrompt.successMessage") });
+      onClose();
     } catch (e) {
       console.error(e);
+      resolvedRef.current = false;
       Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
     }
-    onClose();
   };
 
   // From a notification tap, dismissing without choosing marks the reminder as
@@ -68,7 +70,7 @@ export const ReminderStatusDrawer = ({
     onClose();
   };
 
-  const timeOfDay = reminder?.timeOfDay?.match(/\d{2}:\d{2}/)?.[0];
+  const timeOfDay = extractTimeOfDay(reminder?.timeOfDay);
 
   return (
     <Drawer open onOpenChange={handleOpenChange}>
@@ -86,7 +88,7 @@ export const ReminderStatusDrawer = ({
           </View>
         )}
 
-        {reminder && (
+        {!!reminder && (
           <View style={styles.summary}>
             <Text style={styles.summaryTitle}>{reminder.title}</Text>
             <Text style={styles.summaryMeta}>

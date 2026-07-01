@@ -10,11 +10,11 @@ import { AuthProvider } from "./AuthContext";
 
 const events: string[] = [];
 
-jest.mock("@/notifications/NotificationProvider", () => ({
+jest.mock("@/notifications/providers/NotificationProvider", () => ({
   NotificationProvider: ({ children }: { children: ReactNode }) => children,
 }));
 
-jest.mock("@/notifications/notificationRegistration", () => ({
+jest.mock("@/notifications/services/notificationRegistration", () => ({
   unregisterStoredDeviceToken: jest.fn(),
 }));
 

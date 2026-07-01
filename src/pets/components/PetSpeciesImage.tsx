@@ -1,3 +1,4 @@
+import type { ComponentType } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -16,30 +17,10 @@ type PetSpeciesImageProps = {
   variant?: PetSpeciesImageVariant;
 };
 
-const getNormalizedSpecies = (species: string | null | undefined): string | null => {
-  switch (species?.trim().toLowerCase()) {
-    case "cat":
-      return "cat";
-    case "dog":
-      return "dog";
-    case "rabbit":
-      return "rabbit";
-    default:
-      return null;
-  }
-};
-
-const renderSpeciesIcon = (species: string | null, props: IconProps) => {
-  switch (species) {
-    case "cat":
-      return <CatIcon {...props} />;
-    case "dog":
-      return <DogIcon {...props} />;
-    case "rabbit":
-      return <RabbitIcon {...props} />;
-    default:
-      return null;
-  }
+const SPECIES_ICONS: Record<string, ComponentType<IconProps>> = {
+  cat: CatIcon,
+  dog: DogIcon,
+  rabbit: RabbitIcon,
 };
 
 export function PetSpeciesImage({ photoUrl, species, variant = "card" }: PetSpeciesImageProps) {
@@ -47,17 +28,15 @@ export function PetSpeciesImage({ photoUrl, species, variant = "card" }: PetSpec
     return <Image source={{ uri: photoUrl }} style={styles.image} contentFit="cover" />;
   }
 
-  const normalizedSpecies = getNormalizedSpecies(species);
+  const SpeciesIcon = SPECIES_ICONS[species?.trim().toLowerCase() ?? ""];
   const isHero = variant === "hero";
   const iconSize = isHero ? 96 : 52;
 
   return (
     <View style={[styles.placeholder, isHero && styles.placeholderHero]}>
-      {renderSpeciesIcon(normalizedSpecies, {
-        width: iconSize,
-        height: iconSize,
-        color: palette.brand.textSecondary,
-      })}
+      {!!SpeciesIcon && (
+        <SpeciesIcon width={iconSize} height={iconSize} color={palette.brand.textSecondary} />
+      )}
     </View>
   );
 }

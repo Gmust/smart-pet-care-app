@@ -6,8 +6,8 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { ReminderStatus } from "@/api/generated";
 import { ReminderRow } from "@/home/components/ReminderRow";
+import type { ReminderGroupKey } from "@/home/components/RemindersSection";
 import { RemindersSectionSkeleton } from "@/home/skeletons/HomePageSkeleton";
-import type { ReminderGroupKey } from "@/home/types";
 import { toReminderGroups } from "@/home/utils/homeMappers";
 import { Chevron } from "@/icons/arrows";
 import { CirclePlusIcon } from "@/icons/circle-plus";
@@ -24,6 +24,12 @@ type ReminderFilter = "all" | "active" | "completed" | "missed";
 
 const FILTERS: ReminderFilter[] = ["all", "active", "completed", "missed"];
 
+const FILTER_STATUS: Partial<Record<ReminderFilter, ReminderStatus>> = {
+  active: ReminderStatus.Active,
+  completed: ReminderStatus.Completed,
+  missed: ReminderStatus.Missed,
+};
+
 export default function RemindersPage() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -34,16 +40,10 @@ export default function RemindersPage() {
   const [filter, setFilter] = useState<ReminderFilter>("all");
 
   const filtered = useMemo(() => {
-    switch (filter) {
-      case "active":
-        return (reminders ?? []).filter((reminder) => reminder.status === ReminderStatus.Active);
-      case "completed":
-        return (reminders ?? []).filter((reminder) => reminder.status === ReminderStatus.Completed);
-      case "missed":
-        return (reminders ?? []).filter((reminder) => reminder.status === ReminderStatus.Missed);
-      default:
-        return reminders ?? [];
-    }
+    const status = FILTER_STATUS[filter];
+    return status
+      ? (reminders ?? []).filter((reminder) => reminder.status === status)
+      : (reminders ?? []);
   }, [reminders, filter]);
   const groups = useMemo(() => toReminderGroups(filtered), [filtered]);
 
@@ -78,8 +78,6 @@ export default function RemindersPage() {
     passed: t("reminders:remindersPage.groups.passed"),
   };
 
-  const totalCount = reminders?.length ?? 0;
-
   return (
     <>
       <View style={styles.screen}>
@@ -96,7 +94,7 @@ export default function RemindersPage() {
             <Text style={styles.topBarTitle}>{t("reminders:remindersPage.title")}</Text>
             {!isLoading && (
               <Text style={styles.topBarSubtitle}>
-                {t("reminders:remindersPage.subtitle", { count: totalCount })}
+                {t("reminders:remindersPage.subtitle", { count: reminders?.length ?? 0 })}
               </Text>
             )}
           </View>

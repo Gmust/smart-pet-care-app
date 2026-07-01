@@ -4,15 +4,17 @@ Android builds register the native Firebase Cloud Messaging (FCM) token with the
 
 ## Firebase setup
 
-- Place the Firebase Android client file at `google-services.json` in the repository root.
-- Confirm its Android package is exactly `com.anonymous.smartpetcareapp`, matching `expo.android.package` in `app.json`.
-- Keep Firebase service-account credentials on the backend. Do not add them to the app.
-- Regenerate and rebuild the native Android app after changing `google-services.json`, notification plugin settings, or `expo-notifications`:
+- Create an EAS file environment variable named `GOOGLE_SERVICES_JSON` from the Firebase Android client file for every Android build environment. `app.config.ts` passes the temporary file path to Expo during the build.
+- For local builds, keep the client file at the ignored repository-root path `google-services.json` and expose its path when running Expo commands:
 
 ```bash
-pnpm exec expo prebuild --platform android
-pnpm android
+GOOGLE_SERVICES_JSON=./google-services.json pnpm exec expo prebuild --platform android
+GOOGLE_SERVICES_JSON=./google-services.json pnpm android
 ```
+
+- Confirm its Android package is exactly `com.anonymous.smartpetcareapp`, matching `expo.android.package` in `app.json`.
+- Keep Firebase service-account credentials on the backend. Do not add them to the app.
+- Regenerate and rebuild the native Android app after changing `google-services.json`, notification plugin settings, or `expo-notifications`.
 
 Expo Go cannot validate this integration. Use a development or release build on an Android device or emulator with Google Play services.
 

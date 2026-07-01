@@ -17,7 +17,14 @@ import { ReminderRow } from "./ReminderRow";
 import { SectionLabel } from "./SectionLabel";
 import { useRouter } from "expo-router";
 
-type ReminderGroupKey = "overdue" | "today" | "tomorrow" | "soon" | "nextWeek" | "later" | "passed";
+export type ReminderGroupKey =
+  | "overdue"
+  | "today"
+  | "tomorrow"
+  | "soon"
+  | "nextWeek"
+  | "later"
+  | "passed";
 
 export function RemindersSection() {
   const { t } = useTranslation(["home", "reminders", "common"]);

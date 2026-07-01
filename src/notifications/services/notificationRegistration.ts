@@ -11,6 +11,11 @@ import * as Notifications from "expo-notifications";
 export const ANDROID_NOTIFICATION_CHANNEL_ID = "default";
 
 export const registerAndroidDeviceToken = async (token: string): Promise<void> => {
+  const previousToken = await getStoredDeviceToken();
+  if (previousToken && previousToken !== token) {
+    await deleteApiNotificationsDeviceTokenToken(previousToken);
+  }
+
   await postApiNotificationsDeviceToken({
     token,
     platform: DevicePlatform.Android,
@@ -21,11 +26,12 @@ export const registerAndroidDeviceToken = async (token: string): Promise<void> =
 export const unregisterStoredDeviceToken = async (): Promise<void> => {
   try {
     const token = await getStoredDeviceToken();
-    if (token) {
-      await deleteApiNotificationsDeviceTokenToken(token);
-    }
+    if (!token) return;
+
+    await deleteApiNotificationsDeviceTokenToken(token);
   } catch (error) {
     console.error("Failed to unregister the Android notification token.", error);
+    return;
   }
 
   try {
