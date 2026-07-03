@@ -20,8 +20,8 @@
     "notFound": "Pet not found",
     "tabs": {
       "overview": "Overview",
-      "activity": "Activity",
       "health": "Health",
+      "care": "Care",
       "reminders": "Reminders"
     },
     "basics": {
