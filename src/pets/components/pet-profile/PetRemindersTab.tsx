@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -15,13 +15,13 @@ import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import { SectionLabel } from "./SectionLabel";
-import { useRouter } from "expo-router";
+type PetRemindersTabProps = {
+  petId: string;
+};
 
-export function RemindersSection() {
+export function PetRemindersTab({ petId }: PetRemindersTabProps) {
   const { t } = useTranslation(["home", "reminders", "common"]);
-  const router = useRouter();
-  const { data: reminders, isLoading } = useGetReminders();
+  const { data: reminders, isLoading } = useGetReminders({ petId });
   const groups = useMemo(() => toReminderGroups(reminders ?? []), [reminders]);
 
   const {
@@ -46,53 +46,43 @@ export function RemindersSection() {
     tomorrow: t("reminders.groups.tomorrow"),
   };
 
-  const handleSeeAllReminders = useCallback(() => {
-    router.push("/(tabs)/reminders");
-  }, [router]);
+  if (isLoading) {
+    return <RemindersSectionSkeleton />;
+  }
 
   return (
     <>
-      <SectionLabel
-        title={t("sectionLabel.remindersAmount.title")}
-        action={t("sectionLabel.remindersAmount.action")}
-        onActionPress={handleSeeAllReminders}
-      />
       <View style={styles.groups}>
-        {isLoading ? (
-          <RemindersSectionSkeleton />
-        ) : groups.length === 0 ? (
-          <Button
-            variant="ghost"
-            size="md"
-            dotted
-            accessibilityLabel={t("reminders:addReminder")}
-            icon={<CirclePlusIcon width={20} height={20} color={palette.brand.textSecondary} />}
-            style={styles.addButton}
-            textStyle={styles.addButtonText}
-            onPress={() => setIsCreateOpen(true)}
-          >
-            {t("reminders:addReminder")}
-          </Button>
-        ) : (
-          groups.map((group) => (
-            <View key={group.key} style={styles.group}>
-              <Text style={styles.groupTitle}>{reminderGroupTitle[group.key]}</Text>
-              <View style={styles.stack}>
-                {group.reminders.map((reminder) => (
-                  <ReminderRow
-                    key={reminder.id}
-                    reminder={reminder}
-                    onEdit={() => setEditReminderId(reminder.id)}
-                    onChangeStatus={() => setStatusReminderId(reminder.id)}
-                    onDelete={() => handleDeleteReminder(reminder.id)}
-                    isDeleting={isDeleting && deletingId === reminder.id}
-                    muted={group.key === "passed"}
-                  />
-                ))}
-              </View>
+        {groups.map((group) => (
+          <View key={group.key} style={styles.group}>
+            <Text style={styles.groupTitle}>{reminderGroupTitle[group.key]}</Text>
+            <View style={styles.stack}>
+              {group.reminders.map((reminder) => (
+                <ReminderRow
+                  key={reminder.id}
+                  reminder={reminder}
+                  onEdit={() => setEditReminderId(reminder.id)}
+                  onChangeStatus={() => setStatusReminderId(reminder.id)}
+                  onDelete={() => handleDeleteReminder(reminder.id)}
+                  isDeleting={isDeleting && deletingId === reminder.id}
+                  muted={group.key === "passed"}
+                />
+              ))}
             </View>
-          ))
-        )}
+          </View>
+        ))}
+        <Button
+          variant="ghost"
+          size="md"
+          dotted
+          accessibilityLabel={t("reminders:addReminder")}
+          icon={<CirclePlusIcon width={20} height={20} color={palette.brand.textSecondary} />}
+          style={styles.addButton}
+          textStyle={styles.addButtonText}
+          onPress={() => setIsCreateOpen(true)}
+        >
+          {t("reminders:addReminder")}
+        </Button>
       </View>
 
       <ReminderDrawers

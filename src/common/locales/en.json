@@ -15,7 +15,17 @@
     "close": "Close"
   },
   "errors": {
-    "somethingWentWrong": "Something went wrong"
+    "somethingWentWrong": "Something went wrong",
+    "screenErrorDescription": "An unexpected error occurred on this screen. Please try again.",
+    "tryAgain": "Try again"
+  },
+  "offline": {
+    "bannerMessage": "No internet connection",
+    "dismiss": "Dismiss offline notice",
+    "title": "You're offline",
+    "description": "We can't reach the internet right now. Check your connection to keep your pet's data up to date.",
+    "reconnect": "Reconnect",
+    "openWifiSettings": "Open Wi-Fi settings"
   },
   "fab": {
     "open": "Open quick actions",
@@ -45,6 +55,7 @@
     }
   },
   "imagePicker": {
-    "title": "Add Photo"
+    "title": "Add Photo",
+    "remove": "Remove photo"
   }
 }

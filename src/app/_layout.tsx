@@ -4,7 +4,7 @@ import "@/i18n";
 import { useEffect } from "react";
 import { StatusBar } from "react-native";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
-import { Fraunces_700Bold } from "@expo-google-fonts/fraunces";
+import { Fraunces_400Regular, Fraunces_700Bold } from "@expo-google-fonts/fraunces";
 
 import { AuthProvider } from "@/auth/context/AuthContext";
 import AppProvider from "@/common/providers/AppProvider";
@@ -40,6 +40,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Fraunces_700Bold,
+    Fraunces_400Regular,
   });
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import React from "react";
 import type { PressableProps, StyleProp, ViewProps, ViewStyle } from "react-native";
-import { Pressable, View } from "react-native";
+import { AppState, Pressable, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -20,22 +20,37 @@ import { LinearGradient } from "expo-linear-gradient";
 const TRANSPARENT_WHITE = "rgba(255, 255, 255, 0)";
 type BackdropPressBehavior = React.ComponentProps<typeof BottomSheetBackdrop>["pressBehavior"];
 
+//TODO try expo ui drawer, could fix side activity problem
 type DrawerContextValue = {
   open: boolean;
   setOpen: (open: boolean) => void;
   modalRef: React.RefObject<BottomSheetModal | null>;
   /** When true, header/footer render edge fades over the scrollable content. */
   scrollable?: boolean;
-  externalActivity?: {
-    suspend: () => Promise<void>;
-    resume: () => void;
-  };
+  /**
+   * Wrap a same-Activity native dialog (date/time picker): its focus-steal
+   * collapses the sheet and fires `onDismiss`; while at least one is pending that
+   * dismiss is swallowed, and the sheet is snapped back on Activity return.
+   * Returns undefined outside a drawer.
+   */
+  beginNativeActivity?: () => () => void;
 };
 
 const DrawerContext = React.createContext<DrawerContextValue | null>(null);
 
-export function useDrawerExternalActivity() {
-  return React.useContext(DrawerContext)?.externalActivity;
+/**
+ * For same-Activity native dialogs (date/time picker) that only collapse the
+ * sheet. Full-screen pickers (image library/camera) pause the Activity and
+ * dismiss the modal outright — those must instead close and reopen the drawer
+ * via {@link useDrawerSetOpen}, not this.
+ */
+export function useDrawerNativeActivity() {
+  return React.useContext(DrawerContext)?.beginNativeActivity;
+}
+
+/** Imperatively open/close the enclosing drawer. Undefined outside a drawer. */
+export function useDrawerSetOpen() {
+  return React.useContext(DrawerContext)?.setOpen;
 }
 
 type DrawerProps = React.PropsWithChildren<{
@@ -171,41 +186,33 @@ function DrawerContent({
   keyboardBehavior,
   keyboardBlurBehavior = "restore",
   android_keyboardInputMode = "adjustResize",
+  onChange,
   ...props
 }: DrawerContentProps) {
   const insets = useSafeAreaInsets();
   const { modalRef, open, setOpen } = useDrawerContext("DrawerContent");
-  const externalActivityDismissRef = React.useRef<{
-    promise: Promise<void>;
-    resolve: () => void;
-  } | null>(null);
+  const openRef = React.useRef(open);
+  React.useEffect(() => {
+    openRef.current = open;
+  }, [open]);
+  const nativeActivityCountRef = React.useRef(0);
+  // A same-Activity dialog's focus steal can dismiss the modal; keep swallowing
+  // those dismisses (and re-presenting) until the sheet reports visible again.
+  const isRecoveringNativeActivityRef = React.useRef(false);
 
-  const suspendForExternalActivity = React.useCallback(() => {
-    const pendingDismiss = externalActivityDismissRef.current;
-    if (pendingDismiss) {
-      return pendingDismiss.promise;
-    }
-
-    const modal = modalRef.current;
-    if (!modal || !open) {
-      return Promise.resolve();
-    }
-
-    const resolver: { current: () => void } = { current: () => undefined };
-    const promise = new Promise<void>((resolve) => {
-      resolver.current = resolve;
-    });
-    externalActivityDismissRef.current = { promise, resolve: resolver.current };
-    modal.dismiss();
-
-    return promise;
-  }, [modalRef, open]);
-
-  const resumeAfterExternalActivity = React.useCallback(() => {
-    if (open) {
-      modalRef.current?.present();
-    }
-  }, [modalRef, open]);
+  const beginNativeActivity = React.useCallback(() => {
+    nativeActivityCountRef.current += 1;
+    isRecoveringNativeActivityRef.current = true;
+    let ended = false;
+    return () => {
+      if (ended) return;
+      ended = true;
+      nativeActivityCountRef.current -= 1;
+      if (nativeActivityCountRef.current === 0 && openRef.current) {
+        modalRef.current?.present();
+      }
+    };
+  }, [modalRef]);
 
   const renderBackdrop = React.useCallback(
     (backdropProps: BottomSheetBackdropProps) => (
@@ -220,30 +227,40 @@ function DrawerContent({
     [backdropPressBehavior]
   );
   const contextValue = React.useMemo(
-    () => ({
-      open,
-      setOpen,
-      modalRef,
-      scrollable,
-      externalActivity: {
-        suspend: suspendForExternalActivity,
-        resume: resumeAfterExternalActivity,
-      },
-    }),
-    [modalRef, open, resumeAfterExternalActivity, scrollable, setOpen, suspendForExternalActivity]
+    () => ({ open, setOpen, modalRef, scrollable, beginNativeActivity }),
+    [beginNativeActivity, modalRef, open, scrollable, setOpen]
   );
 
   React.useEffect(() => {
     const modal = modalRef.current;
-    if (!modal) {
-      return;
-    }
+    if (!modal) return;
     if (open) {
       modal.present();
     } else {
       modal.dismiss();
     }
   }, [modalRef, open]);
+
+  // A same-Activity native dialog (date/time picker) steals window focus and
+  // drops the sheet to its closed position without unmounting the modal. On
+  // Activity return, snap it back. Full-screen pickers (image library/camera)
+  // are handled differently — they close and reopen the drawer entirely — so
+  // this only fires for the collapse case.
+  React.useEffect(() => {
+    const restore = () => {
+      if (open && nativeActivityCountRef.current === 0) {
+        modalRef.current?.snapToIndex(index >= 0 ? index : 0);
+      }
+    };
+    const changeSubscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") restore();
+    });
+    const focusSubscription = AppState.addEventListener("focus", restore);
+    return () => {
+      changeSubscription.remove();
+      focusSubscription.remove();
+    };
+  }, [index, modalRef, open]);
 
   return (
     <BottomSheetModal
@@ -252,14 +269,24 @@ function DrawerContent({
       index={index}
       backdropComponent={renderBackdrop}
       onDismiss={() => {
-        const externalActivityDismiss = externalActivityDismissRef.current;
-        if (externalActivityDismiss) {
-          externalActivityDismissRef.current = null;
-          externalActivityDismiss.resolve();
+        // A same-Activity dialog (date/time picker) can report this dismiss even
+        // after its promise settled. Keep swallowing native-activity dismisses —
+        // re-presenting the sheet — until it reports a visible index again, then
+        // allow real user dismisses through.
+        if (isRecoveringNativeActivityRef.current) {
+          if (nativeActivityCountRef.current === 0 && openRef.current) {
+            modalRef.current?.present();
+          }
           return;
         }
         setOpen(false);
         onDismiss?.();
+      }}
+      onChange={(sheetIndex, position, type) => {
+        if (sheetIndex >= 0 && nativeActivityCountRef.current === 0) {
+          isRecoveringNativeActivityRef.current = false;
+        }
+        onChange?.(sheetIndex, position, type);
       }}
       enableDynamicSizing={enableDynamicSizing}
       enablePanDownToClose={enablePanDownToClose}

@@ -4,6 +4,7 @@ const BASE_SPACING = 4;
 const BASE_TEXT_SIZE = 16;
 const FONT_FAMILY = "Inter";
 const DISPLAY_FONT_FAMILY = "Fraunces_700Bold";
+const DISPLAY_REGULAR_FONT_FAMILY = "Fraunces_400Regular";
 
 const getTextSize = (s: number) => s * BASE_TEXT_SIZE;
 
@@ -16,6 +17,7 @@ export const theme = {
   },
   fonts: {
     display: DISPLAY_FONT_FAMILY,
+    displayRegular: DISPLAY_REGULAR_FONT_FAMILY,
     thin: FONT_FAMILY,
     extraLight: FONT_FAMILY,
     light: FONT_FAMILY,

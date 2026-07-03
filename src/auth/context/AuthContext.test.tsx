@@ -18,6 +18,13 @@ jest.mock("@/notifications/services/notificationRegistration", () => ({
   unregisterStoredDeviceToken: jest.fn(),
 }));
 
+jest.mock("@react-native-google-signin/google-signin", () => ({
+  GoogleSignin: {
+    signOut: jest.fn(),
+    hasPreviousSignIn: jest.fn(() => true),
+  },
+}));
+
 jest.mock("@/api", () => ({
   postApiAuthRefresh: jest.fn(),
 }));
@@ -36,11 +43,14 @@ jest.mock("@/api/tokenStorage", () => ({
   setStoredSession: jest.fn(),
 }));
 
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+
 import { clearStoredSession } from "@/api/tokenStorage";
 import { unregisterStoredDeviceToken } from "@/notifications/services/notificationRegistration";
 
 const mockedClearStoredSession = jest.mocked(clearStoredSession);
 const mockedUnregisterStoredDeviceToken = jest.mocked(unregisterStoredDeviceToken);
+const mockedGoogleSignOut = jest.mocked(GoogleSignin.signOut);
 
 describe("AuthProvider sign-out", () => {
   beforeEach(() => {
@@ -48,6 +58,10 @@ describe("AuthProvider sign-out", () => {
     jest.clearAllMocks();
     mockedUnregisterStoredDeviceToken.mockImplementation(async () => {
       events.push("delete-device-token");
+    });
+    mockedGoogleSignOut.mockImplementation(async () => {
+      events.push("google-sign-out");
+      return null;
     });
   });
 
@@ -58,12 +72,26 @@ describe("AuthProvider sign-out", () => {
       await auth.signOut();
     });
 
-    expect(events).toEqual(["delete-device-token", "clear-auth"]);
+    expect(events).toEqual(["delete-device-token", "google-sign-out", "clear-auth"]);
   });
 
   it("still clears authentication when notification cleanup fails", async () => {
     const consoleError = jest.spyOn(console, "error").mockImplementation();
     mockedUnregisterStoredDeviceToken.mockRejectedValue(new Error("delete failed"));
+    const auth = await renderAuthProvider();
+
+    await act(async () => {
+      await auth.signOut();
+    });
+
+    expect(mockedClearStoredSession).toHaveBeenCalledTimes(1);
+    expect(consoleError).toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
+  it("still clears authentication when Google cleanup fails", async () => {
+    const consoleError = jest.spyOn(console, "error").mockImplementation();
+    mockedGoogleSignOut.mockRejectedValue(new Error("Google sign-out failed"));
     const auth = await renderAuthProvider();
 
     await act(async () => {
