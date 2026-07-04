@@ -1,11 +1,6 @@
-export type DayOfWeek =
-  | "Sunday"
-  | "Monday"
-  | "Tuesday"
-  | "Wednesday"
-  | "Thursday"
-  | "Friday"
-  | "Saturday";
+import type { DaysOfWeek } from "@/api/generated";
+
+export type DayOfWeek = DaysOfWeek;
 
 export type RecurrenceType = "Daily" | "Weekly" | "EveryNWeeks" | "EveryNMonths";
 
