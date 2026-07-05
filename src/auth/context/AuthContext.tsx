@@ -1,5 +1,6 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 import { postApiAuthRefresh } from "@/api";
 import type { AuthResponse } from "@/api/generated";
@@ -67,6 +68,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       unregisterStoredDeviceToken().catch((error: unknown) => {
         console.error("Failed to clean up notifications during sign-out.", error);
       });
+      if (GoogleSignin.hasPreviousSignIn()) {
+        GoogleSignin.signOut().catch((error: unknown) => {
+          console.error("Failed to clear the Google session during sign-out.", error);
+        });
+      }
       await clearStoredSession();
       applySession(null);
     })().finally(() => {

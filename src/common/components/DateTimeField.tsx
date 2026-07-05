@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Platform, Pressable, View } from "react-native";
+import { Keyboard, Platform, Pressable, View } from "react-native";
 import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
-import { useDrawerExternalActivity } from "@/shadecn/ui/drawer";
+import { useDrawerNativeActivity } from "@/shadecn/ui/drawer";
 import { Input } from "@/shadecn/ui/input";
 
 type DateTimeMode = "date" | "time";
@@ -39,15 +39,16 @@ export function DateTimeField({
   onBlur,
 }: DateTimeFieldProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const externalActivity = useDrawerExternalActivity();
+  const beginNativeActivity = useDrawerNativeActivity();
 
-  const open = async () => {
+  const open = () => {
     if (disabled) return;
 
     if (Platform.OS === "android") {
-      // Suspend the enclosing drawer (gorhom sheet) so the native picker
-      // dialog doesn't fight it for window focus and remount/close the sheet.
-      await externalActivity?.suspend();
+      Keyboard.dismiss();
+      // The dialog's focus steal collapses an enclosing drawer; mark it as a
+      // native activity so the drawer swallows that dismiss and re-presents.
+      const endNativeActivity = beginNativeActivity?.();
       DateTimePickerAndroid.open({
         mode,
         value: value ?? new Date(),
@@ -57,7 +58,7 @@ export function DateTimeField({
         onValueChange: (event, selectedDate) => {
           if (selectedDate) onChange(selectedDate);
           onBlur?.();
-          externalActivity?.resume();
+          endNativeActivity?.();
         },
       });
       return;
@@ -69,7 +70,12 @@ export function DateTimeField({
 
   return (
     <View>
-      <Pressable onPress={open} disabled={disabled}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={typeof label === "string" ? label : placeholder}
+        onPress={open}
+        disabled={disabled}
+      >
         <View pointerEvents="none">
           <Input
             label={label}

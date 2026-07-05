@@ -6,7 +6,7 @@ import { PencilLineIcon } from "@/icons/pencil-line";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import type { PetNote } from "../types";
+import type { PetNote } from "../../types";
 
 type NoteRowProps = {
   note: PetNote;

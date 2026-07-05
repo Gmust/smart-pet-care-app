@@ -1,9 +1,9 @@
 import { type ReactNode, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { useDrawerExternalActivity } from "@/shadecn/ui/drawer";
+import { useDrawerSetOpen } from "@/shadecn/ui/drawer";
 import { Text } from "@/shadecn/ui/text";
 
 import { Image } from "expo-image";
@@ -45,22 +45,22 @@ export function ImagePicker({
   quality = 0.8,
 }: ImagePickerProps) {
   const { t } = useTranslation(["common"]);
-  const drawerExternalActivity = useDrawerExternalActivity();
+  const setDrawerOpen = useDrawerSetOpen();
 
   const pick = useCallback(async () => {
     if (disabled) return;
 
-    const permission = await ExpoImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      onBlur?.();
-      return;
-    }
-
-    // Tear down the sheet before Android leaves the host Activity. Rebuilding a
-    // BottomSheetModal after returning can orphan its previous portal instance.
-    await drawerExternalActivity?.suspend();
+    // The full-screen library + crop editor pause the Android Activity, which
+    // dismisses the enclosing drawer's modal and can't be reliably kept open.
+    // Instead close the drawer up front and reopen it when the picker returns —
+    // the selected image lives in the parent form state, so it survives.
+    const isAndroid = Platform.OS === "android";
+    if (isAndroid) setDrawerOpen?.(false);
 
     try {
+      const permission = await ExpoImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) return;
+
       const result = await ExpoImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsEditing,
@@ -80,9 +80,9 @@ export function ImagePicker({
       });
     } finally {
       onBlur?.();
-      drawerExternalActivity?.resume();
+      if (isAndroid) setDrawerOpen?.(true);
     }
-  }, [allowsEditing, aspect, disabled, drawerExternalActivity, onBlur, onChange, quality]);
+  }, [allowsEditing, aspect, disabled, onBlur, onChange, quality, setDrawerOpen]);
 
   return (
     <View style={styles.wrapper}>
@@ -114,6 +114,8 @@ export function ImagePicker({
 
       {!!value && (
         <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("imagePicker.remove")}
           style={styles.removeBtn}
           onPress={() => onChange(null)}
           disabled={disabled}

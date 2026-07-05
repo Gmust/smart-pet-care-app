@@ -10,14 +10,13 @@ import { palette } from "@/styles/palette";
 type StatCellProps = {
   icon: "activity" | "vet" | "weight";
   value: string;
-  first?: boolean;
 };
 
 const STAT_ICON_SIZE = 16;
 
-export function StatCell({ icon, value, first = false }: StatCellProps) {
+export function StatCell({ icon, value }: StatCellProps) {
   return (
-    <View style={[styles.statCell, !first && styles.statDivider]}>
+    <View style={statCellStyles.statCell}>
       {icon === "weight" && (
         <WeightIcon
           width={STAT_ICON_SIZE}
@@ -39,27 +38,32 @@ export function StatCell({ icon, value, first = false }: StatCellProps) {
           color={palette.brand.textSecondary}
         />
       )}
-      <Text style={styles.statValue}>{value}</Text>
+      <Text style={statCellStyles.statValue} numberOfLines={2} ellipsizeMode="tail">
+        {value}
+      </Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+export const statCellStyles = StyleSheet.create((theme) => ({
   statCell: {
     flex: 1,
+    minWidth: 0,
+    minHeight: theme.spacing(13),
     alignItems: "center",
+    justifyContent: "center",
     gap: theme.spacing(1),
-    paddingHorizontal: theme.spacing(2),
-  },
-  statDivider: {
-    borderLeftWidth: 1,
-    borderLeftColor: theme.palette.brand.surfaceBorder,
+    borderRadius: theme.borderRadius.lg,
+    borderCurve: "continuous",
+    backgroundColor: theme.palette.brand.surfacePage,
+    paddingHorizontal: theme.spacing(1),
+    paddingVertical: theme.spacing(1.5),
   },
   statValue: {
-    fontFamily: theme.fonts.regular,
+    fontFamily: theme.fonts.medium,
     fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
+    lineHeight: theme.fontSize.xs * 1.25,
     textAlign: "center",
-    color: theme.palette.brand.textSecondary,
+    color: theme.palette.brand.textPrimary,
   },
 }));

@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
-import type { PetFlag } from "../types";
+import type { PetFlag } from "../../types";
 
 type FlagChipProps = {
   flag: PetFlag;

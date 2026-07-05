@@ -1,3 +1,5 @@
+import { SECURE_STORE_OPTIONS } from "@/common/utils/secureStoreOptions";
+
 import * as SecureStore from "expo-secure-store";
 
 const DEVICE_TOKEN_KEY = "spc.notifications.androidDeviceToken";
@@ -7,7 +9,7 @@ export const getStoredDeviceToken = (): Promise<string | null> => {
 };
 
 export const setStoredDeviceToken = (token: string): Promise<void> => {
-  return SecureStore.setItemAsync(DEVICE_TOKEN_KEY, token);
+  return SecureStore.setItemAsync(DEVICE_TOKEN_KEY, token, SECURE_STORE_OPTIONS);
 };
 
 export const clearStoredDeviceToken = (): Promise<void> => {

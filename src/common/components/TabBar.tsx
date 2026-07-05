@@ -135,7 +135,7 @@ const styles = StyleSheet.create((theme) => ({
   label: {
     fontFamily: theme.fonts.medium,
     fontSize: theme.fontSize.xs,
-    lineHeight: 10,
+    lineHeight: theme.fontSize.xs * 1.2,
   },
   labelActive: {
     fontFamily: theme.fonts.semiBold,

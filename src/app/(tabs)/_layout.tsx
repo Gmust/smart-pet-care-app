@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useAuth } from "@/auth/hooks/useAuth";
 import { Fab } from "@/common/components/Fab";
+import { OfflineBanner } from "@/common/components/OfflineBanner";
 import { TabBar } from "@/common/components/TabBar";
 
 import { Redirect, Tabs, usePathname } from "expo-router";
@@ -42,6 +43,7 @@ export default function TabLayout() {
         <Tabs.Screen name="reminders" options={{ href: null }} />
       </Tabs>
       {pathname.endsWith("/home") && <Fab />}
+      <OfflineBanner />
     </View>
   );
 }

@@ -6,6 +6,8 @@ import { ActivityIcon } from "@/icons/activity";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
+export { RouteErrorFallback as ErrorBoundary } from "@/common/components/RouteErrorFallback";
+
 export default function ActivityScreen() {
   return (
     <SafeAreaView style={styles.screen}>

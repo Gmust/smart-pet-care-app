@@ -40,7 +40,7 @@ export const useUpdateAvatar = () => {
 
       const file = asFormFile({
         uri: resized.uri,
-        name: "avatar.jpg",
+        name: "user-avatar.jpg",
         type: "image/jpeg",
       });
 

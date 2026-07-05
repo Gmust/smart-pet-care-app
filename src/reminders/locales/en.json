@@ -9,6 +9,7 @@
     "endAtInvalid": "Enter a valid end date."
   },
   "addReminder": "Add reminder",
+  "noTime": "No time",
   "remindersPage": {
     "title": "Reminders",
     "subtitle_one": "{{count}} reminder",

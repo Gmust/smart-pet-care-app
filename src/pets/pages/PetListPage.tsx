@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, View } from "react-native";
+import { FlatList, RefreshControl, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -10,17 +10,21 @@ import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
 import { CreatePetDrawer } from "../components/actions/CreatePetDrawer";
-import { PetListCard } from "../components/PetListCard";
+import { PetListCard } from "../components/pet-list/PetListCard";
 import { usePetsQuery } from "../queries/usePetsQuery";
 import { PetListPageSkeleton, PetListSubtitleSkeleton } from "../skeletons/PetListPageSkeleton";
 import { useRouter } from "expo-router";
+
+function ItemSeparator() {
+  return <View style={styles.separator} />;
+}
 
 export default function PetListPage() {
   const [openCreatePetDrawer, setOpenCreatePetDrawer] = useState(false);
 
   const { t } = useTranslation(["pets"]);
   const router = useRouter();
-  const { data: pets, isLoading } = usePetsQuery();
+  const { data: pets, isLoading, refetch, isRefetching } = usePetsQuery();
 
   const handleOpenPet = (petId: string) => {
     router.push({ pathname: "/(tabs)/pet-profile", params: { petId } });
@@ -42,37 +46,40 @@ export default function PetListPage() {
           </View>
         </View>
 
-        <ScrollView
+        <FlatList
+          data={isLoading ? [] : (pets ?? [])}
+          keyExtractor={(pet, index) => pet.id ?? String(index)}
+          renderItem={({ item }) => <PetListCard pet={item} onPress={handleOpenPet} />}
           showsVerticalScrollIndicator={false}
           contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={styles.content}
-        >
-          <View style={styles.cardStack}>
-            {isLoading ? (
+          ItemSeparatorComponent={ItemSeparator}
+          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+          ListEmptyComponent={
+            isLoading ? (
               <PetListPageSkeleton />
             ) : (
-              pets?.map((pet) => <PetListCard key={pet.id} pet={pet} onPress={handleOpenPet} />)
-            )}
-            {!isLoading && !pets?.length && (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyText}>{t("pets:petListPage.emptyState")}</Text>
               </View>
-            )}
-          </View>
-
-          <Button
-            variant="ghost"
-            size="md"
-            dotted
-            accessibilityLabel={t("pets:petListPage.addPet")}
-            icon={<CirclePlusIcon width={20} height={20} color={palette.brand.textSecondary} />}
-            style={styles.addButton}
-            textStyle={styles.addButtonText}
-            onPress={() => setOpenCreatePetDrawer(true)}
-          >
-            {t("pets:petListPage.addPet")}
-          </Button>
-        </ScrollView>
+            )
+          }
+          ListFooterComponent={
+            <Button
+              variant="ghost"
+              size="md"
+              dotted
+              accessibilityLabel={t("pets:petListPage.addPet")}
+              icon={<CirclePlusIcon width={20} height={20} color={palette.brand.textSecondary} />}
+              style={styles.addButton}
+              textStyle={styles.addButtonText}
+              onPress={() => setOpenCreatePetDrawer(true)}
+            >
+              {t("pets:petListPage.addPet")}
+            </Button>
+          }
+          ListFooterComponentStyle={styles.footer}
+        />
       </SafeAreaView>
       <CreatePetDrawer isOpen={openCreatePetDrawer} setIsOpen={setOpenCreatePetDrawer} />
     </>
@@ -109,12 +116,14 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.palette.brand.textSecondary,
   },
   content: {
-    gap: theme.spacing(3),
     paddingHorizontal: theme.spacing(4),
     paddingBottom: theme.spacing(28),
   },
-  cardStack: {
-    gap: theme.spacing(2),
+  separator: {
+    height: theme.spacing(2),
+  },
+  footer: {
+    paddingTop: theme.spacing(3),
   },
   emptyState: {
     alignItems: "center",

@@ -1,29 +1,34 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, View } from "react-native";
+import { RefreshControl, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
 import { Chevron } from "@/icons/arrows";
 import { CirclePlusIcon } from "@/icons/circle-plus";
 import { Button } from "@/shadecn/ui/button";
+import type { TabItem } from "@/shadecn/ui/tabs";
+import { Tabs, tabsContentEntering } from "@/shadecn/ui/tabs";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import { DeletePetConfirmation } from "../components/actions/DeletePetConfirmation";
-import { EditPetDrawer } from "../components/actions/EditPetDrawer";
-import { PetProfilePageActions } from "../components/actions/PetProfilePageActions";
-import { UploadPetPhotoDrawer } from "../components/actions/UploadPetPhotoDrawer";
-import { FlagChip } from "../components/FlagChip";
-import { InfoRow } from "../components/InfoRow";
-import { NoteRow } from "../components/NoteRow";
+import { DeletePetConfirmation } from "../components/pet-profile/actions/DeletePetConfirmation";
+import { EditPetDrawer } from "../components/pet-profile/actions/EditPetDrawer";
+import { PetProfilePageActions } from "../components/pet-profile/actions/PetProfilePageActions";
+import { UploadPetPhotoDrawer } from "../components/pet-profile/actions/UploadPetPhotoDrawer";
+import { FlagChip } from "../components/pet-profile/FlagChip";
+import { InfoRow } from "../components/pet-profile/InfoRow";
+import { NoteRow } from "../components/pet-profile/NoteRow";
+import { PetRemindersTab } from "../components/pet-profile/PetRemindersTab";
+import { SectionHeader } from "../components/pet-profile/SectionHeader";
 import { PetSpeciesImage } from "../components/PetSpeciesImage";
-import { SectionHeader } from "../components/SectionHeader";
 import { usePetQuery } from "../queries/usePetQuery";
+import { petProfileParamsSchema } from "../schemas/pet-profile-params.schema";
 import { PetProfilePageSkeleton } from "../skeletons/PetProfilePageSkeleton";
 import type { PetFlag, PetNote } from "../types";
 import dayjs from "dayjs";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
 export default function PetProfilePage() {
   const router = useRouter();
@@ -32,19 +37,27 @@ export default function PetProfilePage() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { petId } = useLocalSearchParams<{ petId?: string }>();
-  const { data: pet, isLoading: isPetLoading } = usePetQuery(petId);
+  const [activeTab, setActiveTab] = useState("overview");
+  const parsedParams = petProfileParamsSchema.safeParse(useLocalSearchParams());
+  const petId = parsedParams.success ? parsedParams.data.petId : undefined;
+  const { data: pet, isLoading: isPetLoading, refetch, isRefetching } = usePetQuery(petId);
   const petName = pet?.name;
 
-  const tabs = [
-    t("petProfilePage.tabs.overview"),
-    t("petProfilePage.tabs.activity"),
-    t("petProfilePage.tabs.health"),
-    t("petProfilePage.tabs.reminders"),
+  // Deep links can carry arbitrary params — never fetch with an unvalidated id.
+  if (!parsedParams.success) {
+    return <Redirect href="/(tabs)/pets" />;
+  }
+
+  const tabs: TabItem[] = [
+    { key: "overview", label: t("petProfilePage.tabs.overview") },
+    { key: "activity", label: t("petProfilePage.tabs.activity") },
+    { key: "health", label: t("petProfilePage.tabs.health") },
+    { key: "reminders", label: t("petProfilePage.tabs.reminders") },
   ];
 
   const flags: PetFlag[] = [];
   const notes: PetNote[] = [];
+
   if (pet) {
     if (pet.allergies) {
       flags.push({ id: "allergies", label: t("petProfilePage.flags.allergies"), tone: "warn" });
@@ -148,22 +161,17 @@ export default function PetProfilePage() {
           </View>
         )}
 
-        <View style={styles.segmentedTabs}>
-          {tabs.map((label, index) => (
-            <View key={label} style={[styles.segmentTab, index === 0 && styles.segmentTabActive]}>
-              <Text style={[styles.segmentText, index === 0 && styles.segmentTextActive]}>
-                {label}
-              </Text>
-            </View>
-          ))}
-        </View>
+        <Tabs items={tabs} value={activeTab} onChange={setActiveTab} variant="segmented" />
 
-        <ScrollView
+        <Animated.ScrollView
+          key={activeTab}
+          entering={tabsContentEntering}
           showsVerticalScrollIndicator={false}
           contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={styles.content}
+          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
         >
-          {!!pet && (
+          {!!pet && activeTab === "overview" && (
             <>
               <SectionHeader label={t("petProfilePage.basics.title")} />
               <View style={styles.listCard}>
@@ -204,7 +212,9 @@ export default function PetProfilePage() {
               </View>
             </>
           )}
-        </ScrollView>
+
+          {!!pet?.id && activeTab === "reminders" && <PetRemindersTab petId={pet.id} />}
+        </Animated.ScrollView>
       </View>
       {!!pet && <EditPetDrawer pet={pet} isOpen={isEditOpen} setIsOpen={setIsEditOpen} />}
 
@@ -263,37 +273,6 @@ const styles = StyleSheet.create((theme) => ({
     bottom: theme.spacing(1.5),
     flexDirection: "row",
     gap: theme.spacing(2),
-  },
-  segmentedTabs: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    borderWidth: 1,
-    borderColor: theme.palette.brand.surfaceBorder,
-    backgroundColor: theme.palette.white,
-    paddingHorizontal: theme.spacing(5),
-  },
-  segmentTab: {
-    flex: 1,
-    minWidth: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: theme.spacing(2.5),
-  },
-  segmentTabActive: {
-    borderBottomWidth: 2,
-    borderBottomColor: theme.palette.brand.primaryDefault,
-  },
-  segmentText: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
-    color: theme.palette.brand.textSecondary,
-  },
-  segmentTextActive: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
-    color: theme.palette.brand.primaryDefault,
   },
   content: {
     gap: theme.spacing(2),
