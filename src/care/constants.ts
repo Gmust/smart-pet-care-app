@@ -1,4 +1,9 @@
-import type { CareCategory, CareSectionKey, PlannedHealthEventCategory } from "./types";
+import type {
+  CareCategory,
+  CareSectionKey,
+  CareTranslationKey,
+  PlannedHealthEventCategory,
+} from "./types";
 
 /**
  * "meals"        — always a list of MealRow, header action = "Edit"
@@ -18,9 +23,9 @@ export type CareSectionVariant = "meals" | "foodTracker" | "single" | "growableL
 export type CareSectionConfig = {
   key: CareSectionKey;
   variant: CareSectionVariant;
-  titleKey: string;
+  titleKey: CareTranslationKey;
   /** i18n key for the header action label (e.g. "Add walk"). Omit → no header action. */
-  headerActionLabelKey?: string;
+  headerActionLabelKey?: CareTranslationKey;
   /** For sections backed by CareRule (single / growableList / fixedSlots subset). */
   fixedCareCategories?: CareCategory[];
   /** For sections backed by PlannedHealthEvent (vaccination / treatments). */
@@ -88,5 +93,18 @@ export const CARE_SECTIONS: CareSectionConfig[] = [
     ],
   },
 ];
+
+export const CARE_CATEGORY_LABEL_KEYS: Partial<
+  Record<CareCategory | PlannedHealthEventCategory, CareTranslationKey>
+> = {
+  Bathing: "categoryLabels.Bathing",
+  Brushing: "categoryLabels.Brushing",
+  EarCleaning: "categoryLabels.EarCleaning",
+  NailTrimming: "categoryLabels.NailTrimming",
+  PawCare: "categoryLabels.PawCare",
+  TeethCleaning: "categoryLabels.TeethCleaning",
+  Deworming: "categoryLabels.Deworming",
+  Antiparasite: "categoryLabels.Antiparasite",
+};
 
 export const RECURRENCE_TYPE_DEFAULT_INTERVAL = 1;

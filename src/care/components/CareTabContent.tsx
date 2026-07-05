@@ -1,19 +1,39 @@
-//import { useTranslation } from "react-i18next";
-
-import { EmptyTabPlaceholder } from "@/pets/components/tabs/EmptyTabPlaceholder";
+import { CARE_SECTIONS } from "../constants";
+import { CareRuleSection } from "./CareRuleSection";
+import { FoodTrackerSection } from "./FoodTrackerSection";
+import { MealsSection } from "./MealsSection";
+import { PlannedHealthEventSection } from "./PlannedHealthEventSection";
 
 type Props = {
   petId: string;
 };
 
 /**
- * Entry point for the Care tab. Section components (Meals, Food Tracker,
- * Vet Visit, Vaccination, Treatments, Weighing, Walking, Grooming) are wired
- * in incrementally — see docs/care-implementation-plan.md step 3/4.
+ * Entry point for the Care tab. Renders every configured section; tapping a
+ * card/empty-state currently no-ops — wiring up AddCareRuleDrawer /
+ * AddFoodTrackerDrawer is the next step.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function CareTabContent({ petId }: Props) {
-  // const { t } = useTranslation(["care"]);
-
-  return <EmptyTabPlaceholder label="Care sections coming soon" />;
+  return (
+    <>
+      {CARE_SECTIONS.map((config) => {
+        switch (config.key) {
+          case "meals":
+            return <MealsSection key={config.key} petId={petId} />;
+          case "foodTracker":
+            return <FoodTrackerSection key={config.key} petId={petId} />;
+          case "vaccination":
+          case "treatments":
+            return <PlannedHealthEventSection key={config.key} config={config} petId={petId} />;
+          case "vetVisit":
+          case "weighing":
+          case "walking":
+          case "grooming":
+            return <CareRuleSection key={config.key} config={config} petId={petId} />;
+          default:
+            return null;
+        }
+      })}
+    </>
+  );
 }

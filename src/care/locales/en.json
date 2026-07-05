@@ -1,0 +1,69 @@
+{
+  "comingSoon": "Care sections coming soon",
+  "emptyState": {
+    "notConfigured": "Not configured"
+  },
+  "sections": {
+    "meals": {
+      "title": "Meals",
+      "editAction": "Edit"
+    },
+    "foodTracker": {
+      "title": "Food Tracker",
+      "addAction": "Add food"
+    },
+    "vetVisit": {
+      "title": "Vet Visit"
+    },
+    "vaccination": {
+      "title": "Vaccination",
+      "addAction": "Add vaccine"
+    },
+    "treatments": {
+      "title": "Treatments"
+    },
+    "weighing": {
+      "title": "Weighing",
+      "addAction": "Add weigh-in"
+    },
+    "walking": {
+      "title": "Walking",
+      "addAction": "Add walk"
+    },
+    "grooming": {
+      "title": "Grooming",
+      "manageAction": "Manage"
+    }
+  },
+  "categoryLabels": {
+    "Bathing": "Bathing",
+    "Brushing": "Brushing",
+    "EarCleaning": "Ear cleaning",
+    "NailTrimming": "Nail trimming",
+    "PawCare": "Paw care",
+    "TeethCleaning": "Teeth cleaning",
+    "Deworming": "Deworming",
+    "Antiparasite": "Anti-parasite"
+  },
+  "foodTracker": {
+    "restockDate": "Restock date: {{date}}",
+    "restockDateUnknown": "Restock date: —"
+  },
+  "recurrence": {
+    "daily": "Every day",
+    "byWeekDays": "By week days",
+    "everyWeek": "Every week",
+    "everyNWeeks": "Every {{n}} weeks",
+    "everyMonth": "Every month",
+    "everyNMonths": "Every {{n}} months"
+  },
+  "daysShort": {
+    "Sunday": "Sun",
+    "Monday": "Mon",
+    "Tuesday": "Tue",
+    "Wednesday": "Wed",
+    "Thursday": "Thu",
+    "Friday": "Fri",
+    "Saturday": "Sat"
+  }
+}

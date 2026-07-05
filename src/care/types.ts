@@ -1,4 +1,5 @@
 import type { DaysOfWeek } from "@/api/generated";
+import type careEn from "@/care/locales/en.json";
 
 export type DayOfWeek = DaysOfWeek;
 
@@ -97,3 +98,14 @@ export type CareSectionKey =
   | "weighing"
   | "walking"
   | "grooming";
+
+/** Recursively extracts every leaf dot-path key from the "care" translation JSON. */
+type DotPaths<T> = {
+  [K in keyof T & string]: T[K] extends string
+    ? K
+    : T[K] extends object
+      ? `${K}.${DotPaths<T[K]>}`
+      : never;
+}[keyof T & string];
+
+export type CareTranslationKey = DotPaths<typeof careEn>;
