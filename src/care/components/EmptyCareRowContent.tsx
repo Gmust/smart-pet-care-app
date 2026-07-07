@@ -1,0 +1,68 @@
+import { View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { Text } from "@/shadecn/ui/text";
+
+import type { CareCategory, PlannedHealthEventCategory } from "../types";
+import { CareCategoryIcon } from "./care-category-icon/CareCategoryIcon";
+
+type Props = {
+  category: CareCategory | PlannedHealthEventCategory;
+  title: string;
+  notConfiguredLabel: string;
+};
+
+/**
+ * Pure presentational "not configured" row for a known fixed-slot category
+ * (Bathing, Deworming, ...). No border/padding of its own — used inside
+ * CareListCard alongside configured CareRuleRowContent rows.
+ */
+export function EmptyCareRowContent({ category, title, notConfiguredLabel }: Props) {
+  const { theme } = useUnistyles();
+
+  return (
+    <View style={styles.row}>
+      <View style={styles.iconBox}>
+        <CareCategoryIcon
+          category={category}
+          width={16}
+          height={16}
+          color={theme.palette.brand.textFaint}
+        />
+      </View>
+      <View style={styles.textCol}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.subtitle}>{notConfiguredLabel}</Text>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create((theme) => ({
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing(3),
+  },
+  iconBox: {
+    width: theme.spacing(9),
+    height: theme.spacing(9),
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: theme.borderRadius.lg,
+    backgroundColor: theme.palette.brand.surfaceSunken,
+  },
+  textCol: {
+    flex: 1,
+    minWidth: 0,
+  },
+  title: {
+    ...theme.textStyles.bodyS,
+    color: theme.palette.brand.textSecondary,
+  },
+  subtitle: {
+    marginTop: theme.spacing(0.5),
+    ...theme.textStyles.caption,
+    color: theme.palette.brand.textFaint,
+  },
+}));

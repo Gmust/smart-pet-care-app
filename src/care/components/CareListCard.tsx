@@ -1,0 +1,58 @@
+import type { ReactNode } from "react";
+import { Pressable, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+
+export const careListCardStyles = StyleSheet.create((theme) => ({
+  card: {
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.palette.brand.surfaceBorder,
+    borderRadius: theme.borderRadius.xl,
+    backgroundColor: theme.palette.white,
+  },
+  row: {
+    paddingHorizontal: theme.spacing(3.5),
+    paddingVertical: theme.spacing(2.75),
+  },
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: theme.palette.brand.surfaceBorder,
+  },
+  rowPressed: {
+    backgroundColor: theme.palette.brand.surfaceSunken,
+  },
+}));
+
+type Props<T> = {
+  items: T[];
+  keyExtractor: (item: T) => string;
+  renderItem: (item: T) => ReactNode;
+  onItemPress?: (item: T) => void;
+};
+
+/**
+ * One bordered card, rows separated by internal dividers instead of each
+ * item getting its own outer border. Used for fixedSlots sections (always)
+ * and growableList sections once they hold 2+ rules. FoodTracker is exempt
+ * by design — every food item stays its own standalone card.
+ */
+export function CareListCard<T>({ items, keyExtractor, renderItem, onItemPress }: Props<T>) {
+  return (
+    <View style={careListCardStyles.card}>
+      {items.map((item, index) => (
+        <Pressable
+          key={keyExtractor(item)}
+          disabled={!onItemPress}
+          onPress={() => onItemPress?.(item)}
+          style={({ pressed }) => [
+            careListCardStyles.row,
+            index > 0 && careListCardStyles.divider,
+            pressed && !!onItemPress && careListCardStyles.rowPressed,
+          ]}
+        >
+          {renderItem(item)}
+        </Pressable>
+      ))}
+    </View>
+  );
+}

@@ -4,7 +4,7 @@ import { useMealsQuery } from "../queries/useMealsQuery";
 import type { MealRule } from "../types";
 import { CareSection } from "./CareSection";
 import { EmptyCareCard } from "./EmptyCareCard";
-import { MealRow } from "./MealRow";
+import { MealsListCard } from "./MealsListCard";
 
 type Props = {
   petId: string;
@@ -22,10 +22,11 @@ export function MealsSection({ petId, onAddMeal, onEditMeal }: Props) {
       actionLabel={t("sections.meals.editAction")}
       onActionPress={onAddMeal}
     >
-      {!meals?.length && <EmptyCareCard onPress={onAddMeal} />}
-      {meals?.map((meal) => (
-        <MealRow key={meal.id} meal={meal} onPress={() => onEditMeal?.(meal)} />
-      ))}
+      {!meals?.length ? (
+        <EmptyCareCard onPress={onAddMeal} />
+      ) : (
+        <MealsListCard meals={meals} onEditMeal={onEditMeal} />
+      )}
     </CareSection>
   );
 }

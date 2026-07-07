@@ -3,9 +3,12 @@ import { useTranslation } from "react-i18next";
 import { CARE_CATEGORY_LABEL_KEYS, type CareSectionConfig } from "../constants";
 import { usePlannedHealthEventsQuery } from "../queries/usePlannedHealthEventsQuery";
 import type { PlannedHealthEvent, PlannedHealthEventCategory } from "../types";
+import { CareListCard } from "./CareListCard";
 import { CareRuleCard } from "./CareRuleCard";
+import { CareRuleRowContent } from "./CareRuleRowContent";
 import { CareSection } from "./CareSection";
 import { EmptyCareCard } from "./EmptyCareCard";
+import { EmptyCareRowContent } from "./EmptyCareRowContent";
 
 type Props = {
   config: CareSectionConfig;
@@ -19,6 +22,10 @@ type Props = {
  * fixed "EveryNMonths" here. */
 const PLANNED_HEALTH_EVENT_RECURRENCE = "EveryNMonths" as const;
 
+type Slot =
+  | { kind: "filled"; category: PlannedHealthEventCategory; event: PlannedHealthEvent; label: string }
+  | { kind: "empty"; category: PlannedHealthEventCategory; label: string };
+
 export function PlannedHealthEventSection({ config, petId, onAddEvent, onEditEvent }: Props) {
   const { t } = useTranslation(["care"]);
   const { data: events } = usePlannedHealthEventsQuery(petId);
@@ -31,37 +38,40 @@ export function PlannedHealthEventSection({ config, petId, onAddEvent, onEditEve
   };
 
   if (config.variant === "fixedSlots") {
-    return (
-      <CareSection
-        title={t(config.titleKey)}
-        actionLabel={actionLabel}
-        onActionPress={handleHeaderAction}
-      >
-        {categories.map((category) => {
-          const event = events?.find((item) => item.category === category);
-          const labelKey = CARE_CATEGORY_LABEL_KEYS[category];
-          const categoryLabel = labelKey ? t(labelKey) : category;
+    const slots: Slot[] = categories.map((category) => {
+      const event = events?.find((item) => item.category === category);
+      const labelKey = CARE_CATEGORY_LABEL_KEYS[category];
+      const label = labelKey ? t(labelKey) : category;
+      return event ? { kind: "filled", category, event, label } : { kind: "empty", category, label };
+    });
 
-          return event ? (
-            <CareRuleCard
-              key={category}
-              category={event.category}
-              title={event.title || categoryLabel}
-              time={event.reminderTime}
-              recurrenceType={PLANNED_HEALTH_EVENT_RECURRENCE}
-              intervalN={event.intervalN}
-              size="sm"
-              onPress={() => onEditEvent?.(event)}
-            />
-          ) : (
-            <EmptyCareCard
-              key={category}
-              category={category}
-              title={categoryLabel}
-              onPress={() => onAddEvent?.(category)}
-            />
-          );
-        })}
+    return (
+      <CareSection title={t(config.titleKey)} actionLabel={actionLabel} onActionPress={handleHeaderAction}>
+        <CareListCard
+          items={slots}
+          keyExtractor={(slot) => slot.category}
+          onItemPress={(slot) =>
+            slot.kind === "filled" ? onEditEvent?.(slot.event) : onAddEvent?.(slot.category)
+          }
+          renderItem={(slot) =>
+            slot.kind === "filled" ? (
+              <CareRuleRowContent
+                category={slot.event.category}
+                title={slot.event.title || slot.label}
+                time={slot.event.reminderTime}
+                recurrenceType={PLANNED_HEALTH_EVENT_RECURRENCE}
+                intervalN={slot.event.intervalN}
+                size="sm"
+              />
+            ) : (
+              <EmptyCareRowContent
+                category={slot.category}
+                title={slot.label}
+                notConfiguredLabel={t("emptyState.notConfigured")}
+              />
+            )
+          }
+        />
       </CareSection>
     );
   }
@@ -72,26 +82,36 @@ export function PlannedHealthEventSection({ config, petId, onAddEvent, onEditEve
     : [];
 
   return (
-    <CareSection
-      title={t(config.titleKey)}
-      actionLabel={actionLabel}
-      onActionPress={handleHeaderAction}
-    >
-      {categoryEvents.length === 0 && (
-        <EmptyCareCard category={primaryCategory} onPress={handleHeaderAction} />
-      )}
-      {categoryEvents.map((event) => (
+    <CareSection title={t(config.titleKey)} actionLabel={actionLabel} onActionPress={handleHeaderAction}>
+      {categoryEvents.length === 0 && <EmptyCareCard onPress={handleHeaderAction} />}
+      {categoryEvents.length === 1 && (
         <CareRuleCard
-          key={event.id}
-          category={event.category}
-          title={event.title}
-          time={event.reminderTime}
+          category={categoryEvents[0].category}
+          title={categoryEvents[0].title}
+          time={categoryEvents[0].reminderTime}
           recurrenceType={PLANNED_HEALTH_EVENT_RECURRENCE}
-          intervalN={event.intervalN}
-          size={categoryEvents.length > 1 ? "sm" : "lg"}
-          onPress={() => onEditEvent?.(event)}
+          intervalN={categoryEvents[0].intervalN}
+          size="lg"
+          onPress={() => onEditEvent?.(categoryEvents[0])}
         />
-      ))}
+      )}
+      {categoryEvents.length > 1 && (
+        <CareListCard
+          items={categoryEvents}
+          keyExtractor={(event) => event.id}
+          onItemPress={(event) => onEditEvent?.(event)}
+          renderItem={(event) => (
+            <CareRuleRowContent
+              category={event.category}
+              title={event.title}
+              time={event.reminderTime}
+              recurrenceType={PLANNED_HEALTH_EVENT_RECURRENCE}
+              intervalN={event.intervalN}
+              size="sm"
+            />
+          )}
+        />
+      )}
     </CareSection>
   );
 }
