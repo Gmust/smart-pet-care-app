@@ -69,8 +69,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(6),
   },
   centeredText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   row: {
@@ -99,14 +98,12 @@ const styles = StyleSheet.create((theme) => ({
     minWidth: 0,
   },
   title: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   subtitle: {
     marginTop: theme.spacing(0.5),
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
+    ...theme.textStyles.caption,
     color: theme.palette.brand.textFaint,
   },
 }));

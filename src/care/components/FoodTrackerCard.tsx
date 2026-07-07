@@ -71,8 +71,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.surfaceSunken,
   },
   title: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textPrimary,
   },
   track: {
@@ -91,8 +90,7 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "space-between",
   },
   footerText: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
+    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
 }));

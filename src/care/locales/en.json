@@ -47,7 +47,7 @@
   },
   "foodTracker": {
     "restockDate": "Restock date: {{date}}",
-    "restockDateUnknown": "Restock date: —"
+    "restockDateUnknown": "Restock date: \u2014"
   },
   "recurrence": {
     "daily": "Every day",
@@ -65,5 +65,126 @@
     "Thursday": "Thu",
     "Friday": "Fri",
     "Saturday": "Sat"
+  },
+  "forms": {
+    "meal": {
+      "createTitle": "Add meal",
+      "editTitle": "Edit meal",
+      "fields": {
+        "title": "Title",
+        "time": "Time"
+      },
+      "placeholders": {
+        "title": "Breakfast, Lunch, Dinner...",
+        "time": "Select time"
+      },
+      "createSuccess": "Meal added",
+      "updateSuccess": "Meal updated",
+      "submitCreate": "Add meal",
+      "submitEdit": "Save changes",
+      "errors": {
+        "titleRequired": "Title is required",
+        "timeRequired": "Time is required"
+      }
+    },
+    "careRule": {
+      "createTitle": "Add rule",
+      "editTitle": "Edit rule",
+      "fields": {
+        "title": "Title",
+        "time": "Reminder time",
+        "recurrenceType": "Repeats",
+        "weekDays": "On these days",
+        "intervalWeeks": "Every how many weeks",
+        "intervalMonths": "Every how many months"
+      },
+      "placeholders": {
+        "title": "e.g. Schedule vet visit",
+        "time": "Select time",
+        "recurrenceType": "Select frequency",
+        "interval": "e.g. 3"
+      },
+      "recurrenceOptions": {
+        "Daily": "Every day",
+        "Weekly": "On specific days",
+        "EveryNWeeks": "Every N weeks",
+        "EveryNMonths": "Every N months"
+      },
+      "createSuccess": "Rule added",
+      "updateSuccess": "Rule updated",
+      "submitCreate": "Add rule",
+      "submitEdit": "Save changes",
+      "errors": {
+        "titleRequired": "Title is required",
+        "timeRequired": "Time is required",
+        "weekDaysRequired": "Pick at least one day",
+        "intervalRequired": "Enter an interval"
+      }
+    },
+    "plannedHealthEvent": {
+      "createTitle": "Add planned event",
+      "editTitle": "Edit planned event",
+      "fields": {
+        "title": "Title",
+        "time": "Reminder time",
+        "intervalMonths": "Every how many months",
+        "productName": "Product (optional)",
+        "lastDoneAt": "Last done (optional)",
+        "notes": "Notes (optional)"
+      },
+      "placeholders": {
+        "title": "e.g. Rabies vaccine",
+        "time": "Select time",
+        "interval": "e.g. 12",
+        "productName": "e.g. Frontline",
+        "lastDoneAt": "Select date",
+        "notes": "Any extra detail"
+      },
+      "createSuccess": "Event added",
+      "updateSuccess": "Event updated",
+      "submitCreate": "Add event",
+      "submitEdit": "Save changes",
+      "errors": {
+        "titleRequired": "Title is required",
+        "timeRequired": "Time is required",
+        "intervalRequired": "Enter an interval"
+      }
+    },
+    "foodTracker": {
+      "createTitle": "Add food",
+      "editTitle": "Edit food",
+      "fields": {
+        "foodName": "Food name",
+        "packageWeight": "Package weight",
+        "packageCount": "Packages bought",
+        "openedAt": "Opened on",
+        "portionWeight": "Portion size",
+        "feedingFrequency": "Feeding frequency",
+        "feedingsPerDay": "Feedings per day",
+        "feedingsPerWeek": "Feedings per week"
+      },
+      "placeholders": {
+        "foodName": "e.g. Dry cat food",
+        "packageCount": "e.g. 1",
+        "openedAt": "Select date"
+      },
+      "frequencyOptions": {
+        "daily": "Daily",
+        "weekly": "Weekly"
+      },
+      "createSuccess": "Food added",
+      "updateSuccess": "Food updated",
+      "submitCreate": "Add food",
+      "submitEdit": "Save changes",
+      "errors": {
+        "foodNameRequired": "Food name is required",
+        "packageWeightRequired": "Enter package weight",
+        "packageCountRequired": "Enter package count",
+        "openedAtRequired": "Select when it was opened",
+        "portionWeightRequired": "Enter portion size",
+        "feedingsPerDayRequired": "Enter feedings per day",
+        "feedingsPerWeekRequired": "Enter feedings per week"
+      }
+    }
   }
 }

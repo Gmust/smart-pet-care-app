@@ -3,16 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Chip } from "@/shadecn/ui/chip";
 
 import type { DayOfWeek, RecurrenceType } from "../types";
-
-const WEEK_DAY_ORDER: DayOfWeek[] = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+import { WEEK_DAYS } from "../types";
 
 type Props = {
   recurrenceType: RecurrenceType;
@@ -41,7 +32,7 @@ export function RecurrenceChip({ recurrenceType, intervalN, weekDays, variant = 
         variant === "compact" || !weekDays?.length
           ? t("recurrence.byWeekDays")
           : [...weekDays]
-              .sort((a, b) => WEEK_DAY_ORDER.indexOf(a) - WEEK_DAY_ORDER.indexOf(b))
+              .sort((a, b) => WEEK_DAYS.indexOf(a) - WEEK_DAYS.indexOf(b))
               .map((day) => t(`daysShort.${day}`))
               .join(" · ");
       break;

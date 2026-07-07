@@ -1,7 +1,8 @@
-import type { DaysOfWeek } from "@/api/generated";
+import { DaysOfWeek } from "@/api/generated";
 import type careEn from "@/care/locales/en.json";
 
 export type DayOfWeek = DaysOfWeek;
+export const WEEK_DAYS = Object.values(DaysOfWeek) as DayOfWeek[];
 
 export type RecurrenceType = "Daily" | "Weekly" | "EveryNWeeks" | "EveryNMonths";
 

@@ -39,7 +39,6 @@ export function CareSection({ title, actionLabel, onActionPress, children }: Pro
 const styles = StyleSheet.create((theme) => ({
   section: {
     gap: theme.spacing(2),
-    marginBottom: theme.spacing(5),
   },
   header: {
     flexDirection: "row",
@@ -54,9 +53,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   actionText: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
+    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.primaryDefault,
   },
   content: {

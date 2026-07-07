@@ -49,8 +49,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.surfaceSunken,
   },
   title: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textPrimary,
   },
   right: {
@@ -58,8 +57,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   time: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
 }));
