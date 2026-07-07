@@ -9,6 +9,7 @@ export function useDeleteMealMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["delete-meal"],
     mutationFn: ({ id }: DeleteMealInput) => mealsMock.remove(id),
     onSuccess: (_void, variables) => {
       queryClient.invalidateQueries({ queryKey: careQueryKeys.meals(variables.petId) });

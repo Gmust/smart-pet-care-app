@@ -14,6 +14,7 @@ export function useUpdatePlannedHealthEventMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["update-planned-health-event"],
     mutationFn: ({ id, patch }: UpdatePlannedHealthEventInput) =>
       plannedHealthEventsMock.update(id, patch),
     onSuccess: (_updated, variables) => {

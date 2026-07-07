@@ -14,6 +14,7 @@ export function useUpdateMealMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["update-meal"],
     mutationFn: ({ id, patch }: UpdateMealInput) => mealsMock.update(id, patch),
     onSuccess: (_updated, variables) => {
       queryClient.invalidateQueries({ queryKey: careQueryKeys.meals(variables.petId) });

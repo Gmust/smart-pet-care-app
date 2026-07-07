@@ -8,6 +8,7 @@ export function useCreateFoodTrackerMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["create-food-tracker"],
     mutationFn: (input: Omit<FoodTracker, "id">) => foodTrackerMock.create(input),
     onSuccess: (_created, variables) => {
       queryClient.invalidateQueries({ queryKey: careQueryKeys.foodTracker(variables.petId) });

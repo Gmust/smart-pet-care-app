@@ -9,6 +9,7 @@ export function useDeletePlannedHealthEventMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["delete-planned-health-event"],
     mutationFn: ({ id }: DeletePlannedHealthEventInput) => plannedHealthEventsMock.remove(id),
     onSuccess: (_void, variables) => {
       queryClient.invalidateQueries({

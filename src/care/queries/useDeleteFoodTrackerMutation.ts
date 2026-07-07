@@ -9,6 +9,7 @@ export function useDeleteFoodTrackerMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["delete-food-tracker"],
     mutationFn: ({ id }: DeleteFoodTrackerInput) => foodTrackerMock.remove(id),
     onSuccess: (_void, variables) => {
       queryClient.invalidateQueries({ queryKey: careQueryKeys.foodTracker(variables.petId) });

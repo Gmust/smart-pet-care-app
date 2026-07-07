@@ -8,6 +8,7 @@ export function useCreatePlannedHealthEventMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["create-planned-health-event"],
     mutationFn: (input: Omit<PlannedHealthEvent, "id">) => plannedHealthEventsMock.create(input),
     onSuccess: (_created, variables) => {
       queryClient.invalidateQueries({

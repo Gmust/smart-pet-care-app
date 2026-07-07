@@ -8,6 +8,7 @@ export function useCreateMealMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["create-meal"],
     mutationFn: (input: Omit<MealRule, "id">) => mealsMock.create(input),
     onSuccess: (_created, variables) => {
       queryClient.invalidateQueries({ queryKey: careQueryKeys.meals(variables.petId) });

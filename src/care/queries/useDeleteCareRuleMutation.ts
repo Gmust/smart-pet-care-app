@@ -9,6 +9,7 @@ export function useDeleteCareRuleMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["delete-care-rule"],
     mutationFn: ({ id }: DeleteCareRuleInput) => careRulesMock.remove(id),
     onSuccess: (_void, variables) => {
       queryClient.invalidateQueries({ queryKey: careQueryKeys.careRules(variables.petId) });

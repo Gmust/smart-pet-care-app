@@ -14,6 +14,7 @@ export function useUpdateFoodTrackerMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: ["update-food-tracker"],
     mutationFn: ({ id, patch }: UpdateFoodTrackerInput) => foodTrackerMock.update(id, patch),
     onSuccess: (_updated, variables) => {
       queryClient.invalidateQueries({ queryKey: careQueryKeys.foodTracker(variables.petId) });
