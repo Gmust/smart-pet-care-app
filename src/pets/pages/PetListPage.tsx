@@ -97,15 +97,11 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   title: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
-    lineHeight: theme.fontSize["2xl"] * 1.3,
+    ...theme.textStyles.titleL,
     color: theme.palette.brand.textBody,
   },
   subtitle: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.4,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
   content: {
@@ -126,17 +122,14 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(6),
   },
   emptyText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
   addButton: {
     width: "100%",
   },
   addButtonText: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
+    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.textSecondary,
   },
 }));

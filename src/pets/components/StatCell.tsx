@@ -56,9 +56,7 @@ const styles = StyleSheet.create((theme) => ({
     borderLeftColor: theme.palette.brand.surfaceBorder,
   },
   statValue: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
+    ...theme.textStyles.caption,
     textAlign: "center",
     color: theme.palette.brand.textSecondary,
   },

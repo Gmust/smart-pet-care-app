@@ -122,9 +122,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2),
   },
   manageText: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
+    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.primaryDefault,
   },
   emptyCard: {
@@ -133,8 +131,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(5),
   },
   emptyText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
 }));

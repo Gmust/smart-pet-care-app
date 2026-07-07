@@ -2,18 +2,44 @@ import { palette } from "./palette";
 
 const BASE_SPACING = 4;
 const BASE_TEXT_SIZE = 16;
+
+// ---------------------------------------------------------------------------
+// LEGACY — Tailwind-style rem scale, does not match Figma values exactly.
+// Kept temporarily so existing usages across the app keep compiling while we
+// migrate screen by screen. Do not use these in new code.
+// TODO(remove-legacy-theme-tokens): delete FONT_FAMILY, DISPLAY_FONT_FAMILY,
+// getTextSize, theme.fonts (old keys), theme.fontSize (old keys) once
+// `graphify query` / grep shows zero remaining references.
+// ---------------------------------------------------------------------------
 const FONT_FAMILY = "Inter";
-const DISPLAY_FONT_FAMILY = "Fraunces_700Bold";
+const DISPLAY_FONT_FAMILY = "Fraunces_700Bold"; // NOTE: likely wrong, Figma Display style uses Fraunces SemiBold, not Bold — confirm before migrating _layout.tsx font loading.
 
 const getTextSize = (s: number) => s * BASE_TEXT_SIZE;
+
+// ---------------------------------------------------------------------------
+// PERMANENT — actual font family names as registered with `useFonts` in
+// _layout.tsx (via @expo-google-fonts/inter and @expo-google-fonts/fraunces).
+// These strings must match the useFonts() keys exactly, or RN silently falls
+// back to the system font instead of erroring.
+// ---------------------------------------------------------------------------
+const INTER_REGULAR = "Inter_400Regular";
+const INTER_MEDIUM = "Inter_500Medium";
+const INTER_SEMIBOLD = "Inter_600SemiBold";
+const FRAUNCES_REGULAR = "Fraunces_400Regular";
+const FRAUNCES_SEMIBOLD = "Fraunces_600SemiBold"; // TODO: confirm this package export exists once _layout.tsx font loading is updated
 
 export const theme = {
   palette,
   spacing: (v: number) => v * BASE_SPACING,
-  textSizing: getTextSize,
+  textSizing: getTextSize, // LEGACY — superseded by explicit pixel values in fontSize below
   shadows: {
     dialog: "0px 4px 10px 0 rgba(0,0,0,0.35)",
   },
+
+  // ---------------------------------------------------------------------
+  // LEGACY fonts/fontSize — Tailwind-style weight & rem scale.
+  // Still used across the app; do not remove until migration is complete.
+  // ---------------------------------------------------------------------
   fonts: {
     display: DISPLAY_FONT_FAMILY,
     thin: FONT_FAMILY,
@@ -41,6 +67,116 @@ export const theme = {
     "8xl": getTextSize(6),
     "9xl": getTextSize(8),
   },
+
+  // ---------------------------------------------------------------------
+  // PERMANENT — new tokens, sourced directly from the Figma "Styles" panel.
+  // Use these for all new work and when migrating existing screens.
+  // ---------------------------------------------------------------------
+
+  // Raw font family primitives, exposed in case a component needs the family
+  // without a full textStyle (e.g. combining with a custom size).
+  fontFamily: {
+    display: FRAUNCES_SEMIBOLD,
+    displayRegular: FRAUNCES_REGULAR,
+    regular: INTER_REGULAR,
+    medium: INTER_MEDIUM,
+    semiBold: INTER_SEMIBOLD,
+  },
+
+  // Raw pixel sizes actually used in the Figma file (not a generated scale —
+  // these are the literal values designers picked, nothing more, nothing less).
+  fontPx: {
+    "10": 10,
+    "11": 11,
+    "12": 12,
+    "13": 13,
+    "14": 14,
+    "15": 15,
+    "17": 17,
+    "24": 24,
+    "32": 32,
+  },
+
+  // Semantic text styles — mirror the named "Text styles" list in the Figma
+  // Styles panel 1:1 (Display, Body, Label, Caption, Title/L, Title/M,
+  // Body/S, Body/SemiBold, Chip/md, Chip/sm, TabLabel/active, TabLabel/inactive).
+  // Prefer these over composing fontFamily + fontPx + lineHeight by hand in
+  // every component — that's the duplication we're trying to get rid of.
+  //
+  // TODO: family/weight for titleM, label, caption, chipMd, chipSm is an
+  // assumption (Inter) pending confirmation from Figma — double check before
+  // relying on these in a real migration.
+  textStyles: {
+    display: {
+      fontFamily: FRAUNCES_SEMIBOLD,
+      fontSize: 32,
+      lineHeight: 32 * 1.2,
+    },
+    titleL: {
+      fontFamily: FRAUNCES_REGULAR,
+      fontSize: 24,
+      lineHeight: 24 * 1.2,
+    },
+    titleM: {
+      fontFamily: INTER_SEMIBOLD,
+      fontSize: 17,
+      lineHeight: 17 * 1.4,
+    },
+    body: {
+      fontFamily: INTER_REGULAR,
+      fontSize: 15,
+      lineHeight: 15 * 1.4,
+    },
+    bodyS: {
+      fontFamily: INTER_REGULAR,
+      fontSize: 13,
+      lineHeight: 13 * 1.4,
+    },
+    bodySemiBold: {
+      fontFamily: INTER_SEMIBOLD,
+      fontSize: 14,
+      lineHeight: 14 * 1.4,
+    },
+    label: {
+      fontFamily: INTER_SEMIBOLD,
+      fontSize: 12,
+      lineHeight: 12 * 1.4,
+    },
+    caption: {
+      fontFamily: INTER_REGULAR,
+      fontSize: 11,
+      lineHeight: 11 * 1.4,
+    },
+    chipMd: {
+      fontFamily: INTER_SEMIBOLD,
+      fontSize: 12,
+      lineHeight: 12 * 1.4,
+    },
+    chipSm: {
+      fontFamily: INTER_MEDIUM,
+      fontSize: 11,
+      lineHeight: 11 * 1.4,
+    },
+    tabLabelActive: {
+      fontFamily: INTER_SEMIBOLD,
+      fontSize: 10,
+      lineHeight: 10 * 1.4,
+    },
+    tabLabelInactive: {
+      fontFamily: INTER_MEDIUM,
+      fontSize: 10,
+      lineHeight: 10 * 1.4,
+    },
+  },
+
+  // Lucide icon sizes used in Figma. Most icons default to `md` (16).
+  iconSize: {
+    sm: 12,
+    md: 16,
+    lg: 18,
+    xl: 20,
+  },
+
   borderRadius: {
     xs: getTextSize(0.125),
     sm: getTextSize(0.25),

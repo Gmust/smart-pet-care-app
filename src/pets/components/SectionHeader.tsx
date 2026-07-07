@@ -15,9 +15,7 @@ export function SectionHeader({ label, compact = false }: SectionHeaderProps) {
 
 const styles = StyleSheet.create((theme) => ({
   sectionHeader: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
+    ...theme.textStyles.label,
     textTransform: "uppercase",
     color: theme.palette.brand.textSecondary,
   },

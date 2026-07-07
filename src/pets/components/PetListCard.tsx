@@ -147,9 +147,7 @@ const styles = StyleSheet.create((theme) => ({
   name: {
     flex: 1,
     minWidth: 0,
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
-    lineHeight: theme.fontSize["2xl"] * 1.3,
+    ...theme.textStyles.titleL,
     color: theme.palette.brand.textPrimary,
   },
   statusChip: {
@@ -169,9 +167,7 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.palette.brand.warn,
   },
   statusText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
+    ...theme.textStyles.chipSm,
   },
   okText: {
     color: theme.palette.brand.ok,
@@ -180,9 +176,7 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.palette.brand.warn,
   },
   meta: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
+    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   statsRow: {
@@ -202,9 +196,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   actionText: {
     flexShrink: 1,
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
+    ...theme.textStyles.bodyS,
     color: theme.palette.brand.primaryDefault,
   },
   viewInfo: {

@@ -29,18 +29,14 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(2.75),
   },
   infoLabel: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.4,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
   infoValue: {
     flex: 1,
     minWidth: 0,
     textAlign: "right",
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.4,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textPrimary,
   },
 }));

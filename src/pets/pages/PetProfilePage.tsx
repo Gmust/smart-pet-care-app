@@ -123,14 +123,18 @@ export default function PetProfilePage() {
             return (
               <Pressable
                 key={key}
-                style={[styles.segmentTab, isActive && styles.segmentTabActive]}
+                style={styles.segmentTab}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isActive }}
                 onPress={() => setActiveTab(key)}
               >
-                <Text style={[styles.segmentText, isActive && styles.segmentTextActive]}>
+                <Text
+                  style={[styles.segmentText, isActive && styles.segmentTextActive]}
+                  numberOfLines={1}
+                >
                   {t(`petProfilePage.tabs.${key}`)}
                 </Text>
+                {isActive && <View style={styles.activeIndicator} />}
               </Pressable>
             );
           })}
@@ -181,9 +185,7 @@ const styles = StyleSheet.create((theme) => ({
   topBarTitle: {
     flex: 1,
     minWidth: 0,
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
-    lineHeight: theme.fontSize["2xl"],
+    ...theme.textStyles.titleL,
     letterSpacing: -0.12,
     textAlign: "center",
     color: theme.palette.brand.textBody,
@@ -218,22 +220,23 @@ const styles = StyleSheet.create((theme) => ({
     minWidth: 0,
     alignItems: "center",
     justifyContent: "center",
-    padding: theme.spacing(2.5),
+    paddingVertical: theme.spacing(2.5),
+    paddingHorizontal: theme.spacing(1),
   },
-  segmentTabActive: {
-    borderBottomWidth: 2,
-    borderBottomColor: theme.palette.brand.primaryDefault,
+  activeIndicator: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 2,
+    backgroundColor: theme.palette.brand.primaryDefault,
   },
   segmentText: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
+    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   segmentTextActive: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
+    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.primaryDefault,
   },
   content: {
@@ -243,8 +246,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing(28),
   },
   emptyText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
 }));

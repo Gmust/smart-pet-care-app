@@ -65,15 +65,11 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   noteTitle: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
+    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textPrimary,
   },
   notePreview: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.4,
+    ...theme.textStyles.caption,
     color: theme.palette.brand.textSecondary,
   },
 }));
