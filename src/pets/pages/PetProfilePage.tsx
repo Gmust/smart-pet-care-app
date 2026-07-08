@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, View } from "react-native";
+import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -98,26 +99,35 @@ export default function PetProfilePage() {
           />
         </View>
 
-        {pet ? (
-          <View style={styles.hero}>
-            {pet.photoUrl ? (
-              <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} variant="hero" />
-            ) : (
-              <PetSpeciesImage species={pet.species} variant="hero" />
-            )}
-            <View style={styles.flagRow}>
-              {flags.map((flag) => (
-                <FlagChip key={flag.id} flag={flag} />
-              ))}
-            </View>
-          </View>
-        ) : (
-          <View style={[styles.hero, styles.heroEmpty]}>
-            <Text style={styles.emptyText}>{t("petProfilePage.notFound")}</Text>
-          </View>
-        )}
+        {activeTab === "overview" &&
+          (pet ? (
+            <Animated.View
+              style={styles.hero}
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(150)}
+            >
+              {pet.photoUrl ? (
+                <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} variant="hero" />
+              ) : (
+                <PetSpeciesImage species={pet.species} variant="hero" />
+              )}
+              <View style={styles.flagRow}>
+                {flags.map((flag) => (
+                  <FlagChip key={flag.id} flag={flag} />
+                ))}
+              </View>
+            </Animated.View>
+          ) : (
+            <Animated.View
+              style={[styles.hero, styles.heroEmpty]}
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(150)}
+            >
+              <Text style={styles.emptyText}>{t("petProfilePage.notFound")}</Text>
+            </Animated.View>
+          ))}
 
-        <View style={styles.segmentedTabs}>
+        <Animated.View style={styles.segmentedTabs} layout={LinearTransition.duration(200)}>
           {PROFILE_TAB_KEYS.map((key) => {
             const isActive = key === activeTab;
             return (
@@ -138,7 +148,7 @@ export default function PetProfilePage() {
               </Pressable>
             );
           })}
-        </View>
+        </Animated.View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
