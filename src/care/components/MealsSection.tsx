@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { useMealsQuery } from "../queries/useMealsQuery";
+import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { MealRule } from "../types";
 import { CareSection } from "./CareSection";
 import { EmptyCareCard } from "./EmptyCareCard";
@@ -14,7 +15,7 @@ type Props = {
 
 export function MealsSection({ petId, onAddMeal, onEditMeal }: Props) {
   const { t } = useTranslation(["care"]);
-  const { data: meals } = useMealsQuery(petId);
+  const { data: meals, isLoading } = useMealsQuery(petId);
 
   return (
     <CareSection
@@ -22,7 +23,9 @@ export function MealsSection({ petId, onAddMeal, onEditMeal }: Props) {
       actionLabel={t("sections.meals.editAction")}
       onActionPress={onAddMeal}
     >
-      {!meals?.length ? (
+      {isLoading ? (
+        <CareListSkeleton rows={2} />
+      ) : !meals?.length ? (
         <EmptyCareCard onPress={onAddMeal} />
       ) : (
         <MealsListCard meals={meals} onEditMeal={onEditMeal} />

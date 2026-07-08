@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { CARE_CATEGORY_LABEL_KEYS, type CareSectionConfig } from "../constants";
 import { usePlannedHealthEventsQuery } from "../queries/usePlannedHealthEventsQuery";
+import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { PlannedHealthEvent, PlannedHealthEventCategory } from "../types";
 import { CareListCard } from "./CareListCard";
 import { CareRuleCard } from "./CareRuleCard";
@@ -23,12 +24,17 @@ type Props = {
 const PLANNED_HEALTH_EVENT_RECURRENCE = "EveryNMonths" as const;
 
 type Slot =
-  | { kind: "filled"; category: PlannedHealthEventCategory; event: PlannedHealthEvent; label: string }
+  | {
+      kind: "filled";
+      category: PlannedHealthEventCategory;
+      event: PlannedHealthEvent;
+      label: string;
+    }
   | { kind: "empty"; category: PlannedHealthEventCategory; label: string };
 
 export function PlannedHealthEventSection({ config, petId, onAddEvent, onEditEvent }: Props) {
   const { t } = useTranslation(["care"]);
-  const { data: events } = usePlannedHealthEventsQuery(petId);
+  const { data: events, isLoading } = usePlannedHealthEventsQuery(petId);
   const categories = config.fixedPlannedHealthCategories ?? [];
   const actionLabel = config.headerActionLabelKey ? t(config.headerActionLabelKey) : undefined;
   const primaryCategory = categories[0];
@@ -37,16 +43,34 @@ export function PlannedHealthEventSection({ config, petId, onAddEvent, onEditEve
     if (primaryCategory) onAddEvent?.(primaryCategory);
   };
 
+  if (isLoading) {
+    return (
+      <CareSection
+        title={t(config.titleKey)}
+        actionLabel={actionLabel}
+        onActionPress={handleHeaderAction}
+      >
+        <CareListSkeleton rows={config.variant === "fixedSlots" ? categories.length : 2} />
+      </CareSection>
+    );
+  }
+
   if (config.variant === "fixedSlots") {
     const slots: Slot[] = categories.map((category) => {
       const event = events?.find((item) => item.category === category);
       const labelKey = CARE_CATEGORY_LABEL_KEYS[category];
       const label = labelKey ? t(labelKey) : category;
-      return event ? { kind: "filled", category, event, label } : { kind: "empty", category, label };
+      return event
+        ? { kind: "filled", category, event, label }
+        : { kind: "empty", category, label };
     });
 
     return (
-      <CareSection title={t(config.titleKey)} actionLabel={actionLabel} onActionPress={handleHeaderAction}>
+      <CareSection
+        title={t(config.titleKey)}
+        actionLabel={actionLabel}
+        onActionPress={handleHeaderAction}
+      >
         <CareListCard
           items={slots}
           keyExtractor={(slot) => slot.category}
@@ -82,7 +106,11 @@ export function PlannedHealthEventSection({ config, petId, onAddEvent, onEditEve
     : [];
 
   return (
-    <CareSection title={t(config.titleKey)} actionLabel={actionLabel} onActionPress={handleHeaderAction}>
+    <CareSection
+      title={t(config.titleKey)}
+      actionLabel={actionLabel}
+      onActionPress={handleHeaderAction}
+    >
       {categoryEvents.length === 0 && <EmptyCareCard onPress={handleHeaderAction} />}
       {categoryEvents.length === 1 && (
         <CareRuleCard

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { CARE_CATEGORY_LABEL_KEYS, type CareSectionConfig } from "../constants";
 import { useCareRulesQuery } from "../queries/useCareRulesQuery";
+import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { CareCategory, CareRule } from "../types";
 import { CareListCard } from "./CareListCard";
 import { CareRuleCard } from "./CareRuleCard";
@@ -23,7 +24,7 @@ type Slot =
 
 export function CareRuleSection({ config, petId, onAddRule, onEditRule }: Props) {
   const { t } = useTranslation(["care"]);
-  const { data: rules } = useCareRulesQuery(petId);
+  const { data: rules, isLoading } = useCareRulesQuery(petId);
   const categories = config.fixedCareCategories ?? [];
   const actionLabel = config.headerActionLabelKey ? t(config.headerActionLabelKey) : undefined;
   const primaryCategory = categories[0];
@@ -31,6 +32,18 @@ export function CareRuleSection({ config, petId, onAddRule, onEditRule }: Props)
   const handleHeaderAction = () => {
     if (primaryCategory) onAddRule?.(primaryCategory);
   };
+
+  if (isLoading) {
+    return (
+      <CareSection
+        title={t(config.titleKey)}
+        actionLabel={actionLabel}
+        onActionPress={handleHeaderAction}
+      >
+        <CareListSkeleton rows={config.variant === "fixedSlots" ? categories.length : 2} />
+      </CareSection>
+    );
+  }
 
   if (config.variant === "fixedSlots") {
     const slots: Slot[] = categories.map((category) => {
@@ -41,7 +54,11 @@ export function CareRuleSection({ config, petId, onAddRule, onEditRule }: Props)
     });
 
     return (
-      <CareSection title={t(config.titleKey)} actionLabel={actionLabel} onActionPress={handleHeaderAction}>
+      <CareSection
+        title={t(config.titleKey)}
+        actionLabel={actionLabel}
+        onActionPress={handleHeaderAction}
+      >
         <CareListCard
           items={slots}
           keyExtractor={(slot) => slot.category}
@@ -80,7 +97,11 @@ export function CareRuleSection({ config, petId, onAddRule, onEditRule }: Props)
     : [];
 
   return (
-    <CareSection title={t(config.titleKey)} actionLabel={actionLabel} onActionPress={handleHeaderAction}>
+    <CareSection
+      title={t(config.titleKey)}
+      actionLabel={actionLabel}
+      onActionPress={handleHeaderAction}
+    >
       {categoryRules.length === 0 && <EmptyCareCard onPress={handleHeaderAction} />}
       {categoryRules.length === 1 && (
         <CareRuleCard

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 
 import { useFoodTrackerQuery } from "../queries/useFoodTrackerQuery";
+import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { FoodTracker } from "../types";
 import { CareSection } from "./CareSection";
 import { EmptyCareCard } from "./EmptyCareCard";
@@ -14,7 +15,7 @@ type Props = {
 
 export function FoodTrackerSection({ petId, onAddFood, onEditFood }: Props) {
   const { t } = useTranslation(["care"]);
-  const { data: trackers } = useFoodTrackerQuery(petId);
+  const { data: trackers, isLoading } = useFoodTrackerQuery(petId);
 
   return (
     <CareSection
@@ -22,10 +23,20 @@ export function FoodTrackerSection({ petId, onAddFood, onEditFood }: Props) {
       actionLabel={t("sections.foodTracker.addAction")}
       onActionPress={onAddFood}
     >
-      {!trackers?.length && <EmptyCareCard onPress={onAddFood} />}
-      {trackers?.map((tracker) => (
-        <FoodTrackerCard key={tracker.id} tracker={tracker} onPress={() => onEditFood?.(tracker)} />
-      ))}
+      {isLoading ? (
+        <CareListSkeleton rows={2} />
+      ) : (
+        <>
+          {!trackers?.length && <EmptyCareCard onPress={onAddFood} />}
+          {trackers?.map((tracker) => (
+            <FoodTrackerCard
+              key={tracker.id}
+              tracker={tracker}
+              onPress={() => onEditFood?.(tracker)}
+            />
+          ))}
+        </>
+      )}
     </CareSection>
   );
 }

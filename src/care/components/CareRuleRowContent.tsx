@@ -28,14 +28,14 @@ type Props = {
  * container renders it: CareRuleCard (standalone) or CareListCard (list row).
  */
 export function CareRuleRowContent({
-                                     category,
-                                     title,
-                                     time,
-                                     recurrenceType,
-                                     intervalN,
-                                     weekDays,
-                                     size = "sm",
-                                   }: Props) {
+  category,
+  title,
+  time,
+  recurrenceType,
+  intervalN,
+  weekDays,
+  size = "sm",
+}: Props) {
   rowVariants.useVariants({ size });
 
   return (

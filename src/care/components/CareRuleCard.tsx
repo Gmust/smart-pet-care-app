@@ -21,15 +21,15 @@ type Props = {
 };
 
 export function CareRuleCard({
-                               category,
-                               title,
-                               time,
-                               recurrenceType,
-                               intervalN,
-                               weekDays,
-                               size = "lg",
-                               onPress,
-                             }: Props) {
+  category,
+  title,
+  time,
+  recurrenceType,
+  intervalN,
+  weekDays,
+  size = "lg",
+  onPress,
+}: Props) {
   cardVariants.useVariants({ size });
 
   return (
