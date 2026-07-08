@@ -25,7 +25,9 @@ export const plannedHealthEventsMock = {
   list: (petId: string) => collection.list(petId),
   create: (input: Omit<PlannedHealthEvent, "id">) =>
     collection.create(withComputedNextDueAt(input)),
-  update: (id: string, patch: Partial<Omit<PlannedHealthEvent, "id" | "petId">>) =>
-    collection.update(id, patch),
+  update: async (id: string, patch: Partial<Omit<PlannedHealthEvent, "id" | "petId">>) => {
+    const merged = await collection.update(id, patch);
+    return collection.update(id, withComputedNextDueAt(merged));
+  },
   remove: (id: string) => collection.remove(id),
 };

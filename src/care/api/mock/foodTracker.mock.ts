@@ -41,7 +41,9 @@ function withComputedFields(input: Omit<FoodTracker, "id">): Omit<FoodTracker, "
 export const foodTrackerMock = {
   list: (petId: string) => collection.list(petId),
   create: (input: Omit<FoodTracker, "id">) => collection.create(withComputedFields(input)),
-  update: (id: string, patch: Partial<Omit<FoodTracker, "id" | "petId">>) =>
-    collection.update(id, patch),
+  update: async (id: string, patch: Partial<Omit<FoodTracker, "id" | "petId">>) => {
+    const merged = await collection.update(id, patch);
+    return collection.update(id, withComputedFields(merged));
+  },
   remove: (id: string) => collection.remove(id),
 };
