@@ -12,7 +12,7 @@ const BASE_TEXT_SIZE = 16;
 // `graphify query` / grep shows zero remaining references.
 // ---------------------------------------------------------------------------
 const FONT_FAMILY = "Inter";
-const DISPLAY_FONT_FAMILY = "Fraunces_700Bold"; // NOTE: likely wrong, Figma Display style uses Fraunces SemiBold, not Bold — confirm before migrating _layout.tsx font loading.
+const DISPLAY_FONT_FAMILY = "Fraunces_700Bold";
 
 const getTextSize = (s: number) => s * BASE_TEXT_SIZE;
 
@@ -26,7 +26,7 @@ const INTER_REGULAR = "Inter_400Regular";
 const INTER_MEDIUM = "Inter_500Medium";
 const INTER_SEMIBOLD = "Inter_600SemiBold";
 const FRAUNCES_REGULAR = "Fraunces_400Regular";
-const FRAUNCES_SEMIBOLD = "Fraunces_600SemiBold"; // TODO: confirm this package export exists once _layout.tsx font loading is updated
+const FRAUNCES_SEMIBOLD = "Fraunces_600SemiBold";
 
 export const theme = {
   palette,
@@ -83,8 +83,7 @@ export const theme = {
     semiBold: INTER_SEMIBOLD,
   },
 
-  // Raw pixel sizes actually used in the Figma file (not a generated scale —
-  // these are the literal values designers picked, nothing more, nothing less).
+  // Raw pixel sizes actually used in the Figma file
   fontPx: {
     "10": 10,
     "11": 11,
@@ -92,7 +91,7 @@ export const theme = {
     "13": 13,
     "14": 14,
     "15": 15,
-    "17": 17,
+    "19": 19,
     "24": 24,
     "32": 32,
   },
@@ -102,10 +101,6 @@ export const theme = {
   // Body/S, Body/SemiBold, Chip/md, Chip/sm, TabLabel/active, TabLabel/inactive).
   // Prefer these over composing fontFamily + fontPx + lineHeight by hand in
   // every component — that's the duplication we're trying to get rid of.
-  //
-  // TODO: family/weight for titleM, label, caption, chipMd, chipSm is an
-  // assumption (Inter) pending confirmation from Figma — double check before
-  // relying on these in a real migration.
   textStyles: {
     display: {
       fontFamily: FRAUNCES_SEMIBOLD,
@@ -118,9 +113,9 @@ export const theme = {
       lineHeight: 24 * 1.2,
     },
     titleM: {
-      fontFamily: INTER_SEMIBOLD,
-      fontSize: 17,
-      lineHeight: 17 * 1.4,
+      fontFamily: FRAUNCES_REGULAR,
+      fontSize: 19,
+      lineHeight: 19 * 1.2,
     },
     body: {
       fontFamily: INTER_REGULAR,
@@ -169,7 +164,6 @@ export const theme = {
     },
   },
 
-  // Lucide icon sizes used in Figma. Most icons default to `md` (16).
   iconSize: {
     sm: 12,
     md: 16,
