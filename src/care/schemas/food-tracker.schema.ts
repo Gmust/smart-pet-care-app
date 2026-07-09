@@ -9,7 +9,7 @@ export type FoodTrackerFormValues = {
   packageCount: number;
   openedAt: string;
   portionWeight: number;
-  portionWeightUnit: WeightUnit;
+  portionWeightUnit: "g";
   feedingFrequency: "daily" | "weekly";
   feedingsPerDay?: number;
   feedingsPerWeek?: number;
@@ -27,7 +27,7 @@ export const foodTrackerSchema = (t: TFunction<["care", "common"]>) =>
         .positive(t("care:forms.foodTracker.errors.packageCountRequired")),
       openedAt: z.string().min(1, t("care:forms.foodTracker.errors.openedAtRequired")),
       portionWeight: z.number().positive(t("care:forms.foodTracker.errors.portionWeightRequired")),
-      portionWeightUnit: z.enum(["g", "kg"]),
+      portionWeightUnit: z.literal("g"),
       feedingFrequency: z.enum(["daily", "weekly"]),
       feedingsPerDay: z.number().int().positive().optional(),
       feedingsPerWeek: z.number().int().positive().optional(),

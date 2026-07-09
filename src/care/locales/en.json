@@ -172,6 +172,9 @@
         "daily": "Daily",
         "weekly": "Weekly"
       },
+      "units": {
+        "grams": "g"
+      },
       "createSuccess": "Food added",
       "updateSuccess": "Food updated",
       "submitCreate": "Add food",

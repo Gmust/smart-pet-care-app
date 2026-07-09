@@ -4,14 +4,9 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
-import type { FoodTracker, WeightUnit } from "../types";
+import type { FoodTracker } from "../types";
+import { formatWeight, toGrams } from "../utils/weight";
 import dayjs from "dayjs";
-
-const GRAMS_PER_KG = 1000;
-
-function toGrams(value: number, unit: WeightUnit): number {
-  return unit === "kg" ? value * GRAMS_PER_KG : value;
-}
 
 type Props = {
   tracker: FoodTracker;
@@ -34,10 +29,11 @@ export function FoodTrackerCard({ tracker, onPress }: Props) {
     ? t("foodTracker.restockDate", { date: dayjs(tracker.restockDate).format("MMMM D, YYYY") })
     : t("foodTracker.restockDateUnknown");
 
-  const remainingLabel =
-    tracker.remainingWeight != null && tracker.remainingWeightUnit
-      ? `${tracker.remainingWeight}/${tracker.packageWeight * tracker.packageCount} ${tracker.remainingWeightUnit}`
-      : "—";
+  const displayUnit = tracker.packageWeightUnit;
+  const remainingLabel = `${formatWeight(remainingGrams, displayUnit)}/${formatWeight(
+    totalGrams,
+    displayUnit
+  )} ${displayUnit}`;
 
   return (
     <Pressable

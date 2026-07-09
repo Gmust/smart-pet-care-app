@@ -1,12 +1,9 @@
-import type { FoodTracker, WeightUnit } from "../../types";
+import type { FoodTracker } from "../../types";
+import { toGrams } from "../../utils/weight";
 import { createMockCollection } from "./store";
 import dayjs from "dayjs";
 
 const collection = createMockCollection<FoodTracker>();
-
-function toGrams(value: number, unit: WeightUnit): number {
-  return unit === "kg" ? value * 1000 : value;
-}
 
 /**
  * The real backend computes remainingWeight / restockDate from consumption.

@@ -16,6 +16,7 @@ import { useCreateFoodTrackerMutation } from "../../queries/useCreateFoodTracker
 import { useUpdateFoodTrackerMutation } from "../../queries/useUpdateFoodTrackerMutation";
 import { type FoodTrackerFormValues, foodTrackerSchema } from "../../schemas/food-tracker.schema";
 import type { FoodTracker } from "../../types";
+import { toGrams } from "../../utils/weight";
 import { CareDrawerShell } from "./CareDrawerShell";
 
 type Props = {
@@ -38,7 +39,6 @@ const defaultValues: FoodTrackerFormValues = {
   feedingsPerWeek: undefined,
 };
 
-/** Reused for the three two-option fields below (weight units x2, frequency). */
 function BinaryToggle<T extends string>({
   options,
   optionLabels,
@@ -110,8 +110,8 @@ export function AddFoodTrackerDrawer({ petId, isOpen, setIsOpen, tracker }: Prop
             packageWeightUnit: tracker.packageWeightUnit,
             packageCount: tracker.packageCount,
             openedAt: tracker.openedAt,
-            portionWeight: tracker.portionWeight,
-            portionWeightUnit: tracker.portionWeightUnit,
+            portionWeight: toGrams(tracker.portionWeight, tracker.portionWeightUnit),
+            portionWeightUnit: "g",
             feedingFrequency: tracker.feedingFrequency,
             feedingsPerDay: tracker.feedingsPerDay,
             feedingsPerWeek: tracker.feedingsPerWeek,
@@ -245,19 +245,16 @@ export function AddFoodTrackerDrawer({ petId, isOpen, setIsOpen, tracker }: Prop
           )}
         </form.Field>
 
-        <form.Field name="portionWeightUnit">
-          {(field) => (
-            <View style={styles.field}>
-              <Text style={styles.label}> </Text>
-              <BinaryToggle
-                options={["g", "kg"] as const}
-                optionLabels={["g", "kg"] as const}
-                value={field.state.value}
-                onChange={field.handleChange}
-              />
-            </View>
-          )}
-        </form.Field>
+        <View style={styles.field}>
+          <Text style={styles.label}> </Text>
+          <View style={styles.chips}>
+            <Chip
+              label={t("care:forms.foodTracker.units.grams")}
+              tone="primary"
+              variant="default"
+            />
+          </View>
+        </View>
       </View>
 
       <form.Field name="feedingFrequency">
