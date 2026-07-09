@@ -85,23 +85,21 @@ const rowVariants = StyleSheet.create((theme) => ({
     minWidth: 0,
   },
   title: {
-    fontFamily: theme.fonts.semiBold,
     color: theme.palette.brand.textPrimary,
     variants: {
       size: {
-        lg: { fontSize: theme.fontSize.base },
-        sm: { fontSize: theme.fontSize.sm },
+        lg: { ...theme.textStyles.body },
+        sm: { ...theme.textStyles.bodyS },
       },
     },
   },
   time: {
     marginTop: theme.spacing(0.5),
-    fontFamily: theme.fonts.regular,
     color: theme.palette.brand.textSecondary,
     variants: {
       size: {
-        lg: { fontSize: theme.fontSize.sm },
-        sm: { fontSize: theme.fontSize.xs },
+        lg: { ...theme.textStyles.bodyS },
+        sm: { ...theme.textStyles.caption },
       },
     },
   },
