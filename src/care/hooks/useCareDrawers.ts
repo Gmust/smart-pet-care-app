@@ -9,29 +9,34 @@ import type {
   PlannedHealthEventCategory,
 } from "../types";
 
-type CareDrawerState =
+type CareDrawerContent =
   | { type: "meal"; meal?: MealRule }
   | { type: "careRule"; category: CareCategory; rule?: CareRule }
   | { type: "plannedHealthEvent"; category: PlannedHealthEventCategory; event?: PlannedHealthEvent }
-  | { type: "foodTracker"; tracker?: FoodTracker }
-  | null;
+  | { type: "foodTracker"; tracker?: FoodTracker };
 
 export function useCareDrawers() {
-  const [drawer, setDrawer] = useState<CareDrawerState>(null);
+  const [content, setContent] = useState<CareDrawerContent | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const open = (next: CareDrawerContent) => {
+    setContent(next);
+    setIsOpen(true);
+  };
 
   return {
-    drawer,
-    close: () => setDrawer(null),
-    openAddMeal: () => setDrawer({ type: "meal" }),
-    openEditMeal: (meal: MealRule) => setDrawer({ type: "meal", meal }),
-    openAddCareRule: (category: CareCategory) => setDrawer({ type: "careRule", category }),
-    openEditCareRule: (rule: CareRule) =>
-      setDrawer({ type: "careRule", category: rule.category, rule }),
+    drawer: content,
+    isOpen,
+    close: () => setIsOpen(false),
+    openAddMeal: () => open({ type: "meal" }),
+    openEditMeal: (meal: MealRule) => open({ type: "meal", meal }),
+    openAddCareRule: (category: CareCategory) => open({ type: "careRule", category }),
+    openEditCareRule: (rule: CareRule) => open({ type: "careRule", category: rule.category, rule }),
     openAddPlannedHealthEvent: (category: PlannedHealthEventCategory) =>
-      setDrawer({ type: "plannedHealthEvent", category }),
+      open({ type: "plannedHealthEvent", category }),
     openEditPlannedHealthEvent: (event: PlannedHealthEvent) =>
-      setDrawer({ type: "plannedHealthEvent", category: event.category, event }),
-    openAddFoodTracker: () => setDrawer({ type: "foodTracker" }),
-    openEditFoodTracker: (tracker: FoodTracker) => setDrawer({ type: "foodTracker", tracker }),
+      open({ type: "plannedHealthEvent", category: event.category, event }),
+    openAddFoodTracker: () => open({ type: "foodTracker" }),
+    openEditFoodTracker: (tracker: FoodTracker) => open({ type: "foodTracker", tracker }),
   };
 }

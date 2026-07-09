@@ -69,20 +69,20 @@ export function CareTabContent({ petId }: Props) {
 
       <AddMealDrawer
         petId={petId}
-        isOpen={drawers.drawer?.type === "meal"}
+        isOpen={drawers.isOpen && drawers.drawer?.type === "meal"}
         setIsOpen={(open) => !open && drawers.close()}
         meal={drawers.drawer?.type === "meal" ? drawers.drawer.meal : undefined}
       />
       <AddCareRuleDrawer
         petId={petId}
-        isOpen={drawers.drawer?.type === "careRule"}
+        isOpen={drawers.isOpen && drawers.drawer?.type === "careRule"}
         setIsOpen={(open) => !open && drawers.close()}
         category={drawers.drawer?.type === "careRule" ? drawers.drawer.category : undefined}
         rule={drawers.drawer?.type === "careRule" ? drawers.drawer.rule : undefined}
       />
       <AddPlannedHealthEventDrawer
         petId={petId}
-        isOpen={drawers.drawer?.type === "plannedHealthEvent"}
+        isOpen={drawers.isOpen && drawers.drawer?.type === "plannedHealthEvent"}
         setIsOpen={(open) => !open && drawers.close()}
         category={
           drawers.drawer?.type === "plannedHealthEvent" ? drawers.drawer.category : undefined
@@ -91,7 +91,7 @@ export function CareTabContent({ petId }: Props) {
       />
       <AddFoodTrackerDrawer
         petId={petId}
-        isOpen={drawers.drawer?.type === "foodTracker"}
+        isOpen={drawers.isOpen && drawers.drawer?.type === "foodTracker"}
         setIsOpen={(open) => !open && drawers.close()}
         tracker={drawers.drawer?.type === "foodTracker" ? drawers.drawer.tracker : undefined}
       />
