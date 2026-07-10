@@ -1,20 +1,23 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
 import type { FoodTracker } from "../types";
 import { formatWeight, toGrams } from "../utils/weight";
+import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 import dayjs from "dayjs";
 
 type Props = {
   tracker: FoodTracker;
   onPress?: () => void;
+  onDelete?: () => void;
 };
 
-export function FoodTrackerCard({ tracker, onPress }: Props) {
+export function FoodTrackerCard({ tracker, onPress, onDelete }: Props) {
   const { t } = useTranslation(["care"]);
+  const { theme } = useUnistyles();
 
   const totalGrams =
     toGrams(tracker.packageWeight, tracker.packageWeightUnit) * tracker.packageCount;
@@ -36,21 +39,29 @@ export function FoodTrackerCard({ tracker, onPress }: Props) {
   )} ${displayUnit}`;
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={tracker.foodName}
-      onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+    <SwipeToDeleteRow
+      disabled={!onDelete}
+      onDelete={() => onDelete?.()}
+      topRadius={theme.borderRadius.xl}
+      bottomRadius={theme.borderRadius.xl}
+      actionVariant="circle"
     >
-      <Text style={styles.title}>{tracker.foodName}</Text>
-      <View style={styles.track}>
-        <View style={[styles.fill, { width: `${percentRemaining * 100}%` }]} />
-      </View>
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>{restockLabel}</Text>
-        <Text style={styles.footerText}>{remainingLabel}</Text>
-      </View>
-    </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={tracker.foodName}
+        onPress={onPress}
+        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      >
+        <Text style={styles.title}>{tracker.foodName}</Text>
+        <View style={styles.track}>
+          <View style={[styles.fill, { width: `${percentRemaining * 100}%` }]} />
+        </View>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>{restockLabel}</Text>
+          <Text style={styles.footerText}>{remainingLabel}</Text>
+        </View>
+      </Pressable>
+    </SwipeToDeleteRow>
   );
 }
 
@@ -71,7 +82,7 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.palette.brand.textPrimary,
   },
   track: {
-    height: theme.spacing(1.5),
+    height: theme.spacing(2.5),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.palette.brand.surfaceSunken,
     overflow: "hidden",

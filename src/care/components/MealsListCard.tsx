@@ -1,14 +1,16 @@
 import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import type { MealRule } from "../types";
 import { careListCardStyles } from "./CareListCard";
 import { MealRowContent } from "./MealRowContent";
 import { RecurrenceChip } from "./RecurrenceChip";
+import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
 type Props = {
   meals: MealRule[];
   onEditMeal?: (meal: MealRule) => void;
+  onDeleteMeal?: (meal: MealRule) => void;
 };
 
 /**
@@ -20,23 +22,30 @@ type Props = {
  * settings ship (see MealsSection / mealSchema) — at that point this
  * footer will need revisiting if meals can genuinely diverge.
  */
-export function MealsListCard({ meals, onEditMeal }: Props) {
+export function MealsListCard({ meals, onEditMeal, onDeleteMeal }: Props) {
+  const { theme } = useUnistyles();
   const [firstMeal] = meals;
 
   return (
     <View style={careListCardStyles.card}>
       {meals.map((meal, index) => (
-        <Pressable
+        <SwipeToDeleteRow
           key={meal.id}
-          onPress={() => onEditMeal?.(meal)}
-          style={({ pressed }) => [
-            careListCardStyles.row,
-            index > 0 && careListCardStyles.divider,
-            pressed && careListCardStyles.rowPressed,
-          ]}
+          disabled={!onDeleteMeal}
+          onDelete={() => onDeleteMeal?.(meal)}
+          topRadius={index === 0 ? theme.borderRadius.xl : 0}
         >
-          <MealRowContent title={meal.title} time={meal.time} />
-        </Pressable>
+          <Pressable
+            onPress={() => onEditMeal?.(meal)}
+            style={({ pressed }) => [
+              careListCardStyles.row,
+              index > 0 && careListCardStyles.divider,
+              pressed && careListCardStyles.rowPressed,
+            ]}
+          >
+            <MealRowContent title={meal.title} time={meal.time} />
+          </Pressable>
+        </SwipeToDeleteRow>
       ))}
 
       {!!firstMeal && (

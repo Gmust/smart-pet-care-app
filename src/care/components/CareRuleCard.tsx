@@ -1,8 +1,9 @@
 import { Pressable } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import type { CareCategory, DayOfWeek, PlannedHealthEventCategory, RecurrenceType } from "../types";
 import { CareRuleRowContent } from "./CareRuleRowContent";
+import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
 type CareRuleCardSize = "lg" | "sm";
 
@@ -18,6 +19,7 @@ type Props = {
    * CareRuleRowContent directly inside CareListCard instead. */
   size?: CareRuleCardSize;
   onPress?: () => void;
+  onDelete?: () => void;
 };
 
 export function CareRuleCard({
@@ -29,26 +31,36 @@ export function CareRuleCard({
   weekDays,
   size = "lg",
   onPress,
+  onDelete,
 }: Props) {
+  const { theme } = useUnistyles();
   cardVariants.useVariants({ size });
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${title}, ${time}`}
-      onPress={onPress}
-      style={({ pressed }) => [cardVariants.card, pressed && cardVariants.cardPressed]}
+    <SwipeToDeleteRow
+      disabled={!onDelete}
+      onDelete={() => onDelete?.()}
+      topRadius={theme.borderRadius.xl}
+      bottomRadius={theme.borderRadius.xl}
+      actionVariant="circle"
     >
-      <CareRuleRowContent
-        category={category}
-        title={title}
-        time={time}
-        recurrenceType={recurrenceType}
-        intervalN={intervalN}
-        weekDays={weekDays}
-        size={size}
-      />
-    </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${title}, ${time}`}
+        onPress={onPress}
+        style={({ pressed }) => [cardVariants.card, pressed && cardVariants.cardPressed]}
+      >
+        <CareRuleRowContent
+          category={category}
+          title={title}
+          time={time}
+          recurrenceType={recurrenceType}
+          intervalN={intervalN}
+          weekDays={weekDays}
+          size={size}
+        />
+      </Pressable>
+    </SwipeToDeleteRow>
   );
 }
 

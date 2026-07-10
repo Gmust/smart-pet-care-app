@@ -28,6 +28,7 @@ type Props<T extends { id: string }, C extends CareCategory | PlannedHealthEvent
   toRowProps: (item: T, label: string) => RowProps;
   onAdd?: (category: C) => void;
   onEdit?: (item: T) => void;
+  onDelete?: (item: T) => void;
 };
 
 export function CareCategorySection<
@@ -46,6 +47,7 @@ export function CareCategorySection<
   toRowProps,
   onAdd,
   onEdit,
+  onDelete,
 }: Props<T, C>) {
   const primaryCategory = categories[0];
   const handleHeaderAction = () => {
@@ -76,6 +78,8 @@ export function CareCategorySection<
         onItemPress={(slot) =>
           slot.kind === "filled" ? onEdit?.(slot.item) : onAdd?.(slot.category)
         }
+        onDeleteItem={(slot) => slot.kind === "filled" && onDelete?.(slot.item)}
+        isDeleteDisabled={(slot) => slot.kind === "empty"}
         renderItem={(slot) =>
           slot.kind === "filled" ? (
             <CareRuleRowContent
@@ -107,6 +111,7 @@ export function CareCategorySection<
           {...toRowProps(categoryItems[0], "")}
           size="lg"
           onPress={() => onEdit?.(categoryItems[0])}
+          onDelete={() => onDelete?.(categoryItems[0])}
         />
       )}
       {categoryItems.length > 1 && (
@@ -114,6 +119,7 @@ export function CareCategorySection<
           items={categoryItems}
           keyExtractor={(item) => item.id}
           onItemPress={(item) => onEdit?.(item)}
+          onDeleteItem={(item) => onDelete?.(item)}
           renderItem={(item) => <CareRuleRowContent {...toRowProps(item, "")} size="sm" />}
         />
       )}

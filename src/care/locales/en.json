@@ -189,5 +189,14 @@
         "feedingsPerWeekRequired": "Enter feedings per week"
       }
     }
+  },
+  "actions": {
+    "delete": "Delete"
+  },
+  "deleteDialog": {
+    "title": "Delete this entry?",
+    "description": "This will remove \"{{name}}\" and its reminder. This can't be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
   }
 }

@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
 export const careListCardStyles = StyleSheet.create((theme) => ({
   card: {
@@ -28,6 +30,8 @@ type Props<T> = {
   keyExtractor: (item: T) => string;
   renderItem: (item: T) => ReactNode;
   onItemPress?: (item: T) => void;
+  onDeleteItem?: (item: T) => void;
+  isDeleteDisabled?: (item: T) => boolean;
 };
 
 /**
@@ -36,22 +40,38 @@ type Props<T> = {
  * and growableList sections once they hold 2+ rules. FoodTracker is exempt
  * by design — every food item stays its own standalone card.
  */
-export function CareListCard<T>({ items, keyExtractor, renderItem, onItemPress }: Props<T>) {
+export function CareListCard<T>({
+  items,
+  keyExtractor,
+  renderItem,
+  onItemPress,
+  onDeleteItem,
+  isDeleteDisabled,
+}: Props<T>) {
+  const { theme } = useUnistyles();
+
   return (
     <View style={careListCardStyles.card}>
       {items.map((item, index) => (
-        <Pressable
+        <SwipeToDeleteRow
           key={keyExtractor(item)}
-          disabled={!onItemPress}
-          onPress={() => onItemPress?.(item)}
-          style={({ pressed }) => [
-            careListCardStyles.row,
-            index > 0 && careListCardStyles.divider,
-            pressed && !!onItemPress && careListCardStyles.rowPressed,
-          ]}
+          disabled={!onDeleteItem || isDeleteDisabled?.(item)}
+          onDelete={() => onDeleteItem?.(item)}
+          topRadius={index === 0 ? theme.borderRadius.xl : 0}
+          bottomRadius={index === items.length - 1 ? theme.borderRadius.xl : 0}
         >
-          {renderItem(item)}
-        </Pressable>
+          <Pressable
+            disabled={!onItemPress}
+            onPress={() => onItemPress?.(item)}
+            style={({ pressed }) => [
+              careListCardStyles.row,
+              index > 0 && careListCardStyles.divider,
+              pressed && !!onItemPress && careListCardStyles.rowPressed,
+            ]}
+          >
+            {renderItem(item)}
+          </Pressable>
+        </SwipeToDeleteRow>
       ))}
     </View>
   );
