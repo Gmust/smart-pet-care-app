@@ -1,0 +1,59 @@
+name: EAS Build (Android preview)
+
+# Produces a new native Android build on the "preview" profile/channel.
+# Needed whenever native code changes (new native deps, app config, runtime
+# fingerprint change) — an OTA update alone cannot ship those.
+#
+# Triggers:
+#   - Manually via the Actions tab (workflow_dispatch)
+#   - Automatically when native-affecting files change on the working branch
+#
+# Requires an EXPO_TOKEN repo secret (Expo account access token).
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - preview
+    paths:
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "app.json"
+      - "app.config.ts"
+      - "eas.json"
+
+concurrency:
+  group: eas-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Android (preview)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate API client
+        run: pnpm api:generate
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build on EAS
+        run: eas build -p android --profile preview --non-interactive --no-wait

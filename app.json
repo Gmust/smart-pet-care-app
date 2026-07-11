@@ -1,12 +1,18 @@
 {
   "expo": {
     "name": "smart-pet-care-app",
-    "slug": "smart-pet-care-app",
+    "slug": "miso",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "smartpetcareapp",
     "userInterfaceStyle": "automatic",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/05b59c80-0998-45de-8dcf-fc5af0872ae5"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.smart-pet-care-app",
@@ -91,8 +97,9 @@
         "hidden": true
       },
       "eas": {
-        "projectId": "05b59c80-0998-45de-8dcf-fc5af0872ae5"
+        "projectId": "44433327-239b-4f93-9693-f527c5f7a0ae"
       }
-    }
+    },
+    "owner": "reflexivecdvs-team"
   }
 }

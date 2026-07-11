@@ -4,10 +4,10 @@ import { useSharedValue } from "react-native-reanimated";
 import Carousel from "react-native-reanimated-carousel";
 import { StyleSheet } from "react-native-unistyles";
 
+import type { PetResponseDto } from "@/api";
 import { CreatePetDrawer } from "@/pets/components/actions/CreatePetDrawer";
 import { palette } from "@/styles/palette";
 
-import type { PetHealth } from "../../types";
 import { AddPetCard } from "../pet-card/AddPetCard";
 import { HealthPetCard } from "../pet-card/HealthPetCard";
 import { DotsIndicator } from "./DotsIndicator";
@@ -18,10 +18,10 @@ const CARD_HEIGHT = 196;
 /** Distinct card color per pet; falls back to the brand forest green past 10 pets. */
 const getPetCardColor = (index: number) => palette.petCard[index] ?? palette.brand.primaryDark;
 
-type CarouselSlide = { type: "pet"; pet: PetHealth; color: string } | { type: "add" };
+type CarouselSlide = { type: "pet"; pet: PetResponseDto; color: string } | { type: "add" };
 
 type PetCarouselProps = {
-  pets: PetHealth[];
+  pets: PetResponseDto[];
 };
 
 export function PetCarousel({ pets }: PetCarouselProps) {

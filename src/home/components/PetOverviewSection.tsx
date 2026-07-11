@@ -1,18 +1,14 @@
-import { useMemo } from "react";
-
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 
 import { PetOverviewSectionSkeleton } from "../skeletons/HomePageSkeleton";
-import { toPetHealth } from "../utils/homeMappers";
 import { PetCarousel } from "./carousel/PetCarousel";
 
 export function PetOverviewSection() {
-  const petsQuery = usePetsQuery();
-  const pets = useMemo(() => (petsQuery.data ?? []).map(toPetHealth), [petsQuery.data]);
+  const { data: pets, isLoading } = usePetsQuery();
 
-  if (petsQuery.isLoading) {
+  if (isLoading) {
     return <PetOverviewSectionSkeleton />;
   }
 
-  return <PetCarousel pets={pets} />;
+  return <PetCarousel pets={pets ?? []} />;
 }

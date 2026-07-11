@@ -44,9 +44,9 @@ const getPetFormValues = (pet: PetResponseDto): CreatePetForm => ({
   birthDate: pet.birthDate ?? null,
   weightKg: pet.weightKg !== null && pet.weightKg !== undefined ? String(pet.weightKg) : "",
   sex: pet.sex ?? Sex.Unknown,
-  allergies: pet.allergies ?? "",
-  chronicConditions: pet.chronicConditions ?? "",
-  behavioralNotes: pet.behavioralNotes ?? "",
+  allergies: pet.allergies?.length ? pet.allergies : [""],
+  chronicConditions: pet.chronicConditions?.length ? pet.chronicConditions : [""],
+  behavioralNotes: pet.behavioralNotes?.length ? pet.behavioralNotes : [""],
 });
 
 export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
@@ -70,7 +70,16 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
       }
 
       try {
-        await updatePet({ id: pet.id, payload: value });
+        const { allergies, behavioralNotes, chronicConditions, ...petDetails } = value;
+        await updatePet({
+          id: pet.id,
+          payload: {
+            ...petDetails,
+            allergies: { isSet: true, value: allergies },
+            chronicConditions: { isSet: true, value: chronicConditions },
+            behavioralNotes: { isSet: true, value: behavioralNotes },
+          },
+        });
         Toast.show({ type: "success", text1: t("pets:updateSuccessMessage") });
         setIsOpen(false);
       } catch (e) {
@@ -233,52 +242,110 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
             )}
           </form.Field>
 
-          <form.Field name="allergies">
+          <form.Field name="allergies" mode="array">
             {(field) => (
               <View style={styles.field}>
-                <Input
-                  label={t("pets:createPetDrawer.fields.allergies")}
-                  placeholder={t("pets:createPetDrawer.placeholders.allergies")}
-                  multiline
-                  value={field.state.value ?? ""}
-                  onChangeText={field.handleChange}
-                  onBlur={field.handleBlur}
-                  error={field.state.meta.errors.length > 0}
-                />
+                <Text style={styles.label}>{t("pets:createPetDrawer.fields.allergies")}</Text>
+                {field.state.value.map((_, index) => (
+                  <form.Field key={index} name={`allergies[${index}]`}>
+                    {(itemField) => (
+                      <Input
+                        placeholder={t("pets:createPetDrawer.placeholders.allergies")}
+                        value={itemField.state.value}
+                        onChangeText={itemField.handleChange}
+                        onBlur={itemField.handleBlur}
+                        error={itemField.state.meta.errors.length > 0}
+                        rightSlot={
+                          <Button
+                            variant="text"
+                            size="sm"
+                            accessibilityLabel={t("pets:createPetDrawer.removeAllergy")}
+                            onPress={() => field.removeValue(index)}
+                          >
+                            {t("pets:createPetDrawer.remove")}
+                          </Button>
+                        }
+                      />
+                    )}
+                  </form.Field>
+                ))}
+                <Button variant="ghost" size="sm" dotted onPress={() => field.pushValue("")}>
+                  {t("pets:createPetDrawer.addAllergy")}
+                </Button>
                 <FieldError errors={field.state.meta.errors} />
               </View>
             )}
           </form.Field>
 
-          <form.Field name="chronicConditions">
+          <form.Field name="chronicConditions" mode="array">
             {(field) => (
               <View style={styles.field}>
-                <Input
-                  label={t("pets:createPetDrawer.fields.chronicConditions")}
-                  placeholder={t("pets:createPetDrawer.placeholders.chronicConditions")}
-                  multiline
-                  value={field.state.value ?? ""}
-                  onChangeText={field.handleChange}
-                  onBlur={field.handleBlur}
-                  error={field.state.meta.errors.length > 0}
-                />
+                <Text style={styles.label}>
+                  {t("pets:createPetDrawer.fields.chronicConditions")}
+                </Text>
+                {field.state.value.map((_, index) => (
+                  <form.Field key={index} name={`chronicConditions[${index}]`}>
+                    {(itemField) => (
+                      <Input
+                        placeholder={t("pets:createPetDrawer.placeholders.chronicConditions")}
+                        value={itemField.state.value}
+                        onChangeText={itemField.handleChange}
+                        onBlur={itemField.handleBlur}
+                        error={itemField.state.meta.errors.length > 0}
+                        rightSlot={
+                          <Button
+                            variant="text"
+                            size="sm"
+                            accessibilityLabel={t("pets:createPetDrawer.removeChronicCondition")}
+                            onPress={() => field.removeValue(index)}
+                          >
+                            {t("pets:createPetDrawer.remove")}
+                          </Button>
+                        }
+                      />
+                    )}
+                  </form.Field>
+                ))}
+                <Button variant="ghost" size="sm" dotted onPress={() => field.pushValue("")}>
+                  {t("pets:createPetDrawer.addChronicCondition")}
+                </Button>
                 <FieldError errors={field.state.meta.errors} />
               </View>
             )}
           </form.Field>
 
-          <form.Field name="behavioralNotes">
+          <form.Field name="behavioralNotes" mode="array">
             {(field) => (
               <View style={styles.field}>
-                <Input
-                  label={t("pets:createPetDrawer.fields.behavioralNotes")}
-                  placeholder={t("pets:createPetDrawer.placeholders.behavioralNotes")}
-                  multiline
-                  value={field.state.value ?? ""}
-                  onChangeText={field.handleChange}
-                  onBlur={field.handleBlur}
-                  error={field.state.meta.errors.length > 0}
-                />
+                <Text style={styles.label}>
+                  {t("pets:createPetDrawer.fields.behavioralNotes")}
+                </Text>
+                {field.state.value.map((_, index) => (
+                  <form.Field key={index} name={`behavioralNotes[${index}]`}>
+                    {(itemField) => (
+                      <Input
+                        placeholder={t("pets:createPetDrawer.placeholders.behavioralNotes")}
+                        value={itemField.state.value}
+                        onChangeText={itemField.handleChange}
+                        onBlur={itemField.handleBlur}
+                        error={itemField.state.meta.errors.length > 0}
+                        rightSlot={
+                          <Button
+                            variant="text"
+                            size="sm"
+                            accessibilityLabel={t("pets:createPetDrawer.removeBehavioralNote")}
+                            onPress={() => field.removeValue(index)}
+                          >
+                            {t("pets:createPetDrawer.remove")}
+                          </Button>
+                        }
+                      />
+                    )}
+                  </form.Field>
+                ))}
+                <Button variant="ghost" size="sm" dotted onPress={() => field.pushValue("")}>
+                  {t("pets:createPetDrawer.addBehavioralNote")}
+                </Button>
                 <FieldError errors={field.state.meta.errors} />
               </View>
             )}
