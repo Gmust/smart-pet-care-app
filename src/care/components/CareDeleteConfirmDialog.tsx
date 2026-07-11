@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next";
+import { View } from "react-native";
 import Toast from "react-native-toast-message";
+import { StyleSheet } from "react-native-unistyles";
 
+import { TriangleAlertIcon } from "@/icons/triangle-alert";
 import { Button } from "@/shadecn/ui/button";
 import type { DialogHandler } from "@/shadecn/ui/dialog";
 import {
@@ -43,12 +46,16 @@ export function CareDeleteConfirmDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+        <View style={styles.iconCircle}>
+          <TriangleAlertIcon width={24} height={24} color={styles.iconColor.color} />
+        </View>
+
+        <DialogHeader style={styles.header}>
+          <DialogTitle style={styles.title}>{title}</DialogTitle>
+          <DialogDescription style={styles.description}>{description}</DialogDescription>
         </DialogHeader>
 
-        <DialogFooter>
+        <DialogFooter style={styles.footer}>
           <Button
             variant="danger"
             size="md"
@@ -68,3 +75,35 @@ export function CareDeleteConfirmDialog({
     </Dialog>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  iconCircle: {
+    alignSelf: "center",
+    width: 52,
+    height: 52,
+    borderRadius: theme.borderRadius.full,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.palette.brand.dangerBg,
+    marginBottom: theme.spacing(1),
+  },
+  iconColor: {
+    color: theme.palette.brand.danger,
+  },
+  header: {
+    gap: theme.spacing(1.5),
+  },
+  title: {
+    ...theme.textStyles.titleM,
+    textAlign: "center",
+    color: theme.palette.brand.textPrimary,
+  },
+  description: {
+    ...theme.textStyles.body,
+    textAlign: "center",
+    color: theme.palette.brand.textSecondary,
+  },
+  footer: {
+    gap: theme.spacing(2),
+  },
+}));
