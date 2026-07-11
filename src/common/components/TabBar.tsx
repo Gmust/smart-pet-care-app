@@ -50,7 +50,10 @@ export function TabBar({ state, navigation }: TabBarProps) {
 
   return (
     <View
-      style={[styles.wrapper, { paddingBottom: insets.bottom || styles.wrapper.paddingHorizontal }]}
+      style={[
+        styles.wrapper,
+        { paddingBottom: insets.bottom > 0 ? insets.bottom : styles.wrapper.paddingHorizontal },
+      ]}
       pointerEvents="box-none"
     >
       <View style={styles.bar}>
@@ -108,6 +111,7 @@ const styles = StyleSheet.create((theme) => ({
     bottom: 0,
     alignItems: "center",
     paddingHorizontal: theme.spacing(4),
+    zIndex: 1,
   },
   bar: {
     flexDirection: "row",
@@ -133,11 +137,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: 3,
   },
   label: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.xs,
-    lineHeight: 10,
+    ...theme.textStyles.tabLabelInactive,
   },
   labelActive: {
-    fontFamily: theme.fonts.semiBold,
+    ...theme.textStyles.tabLabelActive,
   },
 }));

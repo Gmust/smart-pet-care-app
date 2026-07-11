@@ -16,6 +16,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider } from "@/auth/context/AuthContext";
 import AppProvider from "@/common/providers/AppProvider";
 
+import { NavigationBarScrim } from "@/common/components/NavigationBarScrim";
+
 import "@/styles/config";
 import "dayjs/locale/en.js";
 import "dayjs/locale/ru.js";
@@ -27,7 +29,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { useFonts } from "expo-font";
-import { NavigationBar } from "expo-navigation-bar";
+import { SystemBars } from "react-native-edge-to-edge";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -55,10 +57,6 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    NavigationBar.setHidden(true);
-  }, []);
-
-  useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
@@ -73,7 +71,9 @@ export default function RootLayout() {
       <AppProvider>
         <AuthProvider>
           <StatusBar hidden />
+          <SystemBars style="dark" />
           <RootNavigator />
+          <NavigationBarScrim />
         </AuthProvider>
       </AppProvider>
     </GestureHandlerRootView>
