@@ -12,11 +12,6 @@ type Props = {
   notConfiguredLabel: string;
 };
 
-/**
- * Pure presentational "not configured" row for a known fixed-slot category
- * (Bathing, Deworming, ...). No border/padding of its own — used inside
- * CareListCard alongside configured CareRuleRowContent rows.
- */
 export function EmptyCareRowContent({ category, title, notConfiguredLabel }: Props) {
   const { theme } = useUnistyles();
 

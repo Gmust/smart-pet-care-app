@@ -4,7 +4,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
-export const careListCardStyles = StyleSheet.create((theme) => ({
+const careListCardStyles = StyleSheet.create((theme) => ({
   card: {
     overflow: "hidden",
     borderWidth: 1,
@@ -32,13 +32,14 @@ type Props<T> = {
   onItemPress?: (item: T) => void;
   onDeleteItem?: (item: T) => void;
   isDeleteDisabled?: (item: T) => boolean;
+  footer?: ReactNode;
 };
 
 /**
  * One bordered card, rows separated by internal dividers instead of each
- * item getting its own outer border. Used for fixedSlots sections (always)
- * and growableList sections once they hold 2+ rules. FoodTracker is exempt
- * by design — every food item stays its own standalone card.
+ * item getting its own outer border. Used for fixedSlots sections (always),
+ * growableList sections once they hold 2+ rules, and Meals (footer variant).
+ * FoodTracker is exempt by design — every food item stays its own standalone card.
  */
 export function CareListCard<T>({
   items,
@@ -47,6 +48,7 @@ export function CareListCard<T>({
   onItemPress,
   onDeleteItem,
   isDeleteDisabled,
+  footer,
 }: Props<T>) {
   const { theme } = useUnistyles();
 
@@ -58,7 +60,7 @@ export function CareListCard<T>({
           disabled={!onDeleteItem || isDeleteDisabled?.(item)}
           onDelete={() => onDeleteItem?.(item)}
           topRadius={index === 0 ? theme.borderRadius.xl : 0}
-          bottomRadius={index === items.length - 1 ? theme.borderRadius.xl : 0}
+          bottomRadius={!footer && index === items.length - 1 ? theme.borderRadius.xl : 0}
         >
           <Pressable
             disabled={!onItemPress}
@@ -73,6 +75,12 @@ export function CareListCard<T>({
           </Pressable>
         </SwipeToDeleteRow>
       ))}
+
+      {!!footer && (
+        <View style={[careListCardStyles.row, items.length > 0 && careListCardStyles.divider]}>
+          {footer}
+        </View>
+      )}
     </View>
   );
 }

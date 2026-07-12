@@ -2,14 +2,11 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { ChevronRightIcon } from "@/icons/chevron-right";
 import { SectionHeader } from "@/pets/components/SectionHeader";
 import { Text } from "@/shadecn/ui/text";
-import { palette } from "@/styles/palette";
 
 type Props = {
   title: string;
-  /** Omit for sections with no header action (VetVisit, Treatments today). */
   actionLabel?: string;
   onActionPress?: () => void;
   children: ReactNode;
@@ -21,8 +18,6 @@ export function CareSection({ title, actionLabel, onActionPress, children }: Pro
       <View style={styles.header}>
         <View style={styles.headerLabelRow}>
           <SectionHeader label={title} compact />
-          {/* Inert for now — no section detail screen exists yet (agreed with product). */}
-          <ChevronRightIcon width={12} height={12} color={palette.brand.textFaint} />
         </View>
         {!!actionLabel && (
           <Pressable

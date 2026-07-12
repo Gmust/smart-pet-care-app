@@ -26,7 +26,7 @@ export function MealsSection({ petId, onAddMeal, onEditMeal }: Props) {
     <>
       <CareSection
         title={t("sections.meals.title")}
-        actionLabel={t("sections.meals.editAction")}
+        actionLabel={t("sections.meals.addAction")}
         onActionPress={onAddMeal}
       >
         {isLoading ? (

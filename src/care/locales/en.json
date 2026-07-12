@@ -6,7 +6,7 @@
   "sections": {
     "meals": {
       "title": "Meals",
-      "editAction": "Edit"
+      "addAction": "Add meal"
     },
     "foodTracker": {
       "title": "Food Tracker",
@@ -31,8 +31,7 @@
       "addAction": "Add walk"
     },
     "grooming": {
-      "title": "Grooming",
-      "manageAction": "Manage"
+      "title": "Grooming"
     }
   },
   "categoryLabels": {

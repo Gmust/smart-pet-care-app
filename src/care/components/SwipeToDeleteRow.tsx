@@ -49,7 +49,7 @@ export function SwipeToDeleteRow({
       overshootRight={false}
       rightThreshold={40}
       // Transparent, unrounded — purely a gesture container, not a visual layer.
-      containerStyle={styles.container}
+      containerStyle={[styles.container, topRadius === 0 && styles.overlapSeam]}
       childrenContainerStyle={[
         { backgroundColor: theme.palette.white, overflow: "hidden" },
         cornerStyle,
@@ -90,6 +90,9 @@ export function SwipeToDeleteRow({
 const styles = StyleSheet.create((theme) => ({
   container: {
     backgroundColor: "transparent",
+  },
+  overlapSeam: {
+    marginTop: -1,
   },
   fillAction: {
     width: 55,

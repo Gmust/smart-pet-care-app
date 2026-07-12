@@ -8,8 +8,6 @@ type Props = {
   time: string;
 };
 
-/** Pure content — title left, time right. No icon, no chip, no border/padding
- * of its own (that lives in MealsListCard's row wrapper). */
 export function MealRowContent({ title, time }: Props) {
   return (
     <View style={styles.row}>

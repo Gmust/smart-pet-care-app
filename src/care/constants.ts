@@ -37,7 +37,7 @@ export const CARE_SECTIONS: CareSectionConfig[] = [
     key: "meals",
     variant: "meals",
     titleKey: "sections.meals.title",
-    headerActionLabelKey: "sections.meals.editAction",
+    headerActionLabelKey: "sections.meals.addAction",
   },
   {
     key: "foodTracker",
@@ -82,7 +82,6 @@ export const CARE_SECTIONS: CareSectionConfig[] = [
     key: "grooming",
     variant: "fixedSlots",
     titleKey: "sections.grooming.title",
-    headerActionLabelKey: "sections.grooming.manageAction",
     fixedCareCategories: [
       "Bathing",
       "Brushing",
