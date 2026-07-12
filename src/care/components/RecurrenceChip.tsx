@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 
+import { RepeatIcon } from "@/icons/general";
 import { Chip } from "@/shadecn/ui/chip";
 
 import type { DayOfWeek, RecurrenceType } from "../types";
@@ -50,5 +51,5 @@ export function RecurrenceChip({ recurrenceType, intervalN, weekDays, variant = 
       break;
   }
 
-  return <Chip label={label} tone="neutral" variant="ghost" size="sm" />;
+  return <Chip label={label} tone="neutral" variant="ghost" size="sm" icon={RepeatIcon} />;
 }

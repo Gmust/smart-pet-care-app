@@ -5,7 +5,7 @@ import { Pressable } from "react-native-gesture-handler";
 import Swipeable, { type SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { TriangleAlertIcon } from "@/icons/triangle-alert";
+import { Trash2Icon } from "@/icons/general";
 
 type Props = {
   onDelete: () => void;
@@ -63,7 +63,7 @@ export function SwipeToDeleteRow({
               onPress={handlePress}
               style={({ pressed }) => [styles.circleButton, pressed && styles.circleButtonPressed]}
             >
-              <TriangleAlertIcon width={18} height={18} color={theme.palette.white} />
+              <Trash2Icon width={18} height={18} color={theme.palette.white} />
             </Pressable>
           </View>
         ) : (
@@ -77,7 +77,7 @@ export function SwipeToDeleteRow({
               pressed && styles.fillActionPressed,
             ]}
           >
-            <TriangleAlertIcon width={20} height={20} color={theme.palette.white} />
+            <Trash2Icon width={20} height={20} color={theme.palette.white} />
           </Pressable>
         )
       }

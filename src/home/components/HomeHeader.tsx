@@ -27,7 +27,7 @@ export function HomeHeader({ username }: Props) {
         accessibilityLabel="Notifications"
         variant="icon"
         size="icon"
-        icon={<BellIcon width={20} height={20} color={palette.brand.textPrimary} />}
+        icon={<BellIcon width={18} height={18} color={palette.brand.textPrimary} />}
         onPress={() => {}}
       />
     </View>

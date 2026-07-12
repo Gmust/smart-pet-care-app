@@ -1,5 +1,7 @@
+import type { ComponentType } from "react";
 import { Pressable, Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import type { SvgProps } from "react-native-svg";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 export type ChipTone = "neutral" | "primary" | "ok" | "peach" | "warn" | "danger";
 export type ChipVariant = "default" | "ghost";
@@ -47,8 +49,16 @@ const chipVariants = StyleSheet.create((theme) => {
           "ghost-danger": { backgroundColor: theme.palette.transparent, borderColor: brand.danger },
         },
         size: {
-          md: { paddingHorizontal: theme.spacing(2.75), paddingVertical: theme.spacing(1.25) },
-          sm: { paddingHorizontal: theme.spacing(2.25), paddingVertical: theme.spacing(0.75) },
+          md: {
+            paddingHorizontal: theme.spacing(2.75),
+            paddingVertical: theme.spacing(1.25),
+            gap: theme.spacing(1),
+          },
+          sm: {
+            paddingHorizontal: theme.spacing(2.25),
+            paddingVertical: theme.spacing(0.75),
+            gap: theme.spacing(1),
+          },
         },
       },
     }),
@@ -70,8 +80,8 @@ const chipVariants = StyleSheet.create((theme) => {
           "ghost-danger": { color: brand.danger },
         },
         size: {
-          md: { fontFamily: theme.fonts.semiBold, fontSize: theme.fontSize.sm },
-          sm: { fontFamily: theme.fonts.medium, fontSize: theme.fontSize.xs },
+          md: { ...theme.textStyles.chipMd },
+          sm: { ...theme.textStyles.chipSm },
         },
       },
     },
@@ -83,6 +93,8 @@ type ChipProps = {
   tone?: ChipTone;
   variant?: ChipVariant;
   size?: ChipSize;
+  icon?: ComponentType<SvgProps>;
+  iconSize?: number;
   onPress?: () => void;
   disabled?: boolean;
 };
@@ -92,11 +104,14 @@ export function Chip({
   tone = "neutral",
   variant = "default",
   size = "md",
+  icon: Icon,
+  iconSize,
   onPress,
   disabled = false,
 }: ChipProps) {
   const toneKey: ChipToneKey = variant === "ghost" ? `ghost-${tone}` : tone;
   chipVariants.useVariants({ size, tone: toneKey });
+  const { theme } = useUnistyles();
 
   return (
     <Pressable
@@ -107,6 +122,13 @@ export function Chip({
       accessibilityState={{ disabled }}
       style={({ pressed }) => chipVariants.root(pressed && !disabled, disabled)}
     >
+      {Icon && (
+        <Icon
+          width={iconSize ?? theme.iconSize[size]}
+          height={iconSize ?? theme.iconSize[size]}
+          color={chipVariants.label.color as string}
+        />
+      )}
       <Text style={chipVariants.label}>{label}</Text>
     </Pressable>
   );

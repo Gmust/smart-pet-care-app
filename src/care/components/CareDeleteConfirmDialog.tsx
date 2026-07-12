@@ -3,7 +3,7 @@ import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 
-import { TriangleAlertIcon } from "@/icons/triangle-alert";
+import { Trash2Icon } from "@/icons/general";
 import { Button } from "@/shadecn/ui/button";
 import type { DialogHandler } from "@/shadecn/ui/dialog";
 import {
@@ -47,7 +47,7 @@ export function CareDeleteConfirmDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
         <View style={styles.iconCircle}>
-          <TriangleAlertIcon width={24} height={24} color={styles.iconColor.color} />
+          <Trash2Icon width={24} height={24} color={styles.iconColor.color} />
         </View>
 
         <DialogHeader style={styles.header}>

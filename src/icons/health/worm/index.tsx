@@ -1,32 +1,25 @@
 import type { Icon, IconProps } from "../../icons";
 import { Path, StyledSvg as Svg } from "../../StyledSvg";
 
-export const CatIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
+export const WormIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
   return (
     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={style} {...props}>
       <Path
-        d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"
+        d="m19 12-1.5 3"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M8 14v.5"
+        d="M19.63 18.81 22 20"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M16 14v.5"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <Path
-        d="M11.25 16.25h1.5L12 17l-.75-.75Z"
+        d="M6.47 8.23a1.68 1.68 0 0 1 2.44 1.93l-.64 2.08a6.76 6.76 0 0 0 10.16 7.67l.42-.27a1 1 0 1 0-2.73-4.21l-.42.27a1.76 1.76 0 0 1-2.63-1.99l.64-2.08A6.66 6.66 0 0 0 3.94 3.9l-.7.4a1 1 0 1 0 2.55 4.34z"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"

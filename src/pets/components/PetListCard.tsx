@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import type { PetResponseDto } from "@/api/generated";
 import { ReminderType } from "@/api/generated";
 import { Chevron } from "@/icons/arrows";
 import { TriangleAlertIcon } from "@/icons/triangle-alert";
 import { useGetRemindersByPet } from "@/reminders/queries/useGetReminderByPet";
+import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
@@ -21,15 +22,12 @@ type PetListCardProps = {
 
 export function PetListCard({ pet, onPress }: PetListCardProps) {
   const { t } = useTranslation(["pets"]);
+  const { theme } = useUnistyles();
   // const StatusIcon = pet.statusTone === "ok" ? TrendingUpIcon : TriangleAlertIcon;
   // const statusStyle = pet.statusTone === "ok" ? styles.okChip : styles.warnChip;
   // const statusTextStyle = pet.statusTone === "ok" ? styles.okText : styles.warnText;
 
   const { data: reminders, isLoading: isRemindersLoading } = useGetRemindersByPet(pet.id);
-
-  const StatusIcon = TriangleAlertIcon;
-  const statusStyle = styles.warnChip;
-  const statusTextStyle = styles.warnText;
 
   const petLastVetVisit = (reminders ?? [])
     .filter((reminder) => reminder.type === ReminderType.VetVisit)
@@ -63,13 +61,15 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
             <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
               {pet.name}
             </Text>
-            <View style={[styles.statusChip, statusStyle]}>
-              <StatusIcon width={14} height={14} color={statusTextStyle.color} />
-              {/* TODO add status when backend would be ready */}
-              <Text style={[styles.statusText, statusTextStyle]}>
-                {t("pets:petListCard.statusOk")}
-              </Text>
-            </View>
+            {/* TODO add status when backend would be ready */}
+            <Chip
+              label={t("pets:petListCard.statusOk")}
+              tone="warn"
+              variant="ghost"
+              size="sm"
+              icon={TriangleAlertIcon}
+              iconSize={theme.iconSize.md}
+            />
           </View>
 
           <Text style={styles.meta} numberOfLines={1}>
@@ -149,31 +149,6 @@ const styles = StyleSheet.create((theme) => ({
     minWidth: 0,
     ...theme.textStyles.titleL,
     color: theme.palette.brand.textPrimary,
-  },
-  statusChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: theme.spacing(1.25),
-    borderWidth: 1,
-    borderRadius: theme.borderRadius.full,
-    paddingHorizontal: theme.spacing(2.25),
-    paddingVertical: theme.spacing(0.75),
-  },
-  okChip: {
-    borderColor: theme.palette.brand.primaryDefault,
-  },
-  warnChip: {
-    borderColor: theme.palette.brand.warn,
-  },
-  statusText: {
-    ...theme.textStyles.chipSm,
-  },
-  okText: {
-    color: theme.palette.brand.ok,
-  },
-  warnText: {
-    color: theme.palette.brand.warn,
   },
   meta: {
     ...theme.textStyles.bodyS,

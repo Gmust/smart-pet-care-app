@@ -1,18 +1,18 @@
-import type { Icon, IconProps } from "../icons";
-import { Path, StyledSvg as Svg } from "../StyledSvg";
+import type { Icon, IconProps } from "../../icons";
+import { Path, StyledSvg as Svg } from "../../StyledSvg";
 
-export const HomeIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
+export const EarIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
   return (
     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={style} {...props}>
       <Path
-        d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"
+        d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+        d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"

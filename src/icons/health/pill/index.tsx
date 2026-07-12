@@ -1,18 +1,18 @@
-import type { Icon, IconProps } from "../icons";
-import { Path, StyledSvg as Svg } from "../StyledSvg";
+import type { Icon, IconProps } from "../../icons";
+import { Path, StyledSvg as Svg } from "../../StyledSvg";
 
-export const HomeIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
+export const PillIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
   return (
     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={style} {...props}>
       <Path
-        d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"
+        d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+        d="m8.5 8.5 7 7"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"

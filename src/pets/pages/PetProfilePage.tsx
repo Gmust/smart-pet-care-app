@@ -88,7 +88,7 @@ export default function PetProfilePage() {
             accessibilityLabel={t("petProfilePage.goBack")}
             onPress={handleBack}
           >
-            <Chevron width={9} height={16} color={palette.brand.textBody} />
+            <Chevron width={18} height={18} color={palette.brand.primaryDark} />
           </Button>
           <Text style={styles.topBarTitle}>{petName}</Text>
           <PetProfilePageActions

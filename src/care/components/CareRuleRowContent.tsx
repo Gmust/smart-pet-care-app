@@ -2,9 +2,9 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
-import { palette } from "@/styles/palette";
 
 import type { CareCategory, DayOfWeek, PlannedHealthEventCategory, RecurrenceType } from "../types";
+import { getCareCategoryColors } from "./care-category-icon/careCategoryColors";
 import { CareCategoryIcon } from "./care-category-icon/CareCategoryIcon";
 import { RecurrenceChip } from "./RecurrenceChip";
 
@@ -37,15 +37,16 @@ export function CareRuleRowContent({
   size = "sm",
 }: Props) {
   rowVariants.useVariants({ size });
+  const colors = getCareCategoryColors(category);
 
   return (
     <View style={rowVariants.row}>
-      <View style={rowVariants.iconBox}>
+      <View style={[rowVariants.iconBox, { backgroundColor: colors.background }]}>
         <CareCategoryIcon
           category={category}
-          width={size === "lg" ? 20 : 16}
-          height={size === "lg" ? 20 : 16}
-          color={palette.brand.peachDefault}
+          width={size === "lg" ? 18 : 16}
+          height={size === "lg" ? 18 : 16}
+          color={colors.iconColor}
         />
       </View>
       <View style={rowVariants.textCol}>
@@ -72,7 +73,6 @@ const rowVariants = StyleSheet.create((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: theme.borderRadius.lg,
-    backgroundColor: theme.palette.brand.peachIconBg,
     variants: {
       size: {
         lg: { width: theme.spacing(11), height: theme.spacing(11) },

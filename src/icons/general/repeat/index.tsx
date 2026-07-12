@@ -1,32 +1,32 @@
 import type { Icon, IconProps } from "../../icons";
 import { Path, StyledSvg as Svg } from "../../StyledSvg";
 
-export const CatIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
+export const RepeatIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
   return (
     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={style} {...props}>
       <Path
-        d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"
+        d="m17 2 4 4-4 4"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M8 14v.5"
+        d="M3 11v-1a4 4 0 0 1 4-4h14"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M16 14v.5"
+        d="m7 22-4-4 4-4"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M11.25 16.25h1.5L12 17l-.75-.75Z"
+        d="M21 13v1a4 4 0 0 1-4 4H3"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"

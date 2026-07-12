@@ -242,6 +242,9 @@ importers:
       lint-staged:
         specifier: 16.4.0
         version: 16.4.0
+      lucide-static:
+        specifier: ^1.24.0
+        version: 1.24.0
       orval:
         specifier: 8.14.0
         version: 8.14.0(prettier@3.8.1)(typescript@6.0.3)
@@ -7305,6 +7308,12 @@ packages:
     resolution:
       {
         integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==,
+      }
+
+  lucide-static@1.24.0:
+    resolution:
+      {
+        integrity: sha512-NDSgPb/RWllI9QooPbGXfQCXQi/45oquDmtljeN3qVxqfEUf91uM2C4zijy8bs+pEWxKckA0/WZLZT43YD4Xnw==,
       }
 
   lunr@2.3.9:
@@ -15463,6 +15472,8 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  lucide-static@1.24.0: {}
 
   lunr@2.3.9: {}
 
