@@ -317,9 +317,7 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
           <form.Field name="behavioralNotes" mode="array">
             {(field) => (
               <View style={styles.field}>
-                <Text style={styles.label}>
-                  {t("pets:createPetDrawer.fields.behavioralNotes")}
-                </Text>
+                <Text style={styles.label}>{t("pets:createPetDrawer.fields.behavioralNotes")}</Text>
                 {field.state.value.map((_, index) => (
                   <form.Field key={index} name={`behavioralNotes[${index}]`}>
                     {(itemField) => (
