@@ -81,6 +81,8 @@ export default function RemindersPage() {
     setEditReminderId,
     statusReminderId,
     setStatusReminderId,
+    descriptionReminderId,
+    setDescriptionReminderId,
     isDeleting,
     deletingId,
     handleDeleteReminder,
@@ -169,6 +171,7 @@ export default function RemindersPage() {
                   reminder={item.reminder}
                   onEdit={() => setEditReminderId(item.reminder.id)}
                   onChangeStatus={() => setStatusReminderId(item.reminder.id)}
+                  onShowDescription={() => setDescriptionReminderId(item.reminder.id)}
                   onDelete={() => handleDeleteReminder(item.reminder.id)}
                   isDeleting={isDeleting && deletingId === item.reminder.id}
                   muted={item.groupKey === "passed"}
@@ -224,6 +227,8 @@ export default function RemindersPage() {
         setEditReminderId={setEditReminderId}
         statusReminderId={statusReminderId}
         setStatusReminderId={setStatusReminderId}
+        descriptionReminderId={descriptionReminderId}
+        setDescriptionReminderId={setDescriptionReminderId}
       />
     </>
   );

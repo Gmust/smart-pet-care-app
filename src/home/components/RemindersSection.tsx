@@ -31,6 +31,8 @@ export function RemindersSection() {
     setEditReminderId,
     statusReminderId,
     setStatusReminderId,
+    descriptionReminderId,
+    setDescriptionReminderId,
     isDeleting,
     deletingId,
     handleDeleteReminder,
@@ -84,6 +86,7 @@ export function RemindersSection() {
                     reminder={reminder}
                     onEdit={() => setEditReminderId(reminder.id)}
                     onChangeStatus={() => setStatusReminderId(reminder.id)}
+                    onShowDescription={() => setDescriptionReminderId(reminder.id)}
                     onDelete={() => handleDeleteReminder(reminder.id)}
                     isDeleting={isDeleting && deletingId === reminder.id}
                     muted={group.key === "passed"}
@@ -102,6 +105,8 @@ export function RemindersSection() {
         setEditReminderId={setEditReminderId}
         statusReminderId={statusReminderId}
         setStatusReminderId={setStatusReminderId}
+        descriptionReminderId={descriptionReminderId}
+        setDescriptionReminderId={setDescriptionReminderId}
       />
     </>
   );

@@ -17,10 +17,10 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 export default function AuthPage() {
   const { t } = useTranslation(["auth"]);
   const router = useRouter();
-  const { agreed } = useLocalSearchParams<{ agreed?: string }>();
+  const { agreed, mode: modeParam } = useLocalSearchParams<{ agreed?: string; mode?: string }>();
   const { signIn } = useAuth();
 
-  const [mode, setMode] = useState<AuthMode>("register");
+  const [mode, setMode] = useState<AuthMode>(modeParam === "login" ? "login" : "register");
   const isRegister = mode === "register";
   const termsPreAccepted = agreed === "1";
 

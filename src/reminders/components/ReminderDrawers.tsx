@@ -1,4 +1,5 @@
 import { CreateReminderDrawer } from "./CreateReminderDrawer";
+import { ReminderDescriptionDrawer } from "./ReminderDescriptionDrawer";
 import { ReminderStatusDrawer } from "./ReminderStatusDrawer";
 
 type ReminderDrawersProps = {
@@ -8,6 +9,8 @@ type ReminderDrawersProps = {
   setEditReminderId: (id: string | null) => void;
   statusReminderId: string | null;
   setStatusReminderId: (id: string | null) => void;
+  descriptionReminderId: string | null;
+  setDescriptionReminderId: (id: string | null) => void;
 };
 
 export function ReminderDrawers({
@@ -17,6 +20,8 @@ export function ReminderDrawers({
   setEditReminderId,
   statusReminderId,
   setStatusReminderId,
+  descriptionReminderId,
+  setDescriptionReminderId,
 }: ReminderDrawersProps) {
   return (
     <>
@@ -38,6 +43,14 @@ export function ReminderDrawers({
           key={statusReminderId}
           reminderId={statusReminderId}
           onClose={() => setStatusReminderId(null)}
+        />
+      )}
+
+      {descriptionReminderId !== null && (
+        <ReminderDescriptionDrawer
+          key={descriptionReminderId}
+          reminderId={descriptionReminderId}
+          onClose={() => setDescriptionReminderId(null)}
         />
       )}
     </>

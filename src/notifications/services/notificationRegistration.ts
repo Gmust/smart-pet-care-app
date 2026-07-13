@@ -6,6 +6,7 @@ import {
   getStoredDeviceToken,
   setStoredDeviceToken,
 } from "../services/notificationTokenStorage";
+import { isAxiosError } from "axios";
 import * as Notifications from "expo-notifications";
 
 export const ANDROID_NOTIFICATION_CHANNEL_ID = "default";
@@ -28,14 +29,17 @@ export const registerAndroidDeviceToken = async (token: string): Promise<void> =
 };
 
 export const unregisterStoredDeviceToken = async (): Promise<void> => {
-  try {
-    const token = await getStoredDeviceToken();
-    if (!token) return;
+  const token = await getStoredDeviceToken();
+  if (!token) return;
 
+  try {
     await deleteApiNotificationsDeviceTokenToken(token);
   } catch (error) {
-    console.error("Failed to unregister the Android notification token.", error);
-    return;
+    // 404 = token already gone server-side (e.g. account deleted). Still clear local copy.
+    if (!(isAxiosError(error) && error.response?.status === 404)) {
+      console.error("Failed to unregister the Android notification token.", error);
+      return;
+    }
   }
 
   try {
