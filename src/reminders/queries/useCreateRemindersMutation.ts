@@ -9,7 +9,7 @@ export const useCreateRemindersMutation = () => {
 
   return useMutation({
     mutationKey: ["create-reminder"],
-    mutationFn: async (payload: CreateReminderDto) => {
+    mutationFn: async (payload: Omit<CreateReminderDto, "utcOffsetMinutes">) => {
       const { data } = await postApiReminders({
         ...payload,
         utcOffsetMinutes: getUtcOffsetMinutes(),

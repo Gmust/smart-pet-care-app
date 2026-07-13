@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
-import { DaysOfWeek, ReminderType } from "@/api/generated";
+import { DaysOfWeek, ReminderType, RepeatType } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
@@ -23,7 +23,6 @@ import {
 import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shadecn/ui/select";
-import { Switch } from "@/shadecn/ui/switch";
 import { Text } from "@/shadecn/ui/text";
 
 import { useCreateRemindersMutation } from "../queries/useCreateRemindersMutation";
@@ -31,6 +30,7 @@ import { useGetReminderById } from "../queries/useGetReminderById";
 import { useUpdateRemindersMutation } from "../queries/useUpdateRemindersMutation";
 import { type CreateReminderForm, createReminderSchema } from "../schemas/create-reminder.schema";
 import { ReminderPetSelectSkeleton } from "../skeletons/CreateReminderDrawerSkeleton";
+import dayjs from "dayjs";
 
 type Props = {
   isOpen: boolean;
@@ -49,6 +49,7 @@ const DAY_ORDER: DaysOfWeek[] = [
 ];
 
 const REMINDER_TYPES: ReminderType[] = Object.values(ReminderType);
+const REPEAT_TYPES: RepeatType[] = Object.values(RepeatType);
 const SELECT_PORTAL_HOST = "select";
 
 const parseTime = (value: string): Date => {
@@ -71,8 +72,9 @@ const defaultValues: CreateReminderForm = {
   title: "",
   description: null,
   type: ReminderType.Feeding,
+  repeatType: RepeatType.Weekly,
   days: [],
-  isRepeatable: false,
+  date: null,
   time: "",
   endAt: null,
 };
@@ -105,8 +107,9 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
             payload: {
               title: value.title,
               description: value.description ?? null,
-              days: value.days,
-              isRepeatable: value.isRepeatable,
+              repeatType: value.repeatType,
+              days: value.days ?? [],
+              date: value.date ?? null,
               time: value.time,
               endAt: value.endAt ?? null,
             },
@@ -136,8 +139,9 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
       title: reminder.title ?? "",
       description: reminder.description ?? null,
       type: reminder.type ?? ReminderType.Feeding,
+      repeatType: reminder.repeatType ?? RepeatType.Weekly,
       days: reminder.days ?? [],
-      isRepeatable: reminder.isRepeatable ?? false,
+      date: reminder.date ?? null,
       time: extractTimeOfDay(reminder.timeOfDay) ?? "",
       endAt: reminder.endAt ?? null,
     });
@@ -218,6 +222,27 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
                   onChangeText={field.handleChange}
                   onBlur={field.handleBlur}
                   error={field.state.meta.errors.length > 0}
+                  containerStyle={styles.inputSurface}
+                />
+                <FieldError errors={field.state.meta.errors} />
+              </View>
+            )}
+          </form.Field>
+
+          <form.Field name="description">
+            {(field) => (
+              <View style={styles.field}>
+                <Input
+                  label={t("reminders:createReminderDrawer.fields.description")}
+                  placeholder={t("reminders:createReminderDrawer.placeholders.description")}
+                  value={field.state.value ?? ""}
+                  onChangeText={field.handleChange}
+                  onBlur={field.handleBlur}
+                  error={field.state.meta.errors.length > 0}
+                  multiline
+                  numberOfLines={4}
+                  containerStyle={[styles.inputSurface, styles.textArea]}
+                  inputStyle={styles.textAreaInput}
                 />
                 <FieldError errors={field.state.meta.errors} />
               </View>
@@ -256,58 +281,106 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
             )}
           </form.Field>
 
-          <form.Field name="isRepeatable">
-            {(field) => {
-              const isRepeatable = field.state.value ?? false;
-              return (
-                <Pressable
-                  style={styles.switchRow}
-                  accessibilityRole="switch"
-                  accessibilityState={{ checked: isRepeatable }}
-                  onPress={() => field.handleChange(!isRepeatable)}
+          <form.Field name="repeatType">
+            {(field) => (
+              <View style={styles.field}>
+                <Text style={styles.label}>
+                  {t("reminders:createReminderDrawer.fields.repeat")}
+                </Text>
+                <Select
+                  containerStyle={styles.selectContainer}
+                  value={{
+                    value: field.state.value,
+                    label: t(`reminders:repeatTypes.${field.state.value}`),
+                  }}
+                  onValueChange={(option) => {
+                    const next = REPEAT_TYPES.find((type) => type === option?.value);
+                    if (next) field.handleChange(next);
+                  }}
                 >
-                  <Text style={styles.label}>
-                    {t("reminders:createReminderDrawer.fields.repeat")}
-                  </Text>
-                  <Switch checked={isRepeatable} onCheckedChange={field.handleChange} />
-                </Pressable>
-              );
-            }}
+                  <SelectTrigger style={styles.selectTrigger}>
+                    <SelectValue
+                      placeholder={t("reminders:createReminderDrawer.placeholders.repeat")}
+                    />
+                  </SelectTrigger>
+                  <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
+                    {REPEAT_TYPES.map((type) => (
+                      <SelectItem
+                        key={type}
+                        value={type}
+                        label={t(`reminders:repeatTypes.${type}`)}
+                      />
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError errors={field.state.meta.errors} />
+              </View>
+            )}
           </form.Field>
 
-          <form.Field name="days">
-            {(field) => {
-              const selectedDays = field.state.value ?? [];
-              return (
-                <View style={styles.field}>
-                  <Text style={styles.label}>
-                    {t("reminders:createReminderDrawer.fields.days")}
-                  </Text>
-                  <View style={styles.chips}>
-                    {DAY_ORDER.map((day) => {
-                      const isSelected = selectedDays.includes(day);
+          <form.Subscribe selector={(state) => state.values.repeatType}>
+            {(repeatType) => (
+              <>
+                {repeatType === RepeatType.Weekly && (
+                  <form.Field name="days">
+                    {(field) => {
+                      const selectedDays = field.state.value ?? [];
                       return (
-                        <Chip
-                          key={day}
-                          label={t(`reminders:days.${day}`)}
-                          tone={isSelected ? "primary" : "neutral"}
-                          variant={isSelected ? "default" : "ghost"}
-                          onPress={() =>
-                            field.handleChange(
-                              isSelected
-                                ? selectedDays.filter((value) => value !== day)
-                                : [...selectedDays, day]
-                            )
-                          }
-                        />
+                        <View style={styles.field}>
+                          <Text style={styles.label}>
+                            {t("reminders:createReminderDrawer.fields.days")}
+                          </Text>
+                          <View style={styles.chips}>
+                            {DAY_ORDER.map((day) => {
+                              const isSelected = selectedDays.includes(day);
+                              return (
+                                <Chip
+                                  key={day}
+                                  label={t(`reminders:days.${day}`)}
+                                  tone={isSelected ? "primary" : "neutral"}
+                                  variant={isSelected ? "default" : "ghost"}
+                                  onPress={() =>
+                                    field.handleChange(
+                                      isSelected
+                                        ? selectedDays.filter((value) => value !== day)
+                                        : [...selectedDays, day]
+                                    )
+                                  }
+                                />
+                              );
+                            })}
+                          </View>
+                          <FieldError errors={field.state.meta.errors} />
+                        </View>
                       );
-                    })}
-                  </View>
-                  <FieldError errors={field.state.meta.errors} />
-                </View>
-              );
-            }}
-          </form.Field>
+                    }}
+                  </form.Field>
+                )}
+
+                {(repeatType === RepeatType.Once || repeatType === RepeatType.Monthly) && (
+                  <form.Field name="date">
+                    {(field) => (
+                      <View style={styles.field}>
+                        <DateTimeField
+                          mode="date"
+                          label={t("reminders:createReminderDrawer.fields.date")}
+                          placeholder={t("reminders:createReminderDrawer.placeholders.date")}
+                          value={field.state.value ? dayjs(field.state.value).toDate() : null}
+                          display={(date) => dayjs(date).format("DD/MM/YYYY")}
+                          minimumDate={new Date()}
+                          error={field.state.meta.errors.length > 0}
+                          onChange={(date) => field.handleChange(dayjs(date).format("YYYY-MM-DD"))}
+                          onBlur={field.handleBlur}
+                          containerStyle={styles.inputSurface}
+                        />
+                        <FieldError errors={field.state.meta.errors} />
+                      </View>
+                    )}
+                  </form.Field>
+                )}
+              </>
+            )}
+          </form.Subscribe>
 
           <form.Field name="time">
             {(field) => (
@@ -321,6 +394,7 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
                   error={field.state.meta.errors.length > 0}
                   onChange={(date) => field.handleChange(formatTime(date))}
                   onBlur={field.handleBlur}
+                  containerStyle={styles.inputSurface}
                 />
                 <FieldError errors={field.state.meta.errors} />
               </View>
@@ -361,11 +435,12 @@ const styles = StyleSheet.create((theme) => ({
     letterSpacing: 0,
   },
   scroll: {
+    paddingTop: theme.spacing(4),
     flex: 1,
   },
   content: {
     gap: theme.spacing(3),
-    paddingBottom: theme.spacing(3),
+    paddingBottom: theme.spacing(20),
   },
   field: {
     gap: theme.spacing(1),
@@ -375,14 +450,15 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
-  switchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    minHeight: theme.spacing(12),
-    borderRadius: theme.borderRadius.lg,
-    backgroundColor: theme.palette.brand.surfacePage,
-    paddingHorizontal: theme.spacing(4),
+  inputSurface: {
+    backgroundColor: theme.palette.white,
+  },
+  textArea: {
+    alignItems: "flex-start",
+    minHeight: theme.spacing(30),
+  },
+  textAreaInput: {
+    paddingVertical: theme.spacing(2),
   },
   chips: {
     flexDirection: "row",

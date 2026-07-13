@@ -3,7 +3,10 @@
     "petRequired": "Choose which pet this reminder is for.",
     "titleRequired": "Give the reminder a title.",
     "typeRequired": "Pick a reminder type.",
+    "repeatTypeRequired": "Pick how often it repeats.",
     "daysRequired": "Select at least one day.",
+    "dateRequired": "Pick a date.",
+    "dateInvalid": "Enter a valid date.",
     "timeInvalid": "Enter a time in HH:mm format.",
     "timePast": "Choose a time that is later than now.",
     "endAtInvalid": "Enter a valid end date."
@@ -45,7 +48,12 @@
     "title": "Reminder actions",
     "edit": "Edit reminder",
     "changeStatus": "Change status",
+    "showDescription": "Show description",
     "delete": "Delete reminder"
+  },
+  "descriptionDrawer": {
+    "title": "Reminder",
+    "empty": "No description was added to this reminder."
   },
   "editReminderDrawer": {
     "title": "Edit Reminder",
@@ -67,15 +75,20 @@
     "fields": {
       "pet": "Pet",
       "title": "Title",
+      "description": "Description",
       "type": "Type",
       "days": "Repeat on",
-      "repeat": "Repeating reminder",
+      "repeat": "Repeat",
+      "date": "Date",
       "time": "Time"
     },
     "placeholders": {
       "pet": "Select a pet",
       "title": "e.g. Morning feeding",
+      "description": "Add any details, notes or instructions",
       "type": "Select a type",
+      "repeat": "Select how often",
+      "date": "Select a date",
       "time": "HH:mm"
     },
     "submit": "Create reminder"
@@ -88,6 +101,12 @@
     "Friday": "Fri",
     "Saturday": "Sat",
     "Sunday": "Sun"
+  },
+  "repeatTypes": {
+    "Weekly": "Weekly",
+    "Monthly": "Monthly",
+    "Once": "Once",
+    "Daily": "Daily"
   },
   "types": {
     "Feeding": "Feeding",

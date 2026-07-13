@@ -31,6 +31,8 @@ export function PetRemindersTab({ petId }: PetRemindersTabProps) {
     setEditReminderId,
     statusReminderId,
     setStatusReminderId,
+    descriptionReminderId,
+    setDescriptionReminderId,
     isDeleting,
     deletingId,
     handleDeleteReminder,
@@ -63,6 +65,7 @@ export function PetRemindersTab({ petId }: PetRemindersTabProps) {
                   reminder={reminder}
                   onEdit={() => setEditReminderId(reminder.id)}
                   onChangeStatus={() => setStatusReminderId(reminder.id)}
+                  onShowDescription={() => setDescriptionReminderId(reminder.id)}
                   onDelete={() => handleDeleteReminder(reminder.id)}
                   isDeleting={isDeleting && deletingId === reminder.id}
                   muted={group.key === "passed"}
@@ -92,6 +95,8 @@ export function PetRemindersTab({ petId }: PetRemindersTabProps) {
         setEditReminderId={setEditReminderId}
         statusReminderId={statusReminderId}
         setStatusReminderId={setStatusReminderId}
+        descriptionReminderId={descriptionReminderId}
+        setDescriptionReminderId={setDescriptionReminderId}
       />
     </>
   );

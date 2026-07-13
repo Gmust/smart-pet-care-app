@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
+import type { StyleProp, ViewStyle } from "react-native";
 import { Keyboard, Platform, Pressable, View } from "react-native";
 import DateTimePicker, { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
@@ -22,6 +23,7 @@ type DateTimeFieldProps = {
   minimumDate?: Date;
   maximumDate?: Date;
   onBlur?: () => void;
+  containerStyle?: StyleProp<ViewStyle>;
 };
 
 export function DateTimeField({
@@ -37,6 +39,7 @@ export function DateTimeField({
   minimumDate,
   maximumDate,
   onBlur,
+  containerStyle,
 }: DateTimeFieldProps) {
   const [isOpen, setIsOpen] = useState(false);
   const beginNativeActivity = useDrawerNativeActivity();
@@ -83,6 +86,7 @@ export function DateTimeField({
             value={value ? display(value) : ""}
             editable={false}
             error={error}
+            containerStyle={containerStyle}
           />
         </View>
       </Pressable>

@@ -10,6 +10,7 @@ export function useReminderActions() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editReminderId, setEditReminderId] = useState<string | null>(null);
   const [statusReminderId, setStatusReminderId] = useState<string | null>(null);
+  const [descriptionReminderId, setDescriptionReminderId] = useState<string | null>(null);
 
   const {
     mutateAsync: deleteReminder,
@@ -37,6 +38,8 @@ export function useReminderActions() {
     setEditReminderId,
     statusReminderId,
     setStatusReminderId,
+    descriptionReminderId,
+    setDescriptionReminderId,
     isDeleting,
     deletingId,
     handleDeleteReminder,
