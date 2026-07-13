@@ -126,7 +126,7 @@ export function Chip({
         <Icon
           width={iconSize ?? theme.iconSize[size]}
           height={iconSize ?? theme.iconSize[size]}
-          color={chipVariants.label.color as string}
+          color={(chipVariants.label as { color: string }).color}
         />
       )}
       <Text style={chipVariants.label}>{label}</Text>
