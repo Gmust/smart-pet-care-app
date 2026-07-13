@@ -12,7 +12,11 @@
   "consent": {
     "title": "Before you continue",
     "information": "This assistant provides general information only. It cannot diagnose your pet or replace a veterinarian.",
-    "privacy": "Your current conversation is stored securely on this device until you reset it or sign out.",
+    "privacy": {
+      "encrypted": "Your current conversation is stored securely on this device until you reset it or sign out.",
+      "session": "This conversation is available only during this session. It is not saved, so it will not be restored after you leave or sign out.",
+      "unavailable": "This conversation is kept in memory only for now and may not be restored. Your consent is still saved securely."
+    },
     "emergency": "For an emergency, contact the nearest emergency veterinary service immediately. Do not wait for this assistant.",
     "accept": "I understand and continue",
     "decline": "Decline and go back",
@@ -40,15 +44,19 @@
     "chattingAbout": "Chatting about",
     "placeholder": "Ask about {{name}}…",
     "send": "Send message",
+    "sending": "Assistant is responding",
     "pending": "Thinking about your pet…",
-    "reset": "Reset conversation",
+    "reset": "New chat",
     "newChat": "New chat",
     "newChatTitle": "Start a new chat?",
     "startNewChat": "Start new chat",
+    "cancel": "Keep this chat",
     "confirmReset": "Clear this conversation? Your consent and selected pet will remain.",
+    "confirmChangePet": "Change to {{name}}? This clears the current conversation. Your consent will remain.",
     "disclaimer": "General guidance only — not a diagnosis.",
     "userSender": "You",
     "assistantSender": "Assistant",
+    "restoring": "Loading your conversation…",
     "scrollToEnd": "Scroll to latest message"
   },
   "empty": {
@@ -65,6 +73,8 @@
   "assessment": {
     "nextSteps": "Recommended next steps",
     "urgency": "Urgency: {{urgency}}",
+    "possibleCondition": "Possible concern: {{condition}}",
+    "possibleConditionNote": "A possibility to raise with a veterinarian — not a diagnosis.",
     "confidence": "Confidence: {{value}}%"
   },
   "urgency": {
@@ -92,7 +102,10 @@
   "emergency": {
     "title": "Emergency action needed",
     "body": "Contact the nearest emergency veterinary service immediately. Do not wait for another assistant response.",
-    "detected": "Your message may describe an emergency."
+    "detected": "Your message may describe an emergency.",
+    "findVet": "Find an emergency vet",
+    "findVetHint": "Opens maps or search for nearby emergency veterinary care.",
+    "findVetFailed": "We couldn't open maps here. Search for the nearest emergency veterinary clinic and contact them directly."
   },
   "errors": {
     "requestTitle": "That answer did not come through",
@@ -106,6 +119,9 @@
   },
   "accessibility": {
     "newAssessment": "New veterinary guidance is available.",
-    "emergency": "Emergency veterinary action is needed."
+    "emergency": "Emergency veterinary action is needed.",
+    "emergencyActionUnavailable": "Could not open emergency care search. Emergency instructions remain on screen.",
+    "responsePending": "Sending your message. The assistant is responding.",
+    "requestFailed": "The assistant could not answer. You can retry."
   }
 }

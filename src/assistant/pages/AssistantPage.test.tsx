@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import type { ReactNode } from "react";
-import { Alert } from "react-native";
+import { PortalHost } from "@rn-primitives/portal";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 
 import * as aiConsentStorage from "../utils/aiUsingConsentStorage";
@@ -15,7 +15,12 @@ const mockTranslate = (key: string, opts?: Record<string, unknown>) => {
   return key;
 };
 
-const mockRouter = { back: jest.fn(), push: jest.fn(), replace: jest.fn() };
+const mockRouter = {
+  back: jest.fn(),
+  push: jest.fn(),
+  replace: jest.fn(),
+  canGoBack: jest.fn(() => true),
+};
 let mockSearchParams: Record<string, unknown> = {};
 
 jest.mock("react-i18next", () => ({
@@ -25,10 +30,16 @@ jest.mock("react-i18next", () => ({
 jest.mock("expo-router", () => ({
   useRouter: () => mockRouter,
   useLocalSearchParams: () => mockSearchParams,
+  useFocusEffect: (callback: () => void) => {
+    const React = require("react");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    React.useEffect(() => callback(), []);
+  },
 }));
 
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children }: { children: ReactNode }) => children,
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
 jest.mock("@/pets/queries/usePetsQuery", () => ({ usePetsQuery: jest.fn() }));
@@ -49,7 +60,11 @@ const setAiUsingConsentMock = jest.mocked(aiConsentStorage.setAiUsingConsent);
 const milo = { id: "pet-milo", name: "Milo", species: "dog" };
 const acceptedConsent = true;
 
-const mockAnswer = "Mock assistant response for Milo. Backend chat is not connected yet.";
+// Free-text answers come straight from the wire-shape mock fixtures (no i18n keys).
+const monitorAnswer =
+  "This sounds appropriate for routine veterinary follow-up. Keep an eye on your pet between now and their next checkup.";
+const generalAnswer =
+  "A balanced diet and consistent training routines go a long way for most pets. Keep meals portioned to their size and reinforce good behavior with positive rewards.";
 
 const setPets = (
   value: {
@@ -70,7 +85,12 @@ const setPets = (
 };
 
 const renderPage = async () => {
-  const utils = render(<AssistantPage />);
+  const utils = render(
+    <>
+      <AssistantPage />
+      <PortalHost name="dialog" />
+    </>
+  );
   // Wait past the async restore gate (`if (!restored) return null`).
   await waitFor(() => expect(getAiUsingConsentMock).toHaveBeenCalled());
   return utils;
@@ -120,16 +140,16 @@ describe("AssistantPage – navigation (task 3.5)", () => {
   it("routes back from the conversation header", async () => {
     mockSearchParams = { petId: "pet-milo" };
     const { getByLabelText } = await renderPage();
-    await waitFor(() => expect(getByLabelText("back")).toBeTruthy());
-    fireEvent.press(getByLabelText("back"));
+    await waitFor(() => expect(getByLabelText("actions.back")).toBeTruthy());
+    fireEvent.press(getByLabelText("actions.back"));
     expect(mockRouter.back).toHaveBeenCalled();
   });
 
   it("does not throw when unmounted during a pending request", async () => {
     mockSearchParams = { petId: "pet-milo" };
     const { getByPlaceholderText, getByLabelText, unmount } = await renderPage();
-    await waitFor(() => expect(getByPlaceholderText("conversation.placeholder")).toBeTruthy());
-    fireEvent.changeText(getByPlaceholderText("conversation.placeholder"), "routine checkup");
+    await waitFor(() => expect(getByPlaceholderText("conversation.placeholder:Milo")).toBeTruthy());
+    fireEvent.changeText(getByPlaceholderText("conversation.placeholder:Milo"), "routine checkup");
     fireEvent.press(getByLabelText("conversation.send"));
     expect(() => unmount()).not.toThrow();
   });
@@ -137,7 +157,12 @@ describe("AssistantPage – navigation (task 3.5)", () => {
 
 describe("AssistantPage – consent & pet selection (task 4.5)", () => {
   const renderPetSelectionPage = async () => {
-    const utils = render(<AssistantPetSelectionPage />);
+    const utils = render(
+      <>
+        <AssistantPetSelectionPage />
+        <PortalHost name="dialog" />
+      </>
+    );
     await waitFor(() => expect(getAiUsingConsentMock).toHaveBeenCalled());
     return utils;
   };
@@ -226,13 +251,13 @@ describe("AssistantPage – mock conversation", () => {
     mockSearchParams = { petId: "pet-milo" };
     const utils = await renderPage();
     await waitFor(() =>
-      expect(utils.getByPlaceholderText("conversation.placeholder")).toBeTruthy()
+      expect(utils.getByPlaceholderText("conversation.placeholder:Milo")).toBeTruthy()
     );
     return utils;
   };
 
   const sendText = async (utils: Awaited<ReturnType<typeof renderConversation>>, text: string) => {
-    fireEvent.changeText(utils.getByPlaceholderText("conversation.placeholder"), text);
+    fireEvent.changeText(utils.getByPlaceholderText("conversation.placeholder:Milo"), text);
     await act(async () => {
       fireEvent.press(utils.getByLabelText("conversation.send"));
     });
@@ -242,39 +267,41 @@ describe("AssistantPage – mock conversation", () => {
     const utils = await renderConversation();
     await sendText(utils, "routine checkup");
     await waitFor(() => expect(utils.getByText("routine checkup")).toBeTruthy());
-    await waitFor(() => expect(utils.getByText(mockAnswer)).toBeTruthy());
+    await waitFor(() => expect(utils.getByText(monitorAnswer)).toBeTruthy());
     expect(utils.getByText("routine checkup")).toBeTruthy();
   });
 
   it("disables sending for whitespace-only input", async () => {
     const utils = await renderConversation();
-    fireEvent.changeText(utils.getByPlaceholderText("conversation.placeholder"), "    ");
+    fireEvent.changeText(utils.getByPlaceholderText("conversation.placeholder:Milo"), "    ");
     expect(utils.getByLabelText("conversation.send").props.accessibilityState?.disabled).toBe(true);
   });
 
-  it("renders general mode with simple related-topic chips", async () => {
+  it("renders general mode with editable related-topic chips", async () => {
     const utils = await renderConversation();
     await sendText(utils, "food and training tips");
-    await waitFor(() => expect(utils.getByText(mockAnswer)).toBeTruthy());
-    expect(utils.getByText("Nutrition")).toBeTruthy();
+    await waitFor(() => expect(utils.getByText(generalAnswer)).toBeTruthy());
+    // A related topic populates the composer as an editable draft instead of auto-sending.
+    fireEvent.press(utils.getByLabelText("Choosing the right food"));
+    expect(utils.getByPlaceholderText("conversation.placeholder:Milo").props.value).toBe(
+      "Choosing the right food"
+    );
     expect(utils.queryByText(/assessment\.urgency/)).toBeNull();
   });
 
   it("resets the conversation while retaining consent and the pet", async () => {
-    const alertSpy = jest.spyOn(Alert, "alert");
     const utils = await renderConversation();
     await sendText(utils, "routine checkup");
-    await waitFor(() => expect(utils.getByText(mockAnswer)).toBeTruthy());
+    await waitFor(() => expect(utils.getByText(monitorAnswer)).toBeTruthy());
     fireEvent.press(utils.getByLabelText("conversation.reset"));
-    const buttons = alertSpy.mock.calls.at(-1)?.[2];
-    const destructive = buttons?.find((button) => button.style === "destructive");
+    // A non-empty conversation opens the confirmation dialog before clearing.
+    await waitFor(() => expect(utils.getByText("conversation.startNewChat")).toBeTruthy());
     await act(async () => {
-      destructive?.onPress?.();
+      fireEvent.press(utils.getByText("conversation.startNewChat"));
     });
-    await waitFor(() => expect(utils.queryByText(mockAnswer)).toBeNull());
+    await waitFor(() => expect(utils.queryByText(monitorAnswer)).toBeNull());
     // Consent + pet retained: still in conversation, not gated back to consent/selection.
     expect(utils.getByLabelText("conversation.about:Milo")).toBeTruthy();
-    alertSpy.mockRestore();
   });
 });
 
@@ -283,7 +310,7 @@ describe("AssistantPage – accessibility (task 6.5)", () => {
     mockSearchParams = { petId: "pet-milo" };
     const utils = await renderPage();
     await waitFor(() =>
-      expect(utils.getByPlaceholderText("conversation.placeholder")).toBeTruthy()
+      expect(utils.getByPlaceholderText("conversation.placeholder:Milo")).toBeTruthy()
     );
     return utils;
   };
@@ -296,21 +323,24 @@ describe("AssistantPage – accessibility (task 6.5)", () => {
 
   it("labels and sizes the composer input for a 44pt+ target", async () => {
     const utils = await renderConversation();
-    const input = utils.getByPlaceholderText("conversation.placeholder");
-    expect(input.props.accessibilityLabel).toBe("conversation.placeholder");
+    const input = utils.getByPlaceholderText("conversation.placeholder:Milo");
+    expect(input.props.accessibilityLabel).toBe("conversation.placeholder:Milo");
     const style = Array.isArray(input.props.style)
       ? Object.assign({}, ...input.props.style)
       : input.props.style;
     expect(style.minHeight).toBeGreaterThanOrEqual(44);
   });
 
-  it("keeps simple mock response readable without urgency-only color cues", async () => {
+  it("keeps a general mock response readable without urgency-only color cues", async () => {
     const utils = await renderConversation();
-    fireEvent.changeText(utils.getByPlaceholderText("conversation.placeholder"), "routine checkup");
+    fireEvent.changeText(
+      utils.getByPlaceholderText("conversation.placeholder:Milo"),
+      "food and training tips"
+    );
     await act(async () => {
       fireEvent.press(utils.getByLabelText("conversation.send"));
     });
-    await waitFor(() => expect(utils.getByText(mockAnswer)).toBeTruthy());
+    await waitFor(() => expect(utils.getByText(generalAnswer)).toBeTruthy());
     expect(utils.queryByText(/assessment\.urgency/)).toBeNull();
   });
 });

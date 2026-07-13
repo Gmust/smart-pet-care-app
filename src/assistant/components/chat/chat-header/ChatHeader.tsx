@@ -9,10 +9,10 @@ import { Button } from "@/shadecn/ui/button";
 import { FocusHeading } from "./FocusHeading";
 
 type Props = {
-  setNewChatDialogOpen: (value: boolean) => void;
+  onNewChat: () => void;
 };
 
-export const ChatHeader = ({ setNewChatDialogOpen }: Props) => {
+export const ChatHeader = ({ onNewChat }: Props) => {
   const { t } = useTranslation(["assistant"]);
 
   return (
@@ -27,7 +27,7 @@ export const ChatHeader = ({ setNewChatDialogOpen }: Props) => {
           accessibilityHint={t("hints.reset")}
           onPress={() => {
             Keyboard.dismiss();
-            setNewChatDialogOpen(true);
+            onNewChat();
           }}
         >
           <PlusIcon width={18} height={18} color={styles.headerIcon.color} />

@@ -11,14 +11,24 @@ import {
 } from "@/shadecn/ui/dialog";
 import { Text } from "@/shadecn/ui/text";
 
+import type { AssistantPersistenceStatus } from "../../utils/assistantPersistence";
+import { ASSISTANT_PERSISTENCE_STATUS } from "../../utils/assistantPersistence";
+
 type Props = {
   isOpen: boolean;
   onOpenChange: (value: boolean) => void;
   onAccept: () => void;
   onDecline: () => void;
+  persistenceStatus?: AssistantPersistenceStatus;
 };
 
-export const ConsentDialog = ({ isOpen, onOpenChange, onAccept, onDecline }: Props) => {
+export const ConsentDialog = ({
+  isOpen,
+  onOpenChange,
+  onAccept,
+  onDecline,
+  persistenceStatus = ASSISTANT_PERSISTENCE_STATUS,
+}: Props) => {
   const { t } = useTranslation(["assistant"]);
 
   return (
@@ -28,7 +38,7 @@ export const ConsentDialog = ({ isOpen, onOpenChange, onAccept, onDecline }: Pro
           <DialogTitle style={styles.dialogTitle}>{t("consent.title")}</DialogTitle>
         </DialogHeader>
         <Text style={styles.body}>{t("consent.information")}</Text>
-        <Text style={styles.body}>{t("consent.privacy")}</Text>
+        <Text style={styles.body}>{t(`consent.privacy.${persistenceStatus}`)}</Text>
         <Text accessibilityRole="alert" style={styles.emergencyText}>
           {t("consent.emergency")}
         </Text>

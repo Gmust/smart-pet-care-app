@@ -23,16 +23,18 @@ export function PredictionCard({
   });
   return (
     <View style={[styles.predictionCard, deemphasized && styles.predictionCardDeemphasized]}>
-      <Text style={styles.section}>{prediction.predictedCondition}</Text>
       <Text style={styles.urgency}>⚕ {t("assessment.urgency", { urgency: urgencyLabel })}</Text>
-      <Text>{t("assessment.confidence", { value: Math.round(prediction.confidence * 100) })}</Text>
-      <Text>
-        {specialistLabel} · {categoryLabel}
-      </Text>
       <Text style={styles.section}>{t("assessment.nextSteps")}</Text>
       {prediction.homeAdvice.map((advice) => (
         <Text key={advice}>• {advice}</Text>
       ))}
+      <Text style={styles.possibleCondition}>
+        {t("assessment.possibleCondition", { condition: prediction.predictedCondition })}
+      </Text>
+      <Text style={styles.possibleConditionNote}>{t("assessment.possibleConditionNote")}</Text>
+      <Text style={styles.meta}>
+        {specialistLabel} · {categoryLabel}
+      </Text>
     </View>
   );
 }
@@ -50,4 +52,11 @@ const styles = StyleSheet.create((theme) => ({
   predictionCardDeemphasized: { opacity: 0.6 },
   section: { fontFamily: theme.fonts.bold, marginTop: theme.spacing(2) },
   urgency: { fontFamily: theme.fonts.bold, color: theme.palette.brand.primaryDark },
+  possibleCondition: { fontFamily: theme.fonts.semiBold, marginTop: theme.spacing(2) },
+  possibleConditionNote: {
+    fontSize: theme.fontSize.xs,
+    lineHeight: theme.fontSize.xs * 1.45,
+    color: theme.palette.brand.textSecondary,
+  },
+  meta: { fontSize: theme.fontSize.sm, color: theme.palette.brand.textBody },
 }));

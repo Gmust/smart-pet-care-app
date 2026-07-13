@@ -21,6 +21,7 @@ export default function AssistantPetSelectionPage() {
   const { data: pets, isLoading, isError, refetch } = usePetsQuery();
 
   const [consent, setConsent] = useState<boolean | null>(null);
+  const [consentChecked, setConsentChecked] = useState(false);
   const [consentDialogOpen, setConsentDialogOpen] = useState(false);
 
   const acceptConsent = async () => {
@@ -37,9 +38,18 @@ export default function AssistantPetSelectionPage() {
   };
 
   const handleGetConsent = useCallback(async () => {
-    const res = await getAiUsingConsent();
-    setConsent(res);
-    setConsentDialogOpen(!res);
+    try {
+      const result = await getAiUsingConsent();
+      const accepted = result.ok && result.value === true;
+      setConsent(accepted);
+      setConsentDialogOpen(!accepted);
+    } catch {
+      // A failed consent read fails closed: prompt for consent again rather than assuming it.
+      setConsent(false);
+      setConsentDialogOpen(true);
+    } finally {
+      setConsentChecked(true);
+    }
   }, []);
 
   useFocusEffect(
@@ -52,7 +62,7 @@ export default function AssistantPetSelectionPage() {
     <View style={styles.screen}>
       <PetSelection
         pets={pets ?? []}
-        loading={isLoading}
+        loading={isLoading || !consentChecked}
         error={isError}
         retry={() => void refetch()}
         choose={(petId) => {

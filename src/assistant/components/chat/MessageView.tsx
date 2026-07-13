@@ -13,10 +13,12 @@ export function MessageView({
   message,
   retry,
   dismiss,
+  onSelectTopic,
 }: {
   message: AssistantMessage;
   retry: () => void;
   dismiss: () => void;
+  onSelectTopic?: (text: string) => void;
 }) {
   const { t } = useTranslation(["assistant"]);
   if (message.sender === "user")
@@ -65,7 +67,9 @@ export function MessageView({
         </View>
       </View>
     );
-  return message.response ? <ChatResponseView response={message.response} /> : null;
+  return message.response ? (
+    <ChatResponseView response={message.response} onSelectTopic={onSelectTopic} />
+  ) : null;
 }
 
 const styles = StyleSheet.create((theme) => ({

@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { TextInput, View } from "react-native";
 import Animated, {
@@ -17,34 +17,41 @@ import { Button } from "@/shadecn/ui/button";
 import { palette } from "@/styles/palette";
 
 export type ChatInputHandle = {
-  setText: (text: string) => void;
+  setDraft: (text: string) => void;
 };
 
 type Props = {
-  disabled?: boolean;
+  inputDisabled?: boolean;
+  submitDisabled?: boolean;
   petName: string;
   onSubmit: (message: string) => void;
 };
 
 export const ChatInput = forwardRef<ChatInputHandle, Props>(
-  ({ disabled = false, petName, onSubmit }, ref) => {
+  ({ inputDisabled = false, submitDisabled = false, petName, onSubmit }, ref) => {
     const { t } = useTranslation(["assistant"]);
+
+    const inputRef = useRef<TextInput>(null);
 
     const form = useForm({
       defaultValues: { message: "" },
       onSubmit: ({ value }) => {
         const message = value.message.trim();
-        if (!message || disabled) return;
+        if (!message || submitDisabled) return;
         onSubmit(message);
         form.reset();
       },
     });
 
     useImperativeHandle(ref, () => ({
-      setText: (text: string) => form.setFieldValue("message", text),
+      setDraft: (text: string) => {
+        form.setFieldValue("message", text);
+        inputRef.current?.focus();
+      },
     }));
 
-    const isReady = useStore(form.store, (state) => !!state.values.message.trim() && !disabled);
+    const hasText = useStore(form.store, (state) => !!state.values.message.trim());
+    const canSubmit = hasText && !submitDisabled;
 
     const shine = useSharedValue(0);
 
@@ -54,7 +61,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(
     }));
 
     useEffect(() => {
-      if (isReady) {
+      if (canSubmit) {
         shine.value = withRepeat(
           withTiming(1, { duration: 900, easing: Easing.inOut(Easing.ease) }),
           -1,
@@ -65,13 +72,14 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(
         shine.value = withTiming(0, { duration: 150 });
       }
       return () => cancelAnimation(shine);
-    }, [isReady, shine]);
+    }, [canSubmit, shine]);
 
     return (
       <form.Field name="message">
         {(field) => (
           <View style={styles.composerInput}>
             <TextInput
+              ref={inputRef}
               style={styles.input}
               value={field.state.value}
               onBlur={field.handleBlur}
@@ -81,24 +89,26 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(
               accessibilityLabel={t("conversation.placeholder", { name: petName })}
               multiline
               maxLength={4000}
-              editable={!disabled}
+              editable={!inputDisabled}
               textAlignVertical="center"
             />
             <View style={styles.sendWrapper}>
-              {isReady && <Animated.View pointerEvents="none" style={[styles.shine, shineStyle]} />}
+              {canSubmit && (
+                <Animated.View pointerEvents="none" style={[styles.shine, shineStyle]} />
+              )}
               <Button
                 size="icon"
                 variant="icon"
                 accessibilityLabel={t("conversation.send")}
                 accessibilityHint={t("hints.send")}
-                disabled={!isReady}
+                disabled={!canSubmit}
                 onPress={() => void form.handleSubmit()}
-                style={styles.sendButton(isReady)}
+                style={styles.sendButton(canSubmit)}
               >
                 <AiIcon
                   width={18}
                   height={18}
-                  color={isReady ? palette.white : palette.brand.primaryDefault}
+                  color={canSubmit ? palette.white : palette.brand.primaryDefault}
                 />
               </Button>
             </View>
@@ -145,7 +155,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.palette.brand.primaryDefault,
   },
-  sendButton: (isReady) => ({
-    backgroundColor: isReady ? theme.palette.brand.primaryDefault : theme.palette.white,
+  sendButton: (canSubmit) => ({
+    backgroundColor: canSubmit ? theme.palette.brand.primaryDefault : theme.palette.white,
   }),
 }));

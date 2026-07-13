@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
-import { AccessibilityInfo, FlatList, View } from "react-native";
+import { AccessibilityInfo, ActivityIndicator, FlatList, View } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
@@ -30,6 +30,7 @@ import {
   getAiUsingConsent,
   setAiUsingConsent,
 } from "../utils/aiUsingConsentStorage";
+import { ASSISTANT_PERSISTENCE_STATUS } from "../utils/assistantPersistence";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 const SCROLL_TO_END_THRESHOLD = 160;
@@ -174,10 +175,29 @@ export default function AssistantPage() {
       );
   };
 
+  const performReset = () => {
+    scopeRef.current += 1;
+    abortRef.current?.abort();
+    setPendingRequestId(null);
+    setState((current) => ({ ...current, messages: [], conversationId: null }));
+  };
+
+  const requestNewChat = () => {
+    // An empty conversation transitions directly; a non-empty one needs confirmation.
+    if (state.messages.length === 0) {
+      performReset();
+      return;
+    }
+    setNewChatDialogOpen(true);
+  };
+
   const handleGetConsent = useCallback(async () => {
-    const res = await getAiUsingConsent();
-    setConsent(!!res);
-    setConsentDialogOpen(!res);
+    const result = await getAiUsingConsent().catch(
+      () => ({ ok: false, reason: "unavailable" }) as const
+    );
+    const accepted = result.ok && result.value === true;
+    setConsent(accepted);
+    setConsentDialogOpen(!accepted);
     setConsentChecked(true);
   }, []);
 
@@ -190,14 +210,23 @@ export default function AssistantPage() {
   useEffect(() => {
     if (isPetsLoading) return;
     const candidateId = entryPetId ?? state.selectedPetId;
-    if (candidateId && pets?.some((pet) => pet.id === candidateId)) {
-      if (state.selectedPetId !== candidateId)
-        setState((current) => ({
-          ...current,
-          selectedPetId: candidateId,
-          messages: current.selectedPetId ? [] : current.messages,
-          conversationId: current.selectedPetId ? null : current.conversationId,
-        }));
+    const candidateValid = Boolean(candidateId && pets?.some((pet) => pet.id === candidateId));
+
+    if (candidateValid && candidateId) {
+      if (state.selectedPetId === candidateId) return;
+
+      // Each pet owns a separate private conversation on the server, so switching pets is
+      // not destructive — it swaps context. The previous pet's conversation is not destroyed;
+      // it stays on the server. Local state is cleared only because the current stopgap holds
+      // one conversation in memory.
+      // TODO(backend-history): load the selected pet's own conversation from the server instead
+      // of clearing, so switching back restores that pet's messages.
+      setState((current) => ({
+        ...current,
+        selectedPetId: candidateId,
+        messages: current.selectedPetId ? [] : current.messages,
+        conversationId: current.selectedPetId ? null : current.conversationId,
+      }));
     } else if (state.selectedPetId) {
       setState((current) => ({
         ...current,
@@ -213,13 +242,19 @@ export default function AssistantPage() {
     if (!selectedPet) router.replace("/(tabs)/assistant-pet-selection");
   }, [consentChecked, isPetsLoading, router, selectedPet]);
 
-  if (isPetsLoading || !selectedPet) return null;
+  if (isPetsLoading || !consentChecked || !selectedPet)
+    return (
+      <SafeAreaView style={styles.loadingScreen} edges={["top"]}>
+        <ActivityIndicator color={styles.loadingIndicator.color} />
+        <Text style={styles.loadingText}>{t("conversation.restoring")}</Text>
+      </SafeAreaView>
+    );
 
   return (
     <>
       {consentAccepted && (
         <SafeAreaView style={styles.screen} edges={["top"]}>
-          <ChatHeader setNewChatDialogOpen={setNewChatDialogOpen} />
+          <ChatHeader onNewChat={requestNewChat} />
           <KeyboardAvoidingView style={styles.flex} behavior="padding">
             <View style={styles.listArea}>
               <FlatList
@@ -234,7 +269,7 @@ export default function AssistantPage() {
                 ListEmptyComponent={
                   <EmptyConversation
                     petName={selectedPet.name ?? ""}
-                    onSelectPrompt={(text) => chatInputRef.current?.setText(text)}
+                    onSelectPrompt={(text) => chatInputRef.current?.setDraft(text)}
                     onReviewSafety={() => setConsentDialogOpen(true)}
                   />
                 }
@@ -242,6 +277,7 @@ export default function AssistantPage() {
                 renderItem={({ item }) => (
                   <MessageView
                     message={item}
+                    onSelectTopic={(text) => chatInputRef.current?.setDraft(text)}
                     retry={() => {
                       const user =
                         state.messages[
@@ -273,7 +309,8 @@ export default function AssistantPage() {
                 ref={chatInputRef}
                 onSubmit={(message) => void send(message)}
                 petName={selectedPet.name ?? ""}
-                disabled={false}
+                inputDisabled={false}
+                submitDisabled={pendingRequestId !== null}
               />
               <Text style={styles.composerNote}>{t("conversation.disclaimer")}</Text>
             </View>
@@ -284,10 +321,7 @@ export default function AssistantPage() {
         open={newChatDialogOpen}
         onOpenChange={setNewChatDialogOpen}
         onConfirm={() => {
-          scopeRef.current += 1;
-          abortRef.current?.abort();
-          setPendingRequestId(null);
-          setState({ ...state, messages: [], conversationId: null });
+          performReset();
           setNewChatDialogOpen(false);
         }}
       />
@@ -296,6 +330,7 @@ export default function AssistantPage() {
         onOpenChange={setConsentDialogOpen}
         onAccept={() => void acceptConsent()}
         onDecline={declineConsent}
+        persistenceStatus={ASSISTANT_PERSISTENCE_STATUS}
       />
     </>
   );
@@ -304,7 +339,15 @@ export default function AssistantPage() {
 const styles = StyleSheet.create((theme) => ({
   screen: { flex: 1, backgroundColor: theme.palette.brand.surfacePage },
   flex: { flex: 1 },
-  pressed: { opacity: 0.72 },
+  loadingScreen: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: theme.spacing(3),
+    backgroundColor: theme.palette.brand.surfacePage,
+  },
+  loadingIndicator: { color: theme.palette.brand.primaryDefault },
+  loadingText: { fontSize: theme.fontSize.sm, color: theme.palette.brand.textSecondary },
   listArea: { flex: 1 },
   messages: {
     flexGrow: 1,

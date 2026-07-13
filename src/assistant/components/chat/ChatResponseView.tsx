@@ -1,15 +1,39 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { AccessibilityInfo, Linking, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { AiIcon } from "@/icons/ai-icon";
+import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 
 import type { AssistantChatResponse } from "../../schemas/assistant.schema";
 import { PredictionCard } from "./PredictionCard";
 
-export function ChatResponseView({ response }: { response: AssistantChatResponse }) {
+const EMERGENCY_VET_SEARCH_URL =
+  "https://www.google.com/maps/search/?api=1&query=emergency+veterinary+clinic";
+
+export function ChatResponseView({
+  response,
+  onSelectTopic,
+}: {
+  response: AssistantChatResponse;
+  onSelectTopic?: (text: string) => void;
+}) {
   const { t } = useTranslation(["assistant"]);
+
+  const [emergencyLinkFailed, setEmergencyLinkFailed] = useState(false);
+
+  const openEmergencyVetSearch = async () => {
+    try {
+      const canOpen = await Linking.canOpenURL(EMERGENCY_VET_SEARCH_URL);
+      if (!canOpen) throw new Error("unsupported");
+      await Linking.openURL(EMERGENCY_VET_SEARCH_URL);
+    } catch {
+      setEmergencyLinkFailed(true);
+      AccessibilityInfo.announceForAccessibility(t("accessibility.emergencyActionUnavailable"));
+    }
+  };
 
   if (response.mode === "emergency")
     return (
@@ -23,6 +47,19 @@ export function ChatResponseView({ response }: { response: AssistantChatResponse
             • {advice}
           </Text>
         ))}
+        <Button
+          variant="danger"
+          accessibilityLabel={t("emergency.findVet")}
+          accessibilityHint={t("emergency.findVetHint")}
+          onPress={() => void openEmergencyVetSearch()}
+        >
+          {t("emergency.findVet")}
+        </Button>
+        {emergencyLinkFailed && (
+          <Text accessibilityLiveRegion="polite" style={styles.emergencyFallback}>
+            {t("emergency.findVetFailed")}
+          </Text>
+        )}
       </View>
     );
 
@@ -38,11 +75,24 @@ export function ChatResponseView({ response }: { response: AssistantChatResponse
           </Text>
           {response.relatedTopics.length > 0 && (
             <View style={styles.chipRow}>
-              {response.relatedTopics.map((topic) => (
-                <View key={topic} style={styles.chip}>
-                  <Text style={styles.chipText}>{topic}</Text>
-                </View>
-              ))}
+              {response.relatedTopics.map((topic) =>
+                onSelectTopic ? (
+                  <Pressable
+                    key={topic}
+                    accessibilityRole="button"
+                    accessibilityLabel={topic}
+                    accessibilityHint={t("hints.send")}
+                    onPress={() => onSelectTopic(topic)}
+                    style={({ pressed }) => [styles.chip, pressed && styles.pressed]}
+                  >
+                    <Text style={styles.chipText}>{topic}</Text>
+                  </Pressable>
+                ) : (
+                  <View key={topic} style={styles.chip}>
+                    <Text style={styles.chipText}>{topic}</Text>
+                  </View>
+                )
+              )}
             </View>
           )}
         </View>
@@ -74,6 +124,7 @@ export function ChatResponseView({ response }: { response: AssistantChatResponse
 }
 
 const styles = StyleSheet.create((theme) => ({
+  pressed: { opacity: 0.72 },
   title: {
     fontFamily: theme.fonts.display,
     fontSize: theme.fontSize.xl,
@@ -108,6 +159,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   chipRow: { flexDirection: "row", flexWrap: "wrap", gap: theme.spacing(2) },
   chip: {
+    minHeight: theme.spacing(11),
+    justifyContent: "center",
     backgroundColor: theme.palette.brand.primaryXsoft,
     borderRadius: theme.borderRadius.full,
     paddingHorizontal: theme.spacing(3),
@@ -135,5 +188,10 @@ const styles = StyleSheet.create((theme) => ({
     fontFamily: theme.fonts.bold,
     color: theme.palette.brand.danger,
     lineHeight: theme.fontSize.base * 1.5,
+  },
+  emergencyFallback: {
+    fontFamily: theme.fonts.semiBold,
+    color: theme.palette.brand.danger,
+    lineHeight: theme.fontSize.base * 1.45,
   },
 }));

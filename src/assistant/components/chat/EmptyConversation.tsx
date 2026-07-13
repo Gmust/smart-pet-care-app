@@ -42,7 +42,12 @@ export function EmptyConversation({
           </Pressable>
         ))}
       </View>
-      <Pressable accessibilityRole="button" onPress={onReviewSafety} style={styles.safetyLink}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t("consent.review")}
+        onPress={onReviewSafety}
+        style={styles.safetyLink}
+      >
         <Text style={styles.safetyLinkText}>{t("empty.safety")}</Text>
       </Pressable>
     </View>
