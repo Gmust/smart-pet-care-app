@@ -7,7 +7,7 @@ import { useForm } from "@tanstack/react-form";
 
 import { DaysOfWeek, ReminderType, RepeatType } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
-import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
+import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
@@ -152,7 +152,7 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
       repeatType: reminder.repeatType ?? RepeatType.Weekly,
       days: reminder.days ?? [],
       date: reminder.date ?? null,
-      time: extractTimeOfDay(reminder.timeOfDay) ?? "",
+      time: getLocalTimeOfDay(reminder) ?? "",
       endAt: reminder.endAt ?? null,
     });
   }, [isEditMode, reminder, form]);

@@ -1,5 +1,5 @@
 import { deleteApiNotificationsDeviceTokenToken, postApiNotificationsDeviceToken } from "@/api";
-import { DevicePlatform } from "@/api/generated";
+import { AnimalSpecies, DevicePlatform } from "@/api/generated";
 
 import {
   clearStoredDeviceToken,
@@ -10,6 +10,19 @@ import { isAxiosError } from "axios";
 import * as Notifications from "expo-notifications";
 
 export const ANDROID_NOTIFICATION_CHANNEL_ID = "default";
+
+export const ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES = {
+  [AnimalSpecies.Unknown]: ANDROID_NOTIFICATION_CHANNEL_ID,
+  [AnimalSpecies.Dog]: "pet-reminders-dog-v1",
+  [AnimalSpecies.Cat]: "pet-reminders-cat-v1",
+  [AnimalSpecies.Rabbit]: ANDROID_NOTIFICATION_CHANNEL_ID,
+  [AnimalSpecies.Hamster]: ANDROID_NOTIFICATION_CHANNEL_ID,
+  [AnimalSpecies.GuineaPig]: "pet-reminders-guinea-pig-v1",
+  [AnimalSpecies.Bird]: "pet-reminders-bird-v1",
+  [AnimalSpecies.Fish]: "pet-reminders-fish-v1",
+  [AnimalSpecies.Turtle]: ANDROID_NOTIFICATION_CHANNEL_ID,
+  [AnimalSpecies.Other]: ANDROID_NOTIFICATION_CHANNEL_ID,
+} satisfies Record<AnimalSpecies, string>;
 
 export const registerAndroidDeviceToken = async (token: string): Promise<void> => {
   const previousToken = await getStoredDeviceToken();
@@ -49,14 +62,53 @@ export const unregisterStoredDeviceToken = async (): Promise<void> => {
   }
 };
 
-// TODO: future - per-species notification sounds. Register a channel per pet
-// species (own `sound`), have server pick channelId by reminder's pet species
-// when sending push. See NotificationProvider.tsx sound TODO too.
 export const synchronizeAndroidDeviceToken = async (): Promise<void> => {
-  await Notifications.setNotificationChannelAsync(ANDROID_NOTIFICATION_CHANNEL_ID, {
-    name: "Default",
-    importance: Notifications.AndroidImportance.DEFAULT,
-  });
+  await Promise.all([
+    Notifications.setNotificationChannelAsync(ANDROID_NOTIFICATION_CHANNEL_ID, {
+      name: "Default",
+      importance: Notifications.AndroidImportance.DEFAULT,
+    }),
+    Notifications.setNotificationChannelAsync(
+      ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES[AnimalSpecies.Dog],
+      {
+        name: "Dog reminders",
+        importance: Notifications.AndroidImportance.DEFAULT,
+        sound: "dog.wav",
+      }
+    ),
+    Notifications.setNotificationChannelAsync(
+      ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES[AnimalSpecies.Cat],
+      {
+        name: "Cat reminders",
+        importance: Notifications.AndroidImportance.DEFAULT,
+        sound: "cat.wav",
+      }
+    ),
+    Notifications.setNotificationChannelAsync(
+      ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES[AnimalSpecies.GuineaPig],
+      {
+        name: "Guinea pig reminders",
+        importance: Notifications.AndroidImportance.DEFAULT,
+        sound: "guinea_pig.wav",
+      }
+    ),
+    Notifications.setNotificationChannelAsync(
+      ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES[AnimalSpecies.Bird],
+      {
+        name: "Bird reminders",
+        importance: Notifications.AndroidImportance.DEFAULT,
+        sound: "bird.wav",
+      }
+    ),
+    Notifications.setNotificationChannelAsync(
+      ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES[AnimalSpecies.Fish],
+      {
+        name: "Fish reminders",
+        importance: Notifications.AndroidImportance.DEFAULT,
+        sound: "fish.wav",
+      }
+    ),
+  ]);
 
   let permissions = await Notifications.getPermissionsAsync();
   if (permissions.status !== Notifications.PermissionStatus.GRANTED && permissions.canAskAgain) {

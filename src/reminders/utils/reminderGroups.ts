@@ -1,6 +1,6 @@
 import type { ReminderResponseDto } from "@/api/generated";
 import { ReminderStatus, ReminderType } from "@/api/generated";
-import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
+import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
 import { BellIcon } from "@/icons/bell";
 import type { Icon } from "@/icons/icons";
 import { StethoscopeIcon } from "@/icons/stethoscope";
@@ -72,8 +72,8 @@ const formatReminderTime = (reminder: ReminderResponseDto): string => {
     }
   }
 
-  // Fallback to the recurring time-of-day (HH:MM:SS), trimmed to hours and minutes.
-  return extractTimeOfDay(reminder.timeOfDay) ?? i18next.t("reminders:noTime");
+  // Fallback to the recurring time-of-day, shifted into the device timezone.
+  return getLocalTimeOfDay(reminder) ?? i18next.t("reminders:noTime");
 };
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
