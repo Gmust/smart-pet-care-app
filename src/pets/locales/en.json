@@ -3,7 +3,8 @@
     "nameRequired": "Give your pet a name.",
     "speciesRequired": "Pick a species.",
     "birthDateInvalid": "Enter a valid birth date.",
-    "weightInvalid": "Enter a weight greater than 0."
+    "weightInvalid": "Enter a weight greater than 0.",
+    "weightRequired": "Enter your pet's weight."
   },
   "successMessage": "Pet added successfully!",
   "updateSuccessMessage": "Pet updated successfully!",
@@ -103,11 +104,12 @@
   },
   "petListCard": {
     "accessibilityLabel": "View {{name}}",
-    "statusOk": "Ok",
+    "statusStable": "Stable",
     "noVetVisit": "No vet visit",
-    "lastActivityPlaceholder": "Untracked",
+    "lastActivityPlaceholder": "Not tracked",
     "viewInfo": "View info",
-    "assessment": "Assessment"
+    "assessment": "Assessment",
+    "kg": "kg"
   },
   "species": {
     "Dog": "Dog",

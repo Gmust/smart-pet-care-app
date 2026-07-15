@@ -25,7 +25,14 @@ const SPECIES_ICONS: Record<string, ComponentType<IconProps>> = {
 
 export function PetSpeciesImage({ photoUrl, species, variant = "card" }: PetSpeciesImageProps) {
   if (photoUrl) {
-    return <Image source={{ uri: photoUrl }} style={styles.image} contentFit="cover" />;
+    return (
+      <Image
+        source={{ uri: photoUrl }}
+        style={styles.image}
+        contentFit="cover"
+        contentPosition="center"
+      />
+    );
   }
 
   const SpeciesIcon = SPECIES_ICONS[species?.trim().toLowerCase() ?? ""];
@@ -43,12 +50,18 @@ export function PetSpeciesImage({ photoUrl, species, variant = "card" }: PetSpec
 
 const styles = StyleSheet.create((theme) => ({
   image: {
-    width: "100%",
-    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   placeholder: {
-    width: "100%",
-    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.palette.brand.surfaceSunken,

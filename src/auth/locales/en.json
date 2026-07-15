@@ -20,6 +20,15 @@
     "loginSubtitle": "Sign in to pick up where you left off.",
     "orDivider": "or"
   },
+  "confirmEmail": {
+    "title": "Confirm your email",
+    "subtitle": "Enter the 6-digit code we sent to {{email}}.",
+    "subtitleFallback": "Enter the 6-digit code we sent to your email.",
+    "codeLabel": "Confirmation code",
+    "codePlaceholder": "123456",
+    "submit": "Confirm email",
+    "resend": "Didn't get a code? Resend"
+  },
   "fields": {
     "email": "Email",
     "emailPlaceholder": "you@example.com",
@@ -40,18 +49,24 @@
     "passwordRequired": "Enter your password.",
     "passwordMin": "Password must be at least 6 characters.",
     "passwordPattern": "Use at least one letter, one number, and one special character.",
-    "passwordMismatch": "Passwords do not match."
+    "passwordMismatch": "Passwords do not match.",
+    "codeInvalid": "Enter the 6-digit code from your email."
   },
   "errors": {
     "registerFailed": "We couldn't create your account. Please try again.",
     "loginFailed": "Incorrect email or password.",
+    "confirmFailed": "We couldn't confirm your email. Check the code and try again.",
+    "resendFailed": "We couldn't resend the code. Please try again.",
     "googleFailed": "Google sign-in didn't complete. Please try again.",
     "googleUnavailable": "Google sign-in isn't configured yet.",
     "generic": "Something went wrong. Please try again."
   },
   "success": {
     "accountCreatedTitle": "Account created",
-    "accountCreatedBody": "Welcome to Smart Pet Care!",
+    "accountCreatedBody": "Check your email to confirm your account.",
+    "emailConfirmedTitle": "Email confirmed",
+    "emailConfirmedBody": "You can now sign in.",
+    "codeResentTitle": "Code sent",
     "welcomeBackTitle": "Welcome back",
     "welcomeBackBody": "You're signed in."
   }

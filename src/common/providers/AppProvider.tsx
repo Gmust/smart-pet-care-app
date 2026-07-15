@@ -7,6 +7,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 
 import { queryClient } from "@/api/queryClient";
 import { toastConfig } from "@/common/components/AppToast";
+import { installOnlineManager } from "@/common/utils/installOnlineManager";
+
+installOnlineManager();
 
 interface AppProviderProps {
   children: ReactNode;

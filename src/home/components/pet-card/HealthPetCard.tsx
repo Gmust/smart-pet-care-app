@@ -36,6 +36,8 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t("healthPetCard.title", { petName })}
       style={[styles.card, backgroundColor ? { backgroundColor } : null]}
       onPress={() => handleOpenPet(id)}
     >

@@ -1,3 +1,5 @@
+import { SECURE_STORE_OPTIONS } from "@/common/utils/secureStoreOptions";
+
 import * as SecureStore from "expo-secure-store";
 
 // Sensitive auth material lives in the OS keychain/keystore via expo-secure-store,
@@ -22,15 +24,15 @@ export const getStoredSession = async (): Promise<StoredSession | null> => {
 };
 
 export const setStoredSession = async (session: StoredSession): Promise<void> => {
-  await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, session.accessToken);
+  await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, session.accessToken, SECURE_STORE_OPTIONS);
   if (session.refreshToken) {
-    await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken);
+    await SecureStore.setItemAsync(REFRESH_TOKEN_KEY, session.refreshToken, SECURE_STORE_OPTIONS);
   } else {
     await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
   }
 
   if (session.expiresAtUtc) {
-    await SecureStore.setItemAsync(EXPIRES_AT_KEY, session.expiresAtUtc);
+    await SecureStore.setItemAsync(EXPIRES_AT_KEY, session.expiresAtUtc, SECURE_STORE_OPTIONS);
     return;
   }
 

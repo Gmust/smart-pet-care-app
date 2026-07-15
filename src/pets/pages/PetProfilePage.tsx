@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, RefreshControl, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
@@ -8,22 +8,24 @@ import { StyleSheet } from "react-native-unistyles";
 import { CareTabContent } from "@/care/components/CareTabContent";
 import { Chevron } from "@/icons/arrows";
 import { Button } from "@/shadecn/ui/button";
+import { tabsContentEntering } from "@/shadecn/ui/tabs";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import { DeletePetConfirmation } from "../components/actions/DeletePetConfirmation";
-import { EditPetDrawer } from "../components/actions/EditPetDrawer";
-import { PetProfilePageActions } from "../components/actions/PetProfilePageActions";
-import { UploadPetPhotoDrawer } from "../components/actions/UploadPetPhotoDrawer";
-import { FlagChip } from "../components/FlagChip";
+import { DeletePetConfirmation } from "../components/pet-profile/actions/DeletePetConfirmation";
+import { EditPetDrawer } from "../components/pet-profile/actions/EditPetDrawer";
+import { PetProfilePageActions } from "../components/pet-profile/actions/PetProfilePageActions";
+import { UploadPetPhotoDrawer } from "../components/pet-profile/actions/UploadPetPhotoDrawer";
+import { FlagChip } from "../components/pet-profile/FlagChip";
 import { PetSpeciesImage } from "../components/PetSpeciesImage";
 import { HealthTabContent } from "../components/tabs/HealthTabContent";
 import { OverviewTabContent } from "../components/tabs/OverviewTabContent";
 import { RemindersTabContent } from "../components/tabs/RemindersTabContent";
 import { usePetQuery } from "../queries/usePetQuery";
+import { petProfileParamsSchema } from "../schemas/pet-profile-params.schema";
 import { PetProfilePageSkeleton } from "../skeletons/PetProfilePageSkeleton";
 import type { PetFlag } from "../types";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
 const PROFILE_TAB_KEYS = ["overview", "health", "care", "reminders"] as const;
 type ProfileTabKey = (typeof PROFILE_TAB_KEYS)[number];
@@ -36,9 +38,16 @@ export default function PetProfilePage() {
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<ProfileTabKey>("overview");
-  const { petId } = useLocalSearchParams<{ petId?: string }>();
-  const { data: pet, isLoading: isPetLoading } = usePetQuery(petId);
+
+  const parsedParams = petProfileParamsSchema.safeParse(useLocalSearchParams());
+  const petId = parsedParams.success ? parsedParams.data.petId : undefined;
+  const { data: pet, isLoading: isPetLoading, refetch, isRefetching } = usePetQuery(petId);
   const petName = pet?.name;
+
+  // Deep links can carry arbitrary params — never fetch with an unvalidated id.
+  if (!parsedParams.success) {
+    return <Redirect href="/(tabs)/pets" />;
+  }
 
   const flags: PetFlag[] = [];
   if (pet) {
@@ -150,16 +159,19 @@ export default function PetProfilePage() {
           })}
         </Animated.View>
 
-        <ScrollView
+        <Animated.ScrollView
+          key={activeTab}
+          entering={tabsContentEntering}
           showsVerticalScrollIndicator={false}
           contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={styles.content}
+          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
         >
           {!!pet && activeTab === "overview" && <OverviewTabContent pet={pet} />}
           {!!pet && activeTab === "health" && <HealthTabContent petId={pet.id ?? ""} />}
           {!!pet && activeTab === "care" && <CareTabContent petId={pet.id ?? ""} />}
           {!!pet && activeTab === "reminders" && <RemindersTabContent petId={pet.id ?? ""} />}
-        </ScrollView>
+        </Animated.ScrollView>
       </View>
       {!!pet && <EditPetDrawer pet={pet} isOpen={isEditOpen} setIsOpen={setIsEditOpen} />}
 

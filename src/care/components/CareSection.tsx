@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { SectionHeader } from "@/pets/components/SectionHeader";
+import { SectionHeader } from "@/pets/components/pet-profile/SectionHeader";
 import { Text } from "@/shadecn/ui/text";
 
 type Props = {

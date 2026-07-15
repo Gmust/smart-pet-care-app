@@ -13,7 +13,8 @@ export const useUpdateRemindersMutation = () => {
       const hasScheduleFields =
         payload.time !== undefined ||
         payload.days !== undefined ||
-        payload.isRepeatable !== undefined ||
+        payload.repeatType !== undefined ||
+        payload.date !== undefined ||
         payload.endAt !== undefined;
 
       const { data } = await patchApiRemindersId(id, {

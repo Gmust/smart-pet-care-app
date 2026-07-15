@@ -5,26 +5,18 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { CirclePlusIcon } from "@/icons/circle-plus";
 import { ReminderDrawers } from "@/reminders/components/ReminderDrawers";
+import { ReminderRow } from "@/reminders/components/ReminderRow";
 import { useReminderActions } from "@/reminders/hooks/useReminderActions";
 import { useGetReminders } from "@/reminders/queries/useGetReminders";
+import { RemindersSectionSkeleton } from "@/reminders/skeletons/RemindersSectionSkeleton";
+import type { ReminderGroupKey } from "@/reminders/utils/reminderGroups";
+import { toReminderGroups } from "@/reminders/utils/reminderGroups";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import { RemindersSectionSkeleton } from "../skeletons/HomePageSkeleton";
-import { toReminderGroups } from "../utils/homeMappers";
-import { ReminderRow } from "./ReminderRow";
 import { SectionLabel } from "./SectionLabel";
 import { useRouter } from "expo-router";
-
-export type ReminderGroupKey =
-  | "overdue"
-  | "today"
-  | "tomorrow"
-  | "soon"
-  | "nextWeek"
-  | "later"
-  | "passed";
 
 export function RemindersSection() {
   const { t } = useTranslation(["home", "reminders", "common"]);
@@ -39,6 +31,8 @@ export function RemindersSection() {
     setEditReminderId,
     statusReminderId,
     setStatusReminderId,
+    descriptionReminderId,
+    setDescriptionReminderId,
     isDeleting,
     deletingId,
     handleDeleteReminder,
@@ -92,6 +86,7 @@ export function RemindersSection() {
                     reminder={reminder}
                     onEdit={() => setEditReminderId(reminder.id)}
                     onChangeStatus={() => setStatusReminderId(reminder.id)}
+                    onShowDescription={() => setDescriptionReminderId(reminder.id)}
                     onDelete={() => handleDeleteReminder(reminder.id)}
                     isDeleting={isDeleting && deletingId === reminder.id}
                     muted={group.key === "passed"}
@@ -110,6 +105,8 @@ export function RemindersSection() {
         setEditReminderId={setEditReminderId}
         statusReminderId={statusReminderId}
         setStatusReminderId={setStatusReminderId}
+        descriptionReminderId={descriptionReminderId}
+        setDescriptionReminderId={setDescriptionReminderId}
       />
     </>
   );

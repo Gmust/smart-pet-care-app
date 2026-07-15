@@ -15,6 +15,7 @@ import { useRegisterMutation } from "../queries/useRegisterMutation";
 import { loginSchema, registerSchema } from "../schemas/auth.schema";
 import type { AuthMode } from "../types";
 import { getProblemMessage } from "../utils/auth-errors";
+import { useRouter } from "expo-router";
 
 interface EmailAuthFormProps {
   mode: AuthMode;
@@ -24,6 +25,7 @@ interface EmailAuthFormProps {
 
 export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: EmailAuthFormProps) {
   const { t } = useTranslation(["auth"]);
+  const router = useRouter();
   const isRegister = mode === "register";
 
   const { mutateAsync: register } = useRegisterMutation();
@@ -41,7 +43,7 @@ export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: Email
     onSubmit: async ({ value }) => {
       try {
         if (isRegister) {
-          const response = await register({
+          await register({
             email: value.email,
             password: value.password,
             passwordConfirm: value.passwordConfirm,
@@ -52,8 +54,10 @@ export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: Email
             text1: t("auth:success.accountCreatedTitle"),
             text2: t("auth:success.accountCreatedBody"),
           });
-          await new Promise((resolve) => setTimeout(resolve, 350));
-          onAuthenticated(response);
+          router.push({
+            pathname: "/(auth)/confirm-email",
+            params: { email: value.email },
+          });
           return;
         }
 

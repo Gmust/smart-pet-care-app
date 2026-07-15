@@ -8,9 +8,9 @@ import { palette } from "@/styles/palette";
 
 import type { usePetQuery } from "../../queries/usePetQuery";
 import type { PetNote } from "../../types";
-import { InfoRow } from "../InfoRow";
-import { NoteRow } from "../NoteRow";
-import { SectionHeader } from "../SectionHeader";
+import { InfoRow } from "../pet-profile/InfoRow";
+import { NoteRow } from "../pet-profile/NoteRow";
+import { SectionHeader } from "../pet-profile/SectionHeader";
 import dayjs from "dayjs";
 
 type Pet = NonNullable<ReturnType<typeof usePetQuery>["data"]>;

@@ -44,6 +44,7 @@ type ReminderRowProps = {
   reminder: Reminder;
   onEdit?: () => void;
   onChangeStatus?: () => void;
+  onShowDescription?: () => void;
   onDelete?: () => void;
   isDeleting?: boolean;
   muted?: boolean;
@@ -53,6 +54,7 @@ export function ReminderRow({
   reminder,
   onEdit,
   onChangeStatus,
+  onShowDescription,
   onDelete,
   isDeleting = false,
   muted = false,
@@ -101,6 +103,9 @@ export function ReminderRow({
         </DropdownMenuItem>
         <DropdownMenuItem onPress={onChangeStatus}>
           <Text style={styles.menuItemText}>{t("reminders:actionsDrawer.changeStatus")}</Text>
+        </DropdownMenuItem>
+        <DropdownMenuItem onPress={onShowDescription}>
+          <Text style={styles.menuItemText}>{t("reminders:actionsDrawer.showDescription")}</Text>
         </DropdownMenuItem>
         <DropdownMenuItem onPress={onDelete}>
           <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>

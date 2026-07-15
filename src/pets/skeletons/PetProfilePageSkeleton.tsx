@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { SkeletonBox } from "@/common/components/Skeleton";
 
-import { SectionHeader } from "../components/SectionHeader";
+import { SectionHeader } from "../components/pet-profile/SectionHeader";
 
 export function PetProfilePageSkeleton() {
   const insets = useSafeAreaInsets();

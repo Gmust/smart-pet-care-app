@@ -6,6 +6,7 @@ import type { GetApiRemindersParams } from "@/api/generated";
 export function useGetReminders(params?: GetApiRemindersParams, enabled = true) {
   return useQuery({
     enabled,
+    staleTime: 60_000,
     queryKey: ["reminders", params],
     queryFn: async () => {
       const response = await getApiReminders(params);

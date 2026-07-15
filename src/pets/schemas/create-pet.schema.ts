@@ -20,7 +20,8 @@ export const createPetSchema = (t: TFunction<"pets">) =>
       .trim()
       .transform((value, ctx) => {
         if (!value) {
-          return null;
+          ctx.addIssue({ code: "custom", message: t("validation.weightRequired") });
+          return z.NEVER;
         }
 
         const parsed = Number(value.replace(",", "."));
