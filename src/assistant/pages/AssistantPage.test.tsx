@@ -2,16 +2,29 @@
 
 import type { ReactNode } from "react";
 import { PortalHost } from "@rn-primitives/portal";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
+
+import {
+  ChatMessageRole,
+  ChatMessageStatus,
+  ClassifierUrgency,
+  PetType,
+  type SessionMessageResponseDto,
+} from "@/api/generated";
+import { palette } from "@/styles/palette";
 
 import * as aiConsentStorage from "../utils/aiUsingConsentStorage";
 import AssistantPage from "./AssistantPage";
 import AssistantPetSelectionPage from "./AssistantPetSelectionPage";
+import type { AxiosResponse } from "axios";
+import { AxiosError, AxiosHeaders } from "axios";
 
 // Interpolating passthrough so distinct pets/urgencies produce unique, assertable strings.
 const mockTranslate = (key: string, opts?: Record<string, unknown>) => {
   if (opts && typeof opts.name === "string") return `${key}:${opts.name}`;
   if (opts && typeof opts.urgency === "string") return `${key}:${opts.urgency}`;
+  if (opts && typeof opts.seconds === "number") return `${key}:${opts.seconds}`;
   return key;
 };
 
@@ -22,6 +35,7 @@ const mockRouter = {
   canGoBack: jest.fn(() => true),
 };
 let mockSearchParams: Record<string, unknown> = {};
+const mockPetsQuery = jest.fn();
 
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({ t: mockTranslate, i18n: { language: "en" } }),
@@ -42,7 +56,17 @@ jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
-jest.mock("@/pets/queries/usePetsQuery", () => ({ usePetsQuery: jest.fn() }));
+jest.mock("@/pets/queries/usePetsQuery", () => ({
+  usePetsQuery: () => mockPetsQuery(),
+}));
+
+jest.mock("@/api", () => ({
+  getApiSessions: jest.fn(),
+  getApiSessionsSessionIdMessages: jest.fn(),
+  postApiSessions: jest.fn(),
+  postApiSessionsSessionIdMessages: jest.fn(),
+  postApiSessionsSessionIdMessagesMessageIdRetry: jest.fn(),
+}));
 
 jest.mock("../utils/aiUsingConsentStorage", () => ({
   clearAiUsingConsent: jest.fn(),
@@ -50,21 +74,63 @@ jest.mock("../utils/aiUsingConsentStorage", () => ({
   setAiUsingConsent: jest.fn(),
 }));
 
-import { usePetsQuery } from "@/pets/queries/usePetsQuery";
+import {
+  getApiSessions,
+  getApiSessionsSessionIdMessages,
+  postApiSessions,
+  postApiSessionsSessionIdMessages,
+  postApiSessionsSessionIdMessagesMessageIdRetry,
+} from "@/api";
 
-const petsQueryMock = jest.mocked(usePetsQuery);
+const getSessionsMock = jest.mocked(getApiSessions);
+const getMessagesMock = jest.mocked(getApiSessionsSessionIdMessages);
+const createSessionMock = jest.mocked(postApiSessions);
+const sendMessageMock = jest.mocked(postApiSessionsSessionIdMessages);
+const retryMessageMock = jest.mocked(postApiSessionsSessionIdMessagesMessageIdRetry);
 const clearAiUsingConsentMock = jest.mocked(aiConsentStorage.clearAiUsingConsent);
 const getAiUsingConsentMock = jest.mocked(aiConsentStorage.getAiUsingConsent);
 const setAiUsingConsentMock = jest.mocked(aiConsentStorage.setAiUsingConsent);
 
 const milo = { id: "pet-milo", name: "Milo", species: "dog" };
 const acceptedConsent = true;
+const session = {
+  sessionId: "session-milo",
+  petId: "pet-milo",
+  petType: PetType.Dog,
+  createdAt: "2026-07-15T10:00:00Z",
+  updatedAt: "2026-07-15T10:00:00Z",
+};
+const assistantResponse = {
+  answer: "Keep Milo rested and monitor the symptom.",
+  urgency: ClassifierUrgency.MONITOR,
+  homeAdvice: ["Offer water", "Limit strenuous activity"],
+  disclaimer: "General veterinary guidance only.",
+  urgentContactEmergencyVet: false,
+};
 
-// Free-text answers come straight from the wire-shape mock fixtures (no i18n keys).
-const monitorAnswer =
-  "This sounds appropriate for routine veterinary follow-up. Keep an eye on your pet between now and their next checkup.";
-const generalAnswer =
-  "A balanced diet and consistent training routines go a long way for most pets. Keep meals portioned to their size and reinforce good behavior with positive rewards.";
+const apiResponse = <T,>(data: T): AxiosResponse<T> => {
+  const headers = new AxiosHeaders();
+  return {
+    data,
+    status: 200,
+    statusText: "OK",
+    headers,
+    config: { headers },
+  };
+};
+
+const apiError = (status: number, data: unknown): AxiosError => {
+  const headers = new AxiosHeaders();
+  const config = { headers };
+  const response: AxiosResponse = {
+    data,
+    status,
+    statusText: "Failure",
+    headers,
+    config,
+  };
+  return new AxiosError("Request failed", undefined, config, undefined, response);
+};
 
 const setPets = (
   value: {
@@ -74,22 +140,27 @@ const setPets = (
   } = {}
 ) => {
   const refetch = jest.fn();
-  petsQueryMock.mockReturnValue({
+  mockPetsQuery.mockReturnValue({
     data: value.data ?? [milo],
     isLoading: value.isLoading ?? false,
     isError: value.isError ?? false,
     refetch,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+  });
   return refetch;
 };
 
 const renderPage = async () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { gcTime: Infinity, retry: false },
+      mutations: { gcTime: Infinity, retry: false },
+    },
+  });
   const utils = render(
-    <>
+    <QueryClientProvider client={queryClient}>
       <AssistantPage />
       <PortalHost name="dialog" />
-    </>
+    </QueryClientProvider>
   );
   // Wait past the async restore gate (`if (!restored) return null`).
   await waitFor(() => expect(getAiUsingConsentMock).toHaveBeenCalled());
@@ -103,6 +174,23 @@ beforeEach(() => {
   getAiUsingConsentMock.mockResolvedValue({ ok: true, value: acceptedConsent });
   setAiUsingConsentMock.mockResolvedValue({ ok: true, value: undefined });
   setPets();
+  getSessionsMock.mockResolvedValue(apiResponse([session]));
+  getMessagesMock.mockResolvedValue(
+    apiResponse({
+      sessionId: session.sessionId,
+      items: [],
+      pagination: { limit: 8, hasMore: false, nextCursor: null },
+    })
+  );
+  createSessionMock.mockResolvedValue(
+    apiResponse({
+      ...session,
+      sessionId: "session-new",
+      updatedAt: "2026-07-15T11:00:00Z",
+    })
+  );
+  sendMessageMock.mockResolvedValue(apiResponse(assistantResponse));
+  retryMessageMock.mockResolvedValue(apiResponse(assistantResponse));
 });
 
 describe("AssistantPage – navigation (task 3.5)", () => {
@@ -146,6 +234,9 @@ describe("AssistantPage – navigation (task 3.5)", () => {
   });
 
   it("does not throw when unmounted during a pending request", async () => {
+    sendMessageMock.mockImplementation(
+      () => new Promise<AxiosResponse<SessionMessageResponseDto>>(() => undefined)
+    );
     mockSearchParams = { petId: "pet-milo" };
     const { getByPlaceholderText, getByLabelText, unmount } = await renderPage();
     await waitFor(() => expect(getByPlaceholderText("conversation.placeholder:Milo")).toBeTruthy());
@@ -246,7 +337,7 @@ describe("AssistantPage – consent & pet selection (task 4.5)", () => {
   });
 });
 
-describe("AssistantPage – mock conversation", () => {
+describe("AssistantPage – server-backed conversation", () => {
   const renderConversation = async () => {
     mockSearchParams = { petId: "pet-milo" };
     const utils = await renderPage();
@@ -263,12 +354,34 @@ describe("AssistantPage – mock conversation", () => {
     });
   };
 
-  it("adds the user message and simple mock assistant response", async () => {
+  it("adds one optimistic user turn and renders the live urgency response", async () => {
     const utils = await renderConversation();
     await sendText(utils, "routine checkup");
     await waitFor(() => expect(utils.getByText("routine checkup")).toBeTruthy());
-    await waitFor(() => expect(utils.getByText(monitorAnswer)).toBeTruthy());
-    expect(utils.getByText("routine checkup")).toBeTruthy();
+    await waitFor(() => expect(utils.getByText(assistantResponse.answer)).toBeTruthy());
+    expect(sendMessageMock).toHaveBeenCalledWith(session.sessionId, { text: "routine checkup" });
+    expect(utils.getByText("⚕ assessment.urgency:urgency.MONITOR")).toBeTruthy();
+    expect(utils.getByText("• Offer water")).toBeTruthy();
+    expect(utils.getByTestId("assistant-response-card")).toHaveStyle({
+      backgroundColor: palette.white,
+      borderColor: palette.brand.ok,
+      borderWidth: 2,
+    });
+  });
+
+  it.each([
+    [ClassifierUrgency.CONSULT_SOON, palette.brand.warn],
+    [ClassifierUrgency.URGENT, palette.orange["600"]],
+  ])("uses the mapped border for %s urgency", async (urgency, borderColor) => {
+    sendMessageMock.mockResolvedValue(apiResponse({ ...assistantResponse, urgency }));
+    const utils = await renderConversation();
+    await sendText(utils, "routine checkup");
+
+    expect(await utils.findByText(assistantResponse.answer)).toBeOnTheScreen();
+    expect(utils.getByTestId("assistant-response-card")).toHaveStyle({
+      borderColor,
+      borderWidth: 2,
+    });
   });
 
   it("disables sending for whitespace-only input", async () => {
@@ -277,31 +390,239 @@ describe("AssistantPage – mock conversation", () => {
     expect(utils.getByLabelText("conversation.send").props.accessibilityState?.disabled).toBe(true);
   });
 
-  it("renders general mode with editable related-topic chips", async () => {
-    const utils = await renderConversation();
-    await sendText(utils, "food and training tips");
-    await waitFor(() => expect(utils.getByText(generalAnswer)).toBeTruthy());
-    // A related topic populates the composer as an editable draft instead of auto-sending.
-    fireEvent.press(utils.getByLabelText("Choosing the right food"));
-    expect(utils.getByPlaceholderText("conversation.placeholder:Milo").props.value).toBe(
-      "Choosing the right food"
+  it("renders restored user and assistant roles without inventing urgency", async () => {
+    getMessagesMock.mockResolvedValue(
+      apiResponse({
+        sessionId: session.sessionId,
+        items: [
+          {
+            messageId: "user-history",
+            role: ChatMessageRole.user,
+            status: ChatMessageStatus.Completed,
+            content: "Historical question",
+            createdAt: "2026-07-15T10:01:00Z",
+          },
+          {
+            messageId: "assistant-history",
+            role: ChatMessageRole.assistant,
+            status: ChatMessageStatus.Completed,
+            content: "Historical answer",
+            createdAt: "2026-07-15T10:02:00Z",
+          },
+        ],
+        pagination: { limit: 8, hasMore: false, nextCursor: null },
+      })
     );
+    const utils = await renderConversation();
+    expect(utils.getByText("Historical question")).toBeTruthy();
+    expect(utils.getByText("Historical answer")).toBeTruthy();
     expect(utils.queryByText(/assessment\.urgency/)).toBeNull();
   });
 
-  it("resets the conversation while retaining consent and the pet", async () => {
+  it("creates a new server session without deleting the current session", async () => {
     const utils = await renderConversation();
     await sendText(utils, "routine checkup");
-    await waitFor(() => expect(utils.getByText(monitorAnswer)).toBeTruthy());
+    await waitFor(() => expect(utils.getByText(assistantResponse.answer)).toBeTruthy());
     fireEvent.press(utils.getByLabelText("conversation.reset"));
-    // A non-empty conversation opens the confirmation dialog before clearing.
     await waitFor(() => expect(utils.getByText("conversation.startNewChat")).toBeTruthy());
     await act(async () => {
       fireEvent.press(utils.getByText("conversation.startNewChat"));
     });
-    await waitFor(() => expect(utils.queryByText(monitorAnswer)).toBeNull());
-    // Consent + pet retained: still in conversation, not gated back to consent/selection.
+    await waitFor(() => expect(utils.queryByText(assistantResponse.answer)).toBeNull());
+    expect(createSessionMock).toHaveBeenCalledWith({ petId: "pet-milo" });
     expect(utils.getByLabelText("conversation.about:Milo")).toBeTruthy();
+  });
+
+  it("creates the first pet session when no previous session exists", async () => {
+    getSessionsMock.mockResolvedValue(apiResponse([]));
+    await renderConversation();
+    await waitFor(() => expect(createSessionMock).toHaveBeenCalledWith({ petId: "pet-milo" }));
+  });
+
+  it("shows immediate emergency guidance and still submits the message", async () => {
+    const utils = await renderConversation();
+    await sendText(utils, "Milo cannot breathe");
+    expect(utils.getAllByText("emergency.body").length).toBeGreaterThan(0);
+    expect(sendMessageMock).toHaveBeenCalledWith(session.sessionId, {
+      text: "Milo cannot breathe",
+    });
+  });
+
+  it("retries a restored failed assistant message through the retry endpoint", async () => {
+    getMessagesMock.mockResolvedValue(
+      apiResponse({
+        sessionId: session.sessionId,
+        items: [
+          {
+            messageId: "failed-message",
+            role: ChatMessageRole.assistant,
+            status: ChatMessageStatus.FailedRetryable,
+            content: "",
+            createdAt: "2026-07-15T10:02:00Z",
+          },
+        ],
+        pagination: { limit: 8, hasMore: false, nextCursor: null },
+      })
+    );
+    const utils = await renderConversation();
+    fireEvent.press(utils.getByLabelText("errors.retry"));
+    await waitFor(() =>
+      expect(retryMessageMock).toHaveBeenCalledWith(session.sessionId, "failed-message")
+    );
+    await waitFor(() => expect(utils.getByText(assistantResponse.answer)).toBeTruthy());
+  });
+
+  it("preserves a retryable failure when the dedicated retry conflicts", async () => {
+    getMessagesMock.mockResolvedValue(
+      apiResponse({
+        sessionId: session.sessionId,
+        items: [
+          {
+            messageId: "conflict-message",
+            role: ChatMessageRole.assistant,
+            status: ChatMessageStatus.FailedRetryable,
+            content: "",
+            createdAt: "2026-07-15T10:02:00Z",
+          },
+        ],
+        pagination: { limit: 8, hasMore: false, nextCursor: null },
+      })
+    );
+    retryMessageMock.mockRejectedValue(apiError(409, { title: "Conflict" }));
+    const utils = await renderConversation();
+    fireEvent.press(utils.getByLabelText("errors.retry"));
+
+    await waitFor(() => expect(utils.getByText("errors.retryConflict")).toBeTruthy());
+    expect(retryMessageMock).toHaveBeenCalledWith(session.sessionId, "conflict-message");
+  });
+
+  it("loads the next cursor page once the user reaches the transcript start", async () => {
+    getMessagesMock
+      .mockResolvedValueOnce(
+        apiResponse({
+          sessionId: session.sessionId,
+          items: [
+            {
+              messageId: "newer",
+              role: ChatMessageRole.assistant,
+              status: ChatMessageStatus.Completed,
+              content: "Newer answer",
+              createdAt: "2026-07-15T10:02:00Z",
+            },
+          ],
+          pagination: { limit: 8, hasMore: true, nextCursor: "older-cursor" },
+        })
+      )
+      .mockResolvedValueOnce(
+        apiResponse({
+          sessionId: session.sessionId,
+          items: [
+            {
+              messageId: "older",
+              role: ChatMessageRole.user,
+              status: ChatMessageStatus.Completed,
+              content: "Older question",
+              createdAt: "2026-07-15T10:01:00Z",
+            },
+          ],
+          pagination: { limit: 8, hasMore: false, nextCursor: null },
+        })
+      );
+    const utils = await renderConversation();
+    fireEvent.scroll(utils.getByLabelText("conversation.transcript"), {
+      nativeEvent: {
+        contentOffset: { y: 0 },
+        contentSize: { height: 800, width: 320 },
+        layoutMeasurement: { height: 500, width: 320 },
+      },
+    });
+
+    await waitFor(() =>
+      expect(getMessagesMock).toHaveBeenLastCalledWith(
+        session.sessionId,
+        { limit: 8, cursor: "older-cursor" },
+        expect.objectContaining({ signal: expect.any(AbortSignal) })
+      )
+    );
+    await waitFor(() => expect(utils.getByText("Older question")).toBeTruthy());
+  });
+
+  it("keeps the active transcript when new-session creation fails", async () => {
+    createSessionMock.mockRejectedValue(new Error("offline"));
+    const utils = await renderConversation();
+    await sendText(utils, "routine checkup");
+    await waitFor(() => expect(utils.getByText(assistantResponse.answer)).toBeTruthy());
+    fireEvent.press(utils.getByLabelText("conversation.reset"));
+    fireEvent.press(await utils.findByText("conversation.startNewChat"));
+
+    await waitFor(() => expect(utils.getByText("errors.newSession")).toBeTruthy());
+    expect(utils.getByText(assistantResponse.answer)).toBeTruthy();
+  });
+
+  it("renders server emergency guidance for an unflagged message", async () => {
+    sendMessageMock.mockResolvedValue(
+      apiResponse({
+        answer: "Contact an emergency veterinarian now.",
+        urgency: ClassifierUrgency.EMERGENCY,
+        homeAdvice: ["Keep the airway clear"],
+        disclaimer: "Emergency guidance",
+        urgentContactEmergencyVet: true,
+      })
+    );
+    const utils = await renderConversation();
+    await sendText(utils, "Milo seems very unwell");
+
+    await waitFor(() =>
+      expect(utils.getByText("Contact an emergency veterinarian now.")).toBeTruthy()
+    );
+    expect(utils.queryByText("emergency.findVet")).not.toBeOnTheScreen();
+    expect(utils.getByRole("alert")).toHaveStyle({
+      borderColor: palette.brand.danger,
+      borderWidth: 1,
+    });
+  });
+
+  it("shows rate-limit timing and prevents retry during the interval", async () => {
+    sendMessageMock.mockRejectedValue(
+      apiError(429, {
+        messageId: "failed-rate-limit",
+        code: "rate_limit",
+        message: "Wait",
+        retryable: true,
+        retryAfterSeconds: 5,
+      })
+    );
+    const utils = await renderConversation();
+    await sendText(utils, "routine checkup");
+
+    await waitFor(() => expect(utils.getByText("errors.retryAfter:5")).toBeTruthy());
+    expect(utils.getByLabelText("errors.retry").props.accessibilityState?.disabled).toBe(true);
+  });
+
+  it("prevents a duplicate submit while the first message is pending", async () => {
+    sendMessageMock.mockImplementation(
+      () => new Promise<AxiosResponse<SessionMessageResponseDto>>(() => undefined)
+    );
+    const utils = await renderConversation();
+    fireEvent.changeText(
+      utils.getByPlaceholderText("conversation.placeholder:Milo"),
+      "routine checkup"
+    );
+    fireEvent.press(utils.getByLabelText("conversation.send"));
+    fireEvent.press(utils.getByLabelText("conversation.send"));
+
+    await waitFor(() => expect(sendMessageMock).toHaveBeenCalledTimes(1));
+  });
+
+  it("re-bootstraps the pet when the active session is not found", async () => {
+    getSessionsMock
+      .mockResolvedValueOnce(apiResponse([session]))
+      .mockResolvedValue(apiResponse([]));
+    sendMessageMock.mockRejectedValue(apiError(404, { title: "Not found" }));
+    const utils = await renderConversation();
+    await sendText(utils, "routine checkup");
+
+    await waitFor(() => expect(createSessionMock).toHaveBeenCalledWith({ petId: "pet-milo" }));
   });
 });
 
@@ -331,16 +652,26 @@ describe("AssistantPage – accessibility (task 6.5)", () => {
     expect(style.minHeight).toBeGreaterThanOrEqual(44);
   });
 
-  it("keeps a general mock response readable without urgency-only color cues", async () => {
+  it("keeps an answer without urgency readable without an urgency-only color cue", async () => {
+    sendMessageMock.mockResolvedValue(
+      apiResponse({
+        answer: "A plain answer",
+        urgency: null,
+        homeAdvice: [],
+        disclaimer: "General guidance",
+        urgentContactEmergencyVet: false,
+      })
+    );
     const utils = await renderConversation();
     fireEvent.changeText(
       utils.getByPlaceholderText("conversation.placeholder:Milo"),
-      "food and training tips"
+      "general question"
     );
     await act(async () => {
       fireEvent.press(utils.getByLabelText("conversation.send"));
     });
-    await waitFor(() => expect(utils.getByText(generalAnswer)).toBeTruthy());
+    await waitFor(() => expect(utils.getByText("A plain answer")).toBeTruthy());
     expect(utils.queryByText(/assessment\.urgency/)).toBeNull();
+    expect(utils.getByTestId("assistant-response-card")).not.toHaveStyle({ borderWidth: 2 });
   });
 });

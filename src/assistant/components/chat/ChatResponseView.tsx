@@ -1,101 +1,61 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AccessibilityInfo, Linking, Pressable, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import type { SessionMessageResponseDto } from "@/api/generated";
+import { ClassifierUrgency } from "@/api/generated";
 import { AiIcon } from "@/icons/ai-icon";
-import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
-
-import type { AssistantChatResponse } from "../../schemas/assistant.schema";
-import { PredictionCard } from "./PredictionCard";
-
-const EMERGENCY_VET_SEARCH_URL =
-  "https://www.google.com/maps/search/?api=1&query=emergency+veterinary+clinic";
 
 export function ChatResponseView({
   response,
-  onSelectTopic,
+  localEmergency = false,
 }: {
-  response: AssistantChatResponse;
-  onSelectTopic?: (text: string) => void;
+  response: SessionMessageResponseDto;
+  localEmergency?: boolean;
 }) {
   const { t } = useTranslation(["assistant"]);
 
-  const [emergencyLinkFailed, setEmergencyLinkFailed] = useState(false);
+  const emergency =
+    localEmergency ||
+    response.urgentContactEmergencyVet === true ||
+    response.urgency === ClassifierUrgency.EMERGENCY;
 
-  const openEmergencyVetSearch = async () => {
-    try {
-      const canOpen = await Linking.canOpenURL(EMERGENCY_VET_SEARCH_URL);
-      if (!canOpen) throw new Error("unsupported");
-      await Linking.openURL(EMERGENCY_VET_SEARCH_URL);
-    } catch {
-      setEmergencyLinkFailed(true);
-      AccessibilityInfo.announceForAccessibility(t("accessibility.emergencyActionUnavailable"));
-    }
-  };
+  const urgencyBorder =
+    response.urgency === ClassifierUrgency.MONITOR
+      ? styles.monitorBorder
+      : response.urgency === ClassifierUrgency.CONSULT_SOON
+        ? styles.consultSoonBorder
+        : response.urgency === ClassifierUrgency.URGENT
+          ? styles.urgentBorder
+          : response.urgency === ClassifierUrgency.EMERGENCY
+            ? styles.emergencyBorder
+            : null;
 
-  if (response.mode === "emergency")
+  if (emergency)
     return (
-      <View accessibilityRole="alert" accessibilityLiveRegion="assertive" style={styles.emergency}>
+      <View
+        accessible
+        accessibilityRole="alert"
+        accessibilityLiveRegion="assertive"
+        style={styles.emergency}
+      >
         <Text accessibilityRole="header" style={styles.title}>
           ⚠ {t("emergency.title")}
         </Text>
-        <Text style={styles.emergencyText}>{response.answer}</Text>
-        {response.prediction?.homeAdvice.map((advice) => (
+        {localEmergency && response.urgency !== ClassifierUrgency.EMERGENCY && (
+          <Text style={styles.emergencyText}>{t("emergency.body")}</Text>
+        )}
+        <Text selectable style={styles.emergencyText}>
+          {response.answer}
+        </Text>
+        {(response.homeAdvice ?? []).map((advice) => (
           <Text key={advice} style={styles.emergencyText}>
             • {advice}
           </Text>
         ))}
-        <Button
-          variant="danger"
-          accessibilityLabel={t("emergency.findVet")}
-          accessibilityHint={t("emergency.findVetHint")}
-          onPress={() => void openEmergencyVetSearch()}
-        >
-          {t("emergency.findVet")}
-        </Button>
-        {emergencyLinkFailed && (
-          <Text accessibilityLiveRegion="polite" style={styles.emergencyFallback}>
-            {t("emergency.findVetFailed")}
-          </Text>
-        )}
-      </View>
-    );
-
-  if (response.mode === "general")
-    return (
-      <View style={styles.assistantRow} accessibilityLabel={t("conversation.assistantSender")}>
-        <View style={styles.assistantAvatar}>
-          <AiIcon width={15} height={15} color={styles.assistantAvatarIcon.color} />
-        </View>
-        <View style={styles.assessment}>
-          <Text selectable style={styles.answerText}>
-            {response.answer}
-          </Text>
-          {response.relatedTopics.length > 0 && (
-            <View style={styles.chipRow}>
-              {response.relatedTopics.map((topic) =>
-                onSelectTopic ? (
-                  <Pressable
-                    key={topic}
-                    accessibilityRole="button"
-                    accessibilityLabel={topic}
-                    accessibilityHint={t("hints.send")}
-                    onPress={() => onSelectTopic(topic)}
-                    style={({ pressed }) => [styles.chip, pressed && styles.pressed]}
-                  >
-                    <Text style={styles.chipText}>{topic}</Text>
-                  </Pressable>
-                ) : (
-                  <View key={topic} style={styles.chip}>
-                    <Text style={styles.chipText}>{topic}</Text>
-                  </View>
-                )
-              )}
-            </View>
-          )}
-        </View>
+        <Text style={styles.emergencyDisclaimer}>{response.disclaimer}</Text>
+        {/* TODO: Restore the emergency-vet finder when its destination is finalized. */}
       </View>
     );
 
@@ -104,19 +64,27 @@ export function ChatResponseView({
       <View style={styles.assistantAvatar}>
         <AiIcon width={15} height={15} color={styles.assistantAvatarIcon.color} />
       </View>
-      <View style={styles.assessment}>
-        <Text
-          selectable
-          style={[styles.answerText, response.needsClarification && styles.clarificationQuestion]}
-        >
+      <View
+        testID="assistant-response-card"
+        style={[
+          styles.assessment,
+          response.urgency ? styles.urgencyAssessment : null,
+          urgencyBorder,
+        ]}
+      >
+        <Text selectable style={styles.answerText}>
           {response.answer}
         </Text>
-        {response.prediction && (
-          <PredictionCard
-            prediction={response.prediction}
-            deemphasized={response.needsClarification}
-          />
+        {response.urgency && (
+          <Text accessibilityLiveRegion="polite" style={styles.urgency}>
+            ⚕ {t("assessment.urgency", { urgency: t(`urgency.${response.urgency}`) })}
+          </Text>
         )}
+        {(response.homeAdvice ?? []).map((advice) => (
+          <Text key={advice} style={styles.advice}>
+            • {advice}
+          </Text>
+        ))}
         <Text style={styles.disclaimer}>{response.disclaimer}</Text>
       </View>
     </View>
@@ -124,7 +92,6 @@ export function ChatResponseView({
 }
 
 const styles = StyleSheet.create((theme) => ({
-  pressed: { opacity: 0.72 },
   title: {
     fontFamily: theme.fonts.display,
     fontSize: theme.fontSize.xl,
@@ -150,24 +117,23 @@ const styles = StyleSheet.create((theme) => ({
   assessment: {
     flex: 1,
     gap: theme.spacing(2),
-    paddingTop: theme.spacing(1),
+    backgroundColor: theme.palette.white,
+    borderRadius: theme.borderRadius.xl,
+    borderCurve: "continuous",
+    padding: theme.spacing(3),
   },
+  urgencyAssessment: { borderWidth: 2 },
+  monitorBorder: { borderColor: theme.palette.brand.ok },
+  consultSoonBorder: { borderColor: theme.palette.brand.warn },
+  urgentBorder: { borderColor: theme.palette.orange["600"] },
+  emergencyBorder: { borderColor: theme.palette.brand.danger },
   answerText: {
     fontSize: theme.fontSize.base,
     lineHeight: theme.fontSize.base * 1.55,
     color: theme.palette.brand.textBody,
   },
-  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: theme.spacing(2) },
-  chip: {
-    minHeight: theme.spacing(11),
-    justifyContent: "center",
-    backgroundColor: theme.palette.brand.primaryXsoft,
-    borderRadius: theme.borderRadius.full,
-    paddingHorizontal: theme.spacing(3),
-    paddingVertical: theme.spacing(1),
-  },
-  chipText: { color: theme.palette.brand.primaryDark, fontSize: theme.fontSize.sm },
-  clarificationQuestion: { fontFamily: theme.fonts.bold },
+  urgency: { fontFamily: theme.fonts.bold, color: theme.palette.brand.primaryDark },
+  advice: { lineHeight: theme.fontSize.base * 1.45, color: theme.palette.brand.textBody },
   disclaimer: {
     fontSize: theme.fontSize.xs,
     lineHeight: theme.fontSize.xs * 1.45,
@@ -189,9 +155,9 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.palette.brand.danger,
     lineHeight: theme.fontSize.base * 1.5,
   },
-  emergencyFallback: {
-    fontFamily: theme.fonts.semiBold,
+  emergencyDisclaimer: {
+    fontSize: theme.fontSize.xs,
+    lineHeight: theme.fontSize.xs * 1.45,
     color: theme.palette.brand.danger,
-    lineHeight: theme.fontSize.base * 1.45,
   },
 }));

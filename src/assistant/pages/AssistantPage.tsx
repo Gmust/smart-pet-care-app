@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { AccessibilityInfo, ActivityIndicator, FlatList, View } from "react-native";
@@ -6,7 +6,9 @@ import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
+import { ChatMessageStatus, ClassifierUrgency } from "@/api/generated";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
+import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 
 import { ChatHeader } from "../components/chat/chat-header/ChatHeader";
@@ -18,69 +20,89 @@ import { ScrollToEndButton } from "../components/chat/ScrollToEndButton";
 import { ConsentDialog } from "../components/dialogs/ConsentDialog";
 import { NewChatDialog } from "../components/dialogs/NewChatDialog";
 import { PetSelectorChip } from "../components/pet-selection/PetSelectorChip";
-import type {
-  AssistantChatResponse,
-  AssistantMessage,
-  AssistantPersistedState,
-} from "../schemas/assistant.schema";
+import { useAssistantMessagesQuery } from "../queries/useAssistantMessagesQuery";
+import { useAssistantSessionBootstrap } from "../queries/useAssistantSessionBootstrap";
+import { useRetryAssistantMessageMutation } from "../queries/useRetryAssistantMessageMutation";
+import { useSendAssistantMessageMutation } from "../queries/useSendAssistantMessageMutation";
 import { assistantRouteParamsSchema } from "../schemas/assistant.schema";
-import { hasEmergencyIndicator, mockAssistantService } from "../services/mockAssistantService";
+import type { AssistantTranscriptMessage } from "../types";
 import {
   clearAiUsingConsent,
   getAiUsingConsent,
   setAiUsingConsent,
 } from "../utils/aiUsingConsentStorage";
+import { hasEmergencyIndicator } from "../utils/assistantEmergency";
+import { getAssistantApiError, isAssistantNotFoundError } from "../utils/assistantErrors";
 import { ASSISTANT_PERSISTENCE_STATUS } from "../utils/assistantPersistence";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 const SCROLL_TO_END_THRESHOLD = 160;
 
-const initialState = {
-  version: 2,
-  consent: null,
-  selectedPetId: null,
-  conversationId: null,
-  messages: [],
-} satisfies AssistantPersistedState;
-
 export default function AssistantPage() {
-  const { t, i18n } = useTranslation(["assistant"]);
+  const { t } = useTranslation(["assistant"]);
   const router = useRouter();
   const params = assistantRouteParamsSchema.safeParse(useLocalSearchParams());
   const { data: pets, isLoading: isPetsLoading } = usePetsQuery();
 
-  const [state, setState] = useState<AssistantPersistedState>(initialState);
-  const [pendingRequestId, setPendingRequestId] = useState<string | null>(null);
+  const [localTranscript, setLocalTranscript] = useState<{
+    sessionId: string | null;
+    messages: AssistantTranscriptMessage[];
+  }>({ sessionId: null, messages: [] });
   const [newChatDialogOpen, setNewChatDialogOpen] = useState(false);
   const [showScrollToEnd, setShowScrollToEnd] = useState(false);
   const [consent, setConsent] = useState<boolean | null>(null);
   const [consentChecked, setConsentChecked] = useState(false);
   const [consentDialogOpen, setConsentDialogOpen] = useState(false);
 
-  const abortRef = useRef<AbortController | null>(null);
-  const listRef = useRef<FlatList<AssistantMessage>>(null);
+  const listRef = useRef<FlatList<AssistantTranscriptMessage>>(null);
   const chatInputRef = useRef<ChatInputHandle>(null);
   const requestCounterRef = useRef(0);
-  const scopeRef = useRef(0);
+  const isSendingRef = useRef(false);
 
   const entryPetId = params.success ? params.data.petId : undefined;
-  const selectedPet = pets?.find((pet) => pet.id === (entryPetId ?? state.selectedPetId));
-  const consentAccepted = Boolean(consent ?? state.consent);
+  const selectedPet = pets?.find((pet) => pet.id === entryPetId);
+  const selectedPetId = selectedPet?.id ?? null;
+  const consentAccepted = consent === true;
+  const sessionBootstrap = useAssistantSessionBootstrap(
+    selectedPetId,
+    consentChecked && consentAccepted
+  );
+  const activeSessionId = sessionBootstrap.activeSession?.sessionId ?? null;
+  const messagesQuery = useAssistantMessagesQuery(
+    activeSessionId,
+    consentChecked && consentAccepted
+  );
+  const sendMessage = useSendAssistantMessageMutation();
+  const retryMessage = useRetryAssistantMessageMutation();
+  const recoverMissingSession = sessionBootstrap.recoverMissingSession;
+  const activeSessionIdRef = useRef<string | null>(activeSessionId);
+  activeSessionIdRef.current = activeSessionId;
 
-  const persist = async (next: AssistantPersistedState) => {
-    setState(next);
-  };
+  const transcript = useMemo(() => {
+    const liveMessages =
+      localTranscript.sessionId === activeSessionId ? localTranscript.messages : [];
+    const replacedServerIds = new Set<string>();
+    for (const message of liveMessages) {
+      if (
+        (message.kind === "live-assistant" || message.kind === "failed-assistant") &&
+        message.serverMessageId
+      )
+        replacedServerIds.add(message.serverMessageId);
+    }
+    return [
+      ...messagesQuery.messages.filter((message) => !replacedServerIds.has(message.messageId)),
+      ...liveMessages,
+    ];
+  }, [activeSessionId, localTranscript, messagesQuery.messages]);
 
   const acceptConsent = async () => {
     await setAiUsingConsent(true);
     setConsent(true);
-    setState((current) => ({ ...current, consent: true }));
     setConsentDialogOpen(false);
   };
 
   const declineConsent = async () => {
     setConsent(null);
-    setState((current) => ({ ...current, consent: null }));
     setConsentDialogOpen(false);
     await clearAiUsingConsent();
     router.replace("/(tabs)/home");
@@ -90,115 +112,238 @@ export default function AssistantPage() {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
     const distanceFromEnd = contentSize.height - contentOffset.y - layoutMeasurement.height;
     setShowScrollToEnd(distanceFromEnd > SCROLL_TO_END_THRESHOLD);
+    if (contentOffset.y <= 80 && messagesQuery.hasNextPage && !messagesQuery.isFetchingNextPage)
+      void messagesQuery.fetchNextPage();
   };
 
-  const send = async (rawText: string, retryRequestId?: string) => {
+  const send = async (rawText: string) => {
     const text = rawText.trim();
-    if (!text || pendingRequestId || !selectedPet) return;
+    const sessionId = activeSessionId;
+    if (!text || !sessionId || isSendingRef.current || sendMessage.isPending) return;
+    isSendingRef.current = true;
     requestCounterRef.current += 1;
-    const requestId = retryRequestId ?? `request-${requestCounterRef.current}`;
-    const userMessage: AssistantMessage = { id: `user-${requestId}`, sender: "user", text };
-    const pending: AssistantMessage = {
-      id: `assistant-${requestId}`,
-      sender: "assistant",
+    const requestId = `request-${requestCounterRef.current}`;
+    const localEmergency = hasEmergencyIndicator(text);
+    const userMessage: AssistantTranscriptMessage = {
+      kind: "optimistic-user",
+      id: `user-${requestId}`,
       requestId,
-      status: "pending",
+      role: "user",
+      content: text,
     };
-    const messages = retryRequestId
-      ? state.messages.map((message) =>
-          message.sender === "assistant" && message.requestId === requestId ? pending : message
-        )
-      : [...state.messages, userMessage, pending];
-    const next = { ...state, messages };
-    setPendingRequestId(requestId);
+    const pending: AssistantTranscriptMessage = {
+      kind: "pending-assistant",
+      id: `assistant-${requestId}`,
+      requestId,
+      role: "assistant",
+      localEmergency,
+    };
+    setLocalTranscript((current) => ({
+      sessionId,
+      messages: [
+        ...(current.sessionId === sessionId ? current.messages : []),
+        userMessage,
+        pending,
+      ],
+    }));
     requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
 
-    if (hasEmergencyIndicator(text)) {
-      const localEmergencyResponse: AssistantChatResponse = {
-        messageId: `local-emergency-${requestId}`,
-        conversationId: state.conversationId ?? `local-${requestId}`,
-        mode: "emergency",
-        answer: t("emergency.body"),
-        prediction: null,
-        relatedTopics: [],
-        needsClarification: false,
-        disclaimer: t("disclaimer.short"),
-      };
-      const settled = messages.map(
-        (message): AssistantMessage =>
-          message.sender === "assistant" && message.requestId === requestId
-            ? { ...message, status: "complete", response: localEmergencyResponse }
-            : message
-      );
-      await persist({ ...next, messages: settled });
-      setPendingRequestId(null);
-      AccessibilityInfo.announceForAccessibility(t("accessibility.emergency"));
-      return;
-    }
+    if (localEmergency) AccessibilityInfo.announceForAccessibility(t("accessibility.emergency"));
 
-    abortRef.current = new AbortController();
-    const requestScope = scopeRef.current;
-    const result = await mockAssistantService.assess({
-      requestId,
-      locale: i18n.language,
-      pet: {
-        id: selectedPet.id ?? "",
-        name: selectedPet.name ?? "",
-        species: selectedPet.species ?? null,
-      },
-      messages,
-      conversationId: state.conversationId,
-      userText: text,
-      signal: abortRef.current.signal,
-    });
-    if (abortRef.current.signal.aborted || requestScope !== scopeRef.current) return;
-    setPendingRequestId(null);
-    const settled = messages.map(
-      (message): AssistantMessage =>
-        message.sender === "assistant" && message.requestId === requestId
-          ? result.kind === "response"
-            ? { ...message, status: "complete", response: result.response }
-            : { ...message, status: "failed", failure: result.failure }
-          : message
-    );
-    await persist({
-      ...next,
-      messages: settled,
-      conversationId:
-        result.kind === "response" ? result.response.conversationId : state.conversationId,
-    });
-    if (result.kind === "response")
+    try {
+      const response = await sendMessage.mutateAsync({ sessionId, text });
+      if (activeSessionIdRef.current !== sessionId) return;
+      setLocalTranscript((current) => ({
+        sessionId,
+        messages:
+          current.sessionId === sessionId
+            ? current.messages.map((message) =>
+                message.kind === "pending-assistant" && message.requestId === requestId
+                  ? {
+                      kind: "live-assistant",
+                      id: message.id,
+                      requestId,
+                      role: "assistant",
+                      response,
+                      localEmergency,
+                      serverMessageId: null,
+                    }
+                  : message
+              )
+            : [],
+      }));
       AccessibilityInfo.announceForAccessibility(
-        result.response.mode === "emergency"
+        response.urgentContactEmergencyVet === true ||
+          response.urgency === ClassifierUrgency.EMERGENCY ||
+          localEmergency
           ? t("accessibility.emergency")
           : t("accessibility.newAssessment")
       );
+    } catch (error) {
+      if (activeSessionIdRef.current !== sessionId) return;
+      const apiError = getAssistantApiError(error);
+      if (apiError.status === 404) recoverMissingSession(sessionId);
+      if (apiError.retryable && !apiError.messageId) void messagesQuery.refetch();
+      setLocalTranscript((current) => ({
+        sessionId,
+        messages:
+          current.sessionId === sessionId
+            ? current.messages.map((message) =>
+                message.kind === "pending-assistant" && message.requestId === requestId
+                  ? {
+                      kind: "failed-assistant",
+                      id: message.id,
+                      requestId,
+                      role: "assistant",
+                      messageId: apiError.messageId,
+                      serverMessageId: apiError.messageId,
+                      failure:
+                        apiError.status === 409
+                          ? "conflict"
+                          : apiError.status === 404
+                            ? "not-found"
+                            : apiError.status === 429
+                              ? "rate-limited"
+                              : "unavailable",
+                      retryable: apiError.retryable,
+                      retryAfterSeconds: apiError.retryAfterSeconds,
+                      localEmergency,
+                    }
+                  : message
+              )
+            : [],
+      }));
+      AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
+    } finally {
+      isSendingRef.current = false;
+    }
   };
 
-  const performReset = () => {
-    scopeRef.current += 1;
-    abortRef.current?.abort();
-    setPendingRequestId(null);
-    setState((current) => ({ ...current, messages: [], conversationId: null }));
+  const retry = async (message: AssistantTranscriptMessage) => {
+    const sessionId = activeSessionId;
+    const messageId =
+      message.kind === "server"
+        ? message.status === ChatMessageStatus.FailedRetryable
+          ? message.messageId
+          : null
+        : message.kind === "failed-assistant"
+          ? message.messageId
+          : null;
+    if (!sessionId || !messageId || retryMessage.isPending) {
+      if (!messageId) void messagesQuery.refetch();
+      return;
+    }
+
+    const requestId =
+      message.kind === "failed-assistant" ? message.requestId : `retry-${messageId}`;
+    const localEmergency = message.kind === "failed-assistant" ? message.localEmergency : false;
+
+    try {
+      const response = await retryMessage.mutateAsync({ sessionId, messageId });
+      if (activeSessionIdRef.current !== sessionId) return;
+      const liveMessage: AssistantTranscriptMessage = {
+        kind: "live-assistant",
+        id: `assistant-${requestId}`,
+        requestId,
+        role: "assistant",
+        response,
+        localEmergency,
+        serverMessageId: messageId,
+      };
+      setLocalTranscript((current) => ({
+        sessionId,
+        messages: [
+          ...(current.sessionId === sessionId
+            ? current.messages.filter(
+                (item) =>
+                  !(
+                    item.kind === "failed-assistant" &&
+                    (item.requestId === requestId || item.messageId === messageId)
+                  )
+              )
+            : []),
+          liveMessage,
+        ],
+      }));
+      AccessibilityInfo.announceForAccessibility(
+        response.urgentContactEmergencyVet === true ||
+          response.urgency === ClassifierUrgency.EMERGENCY ||
+          localEmergency
+          ? t("accessibility.emergency")
+          : t("accessibility.newAssessment")
+      );
+    } catch (error) {
+      if (activeSessionIdRef.current !== sessionId) return;
+      const apiError = getAssistantApiError(error);
+      if (apiError.status === 404) recoverMissingSession(sessionId);
+      const failedMessage: AssistantTranscriptMessage = {
+        kind: "failed-assistant",
+        id: `assistant-${requestId}`,
+        requestId,
+        role: "assistant",
+        messageId,
+        serverMessageId: messageId,
+        failure:
+          apiError.status === 409
+            ? "conflict"
+            : apiError.status === 404
+              ? "not-found"
+              : apiError.status === 429
+                ? "rate-limited"
+                : "unavailable",
+        retryable: apiError.retryable,
+        retryAfterSeconds: apiError.retryAfterSeconds,
+        localEmergency,
+      };
+      setLocalTranscript((current) => ({
+        sessionId,
+        messages: [
+          ...(current.sessionId === sessionId
+            ? current.messages.filter(
+                (item) =>
+                  !(
+                    item.kind === "failed-assistant" &&
+                    (item.requestId === requestId || item.messageId === messageId)
+                  )
+              )
+            : []),
+          failedMessage,
+        ],
+      }));
+      AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
+    }
+  };
+
+  const createAndActivateSession = async () => {
+    try {
+      const session = await sessionBootstrap.createNewSession();
+      if (session) setLocalTranscript({ sessionId: session.sessionId, messages: [] });
+      setNewChatDialogOpen(false);
+    } catch {
+      setNewChatDialogOpen(false);
+    }
   };
 
   const requestNewChat = () => {
-    // An empty conversation transitions directly; a non-empty one needs confirmation.
-    if (state.messages.length === 0) {
-      performReset();
+    if (transcript.length === 0) {
+      void createAndActivateSession();
       return;
     }
     setNewChatDialogOpen(true);
   };
 
   const handleGetConsent = useCallback(async () => {
-    const result = await getAiUsingConsent().catch(
-      () => ({ ok: false, reason: "unavailable" }) as const
-    );
-    const accepted = result.ok && result.value === true;
-    setConsent(accepted);
-    setConsentDialogOpen(!accepted);
-    setConsentChecked(true);
+    try {
+      const result = await getAiUsingConsent();
+      const accepted = result.ok && result.value === true;
+      setConsent(accepted);
+      setConsentDialogOpen(!accepted);
+    } catch {
+      setConsent(false);
+      setConsentDialogOpen(true);
+    } finally {
+      setConsentChecked(true);
+    }
   }, []);
 
   useFocusEffect(
@@ -208,41 +353,40 @@ export default function AssistantPage() {
   );
 
   useEffect(() => {
-    if (isPetsLoading) return;
-    const candidateId = entryPetId ?? state.selectedPetId;
-    const candidateValid = Boolean(candidateId && pets?.some((pet) => pet.id === candidateId));
-
-    if (candidateValid && candidateId) {
-      if (state.selectedPetId === candidateId) return;
-
-      // Each pet owns a separate private conversation on the server, so switching pets is
-      // not destructive — it swaps context. The previous pet's conversation is not destroyed;
-      // it stays on the server. Local state is cleared only because the current stopgap holds
-      // one conversation in memory.
-      // TODO(backend-history): load the selected pet's own conversation from the server instead
-      // of clearing, so switching back restores that pet's messages.
-      setState((current) => ({
-        ...current,
-        selectedPetId: candidateId,
-        messages: current.selectedPetId ? [] : current.messages,
-        conversationId: current.selectedPetId ? null : current.conversationId,
-      }));
-    } else if (state.selectedPetId) {
-      setState((current) => ({
-        ...current,
-        selectedPetId: null,
-        messages: [],
-        conversationId: null,
-      }));
-    }
-  }, [entryPetId, isPetsLoading, pets, state.selectedPetId]);
-
-  useEffect(() => {
     if (isPetsLoading || !consentChecked) return;
     if (!selectedPet) router.replace("/(tabs)/assistant-pet-selection");
   }, [consentChecked, isPetsLoading, router, selectedPet]);
 
+  useEffect(() => {
+    if (activeSessionId && messagesQuery.error && isAssistantNotFoundError(messagesQuery.error))
+      recoverMissingSession(activeSessionId);
+  }, [activeSessionId, messagesQuery.error, recoverMissingSession]);
+
   if (isPetsLoading || !consentChecked || !selectedPet)
+    return (
+      <SafeAreaView style={styles.loadingScreen} edges={["top"]}>
+        <ActivityIndicator color={styles.loadingIndicator.color} />
+        <Text style={styles.loadingText}>{t("conversation.restoring")}</Text>
+      </SafeAreaView>
+    );
+
+  if (consentAccepted && sessionBootstrap.isError && !activeSessionId)
+    return (
+      <SafeAreaView style={styles.loadingScreen} edges={["top"]}>
+        <View accessibilityRole="alert" style={styles.stateCard}>
+          <Text style={styles.stateTitle}>{t("errors.sessionTitle")}</Text>
+          <Text style={styles.stateText}>{t("errors.session")}</Text>
+          <Button onPress={sessionBootstrap.retry}>{t("errors.retry")}</Button>
+        </View>
+      </SafeAreaView>
+    );
+
+  if (
+    consentAccepted &&
+    (sessionBootstrap.isLoading ||
+      !activeSessionId ||
+      (messagesQuery.isPending && messagesQuery.messages.length === 0))
+  )
     return (
       <SafeAreaView style={styles.loadingScreen} edges={["top"]}>
         <ActivityIndicator color={styles.loadingIndicator.color} />
@@ -255,42 +399,64 @@ export default function AssistantPage() {
       {consentAccepted && (
         <SafeAreaView style={styles.screen} edges={["top"]}>
           <ChatHeader onNewChat={requestNewChat} />
+          {sessionBootstrap.isError && activeSessionId && (
+            <Text accessibilityRole="alert" style={styles.warning}>
+              {t("errors.newSession")}
+            </Text>
+          )}
           <KeyboardAvoidingView style={styles.flex} behavior="padding">
             <View style={styles.listArea}>
               <FlatList
                 ref={listRef}
-                data={state.messages}
+                data={transcript}
+                accessibilityLabel={t("conversation.transcript")}
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={styles.messages}
                 keyboardDismissMode="interactive"
                 keyboardShouldPersistTaps="handled"
+                maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
                 onScroll={handleScroll}
                 scrollEventThrottle={16}
-                ListEmptyComponent={
-                  <EmptyConversation
-                    petName={selectedPet.name ?? ""}
-                    onSelectPrompt={(text) => chatInputRef.current?.setDraft(text)}
-                    onReviewSafety={() => setConsentDialogOpen(true)}
-                  />
+                ListHeaderComponent={
+                  messagesQuery.isFetchingNextPage ? (
+                    <ActivityIndicator color={styles.loadingIndicator.color} />
+                  ) : null
                 }
-                onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
+                ListEmptyComponent={
+                  messagesQuery.isError ? (
+                    <View accessibilityRole="alert" style={styles.stateCard}>
+                      <Text style={styles.stateTitle}>{t("errors.historyTitle")}</Text>
+                      <Text style={styles.stateText}>{t("errors.history")}</Text>
+                      <Button onPress={() => void messagesQuery.refetch()}>
+                        {t("errors.retry")}
+                      </Button>
+                    </View>
+                  ) : (
+                    <EmptyConversation
+                      petName={selectedPet.name ?? ""}
+                      onSelectPrompt={(text) => chatInputRef.current?.setDraft(text)}
+                      onReviewSafety={() => setConsentDialogOpen(true)}
+                    />
+                  )
+                }
+                onContentSizeChange={() => {
+                  if (!messagesQuery.isFetchingNextPage)
+                    listRef.current?.scrollToEnd({ animated: true });
+                }}
                 renderItem={({ item }) => (
                   <MessageView
                     message={item}
-                    onSelectTopic={(text) => chatInputRef.current?.setDraft(text)}
-                    retry={() => {
-                      const user =
-                        state.messages[
-                          state.messages.findIndex((message) => message.id === item.id) - 1
-                        ];
-                      if (user?.sender === "user" && item.sender === "assistant")
-                        void send(user.text, item.requestId);
-                    }}
-                    dismiss={() =>
-                      void persist({
-                        ...state,
-                        messages: state.messages.filter((message) => message.id !== item.id),
-                      })
+                    retry={() => void retry(item)}
+                    dismiss={
+                      item.kind === "failed-assistant"
+                        ? () =>
+                            setLocalTranscript((current) => ({
+                              ...current,
+                              messages: current.messages.filter(
+                                (message) => message.id !== item.id
+                              ),
+                            }))
+                        : undefined
                     }
                   />
                 )}
@@ -309,8 +475,10 @@ export default function AssistantPage() {
                 ref={chatInputRef}
                 onSubmit={(message) => void send(message)}
                 petName={selectedPet.name ?? ""}
-                inputDisabled={false}
-                submitDisabled={pendingRequestId !== null}
+                inputDisabled={!activeSessionId || messagesQuery.isPending}
+                submitDisabled={
+                  sendMessage.isPending || retryMessage.isPending || sessionBootstrap.isCreating
+                }
               />
               <Text style={styles.composerNote}>{t("conversation.disclaimer")}</Text>
             </View>
@@ -320,10 +488,7 @@ export default function AssistantPage() {
       <NewChatDialog
         open={newChatDialogOpen}
         onOpenChange={setNewChatDialogOpen}
-        onConfirm={() => {
-          performReset();
-          setNewChatDialogOpen(false);
-        }}
+        onConfirm={() => void createAndActivateSession()}
       />
       <ConsentDialog
         isOpen={consentDialogOpen}
@@ -348,6 +513,22 @@ const styles = StyleSheet.create((theme) => ({
   },
   loadingIndicator: { color: theme.palette.brand.primaryDefault },
   loadingText: { fontSize: theme.fontSize.sm, color: theme.palette.brand.textSecondary },
+  stateCard: {
+    alignItems: "center",
+    gap: theme.spacing(3),
+    borderWidth: 1,
+    borderColor: theme.palette.brand.surfaceBorder,
+    borderRadius: theme.borderRadius["2xl"],
+    backgroundColor: theme.palette.white,
+    padding: theme.spacing(5),
+  },
+  stateTitle: {
+    textAlign: "center",
+    fontFamily: theme.fonts.displayRegular,
+    fontSize: theme.fontSize.xl,
+    color: theme.palette.brand.textPrimary,
+  },
+  stateText: { textAlign: "center", color: theme.palette.brand.textBody },
   listArea: { flex: 1 },
   messages: {
     flexGrow: 1,

@@ -1,3 +1,11 @@
+const { ReadableStream: NodeReadableStream } = require("stream/web");
+
+Object.defineProperty(globalThis, "ReadableStream", {
+  configurable: true,
+  value: NodeReadableStream,
+  writable: true,
+});
+
 jest.mock("react-native-keyboard-controller", () =>
   require("react-native-keyboard-controller/jest")
 );

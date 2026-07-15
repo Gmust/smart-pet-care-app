@@ -5,14 +5,15 @@
   "hints": {
     "back": "Returns to the screen that opened the assistant.",
     "review": "Opens the informational, privacy, and emergency notices.",
-    "send": "Sends the current message for offline assessment.",
+    "send": "Sends the current message to the veterinary assistant.",
     "changePet": "Selects another pet. An existing conversation requires confirmation.",
-    "reset": "Clears messages after confirmation while retaining consent and the selected pet."
+    "reset": "Starts a separate chat for the selected pet without deleting earlier chats."
   },
   "consent": {
     "title": "Before you continue",
     "information": "This assistant provides general information only. It cannot diagnose your pet or replace a veterinarian.",
     "privacy": {
+      "server": "Your authenticated conversations are stored by the service so they can be restored when you return.",
       "encrypted": "Your current conversation is stored securely on this device until you reset it or sign out.",
       "session": "This conversation is available only during this session. It is not saved, so it will not be restored after you leave or sign out.",
       "unavailable": "This conversation is kept in memory only for now and may not be restored. Your consent is still saved securely."
@@ -51,12 +52,13 @@
     "newChatTitle": "Start a new chat?",
     "startNewChat": "Start new chat",
     "cancel": "Keep this chat",
-    "confirmReset": "Clear this conversation? Your consent and selected pet will remain.",
+    "confirmReset": "Start a separate conversation for this pet? Your current chat will remain available on the service.",
     "confirmChangePet": "Change to {{name}}? This clears the current conversation. Your consent will remain.",
     "disclaimer": "General guidance only — not a diagnosis.",
     "userSender": "You",
     "assistantSender": "Assistant",
     "restoring": "Loading your conversation…",
+    "transcript": "Conversation messages",
     "scrollToEnd": "Scroll to latest message"
   },
   "empty": {
@@ -111,8 +113,17 @@
     "requestTitle": "That answer did not come through",
     "request": "We could not prepare guidance. Your message is saved.",
     "retry": "Retry",
+    "retryAfter": "Try again in {{seconds}} seconds.",
+    "retryConflict": "This message is no longer ready to retry. Refreshing its status may help.",
+    "sessionMissing": "This chat is no longer available. We are restoring the latest chat for this pet.",
+    "rateLimited": "The assistant is receiving too many requests right now.",
     "dismiss": "Dismiss",
-    "persistence": "This conversation may not be restored next time."
+    "persistence": "This conversation may not be restored next time.",
+    "sessionTitle": "Your chat is out of reach",
+    "session": "We could not restore or create a chat for this pet.",
+    "historyTitle": "Messages are out of reach",
+    "history": "We could not load this chat's messages. You can try again without losing the chat.",
+    "newSession": "We could not start a new chat. Your current chat is still open."
   },
   "disclaimer": {
     "short": "General information only—not a diagnosis or substitute for veterinary care."

@@ -5,7 +5,7 @@ import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
-import { type PetResponseDto, Sex } from "@/api/generated";
+import { AnimalSpecies, type PetResponseDto, Sex } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { useUpdatePetMutation } from "@/pets/queries/useUpdatePetMutation";
 import type { CreatePetForm } from "@/pets/schemas/create-pet.schema";
@@ -70,14 +70,25 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
       }
 
       try {
-        const { allergies, behavioralNotes, chronicConditions, ...petDetails } = value;
+        const species = Object.values(AnimalSpecies).find(
+          (animalSpecies) => animalSpecies === value.species
+        );
+        if (!species) {
+          Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+          return;
+        }
+
         await updatePet({
           id: pet.id,
           payload: {
-            ...petDetails,
-            allergies: { isSet: true, value: allergies },
-            chronicConditions: { isSet: true, value: chronicConditions },
-            behavioralNotes: { isSet: true, value: behavioralNotes },
+            name: value.name,
+            species,
+            breed: value.breed,
+            birthDate: value.birthDate,
+            sex: value.sex,
+            allergies: value.allergies,
+            chronicConditions: value.chronicConditions,
+            behavioralNotes: value.behavioralNotes,
           },
         });
         Toast.show({ type: "success", text1: t("pets:updateSuccessMessage") });

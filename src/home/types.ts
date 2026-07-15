@@ -9,3 +9,9 @@ export type AiInsight = {
   timeAgo: Date;
   message: string;
 };
+
+export type Signal = {
+  label: string;
+  status: "ok" | "warn";
+  value: string;
+};

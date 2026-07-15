@@ -4,8 +4,7 @@ import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
-import type { PetResponseDto } from "@/api/generated";
-import { Sex } from "@/api/generated";
+import { AnimalSpecies, type PetResponseDto, Sex } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { useCreatePetMutation } from "@/pets/queries/useCreatePetMutation";
 import type { CreatePetForm } from "@/pets/schemas/create-pet.schema";
@@ -64,7 +63,15 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
     validators: { onChange: createPetSchema(t), onSubmit: createPetSchema(t) },
     onSubmit: async ({ value }) => {
       try {
-        const createdPet = await createPet(value);
+        const species = Object.values(AnimalSpecies).find(
+          (animalSpecies) => animalSpecies === value.species
+        );
+        if (!species) {
+          Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+          return;
+        }
+
+        const createdPet = await createPet({ ...value, species });
         Toast.show({ type: "success", text1: t("pets:successMessage") });
         form.reset();
         onCreated?.(createdPet);

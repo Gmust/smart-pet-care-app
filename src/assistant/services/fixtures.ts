@@ -165,16 +165,6 @@ export const assistantFixtures = [
   { keywords: ["not sure", "sometimes", "comes and goes"], response: needsClarification },
 ] as const;
 
-export const emergencyIndicators = [
-  "cannot breathe",
-  "can't breathe",
-  "not breathing",
-  "unconscious",
-  "seizure",
-  "severe bleeding",
-  "poison",
-] as const;
-
 export const serviceFixtureTriggers = {
   failure: "fixture:failure",
   malformed: "fixture:malformed",

@@ -1,20 +1,14 @@
 import { assistantChatResponseSchema } from "../schemas/assistant.schema";
+import { hasEmergencyIndicator, normalizeAssistantInput } from "../utils/assistantEmergency";
 import type { AssistantService } from "./assistantService";
 import {
   assistantFixtures,
-  emergencyIndicators,
   emergencyResponse,
   genericHealthResponse,
   serviceFixtureTriggers,
 } from "./fixtures";
 
-export const normalizeAssistantInput = (value: string): string =>
-  value.trim().toLocaleLowerCase("en").replace(/\s+/g, " ");
-
-export const hasEmergencyIndicator = (value: string): boolean => {
-  const normalized = normalizeAssistantInput(value);
-  return emergencyIndicators.some((indicator) => normalized.includes(indicator));
-};
+export { hasEmergencyIndicator, normalizeAssistantInput };
 
 export const mockAssistantService: AssistantService = {
   async assess(request) {
