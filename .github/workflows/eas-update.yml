@@ -1,0 +1,58 @@
+name: EAS Update (preview OTA)
+
+# Publishes a JS/asset-only OTA update to the "preview" channel on every push
+# to the working branch. This is the fast "vibe coding from phone" loop:
+# commit -> update lands on the preview build already installed on the phone.
+#
+# Requires an EXPO_TOKEN repo secret (Expo account access token).
+
+on:
+  push:
+    branches:
+      - preview
+    # Skip when only native config / deps change — those need a real rebuild
+    # (handled by eas-build.yml), not an OTA update.
+    paths-ignore:
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "app.json"
+      - "app.config.ts"
+      - "eas.json"
+
+concurrency:
+  group: eas-update-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    name: Publish OTA update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate API client
+        run: pnpm api:generate
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish update
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: eas update --branch preview --message "$COMMIT_MSG" --non-interactive

@@ -4,7 +4,7 @@ import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
-import { Sex } from "@/api/generated";
+import { AnimalSpecies, type PetResponseDto, Sex } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { useCreatePetMutation } from "@/pets/queries/useCreatePetMutation";
 import type { CreatePetForm } from "@/pets/schemas/create-pet.schema";
@@ -29,6 +29,7 @@ import dayjs from "dayjs";
 type Props = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  onCreated?: (pet: PetResponseDto) => void;
 };
 
 const SPECIES = ["Dog", "Cat", "Bird", "Rabbit", "Other"] as const;
@@ -42,12 +43,12 @@ const defaultValues: CreatePetForm = {
   birthDate: null,
   weightKg: "",
   sex: Sex.Unknown,
-  allergies: "",
-  chronicConditions: "",
-  behavioralNotes: "",
+  allergies: [""],
+  chronicConditions: [""],
+  behavioralNotes: [""],
 };
 
-export const CreatePetDrawer = ({ isOpen, setIsOpen }: Props) => {
+export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
   const { t } = useTranslation(["pets", "common"]);
 
   const { mutateAsync: createPet, isPending: isPetCreating } = useCreatePetMutation();
@@ -62,9 +63,18 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen }: Props) => {
     validators: { onChange: createPetSchema(t), onSubmit: createPetSchema(t) },
     onSubmit: async ({ value }) => {
       try {
-        await createPet(value);
+        const species = Object.values(AnimalSpecies).find(
+          (animalSpecies) => animalSpecies === value.species
+        );
+        if (!species) {
+          Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+          return;
+        }
+
+        const createdPet = await createPet({ ...value, species });
         Toast.show({ type: "success", text1: t("pets:successMessage") });
         form.reset();
+        onCreated?.(createdPet);
         setIsOpen(false);
       } catch (e) {
         console.error(e);
@@ -220,52 +230,108 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen }: Props) => {
             )}
           </form.Field>
 
-          <form.Field name="allergies">
+          <form.Field name="allergies" mode="array">
             {(field) => (
               <View style={styles.field}>
-                <Input
-                  label={t("pets:createPetDrawer.fields.allergies")}
-                  placeholder={t("pets:createPetDrawer.placeholders.allergies")}
-                  multiline
-                  value={field.state.value ?? ""}
-                  onChangeText={field.handleChange}
-                  onBlur={field.handleBlur}
-                  error={field.state.meta.errors.length > 0}
-                />
+                <Text style={styles.label}>{t("pets:createPetDrawer.fields.allergies")}</Text>
+                {field.state.value.map((_, index) => (
+                  <form.Field key={index} name={`allergies[${index}]`}>
+                    {(itemField) => (
+                      <Input
+                        placeholder={t("pets:createPetDrawer.placeholders.allergies")}
+                        value={itemField.state.value}
+                        onChangeText={itemField.handleChange}
+                        onBlur={itemField.handleBlur}
+                        error={itemField.state.meta.errors.length > 0}
+                        rightSlot={
+                          <Button
+                            variant="text"
+                            size="sm"
+                            accessibilityLabel={t("pets:createPetDrawer.removeAllergy")}
+                            onPress={() => field.removeValue(index)}
+                          >
+                            {t("pets:createPetDrawer.remove")}
+                          </Button>
+                        }
+                      />
+                    )}
+                  </form.Field>
+                ))}
+                <Button variant="ghost" size="sm" dotted onPress={() => field.pushValue("")}>
+                  {t("pets:createPetDrawer.addAllergy")}
+                </Button>
                 <FieldError errors={field.state.meta.errors} />
               </View>
             )}
           </form.Field>
 
-          <form.Field name="chronicConditions">
+          <form.Field name="chronicConditions" mode="array">
             {(field) => (
               <View style={styles.field}>
-                <Input
-                  label={t("pets:createPetDrawer.fields.chronicConditions")}
-                  placeholder={t("pets:createPetDrawer.placeholders.chronicConditions")}
-                  multiline
-                  value={field.state.value ?? ""}
-                  onChangeText={field.handleChange}
-                  onBlur={field.handleBlur}
-                  error={field.state.meta.errors.length > 0}
-                />
+                <Text style={styles.label}>
+                  {t("pets:createPetDrawer.fields.chronicConditions")}
+                </Text>
+                {field.state.value.map((_, index) => (
+                  <form.Field key={index} name={`chronicConditions[${index}]`}>
+                    {(itemField) => (
+                      <Input
+                        placeholder={t("pets:createPetDrawer.placeholders.chronicConditions")}
+                        value={itemField.state.value}
+                        onChangeText={itemField.handleChange}
+                        onBlur={itemField.handleBlur}
+                        error={itemField.state.meta.errors.length > 0}
+                        rightSlot={
+                          <Button
+                            variant="text"
+                            size="sm"
+                            accessibilityLabel={t("pets:createPetDrawer.removeChronicCondition")}
+                            onPress={() => field.removeValue(index)}
+                          >
+                            {t("pets:createPetDrawer.remove")}
+                          </Button>
+                        }
+                      />
+                    )}
+                  </form.Field>
+                ))}
+                <Button variant="ghost" size="sm" dotted onPress={() => field.pushValue("")}>
+                  {t("pets:createPetDrawer.addChronicCondition")}
+                </Button>
                 <FieldError errors={field.state.meta.errors} />
               </View>
             )}
           </form.Field>
 
-          <form.Field name="behavioralNotes">
+          <form.Field name="behavioralNotes" mode="array">
             {(field) => (
               <View style={styles.field}>
-                <Input
-                  label={t("pets:createPetDrawer.fields.behavioralNotes")}
-                  placeholder={t("pets:createPetDrawer.placeholders.behavioralNotes")}
-                  multiline
-                  value={field.state.value ?? ""}
-                  onChangeText={field.handleChange}
-                  onBlur={field.handleBlur}
-                  error={field.state.meta.errors.length > 0}
-                />
+                <Text style={styles.label}>{t("pets:createPetDrawer.fields.behavioralNotes")}</Text>
+                {field.state.value.map((_, index) => (
+                  <form.Field key={index} name={`behavioralNotes[${index}]`}>
+                    {(itemField) => (
+                      <Input
+                        placeholder={t("pets:createPetDrawer.placeholders.behavioralNotes")}
+                        value={itemField.state.value}
+                        onChangeText={itemField.handleChange}
+                        onBlur={itemField.handleBlur}
+                        error={itemField.state.meta.errors.length > 0}
+                        rightSlot={
+                          <Button
+                            variant="text"
+                            size="sm"
+                            accessibilityLabel={t("pets:createPetDrawer.removeBehavioralNote")}
+                            onPress={() => field.removeValue(index)}
+                          >
+                            {t("pets:createPetDrawer.remove")}
+                          </Button>
+                        }
+                      />
+                    )}
+                  </form.Field>
+                ))}
+                <Button variant="ghost" size="sm" dotted onPress={() => field.pushValue("")}>
+                  {t("pets:createPetDrawer.addBehavioralNote")}
+                </Button>
                 <FieldError errors={field.state.meta.errors} />
               </View>
             )}

@@ -115,7 +115,17 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
             },
           });
         } else {
-          await createReminder(value);
+          await createReminder({
+            petId: value.petId,
+            title: value.title,
+            description: value.description ?? null,
+            type: value.type,
+            repeatType: value.repeatType,
+            days: value.days ?? [],
+            date: value.date ?? null,
+            time: value.time,
+            endAt: value.endAt ?? null,
+          });
         }
         Toast.show({
           type: "success",

@@ -1,0 +1,138 @@
+{
+  "title": "Veterinary assistant",
+  "back": "Back to home",
+  "backShort": "Back",
+  "hints": {
+    "back": "Returns to the screen that opened the assistant.",
+    "review": "Opens the informational, privacy, and emergency notices.",
+    "send": "Sends the current message to the veterinary assistant.",
+    "changePet": "Selects another pet. An existing conversation requires confirmation.",
+    "reset": "Starts a separate chat for the selected pet without deleting earlier chats."
+  },
+  "consent": {
+    "title": "Before you continue",
+    "information": "This assistant provides general information only. It cannot diagnose your pet or replace a veterinarian.",
+    "privacy": {
+      "server": "Your authenticated conversations are stored by the service so they can be restored when you return.",
+      "encrypted": "Your current conversation is stored securely on this device until you reset it or sign out.",
+      "session": "This conversation is available only during this session. It is not saved, so it will not be restored after you leave or sign out.",
+      "unavailable": "This conversation is kept in memory only for now and may not be restored. Your consent is still saved securely."
+    },
+    "emergency": "For an emergency, contact the nearest emergency veterinary service immediately. Do not wait for this assistant.",
+    "accept": "I understand and continue",
+    "decline": "Decline and go back",
+    "review": "Review safety information"
+  },
+  "pets": {
+    "title": "Who are we caring for?",
+    "subtitle": "Choose a pet so the assistant can tailor every answer to their profile.",
+    "loading": "Loading your pets…",
+    "errorTitle": "Your pets are out of reach",
+    "error": "We could not load your pets.",
+    "retry": "Try again",
+    "emptyTitle": "Add a pet to begin",
+    "empty": "Create a pet profile before starting a conversation.",
+    "add": "Add a pet profile",
+    "select": "Ask about {{name}}",
+    "change": "Change pet",
+    "switch": "Switch",
+    "profile": "Pet profile",
+    "footnote": "Each conversation stays focused on one pet so guidance remains clear and relevant.",
+    "confirmChange": "Changing pets starts a new conversation. Continue?"
+  },
+  "conversation": {
+    "about": "About {{name}}",
+    "chattingAbout": "Chatting about",
+    "placeholder": "Ask about {{name}}…",
+    "send": "Send message",
+    "sending": "Assistant is responding",
+    "pending": "Thinking about your pet…",
+    "reset": "New chat",
+    "newChat": "New chat",
+    "newChatTitle": "Start a new chat?",
+    "startNewChat": "Start new chat",
+    "cancel": "Keep this chat",
+    "confirmReset": "Start a separate conversation for this pet? Your current chat will remain available on the service.",
+    "confirmChangePet": "Change to {{name}}? This clears the current conversation. Your consent will remain.",
+    "disclaimer": "General guidance only — not a diagnosis.",
+    "userSender": "You",
+    "assistantSender": "Assistant",
+    "restoring": "Loading your conversation…",
+    "transcript": "Conversation messages",
+    "scrollToEnd": "Scroll to latest message"
+  },
+  "empty": {
+    "title": "How can I help with {{name}}?",
+    "body": "Ask about everyday care, nutrition, behavior, routines, or a health concern.",
+    "prompts": [
+      "What should I feed {{name}}?",
+      "Is this symptom serious?",
+      "Vaccination reminders",
+      "Training advice"
+    ],
+    "safety": "How veterinary safety guidance works"
+  },
+  "assessment": {
+    "nextSteps": "Recommended next steps",
+    "urgency": "Urgency: {{urgency}}",
+    "possibleCondition": "Possible concern: {{condition}}",
+    "possibleConditionNote": "A possibility to raise with a veterinarian — not a diagnosis.",
+    "confidence": "Confidence: {{value}}%"
+  },
+  "urgency": {
+    "MONITOR": "Monitor",
+    "CONSULT_SOON": "Contact a veterinarian soon",
+    "URGENT": "Urgent",
+    "EMERGENCY": "Emergency"
+  },
+  "specialist": {
+    "general-practice": "General practice",
+    "dermatology": "Dermatology",
+    "orthopedics": "Orthopedics",
+    "emergency-critical-care": "Emergency & critical care",
+    "generic": "Veterinary specialist"
+  },
+  "diseaseCategory": {
+    "wellness": "Wellness",
+    "skin-and-coat": "Skin & coat",
+    "musculoskeletal": "Musculoskeletal",
+    "digestive": "Digestive",
+    "general": "General",
+    "emergency": "Emergency",
+    "generic": "General condition"
+  },
+  "emergency": {
+    "title": "Emergency action needed",
+    "body": "Contact the nearest emergency veterinary service immediately. Do not wait for another assistant response.",
+    "detected": "Your message may describe an emergency.",
+    "findVet": "Find an emergency vet",
+    "findVetHint": "Opens maps or search for nearby emergency veterinary care.",
+    "findVetFailed": "We couldn't open maps here. Search for the nearest emergency veterinary clinic and contact them directly."
+  },
+  "errors": {
+    "requestTitle": "That answer did not come through",
+    "request": "We could not prepare guidance. Your message is saved.",
+    "retry": "Retry",
+    "retryAfter": "Try again in {{seconds}} seconds.",
+    "retryConflict": "This message is no longer ready to retry. Refreshing its status may help.",
+    "sessionMissing": "This chat is no longer available. We are restoring the latest chat for this pet.",
+    "rateLimited": "The assistant is receiving too many requests right now.",
+    "dismiss": "Dismiss",
+    "persistence": "This conversation may not be restored next time.",
+    "sessionTitle": "Your chat is out of reach",
+    "session": "We could not restore or create a chat for this pet.",
+    "historyTitle": "Messages are out of reach",
+    "history": "We could not load this chat's messages. You can try again without losing the chat.",
+    "newSession": "We could not start a new chat. Your current chat is still open."
+  },
+  "disclaimer": {
+    "short": "General information only—not a diagnosis or substitute for veterinary care."
+  },
+  "accessibility": {
+    "newAssessment": "New veterinary guidance is available.",
+    "emergency": "Emergency veterinary action is needed.",
+    "emergencyActionUnavailable": "Could not open emergency care search. Emergency instructions remain on screen.",
+    "responsePending": "Sending your message. The assistant is responding.",
+    "requestFailed": "The assistant could not answer. You can retry."
+  }
+}

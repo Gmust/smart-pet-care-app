@@ -2,7 +2,6 @@ import { palette } from "./palette";
 
 const BASE_SPACING = 4;
 const BASE_TEXT_SIZE = 16;
-const FONT_FAMILY = "Inter";
 const DISPLAY_FONT_FAMILY = "Fraunces_700Bold";
 const DISPLAY_REGULAR_FONT_FAMILY = "Fraunces_400Regular";
 
@@ -18,15 +17,15 @@ export const theme = {
   fonts: {
     display: DISPLAY_FONT_FAMILY,
     displayRegular: DISPLAY_REGULAR_FONT_FAMILY,
-    thin: FONT_FAMILY,
-    extraLight: FONT_FAMILY,
-    light: FONT_FAMILY,
-    regular: FONT_FAMILY,
-    medium: FONT_FAMILY,
-    semiBold: FONT_FAMILY,
-    bold: FONT_FAMILY,
-    extraBold: FONT_FAMILY,
-    black: FONT_FAMILY,
+    thin: "Inter_100Thin",
+    extraLight: "Inter_200ExtraLight",
+    light: "Inter_300Light",
+    regular: "Inter_400Regular",
+    medium: "Inter_500Medium",
+    semiBold: "Inter_600SemiBold",
+    bold: "Inter_700Bold",
+    extraBold: "Inter_800ExtraBold",
+    black: "Inter_900Black",
   },
   fontSize: {
     xs: getTextSize(0.75),

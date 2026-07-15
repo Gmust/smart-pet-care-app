@@ -2,18 +2,19 @@ import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import type { PetResponseDto } from "@/api";
 import { hexToRGBA } from "@/common/utils/colors";
 import { SquareActivityIcon } from "@/icons/activity";
 import { HeartPulseIcon } from "@/icons/heart";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import type { PetHealth } from "../../types";
-import { SignalStat } from "./SignalStat";
+import { BlurView } from "expo-blur";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 
 type Props = {
-  pet: PetHealth;
+  pet: PetResponseDto;
   backgroundColor?: string;
 };
 
@@ -22,44 +23,52 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
 
   const router = useRouter();
 
-  const { id, petName, score, status, trendLabel, signals } = pet;
-
-  const handleOpenPet = (petId: string) => {
-    router.push({ pathname: "/(tabs)/pet-profile", params: { petId } });
-  };
-
-  const signalItems = [
-    { key: "weight", label: t("healthPetCard.signals.weight"), ...signals.weight },
-    { key: "appetite", label: t("healthPetCard.signals.appetite"), ...signals.appetite },
-    { key: "activity", label: t("healthPetCard.signals.activity"), ...signals.activity },
-  ];
+  const { name: petName, id: petId, photoUrl } = pet;
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={t("healthPetCard.title", { petName })}
       style={[styles.card, backgroundColor ? { backgroundColor } : null]}
-      onPress={() => handleOpenPet(id)}
+      onPress={() => router.push({ pathname: "/(tabs)/pet-profile", params: { petId } })}
     >
+      {!!photoUrl && (
+        <>
+          <Image
+            source={{ uri: photoUrl }}
+            style={styles.backgroundImage}
+            blurRadius={4}
+            contentFit="cover"
+          />
+          <View style={styles.overlay} />
+        </>
+      )}
+
       <View style={styles.top}>
         <View style={styles.headerRow}>
-          <HeartPulseIcon width={16} height={16} color={palette.brand.textSecondary} />
-          <Text style={styles.eyebrow}>{t("healthPetCard.title", { petName })}</Text>
+          <BlurView intensity={40} tint="dark" style={styles.iconPill}>
+            <HeartPulseIcon width={16} height={16} color={palette.brand.textOnDark} />
+          </BlurView>
+          <BlurView intensity={40} tint="dark" style={styles.namePill}>
+            <Text style={styles.eyebrow}>{t("healthPetCard.title", { petName })}</Text>
+          </BlurView>
           <View style={styles.trendChip}>
             <SquareActivityIcon width={13} height={13} color={palette.brand.primarySoft} />
-            <Text style={styles.trendLabel}>{trendLabel}</Text>
           </View>
         </View>
-
+        {/*
+        //TODO return on backend ready
         <View style={styles.scoreBlock}>
           <View style={styles.scoreValueRow}>
             <Text style={styles.score}>{score}</Text>
             <Text style={styles.scoreMax}>/100</Text>
           </View>
           <Text style={styles.status}>{status}</Text>
-        </View>
+        </View> */}
       </View>
 
+      {/* 
+      //TODO return on backend ready
       <View style={styles.signalRow}>
         {signalItems.map((signal, index) => (
           <SignalStat
@@ -68,7 +77,7 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
             first={index === 0}
           />
         ))}
-      </View>
+      </View> */}
     </Pressable>
   );
 }
@@ -83,6 +92,21 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(4),
     overflow: "hidden",
   },
+  backgroundImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: hexToRGBA(theme.palette.brand.primaryDark, 0.25),
+  },
   top: {
     gap: theme.spacing(1),
   },
@@ -91,13 +115,28 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: theme.spacing(2.5),
   },
-  eyebrow: {
+  iconPill: {
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: theme.borderRadius.full,
+    overflow: "hidden",
+    backgroundColor: hexToRGBA(theme.palette.brand.primaryDark, 0.55),
+    padding: theme.spacing(1.5),
+  },
+  namePill: {
     flex: 1,
+    borderRadius: theme.borderRadius.full,
+    overflow: "hidden",
+    backgroundColor: hexToRGBA(theme.palette.brand.primaryDark, 0.55),
+    paddingHorizontal: theme.spacing(2.5),
+    paddingVertical: theme.spacing(1),
+  },
+  eyebrow: {
     fontFamily: theme.fonts.semiBold,
     fontSize: theme.fontSize.xs,
     letterSpacing: 0.4,
     textTransform: "uppercase",
-    color: theme.palette.brand.textSecondary,
+    color: theme.palette.brand.textOnDark,
   },
   trendChip: {
     flexDirection: "row",

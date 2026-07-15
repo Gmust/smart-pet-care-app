@@ -2,9 +2,20 @@
 import "@/i18n";
 
 import { useEffect } from "react";
-import { StatusBar } from "react-native";
+import { Platform, StatusBar } from "react-native";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 import { Fraunces_400Regular, Fraunces_700Bold } from "@expo-google-fonts/fraunces";
+import {
+  Inter_100Thin,
+  Inter_200ExtraLight,
+  Inter_300Light,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+  Inter_900Black,
+} from "@expo-google-fonts/inter";
 
 import { AuthProvider } from "@/auth/context/AuthContext";
 import AppProvider from "@/common/providers/AppProvider";
@@ -41,10 +52,27 @@ export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Fraunces_700Bold,
     Fraunces_400Regular,
+    Inter_100Thin,
+    Inter_200ExtraLight,
+    Inter_300Light,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+    Inter_900Black,
   });
 
   useEffect(() => {
-    NavigationBar.setHidden(true);
+    if (Platform.OS !== "android") {
+      return;
+    }
+
+    void Promise.resolve()
+      .then(() => NavigationBar.setHidden(true))
+      .catch(() => {
+        // The current Activity can be unavailable during reload or teardown.
+      });
   }, []);
 
   useEffect(() => {

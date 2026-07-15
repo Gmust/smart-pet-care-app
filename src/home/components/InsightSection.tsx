@@ -3,9 +3,11 @@ import { useState } from "react";
 import { InsightSectionSkeleton } from "../skeletons/HomePageSkeleton";
 import type { AiInsight } from "../types";
 import { AiInsightCard } from "./AiInsightCard";
+import { useRouter } from "expo-router";
 
 //TODO add functional when Backend would be ready
 export function InsightSection() {
+  const router = useRouter();
   const [showInsight, setShowInsight] = useState(true);
 
   if (!showInsight) {
@@ -13,6 +15,10 @@ export function InsightSection() {
   }
 
   return (
-    <AiInsightCard insight={null as unknown as AiInsight} onDismiss={() => setShowInsight(false)} />
+    <AiInsightCard
+      insight={{ timeAgo: new Date(), message: "" } satisfies AiInsight}
+      onAsk={() => router.push("../assistant")}
+      onDismiss={() => setShowInsight(false)}
+    />
   );
 }

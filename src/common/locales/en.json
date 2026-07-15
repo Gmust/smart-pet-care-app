@@ -12,7 +12,8 @@
     "night": "night"
   },
   "actions": {
-    "close": "Close"
+    "close": "Close",
+    "back": "Back"
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",
