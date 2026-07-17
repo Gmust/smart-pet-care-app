@@ -17,6 +17,7 @@ import { useUpdateFoodTrackerMutation } from "../../queries/useUpdateFoodTracker
 import { type FoodTrackerFormValues, foodTrackerSchema } from "../../schemas/food-tracker.schema";
 import type { FoodTracker } from "../../types";
 import { toGrams } from "../../utils/weight";
+import { BinaryToggle } from "./BinaryToggle";
 import { CareDrawerShell } from "./CareDrawerShell";
 
 type Props = {
@@ -38,32 +39,6 @@ const defaultValues: FoodTrackerFormValues = {
   feedingsPerDay: undefined,
   feedingsPerWeek: undefined,
 };
-
-function BinaryToggle<T extends string>({
-  options,
-  optionLabels,
-  value,
-  onChange,
-}: {
-  options: readonly [T, T];
-  optionLabels: readonly [string, string];
-  value: T;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <View style={styles.chips}>
-      {options.map((option, index) => (
-        <Chip
-          key={option}
-          label={optionLabels[index]}
-          tone={value === option ? "primary" : "neutral"}
-          variant={value === option ? "default" : "ghost"}
-          onPress={() => onChange(option)}
-        />
-      ))}
-    </View>
-  );
-}
 
 export function AddFoodTrackerDrawer({ petId, isOpen, setIsOpen, tracker }: Props) {
   const { t } = useTranslation(["care", "common"]);

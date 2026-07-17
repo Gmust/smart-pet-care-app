@@ -6,7 +6,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
 import { CareTabContent } from "@/care/components/CareTabContent";
-import { Chevron } from "@/icons/arrows";
+import { BackButton } from "@/common/components/BackButton";
+import { AiIcon } from "@/icons/ai-icon";
 import { Button } from "@/shadecn/ui/button";
 import { tabsContentEntering } from "@/shadecn/ui/tabs";
 import { Text } from "@/shadecn/ui/text";
@@ -31,13 +32,14 @@ const PROFILE_TAB_KEYS = ["overview", "health", "care", "reminders"] as const;
 type ProfileTabKey = (typeof PROFILE_TAB_KEYS)[number];
 
 export default function PetProfilePage() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const { t } = useTranslation(["pets", "common"]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<ProfileTabKey>("overview");
+
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { t } = useTranslation(["pets", "common"]);
 
   const parsedParams = petProfileParamsSchema.safeParse(useLocalSearchParams());
   const petId = parsedParams.success ? parsedParams.data.petId : undefined;
@@ -51,10 +53,13 @@ export default function PetProfilePage() {
 
   const flags: PetFlag[] = [];
   if (pet) {
-    if (pet.allergies) {
+    const hasAllergies = (pet.allergies ?? []).some(Boolean);
+    const hasChronicConditions = (pet.chronicConditions ?? []).some(Boolean);
+
+    if (hasAllergies) {
       flags.push({ id: "allergies", label: t("petProfilePage.flags.allergies"), tone: "warn" });
     }
-    if (pet.chronicConditions) {
+    if (hasChronicConditions) {
       flags.push({
         id: "chronic-conditions",
         label: t("petProfilePage.flags.chronicCondition"),
@@ -66,23 +71,6 @@ export default function PetProfilePage() {
     }
   }
 
-  const handleBack = () => {
-    if (router.canGoBack()) {
-      router.back();
-      return;
-    }
-
-    router.replace("/(tabs)/pets");
-  };
-
-  const handleOpenEdit = () => {
-    setIsEditOpen(true);
-  };
-
-  const handleOpenDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
-  };
-
   if (isPetLoading) {
     return <PetProfilePageSkeleton />;
   }
@@ -91,20 +79,13 @@ export default function PetProfilePage() {
     <>
       <View style={styles.screen}>
         <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
-          <Button
-            size="icon"
-            variant="icon"
-            accessibilityLabel={t("petProfilePage.goBack")}
-            onPress={handleBack}
-          >
-            <Chevron width={18} height={18} color={palette.brand.primaryDark} />
-          </Button>
+          <BackButton />
           <Text style={styles.topBarTitle}>{petName}</Text>
           <PetProfilePageActions
             disabled={!pet}
-            onEdit={handleOpenEdit}
+            onEdit={() => setIsEditOpen(true)}
             onChangePhoto={() => setIsPhotoOpen(true)}
-            onDelete={handleOpenDeleteDialog}
+            onDelete={() => setIsDeleteDialogOpen(true)}
           />
         </View>
 
@@ -120,6 +101,21 @@ export default function PetProfilePage() {
               ) : (
                 <PetSpeciesImage species={pet.species} variant="hero" />
               )}
+              <View style={styles.aiButton}>
+                <Button
+                  accessibilityLabel="ai-assistant"
+                  variant="icon"
+                  size="icon"
+                  disabled={!pet?.id}
+                  icon={<AiIcon width={20} height={20} color={palette.brand.textPrimary} />}
+                  onPress={() =>
+                    router.navigate({
+                      pathname: "/(tabs)/assistant",
+                      params: { petId: pet?.id },
+                    })
+                  }
+                />
+              </View>
               <View style={styles.flagRow}>
                 {flags.map((flag) => (
                   <FlagChip key={flag.id} flag={flag} />
@@ -220,6 +216,11 @@ const styles = StyleSheet.create((theme) => ({
   heroEmpty: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  aiButton: {
+    position: "absolute",
+    top: theme.spacing(3),
+    right: theme.spacing(4),
   },
   flagRow: {
     position: "absolute",

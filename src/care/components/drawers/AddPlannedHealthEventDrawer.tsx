@@ -216,8 +216,6 @@ export function AddPlannedHealthEventDrawer({ petId, isOpen, setIsOpen, category
         )}
       </form.Field>
 
-      {/* TODO: verify DateTimeField supports mode="date" — only mode="time" was
-              confirmed via CreateReminderDrawer. */}
       <form.Field name="lastDoneAt">
         {(field) => (
           <View style={styles.field}>

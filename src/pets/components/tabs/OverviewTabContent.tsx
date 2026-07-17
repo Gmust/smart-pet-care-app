@@ -23,25 +23,30 @@ export function OverviewTabContent({ pet }: Props) {
   const { t } = useTranslation(["pets", "common"]);
 
   const notes: PetNote[] = [];
-  if (pet.allergies) {
+  const allergiesText = (pet.allergies ?? []).filter(Boolean).join(", ");
+  if (allergiesText) {
     notes.push({
       id: "allergies",
       title: t("petProfilePage.flags.allergies"),
-      preview: pet.allergies,
+      preview: allergiesText,
     });
   }
-  if (pet.chronicConditions) {
+
+  const chronicConditionsText = (pet.chronicConditions ?? []).filter(Boolean).join(", ");
+  if (chronicConditionsText) {
     notes.push({
       id: "chronic-conditions",
       title: t("petProfilePage.noteTitles.chronicConditions"),
-      preview: pet.chronicConditions,
+      preview: chronicConditionsText,
     });
   }
-  if (pet.behavioralNotes) {
+
+  const behavioralNotesText = (pet.behavioralNotes ?? []).filter(Boolean).join(", ");
+  if (behavioralNotesText) {
     notes.push({
       id: "behavioral-notes",
       title: t("petProfilePage.noteTitles.behavioralNotes"),
-      preview: pet.behavioralNotes,
+      preview: behavioralNotesText,
     });
   }
 

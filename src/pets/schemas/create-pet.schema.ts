@@ -9,6 +9,12 @@ const optionalText = z
   .nullish()
   .transform((value) => (value && value.length > 0 ? value : null));
 
+const optionalTextList = z.array(z.string()).transform((values) => {
+  const normalizedValues = values.map((value) => value.trim()).filter((value) => value.length > 0);
+
+  return normalizedValues.length > 0 ? normalizedValues : null;
+});
+
 export const createPetSchema = (t: TFunction<"pets">) =>
   z.object({
     name: z.string().trim().min(1, t("validation.nameRequired")),
@@ -33,9 +39,9 @@ export const createPetSchema = (t: TFunction<"pets">) =>
         return parsed;
       }),
     sex: z.enum(Sex).default(Sex.Unknown),
-    allergies: optionalText,
-    chronicConditions: optionalText,
-    behavioralNotes: optionalText,
+    allergies: optionalTextList,
+    chronicConditions: optionalTextList,
+    behavioralNotes: optionalTextList,
   });
 
 type CreatePetSchema = ReturnType<typeof createPetSchema>;

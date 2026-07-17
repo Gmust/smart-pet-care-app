@@ -4,12 +4,14 @@ import { postApiReminders } from "@/api";
 import type { CreateReminderDto } from "@/api/generated";
 import { getUtcOffsetMinutes } from "@/common/utils/getUtcOffsetMinutes";
 
+type CreateReminderInput = Omit<CreateReminderDto, "utcOffsetMinutes">;
+
 export const useCreateRemindersMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: ["create-reminder"],
-    mutationFn: async (payload: Omit<CreateReminderDto, "utcOffsetMinutes">) => {
+    mutationFn: async (payload: CreateReminderInput) => {
       const { data } = await postApiReminders({
         ...payload,
         utcOffsetMinutes: getUtcOffsetMinutes(),

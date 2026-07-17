@@ -3,12 +3,13 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { getDaytime } from "@/common/utils/getDaytime";
-import { BellIcon } from "@/icons/bell";
+import { AiIcon } from "@/icons/ai-icon";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
 import dayjs from "dayjs";
+import { useRouter } from "expo-router";
 
 type Props = {
   username: string;
@@ -17,6 +18,8 @@ type Props = {
 export function HomeHeader({ username }: Props) {
   const { t } = useTranslation(["home"]);
 
+  const router = useRouter();
+
   return (
     <View style={styles.root}>
       <View style={styles.greetings}>
@@ -24,11 +27,11 @@ export function HomeHeader({ username }: Props) {
         <Text style={styles.message}>{t("greetings", { username, daytime: getDaytime() })}</Text>
       </View>
       <Button
-        accessibilityLabel="Notifications"
+        accessibilityLabel="ai-assistant"
         variant="icon"
         size="icon"
-        icon={<BellIcon width={18} height={18} color={palette.brand.textPrimary} />}
-        onPress={() => {}}
+        icon={<AiIcon width={16} height={16} color={palette.brand.textPrimary} />}
+        onPress={() => router.navigate("/assistant-pet-selection")}
       />
     </View>
   );

@@ -18,6 +18,10 @@ export default function TabLayout() {
   const { t } = useTranslation(["common"]);
   const { status } = useAuth();
   const pathname = usePathname();
+  const isAssistantFlow =
+    pathname.endsWith("/assistant") ||
+    pathname.endsWith("/assistant-pet-selection") ||
+    pathname.endsWith("/assistant-new-pet");
 
   if (status === "loading") {
     return null;
@@ -30,7 +34,7 @@ export default function TabLayout() {
   return (
     <View style={styles.root}>
       <Tabs
-        tabBar={(props) => <TabBar {...props} />}
+        tabBar={(props) => (isAssistantFlow ? null : <TabBar {...props} />)}
         screenOptions={{
           headerShown: false,
           animation: "fade",
@@ -41,9 +45,12 @@ export default function TabLayout() {
         ))}
         <Tabs.Screen name="pet-profile" options={{ href: null }} />
         <Tabs.Screen name="reminders" options={{ href: null }} />
+        <Tabs.Screen name="assistant" options={{ href: null }} />
+        <Tabs.Screen name="assistant-pet-selection" options={{ href: null }} />
+        <Tabs.Screen name="assistant-new-pet" options={{ href: null }} />
       </Tabs>
       {pathname.endsWith("/home") && <Fab />}
-      <OfflineBanner />
+      {!isAssistantFlow && <OfflineBanner />}
     </View>
   );
 }

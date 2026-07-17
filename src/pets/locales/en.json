@@ -91,6 +91,13 @@
       "chronicConditions": "Ongoing health conditions",
       "behavioralNotes": "Quirks, training notes, temperament"
     },
+    "addAllergy": "Add allergy",
+    "addChronicCondition": "Add chronic condition",
+    "addBehavioralNote": "Add behavioral note",
+    "remove": "Remove",
+    "removeAllergy": "Remove allergy",
+    "removeChronicCondition": "Remove chronic condition",
+    "removeBehavioralNote": "Remove behavioral note",
     "submit": "Add pet"
   },
   "editPetDrawer": {

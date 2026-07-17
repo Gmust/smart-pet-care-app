@@ -49,11 +49,15 @@ pnpm check          # Lint + typecheck
 
 - Directory names: kebab-case
 - File names: `PascalCase.tsx`
-- Components: PascalCase, one per file
+- Components: PascalCase, one per file. Never define 2+ components in one file — split each into its own file. Exception: `src/shadecn/` (shadcn-style primitives), where multiple related components per file is allowed.
 - Hooks: camelCase filename (`useAuth.ts`), `use*` export
 - Schemas: `*.schema.ts` filename (e.g. `auth.schema.ts`), named exports
 - Styles: defined with `StyleSheet.create` from `react-native-unistyles`, colocated in component file or `styles/` directory
 - Imports: sorted via `eslint-plugin-simple-import-sort`
+- Prefer arrow functions for functions and components.
+- Component internals should be ordered as: state, refs, variables, nested components, effects, JSX.
+- All forms must be implemented with TanStack Form. Do not use local component state for form field values.
+- Use inputs only through TanStack Form field handlers (`field.handleChange`, `field.handleBlur`, and field state); do not manage form input state outside TanStack Form.
 - No default exports for utilities/hooks — named exports only
 - Components may use default exports (Expo Router requirement for pages)
 - No single-use helper/mapper functions. If a transform is called from only one place, inline it at the call site. Extract a function only when reused (2+ call sites).
@@ -100,3 +104,4 @@ Rules:
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- Always use Context7 when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.

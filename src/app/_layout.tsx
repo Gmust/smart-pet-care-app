@@ -5,11 +5,21 @@ import { useEffect } from "react";
 import { StatusBar } from "react-native";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 import {
-  Fraunces_700Bold,
-  Fraunces_600SemiBold,
   Fraunces_400Regular,
+  Fraunces_600SemiBold,
+  Fraunces_700Bold,
 } from "@expo-google-fonts/fraunces";
-import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from "@expo-google-fonts/inter";
+import {
+  Inter_100Thin,
+  Inter_200ExtraLight,
+  Inter_300Light,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+  Inter_900Black,
+} from "@expo-google-fonts/inter";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -51,9 +61,15 @@ export default function RootLayout() {
     Fraunces_700Bold,
     Fraunces_600SemiBold,
     Fraunces_400Regular,
+    Inter_100Thin,
+    Inter_200ExtraLight,
+    Inter_300Light,
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+    Inter_900Black,
   });
 
   useEffect(() => {

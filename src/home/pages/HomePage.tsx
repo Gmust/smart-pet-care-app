@@ -5,7 +5,6 @@ import { StyleSheet } from "react-native-unistyles";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { HeaderSection } from "../components/HeaderSection";
-import { InsightSection } from "../components/InsightSection";
 import { PetOverviewSection } from "../components/PetOverviewSection";
 import { RemindersSection } from "../components/RemindersSection";
 
@@ -39,7 +38,7 @@ const HomePage = () => {
         <HeaderSection />
         <PetOverviewSection />
 
-        <InsightSection />
+        {/* <InsightSection /> */}
         <RemindersSection />
       </ScrollView>
     </View>
