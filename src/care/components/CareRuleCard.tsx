@@ -1,11 +1,18 @@
 import { Pressable } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { cardVariants } from "@/shadecn/ui/card";
+
 import type { CareCategory, DayOfWeek, PlannedHealthEventCategory, RecurrenceType } from "../types";
 import { CareRuleRowContent } from "./CareRuleRowContent";
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
 type CareRuleCardSize = "lg" | "sm";
+
+const CARD_PADDING_BY_SIZE: Record<CareRuleCardSize, "standalone" | "compact"> = {
+  lg: "standalone",
+  sm: "compact",
+};
 
 type Props = {
   category: CareCategory | PlannedHealthEventCategory;
@@ -14,15 +21,12 @@ type Props = {
   recurrenceType: RecurrenceType;
   intervalN?: number;
   weekDays?: DayOfWeek[];
-  /** Standalone-card wrapper — used only for the single-rule state (VetVisit,
-   * or a growableList section holding exactly one rule). 2+ rows render
-   * CareRuleRowContent directly inside CareListCard instead. */
   size?: CareRuleCardSize;
   onPress?: () => void;
   onDelete?: () => void;
 };
 
-export function CareRuleCard({
+export const CareRuleCard = ({
   category,
   title,
   time,
@@ -32,9 +36,9 @@ export function CareRuleCard({
   size = "lg",
   onPress,
   onDelete,
-}: Props) {
+}: Props) => {
   const { theme } = useUnistyles();
-  cardVariants.useVariants({ size });
+  cardVariants.useVariants({ padding: CARD_PADDING_BY_SIZE[size] });
 
   return (
     <SwipeToDeleteRow
@@ -48,7 +52,7 @@ export function CareRuleCard({
         accessibilityRole="button"
         accessibilityLabel={`${title}, ${time}`}
         onPress={onPress}
-        style={({ pressed }) => [cardVariants.card, pressed && cardVariants.cardPressed]}
+        style={({ pressed }) => [cardVariants.card, pressed && styles.cardPressed]}
       >
         <CareRuleRowContent
           category={category}
@@ -62,21 +66,9 @@ export function CareRuleCard({
       </Pressable>
     </SwipeToDeleteRow>
   );
-}
+};
 
-const cardVariants = StyleSheet.create((theme) => ({
-  card: {
-    backgroundColor: theme.palette.white,
-    borderRadius: theme.borderRadius.xl,
-    borderWidth: 1,
-    borderColor: theme.palette.brand.surfaceBorder,
-    variants: {
-      size: {
-        lg: { padding: theme.spacing(4) },
-        sm: { padding: theme.spacing(3) },
-      },
-    },
-  },
+const styles = StyleSheet.create((theme) => ({
   cardPressed: {
     backgroundColor: theme.palette.brand.surfaceSunken,
   },

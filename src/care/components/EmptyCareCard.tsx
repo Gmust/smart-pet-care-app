@@ -2,35 +2,37 @@ import { useTranslation } from "react-i18next";
 import { Pressable } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { cardVariants } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 
 type Props = {
   onPress?: () => void;
 };
 
-export function EmptyCareCard({ onPress }: Props) {
+export const EmptyCareCard = ({ onPress }: Props) => {
   const { t } = useTranslation(["care"]);
+  cardVariants.useVariants({ padding: "none" });
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={t("emptyState.notConfigured")}
       onPress={onPress}
-      style={({ pressed }) => [styles.centeredCard, pressed && styles.cardPressed]}
+      style={({ pressed }) => [
+        cardVariants.card,
+        styles.centeredCard,
+        pressed && styles.cardPressed,
+      ]}
     >
       <Text style={styles.centeredText}>{t("emptyState.notConfigured")}</Text>
     </Pressable>
   );
-}
+};
 
 const styles = StyleSheet.create((theme) => ({
   centeredCard: {
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.palette.white,
-    borderRadius: theme.borderRadius.xl,
-    borderWidth: 1,
-    borderColor: theme.palette.brand.surfaceBorder,
     paddingVertical: theme.spacing(6),
   },
   centeredText: {

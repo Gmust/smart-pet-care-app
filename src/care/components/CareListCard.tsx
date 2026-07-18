@@ -2,15 +2,13 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { cardVariants } from "@/shadecn/ui/card";
+
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
 const careListCardStyles = StyleSheet.create((theme) => ({
   card: {
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: theme.palette.brand.surfaceBorder,
-    borderRadius: theme.borderRadius.xl,
-    backgroundColor: theme.palette.white,
   },
   row: {
     paddingHorizontal: theme.spacing(3.5),
@@ -51,9 +49,10 @@ export function CareListCard<T>({
   footer,
 }: Props<T>) {
   const { theme } = useUnistyles();
+  cardVariants.useVariants({ padding: "none" });
 
   return (
-    <View style={careListCardStyles.card}>
+    <View style={[cardVariants.card, careListCardStyles.card]}>
       {items.map((item, index) => (
         <SwipeToDeleteRow
           key={keyExtractor(item)}

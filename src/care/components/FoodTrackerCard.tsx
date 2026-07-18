@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { cardVariants } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 
 import type { FoodTracker } from "../types";
@@ -15,9 +16,10 @@ type Props = {
   onDelete?: () => void;
 };
 
-export function FoodTrackerCard({ tracker, onPress, onDelete }: Props) {
+export const FoodTrackerCard = ({ tracker, onPress, onDelete }: Props) => {
   const { t } = useTranslation(["care"]);
   const { theme } = useUnistyles();
+  cardVariants.useVariants({ padding: "standalone" });
 
   const totalGrams =
     toGrams(tracker.packageWeight, tracker.packageWeightUnit) * tracker.packageCount;
@@ -50,7 +52,7 @@ export function FoodTrackerCard({ tracker, onPress, onDelete }: Props) {
         accessibilityRole="button"
         accessibilityLabel={tracker.foodName}
         onPress={onPress}
-        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+        style={({ pressed }) => [cardVariants.card, styles.card, pressed && styles.cardPressed]}
       >
         <Text style={styles.title}>{tracker.foodName}</Text>
         <View style={styles.track}>
@@ -63,16 +65,11 @@ export function FoodTrackerCard({ tracker, onPress, onDelete }: Props) {
       </Pressable>
     </SwipeToDeleteRow>
   );
-}
+};
 
 const styles = StyleSheet.create((theme) => ({
   card: {
     gap: theme.spacing(2.5),
-    backgroundColor: theme.palette.white,
-    borderRadius: theme.borderRadius.xl,
-    borderWidth: 1,
-    borderColor: theme.palette.brand.surfaceBorder,
-    padding: theme.spacing(4),
   },
   cardPressed: {
     backgroundColor: theme.palette.brand.surfaceSunken,
