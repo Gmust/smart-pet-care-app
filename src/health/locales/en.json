@@ -1,0 +1,38 @@
+{
+  "emptyState": {
+    "notConfigured": "Not configured"
+  },
+  "history": {
+    "title": "History",
+    "last": "Last: {{date}}",
+    "noRecords": "No records",
+    "next": "Next: {{date}}",
+    "overdue": "Overdue: {{date}}",
+    "loading": "Loading..."
+  },
+  "categoryLabels": {
+    "VetVisit": "Vet visits",
+    "Vaccination": "Vaccinations",
+    "Deworming": "Deworming",
+    "AntiParasiteTreatment": "Anti-parasite"
+  },
+  "overview": {
+    "sections": {
+      "meds": "Meds",
+      "symptoms": "Symptoms",
+      "files": "Files"
+    },
+    "meds": {
+      "title": "Active meds: {{active}}",
+      "subtitle": "past: {{past}}"
+    },
+    "symptoms": {
+      "title": "All symptoms: {{all}}",
+      "subtitle": "last month: {{lastMonth}}"
+    },
+    "files": {
+      "title": "Medical files",
+      "subtitle": "Total: {{total}}"
+    }
+  }
+}

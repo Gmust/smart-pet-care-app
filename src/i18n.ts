@@ -4,6 +4,7 @@ import enAssistant from "@/assistant/locales/en.json";
 import enAuth from "@/auth/locales/en.json";
 import enCare from "@/care/locales/en.json";
 import enCommon from "@/common/locales/en.json";
+import enHealth from "@/health/locales/en.json";
 import enHome from "@/home/locales/en.json";
 import enPets from "@/pets/locales/en.json";
 import enProfile from "@/profile/locales/en.json";
@@ -26,6 +27,7 @@ const modules = [
   "pets",
   "profile",
   "care",
+  "health",
   "assistant",
 ] as const;
 
@@ -41,6 +43,7 @@ const enResources = {
   pets: enPets,
   profile: enProfile,
   care: enCare,
+  health: enHealth,
   assistant: enAssistant,
 } as const satisfies Record<I18nModule, TranslationJson>;
 

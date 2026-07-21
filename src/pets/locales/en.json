@@ -31,7 +31,9 @@
       "breed": "Breed",
       "birthday": "Birthday",
       "sex": "Sex",
-      "weight": "Weight"
+      "weight": "Weight",
+      "allergies": "Allergies",
+      "chronicConditions": "Chronic conditions"
     },
     "fallbacks": {
       "notAdded": "Not added",
