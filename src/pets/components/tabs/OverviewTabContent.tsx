@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { SectionHeader } from "@/common/components/SectionHeader";
 import { CirclePlusIcon } from "@/icons/circle-plus";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
@@ -10,7 +11,6 @@ import type { usePetQuery } from "../../queries/usePetQuery";
 import type { PetNote } from "../../types";
 import { InfoRow } from "../pet-profile/InfoRow";
 import { NoteRow } from "../pet-profile/NoteRow";
-import { SectionHeader } from "../pet-profile/SectionHeader";
 import dayjs from "dayjs";
 
 type Pet = NonNullable<ReturnType<typeof usePetQuery>["data"]>;
