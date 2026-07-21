@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { CareTabContent } from "@/care/components/CareTabContent";
 import { BackButton } from "@/common/components/BackButton";
+import { HealthTabContent } from "@/health/components/HealthTabContent";
 import { AiIcon } from "@/icons/ai-icon";
 import { Button } from "@/shadecn/ui/button";
 import { tabsContentEntering } from "@/shadecn/ui/tabs";
@@ -19,7 +20,6 @@ import { PetProfilePageActions } from "../components/pet-profile/actions/PetProf
 import { UploadPetPhotoDrawer } from "../components/pet-profile/actions/UploadPetPhotoDrawer";
 import { FlagChip } from "../components/pet-profile/FlagChip";
 import { PetSpeciesImage } from "../components/PetSpeciesImage";
-import { HealthTabContent } from "../components/tabs/HealthTabContent";
 import { OverviewTabContent } from "../components/tabs/OverviewTabContent";
 import { RemindersTabContent } from "../components/tabs/RemindersTabContent";
 import { usePetQuery } from "../queries/usePetQuery";
@@ -164,7 +164,7 @@ export default function PetProfilePage() {
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
         >
           {!!pet && activeTab === "overview" && <OverviewTabContent pet={pet} />}
-          {!!pet && activeTab === "health" && <HealthTabContent petId={pet.id ?? ""} />}
+          {!!pet && activeTab === "health" && <HealthTabContent pet={pet} />}
           {!!pet && activeTab === "care" && <CareTabContent petId={pet.id ?? ""} />}
           {!!pet && activeTab === "reminders" && <RemindersTabContent petId={pet.id ?? ""} />}
         </Animated.ScrollView>
