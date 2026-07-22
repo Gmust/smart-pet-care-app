@@ -43,8 +43,8 @@
     "weightValue": "{{value}} kg",
     "notes": {
       "title": "Notes",
-      "manage": "Manage",
-      "manageA11y": "Manage notes",
+      "addNote": "Add note",
+      "addNoteA11y": "Add note",
       "empty": "No notes yet"
     },
     "flags": {

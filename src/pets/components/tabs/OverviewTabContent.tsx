@@ -3,9 +3,7 @@ import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { SectionHeader } from "@/common/components/SectionHeader";
-import { CirclePlusIcon } from "@/icons/circle-plus";
 import { Text } from "@/shadecn/ui/text";
-import { palette } from "@/styles/palette";
 
 import type { usePetQuery } from "../../queries/usePetQuery";
 import type { PetNote } from "../../types";
@@ -23,23 +21,6 @@ export function OverviewTabContent({ pet }: Props) {
   const { t } = useTranslation(["pets", "common"]);
 
   const notes: PetNote[] = [];
-  const allergiesText = (pet.allergies ?? []).filter(Boolean).join(", ");
-  if (allergiesText) {
-    notes.push({
-      id: "allergies",
-      title: t("petProfilePage.flags.allergies"),
-      preview: allergiesText,
-    });
-  }
-
-  const chronicConditionsText = (pet.chronicConditions ?? []).filter(Boolean).join(", ");
-  if (chronicConditionsText) {
-    notes.push({
-      id: "chronic-conditions",
-      title: t("petProfilePage.noteTitles.chronicConditions"),
-      preview: chronicConditionsText,
-    });
-  }
 
   const behavioralNotesText = (pet.behavioralNotes ?? []).filter(Boolean).join(", ");
   if (behavioralNotesText) {
@@ -79,13 +60,12 @@ export function OverviewTabContent({ pet }: Props) {
       <View style={styles.notesHeader}>
         <View style={styles.notesLabelRow}>
           <SectionHeader label={t("petProfilePage.notes.title")} compact />
-          <CirclePlusIcon width={20} height={20} color={palette.brand.textSecondary} />
         </View>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={t("petProfilePage.notes.manageA11y")}
+          accessibilityLabel={t("petProfilePage.notes.addNoteA11y")}
         >
-          <Text style={styles.manageText}>{t("petProfilePage.notes.manage")}</Text>
+          <Text style={styles.addText}>{t("petProfilePage.notes.addNote")}</Text>
         </Pressable>
       </View>
 
@@ -128,7 +108,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: theme.spacing(2),
   },
-  manageText: {
+  addText: {
     ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.primaryDefault,
   },
