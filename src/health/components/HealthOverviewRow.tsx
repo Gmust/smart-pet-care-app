@@ -22,7 +22,7 @@ export function HealthOverviewRow({
   tone,
   onPress,
 }: HealthOverviewRowProps) {
-  cardVariants.useVariants({ padding: "compact" });
+  cardVariants.useVariants({ padding: "compact", radius: "standalone" });
   return (
     <Pressable
       accessibilityRole="button"

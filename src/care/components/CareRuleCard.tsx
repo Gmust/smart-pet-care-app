@@ -38,7 +38,7 @@ export const CareRuleCard = ({
   onDelete,
 }: Props) => {
   const { theme } = useUnistyles();
-  cardVariants.useVariants({ padding: CARD_PADDING_BY_SIZE[size] });
+  cardVariants.useVariants({ padding: CARD_PADDING_BY_SIZE[size], radius: "standalone" });
 
   return (
     <SwipeToDeleteRow

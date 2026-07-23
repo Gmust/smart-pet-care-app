@@ -19,7 +19,7 @@ type Props = {
 export const FoodTrackerCard = ({ tracker, onPress, onDelete }: Props) => {
   const { t } = useTranslation(["care"]);
   const { theme } = useUnistyles();
-  cardVariants.useVariants({ padding: "standalone" });
+  cardVariants.useVariants({ padding: "standalone", radius: "standalone" });
 
   const totalGrams =
     toGrams(tracker.packageWeight, tracker.packageWeightUnit) * tracker.packageCount;

@@ -15,7 +15,7 @@ type NoteRowProps = {
 const NOTE_ICON_SIZE = 16;
 const CHEVRON_ICON_SIZE = 18;
 
-export function NoteRow({ note }: NoteRowProps) {
+export const NoteRow = ({ note }: NoteRowProps) => {
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={note.title} style={styles.noteRow}>
       <View style={styles.noteIconBg}>
@@ -38,7 +38,7 @@ export function NoteRow({ note }: NoteRowProps) {
       />
     </Pressable>
   );
-}
+};
 
 const styles = StyleSheet.create((theme) => ({
   noteRow: {
@@ -46,8 +46,6 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing(2.5),
-    borderTopWidth: 1,
-    borderTopColor: theme.palette.brand.surfaceBorder,
     paddingHorizontal: theme.spacing(3.5),
     paddingVertical: theme.spacing(2.75),
   },

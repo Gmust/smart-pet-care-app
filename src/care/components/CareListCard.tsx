@@ -7,9 +7,6 @@ import { cardVariants } from "@/shadecn/ui/card";
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
 const careListCardStyles = StyleSheet.create((theme) => ({
-  card: {
-    overflow: "hidden",
-  },
   row: {
     paddingHorizontal: theme.spacing(3.5),
     paddingVertical: theme.spacing(2.75),
@@ -33,12 +30,6 @@ type Props<T> = {
   footer?: ReactNode;
 };
 
-/**
- * One bordered card, rows separated by internal dividers instead of each
- * item getting its own outer border. Used for fixedSlots sections (always),
- * growableList sections once they hold 2+ rules, and Meals (footer variant).
- * FoodTracker is exempt by design — every food item stays its own standalone card.
- */
 export function CareListCard<T>({
   items,
   keyExtractor,
@@ -49,17 +40,17 @@ export function CareListCard<T>({
   footer,
 }: Props<T>) {
   const { theme } = useUnistyles();
-  cardVariants.useVariants({ padding: "none" });
+  cardVariants.useVariants({ padding: "none", radius: "list" });
 
   return (
-    <View style={[cardVariants.card, careListCardStyles.card]}>
+    <View style={[cardVariants.card]}>
       {items.map((item, index) => (
         <SwipeToDeleteRow
           key={keyExtractor(item)}
           disabled={!onDeleteItem || isDeleteDisabled?.(item)}
           onDelete={() => onDeleteItem?.(item)}
-          topRadius={index === 0 ? theme.borderRadius.xl : 0}
-          bottomRadius={!footer && index === items.length - 1 ? theme.borderRadius.xl : 0}
+          topRadius={index === 0 ? theme.borderRadius["2xl"] : 0}
+          bottomRadius={!footer && index === items.length - 1 ? theme.borderRadius["2xl"] : 0}
         >
           <Pressable
             disabled={!onItemPress}

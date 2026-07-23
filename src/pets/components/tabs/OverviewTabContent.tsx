@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { SectionHeader } from "@/common/components/SectionHeader";
+import { ListCard } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 
 import type { usePetQuery } from "../../queries/usePetQuery";
@@ -17,7 +18,7 @@ type Props = {
   pet: Pet;
 };
 
-export function OverviewTabContent({ pet }: Props) {
+export const OverviewTabContent = ({ pet }: Props) => {
   const { t } = useTranslation(["pets", "common"]);
 
   const notes: PetNote[] = [];
@@ -43,7 +44,7 @@ export function OverviewTabContent({ pet }: Props) {
   return (
     <>
       <SectionHeader label={t("petProfilePage.basics.title")} />
-      <View style={styles.listCard}>
+      <ListCard style={styles.listCard}>
         <InfoRow
           label={t("petProfilePage.basics.species")}
           value={pet.species ?? t("petProfilePage.fallbacks.speciesUnknown")}
@@ -55,7 +56,7 @@ export function OverviewTabContent({ pet }: Props) {
         <InfoRow label={t("petProfilePage.basics.birthday")} value={birthdayValue} />
         <InfoRow label={t("petProfilePage.basics.sex")} value={pet.sex ?? t("sex.Unknown")} />
         <InfoRow label={t("petProfilePage.basics.weight")} value={weightValue} />
-      </View>
+      </ListCard>
 
       <View style={styles.notesHeader}>
         <View style={styles.notesLabelRow}>
@@ -69,7 +70,7 @@ export function OverviewTabContent({ pet }: Props) {
         </Pressable>
       </View>
 
-      <View style={styles.listCard}>
+      <ListCard style={styles.listCard}>
         {notes.length ? (
           notes.map((note) => <NoteRow key={note.id} note={note} />)
         ) : (
@@ -77,10 +78,10 @@ export function OverviewTabContent({ pet }: Props) {
             <Text style={styles.emptyText}>{t("petProfilePage.notes.empty")}</Text>
           </View>
         )}
-      </View>
+      </ListCard>
     </>
   );
-}
+};
 
 const styles = StyleSheet.create((theme) => ({
   listCard: {

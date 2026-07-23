@@ -20,7 +20,7 @@ export function HistoryCard({
   variant = "default",
   onPress,
 }: HistoryCardProps) {
-  cardVariants.useVariants({ padding: "none" });
+  cardVariants.useVariants({ padding: "none", radius: "standalone" });
 
   return (
     <Pressable

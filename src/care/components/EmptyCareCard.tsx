@@ -11,7 +11,7 @@ type Props = {
 
 export const EmptyCareCard = ({ onPress }: Props) => {
   const { t } = useTranslation(["care"]);
-  cardVariants.useVariants({ padding: "none" });
+  cardVariants.useVariants({ padding: "none", radius: "standalone" });
 
   return (
     <Pressable
