@@ -34,5 +34,60 @@
       "title": "Medical files",
       "subtitle": "Total: {{total}}"
     }
+  },
+  "recordList": {
+    "searchPlaceholder": "Search by title, description, provider",
+    "loading": "Loading...",
+    "empty": "No records found",
+    "addRecord": "Add record",
+    "filters": {
+      "title": "Date range",
+      "openFilter": "Filter by date",
+      "from": "From",
+      "fromPlaceholder": "Start date",
+      "to": "To",
+      "toPlaceholder": "End date",
+      "clear": "Clear dates",
+      "apply": "Apply"
+    },
+    "yearSections": {
+      "thisYear": "This year",
+      "lastYear": "Last year"
+    },
+    "fields": {
+      "provider": "Provider",
+      "description": "Description",
+      "dosage": "Dosage",
+      "nextDueAt": "Next due",
+      "symptoms": "Symptoms"
+    }
+  },
+  "forms": {
+    "healthRecord": {
+      "createTitle": "Add {{category}} record",
+      "createSuccess": "Record added",
+      "submit": "Save record",
+      "fields": {
+        "title": "Title",
+        "performedAt": "Date",
+        "provider": "Provider",
+        "dosage": "Dosage",
+        "nextDueAt": "Next due date",
+        "description": "Description",
+        "symptoms": "Symptoms"
+      },
+      "placeholders": {
+        "title": "e.g. Annual checkup",
+        "performedAt": "Select a date",
+        "provider": "e.g. Dr. Smith / Sunny Vet Clinic",
+        "dosage": "e.g. 1 tablet",
+        "nextDueAt": "Select a date",
+        "description": "Notes about this visit"
+      },
+      "errors": {
+        "titleRequired": "Title is required",
+        "performedAtRequired": "Date is required"
+      }
+    }
   }
 }

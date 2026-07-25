@@ -33,7 +33,7 @@ export function HealthTabContent({ pet }: Props) {
       </HealthSection>
 
       <HealthSection title={t("health:history.title")}>
-        <HealthHistorySection records={records} isLoading={isLoading} />
+        <HealthHistorySection petId={pet.id ?? ""} records={records} isLoading={isLoading} />
       </HealthSection>
 
       <HealthSection title={t("health:overview.sections.meds")}>

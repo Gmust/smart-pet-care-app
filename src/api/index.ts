@@ -46,4 +46,6 @@ export const {
   patchApiPetsIdPhoto,
   deleteApiNotificationsDeviceTokenToken,
   postApiNotificationsDeviceToken,
+  getApiSymptoms,
+  getApiSymptomsId,
 } = getSmartPetCareAPI(api);

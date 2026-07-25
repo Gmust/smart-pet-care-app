@@ -2081,6 +2081,546 @@
         }
       }
     },
+    "/api/pets/{petId}/journal": {
+      "get": {
+        "tags": ["JournalEntry"],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/JournalEntryType"
+            }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/JournalEntrySeverity"
+            }
+          },
+          {
+            "name": "symptom",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SymptomType"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JournalEntryResponseDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JournalEntryResponseDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JournalEntryResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["JournalEntry"],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJournalEntryDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJournalEntryDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJournalEntryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pets/{petId}/journal/{entryId}": {
+      "get": {
+        "tags": ["JournalEntry"],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["JournalEntry"],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchJournalEntryDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchJournalEntryDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchJournalEntryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JournalEntryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["JournalEntry"],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/pets/{petId}/health-records": {
       "get": {
         "tags": ["HealthRecord"],
@@ -2099,6 +2639,13 @@
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/HealthRecordType"
+            }
+          },
+          {
+            "name": "symptom",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SymptomType"
             }
           },
           {
@@ -4419,6 +4966,141 @@
         },
         "security": []
       }
+    },
+    "/api/symptoms": {
+      "get": {
+        "tags": ["SymptomCatalog"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SymptomCatalogItemDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SymptomCatalogItemDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SymptomCatalogItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/symptoms/{id}": {
+      "get": {
+        "tags": ["SymptomCatalog"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SymptomCatalogItemDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SymptomCatalogItemDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SymptomCatalogItemDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4658,6 +5340,12 @@
           "description": {
             "type": ["null", "string"]
           },
+          "symptoms": {
+            "type": ["null", "array"],
+            "items": {
+              "$ref": "#/components/schemas/SymptomType"
+            }
+          },
           "performedAt": {
             "type": "string",
             "format": "date-time"
@@ -4671,6 +5359,40 @@
           },
           "provider": {
             "type": ["null", "string"]
+          }
+        }
+      },
+      "CreateJournalEntryDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/JournalEntryType"
+          },
+          "title": {
+            "type": "string"
+          },
+          "notes": {
+            "type": ["null", "string"]
+          },
+          "symptoms": {
+            "type": ["null", "array"],
+            "items": {
+              "$ref": "#/components/schemas/SymptomType"
+            }
+          },
+          "severity": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JournalEntrySeverity"
+              }
+            ]
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -4886,6 +5608,12 @@
           "description": {
             "type": ["null", "string"]
           },
+          "symptoms": {
+            "type": ["null", "array"],
+            "items": {
+              "$ref": "#/components/schemas/SymptomType"
+            }
+          },
           "performedAt": {
             "type": "string",
             "format": "date-time"
@@ -4918,12 +5646,76 @@
           "Medication",
           "VetVisit",
           "Surgery",
-          "HealthNote"
+          "HealthNote",
+          "Symptom"
         ]
       },
       "IFormFile": {
         "type": "string",
         "format": "binary"
+      },
+      "JournalEntryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "petId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/JournalEntryType"
+          },
+          "title": {
+            "type": "string"
+          },
+          "notes": {
+            "type": ["null", "string"]
+          },
+          "symptoms": {
+            "type": ["null", "array"],
+            "items": {
+              "$ref": "#/components/schemas/SymptomType"
+            }
+          },
+          "severity": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JournalEntrySeverity"
+              }
+            ]
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          }
+        }
+      },
+      "JournalEntrySeverity": {
+        "enum": ["Mild", "Moderate", "Severe", null]
+      },
+      "JournalEntryType": {
+        "enum": [
+          "Observation",
+          "Symptom",
+          "BehaviorChange",
+          "AppetiteChange",
+          "PreVetNote",
+          "Other"
+        ]
       },
       "LoginRequest": {
         "required": ["email", "password"],
@@ -5002,7 +5794,8 @@
           "Medication",
           "VetVisit",
           "Surgery",
-          "HealthNote"
+          "HealthNote",
+          "Symptom"
         ],
         "description": "Optional: omit to leave unchanged; null clears the value."
       },
@@ -5011,10 +5804,32 @@
         "description": "Optional: omit to leave unchanged; null clears the value.",
         "format": "int32"
       },
+      "PatchFieldOfJournalEntrySeverity": {
+        "enum": ["Mild", "Moderate", "Severe"],
+        "description": "Optional: omit to leave unchanged; null clears the value."
+      },
+      "PatchFieldOfJournalEntryType": {
+        "enum": [
+          "Observation",
+          "Symptom",
+          "BehaviorChange",
+          "AppetiteChange",
+          "PreVetNote",
+          "Other"
+        ],
+        "description": "Optional: omit to leave unchanged; null clears the value."
+      },
       "PatchFieldOfListOfstring": {
         "type": ["null", "array"],
         "items": {
           "type": "string"
+        },
+        "description": "Optional: omit to leave unchanged; null clears the value."
+      },
+      "PatchFieldOfListOfSymptomType": {
+        "type": ["null", "array"],
+        "items": {
+          "$ref": "#/components/schemas/SymptomType"
         },
         "description": "Optional: omit to leave unchanged; null clears the value."
       },
@@ -5038,6 +5853,9 @@
           "description": {
             "$ref": "#/components/schemas/PatchFieldOfstring"
           },
+          "symptoms": {
+            "$ref": "#/components/schemas/PatchFieldOfListOfSymptomType"
+          },
           "performedAt": {
             "$ref": "#/components/schemas/PatchFieldOfDateTime"
           },
@@ -5049,6 +5867,29 @@
           },
           "provider": {
             "$ref": "#/components/schemas/PatchFieldOfstring"
+          }
+        }
+      },
+      "PatchJournalEntryDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/PatchFieldOfJournalEntryType"
+          },
+          "title": {
+            "$ref": "#/components/schemas/PatchFieldOfstring"
+          },
+          "notes": {
+            "$ref": "#/components/schemas/PatchFieldOfstring"
+          },
+          "symptoms": {
+            "$ref": "#/components/schemas/PatchFieldOfListOfSymptomType"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/PatchFieldOfJournalEntrySeverity"
+          },
+          "observedAt": {
+            "$ref": "#/components/schemas/PatchFieldOfDateTime"
           }
         }
       },
@@ -5502,6 +6343,55 @@
       "Sex": {
         "enum": ["Unknown", "Male", "Female"]
       },
+      "SymptomCatalogItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "name": {
+            "$ref": "#/components/schemas/SymptomType"
+          },
+          "label": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          }
+        }
+      },
+      "SymptomType": {
+        "enum": [
+          "Fever",
+          "Lethargy",
+          "WeightLoss",
+          "WeightGain",
+          "Dehydration",
+          "Pain",
+          "Vomiting",
+          "Diarrhea",
+          "Constipation",
+          "LossOfAppetite",
+          "IncreasedAppetite",
+          "Coughing",
+          "Sneezing",
+          "NasalDischarge",
+          "DifficultyBreathing",
+          "Itching",
+          "HairLoss",
+          "Swelling",
+          "IncreasedThirst",
+          "FrequentUrination",
+          "EyeDischarge",
+          "EarDischarge",
+          "Seizure",
+          "Limping",
+          "Bleeding",
+          "Other"
+        ]
+      },
       "UpdatePetDto": {
         "type": "object",
         "properties": {
@@ -5617,6 +6507,9 @@
       "name": "Notification"
     },
     {
+      "name": "JournalEntry"
+    },
+    {
       "name": "HealthRecord"
     },
     {
@@ -5630,6 +6523,9 @@
     },
     {
       "name": "Auth"
+    },
+    {
+      "name": "SymptomCatalog"
     }
   ],
   "security": [

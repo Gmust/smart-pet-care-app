@@ -12,6 +12,7 @@ import type { HealthHistoryCategory } from "../types";
 import { HistoryCard } from "./HistoryCard";
 import { HistoryGrid } from "./HistoryGrid";
 import dayjs from "dayjs";
+import { useRouter } from "expo-router";
 
 const CATEGORY_ICON: Record<
   HealthHistoryCategory,
@@ -24,12 +25,14 @@ const CATEGORY_ICON: Record<
 };
 
 type Props = {
+  petId: string;
   records: HealthRecordResponseDto[] | undefined;
   isLoading: boolean;
 };
 
-export function HealthHistorySection({ records, isLoading }: Props) {
+export function HealthHistorySection({ petId, records, isLoading }: Props) {
   const { t } = useTranslation(["health"]);
+  const router = useRouter();
 
   return (
     <HistoryGrid>
@@ -57,6 +60,12 @@ export function HealthHistorySection({ records, isLoading }: Props) {
             subtitle={isLoading ? t("health:history.loading") : subtitle}
             variant={isOverdue ? "overdue" : "default"}
             icon={<Icon width={20} height={20} color={palette.brand.peachDefault} />}
+            onPress={() =>
+              router.navigate({
+                pathname: "/(tabs)/health-record-list",
+                params: { petId, type: category },
+              })
+            }
           />
         );
       })}
