@@ -10,8 +10,8 @@ import { Trash2Icon } from "@/icons/general";
 type Props = {
   onDelete: () => void;
   disabled?: boolean;
-  topRadius?: number;
-  bottomRadius?: number;
+  isFirst?: boolean;
+  isLast?: boolean;
   actionVariant?: "circle" | "fill";
   children: ReactNode;
 };
@@ -19,8 +19,8 @@ type Props = {
 export function SwipeToDeleteRow({
   onDelete,
   disabled,
-  topRadius = 0,
-  bottomRadius = 0,
+  isFirst = false,
+  isLast = false,
   actionVariant = "fill",
   children,
 }: Props) {
@@ -35,12 +35,7 @@ export function SwipeToDeleteRow({
     onDelete();
   };
 
-  const cornerStyle = {
-    borderTopLeftRadius: topRadius,
-    borderTopRightRadius: topRadius,
-    borderBottomLeftRadius: bottomRadius,
-    borderBottomRightRadius: bottomRadius,
-  };
+  const cornerStyle = styles.corners(isFirst, isLast);
 
   return (
     <Swipeable
@@ -49,7 +44,7 @@ export function SwipeToDeleteRow({
       overshootRight={false}
       rightThreshold={40}
       // Transparent, unrounded — purely a gesture container, not a visual layer.
-      containerStyle={[styles.container, topRadius === 0 && styles.overlapSeam]}
+      containerStyle={[styles.container, !isFirst && styles.overlapSeam]}
       childrenContainerStyle={[
         { backgroundColor: theme.palette.white, overflow: "hidden" },
         cornerStyle,
@@ -94,6 +89,12 @@ const styles = StyleSheet.create((theme) => ({
   overlapSeam: {
     marginTop: -1,
   },
+  corners: (isFirst: boolean, isLast: boolean) => ({
+    borderTopLeftRadius: isFirst ? theme.borderRadius.xl : 0,
+    borderTopRightRadius: isFirst ? theme.borderRadius.xl : 0,
+    borderBottomLeftRadius: isLast ? theme.borderRadius.xl : 0,
+    borderBottomRightRadius: isLast ? theme.borderRadius.xl : 0,
+  }),
   fillAction: {
     width: 55,
     alignItems: "center",

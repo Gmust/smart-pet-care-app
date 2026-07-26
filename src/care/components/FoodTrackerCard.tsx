@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
@@ -17,7 +17,6 @@ type Props = {
 
 export function FoodTrackerCard({ tracker, onPress, onDelete }: Props) {
   const { t } = useTranslation(["care"]);
-  const { theme } = useUnistyles();
 
   const totalGrams =
     toGrams(tracker.packageWeight, tracker.packageWeightUnit) * tracker.packageCount;
@@ -42,8 +41,8 @@ export function FoodTrackerCard({ tracker, onPress, onDelete }: Props) {
     <SwipeToDeleteRow
       disabled={!onDelete}
       onDelete={() => onDelete?.()}
-      topRadius={theme.borderRadius.xl}
-      bottomRadius={theme.borderRadius.xl}
+      isFirst
+      isLast
       actionVariant="circle"
     >
       <Pressable

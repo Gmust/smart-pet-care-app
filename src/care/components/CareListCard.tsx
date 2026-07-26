@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
@@ -29,8 +29,6 @@ export function CareListCard<T>({
   isDeleteDisabled,
   footer,
 }: Props<T>) {
-  const { theme } = useUnistyles();
-
   return (
     <View style={careListCardStyles.card}>
       {items.map((item, index) => (
@@ -38,8 +36,8 @@ export function CareListCard<T>({
           key={keyExtractor(item)}
           disabled={!onDeleteItem || isDeleteDisabled?.(item)}
           onDelete={() => onDeleteItem?.(item)}
-          topRadius={index === 0 ? theme.borderRadius.xl : 0}
-          bottomRadius={!footer && index === items.length - 1 ? theme.borderRadius.xl : 0}
+          isFirst={index === 0}
+          isLast={!footer && index === items.length - 1}
         >
           <Pressable
             disabled={!onItemPress}
