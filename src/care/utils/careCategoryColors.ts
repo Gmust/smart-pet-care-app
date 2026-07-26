@@ -1,6 +1,6 @@
 import { palette } from "@/styles/palette";
 
-import type { CareCategory, PlannedHealthEventCategory } from "../../types";
+import type { CareCategory, PlannedHealthEventCategory } from "../types";
 
 type CategoryColors = { background: string; iconColor: string };
 

@@ -122,7 +122,7 @@ export function Chip({
       accessibilityState={{ disabled }}
       style={({ pressed }) => chipVariants.root(pressed && !disabled, disabled)}
     >
-      {Icon && (
+      {!!Icon && (
         <Icon
           width={iconSize ?? theme.iconSize[size]}
           height={iconSize ?? theme.iconSize[size]}

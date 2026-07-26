@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { Text } from "@/shadecn/ui/text";
 
 import type { CareCategory, DayOfWeek, PlannedHealthEventCategory, RecurrenceType } from "../types";
-import { getCareCategoryColors } from "./care-category-icon/careCategoryColors";
+import { getCareCategoryColors } from "../utils/careCategoryColors";
 import { CareCategoryIcon } from "./care-category-icon/CareCategoryIcon";
 import { RecurrenceChip } from "./RecurrenceChip";
 

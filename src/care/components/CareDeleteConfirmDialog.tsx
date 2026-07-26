@@ -79,8 +79,8 @@ export function CareDeleteConfirmDialog({
 const styles = StyleSheet.create((theme) => ({
   iconCircle: {
     alignSelf: "center",
-    width: 52,
-    height: 52,
+    width: theme.spacing(13),
+    height: theme.spacing(13),
     borderRadius: theme.borderRadius.full,
     alignItems: "center",
     justifyContent: "center",

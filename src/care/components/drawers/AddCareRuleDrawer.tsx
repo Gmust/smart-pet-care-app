@@ -71,10 +71,10 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
     onSubmit: async ({ value }) => {
       if (!category) return;
 
-      const title = isFixedSlot && categoryLabel ? categoryLabel : value.title;
+      const title = categoryLabel ?? value.title;
 
       try {
-        if (isEditMode && rule) {
+        if (rule) {
           await updateRule({
             id: rule.id,
             petId,

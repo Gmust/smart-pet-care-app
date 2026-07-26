@@ -32,7 +32,7 @@ export function MealsListCard({ meals, onEditMeal, onDeleteMeal }: Props) {
       onDeleteItem={onDeleteMeal}
       renderItem={(meal) => <MealRowContent title={meal.title} time={meal.time} />}
       footer={
-        firstMeal && (
+        !!firstMeal && (
           <View style={styles.footerRow}>
             <RecurrenceChip
               recurrenceType={firstMeal.recurrenceType}

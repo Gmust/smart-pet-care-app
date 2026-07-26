@@ -21,6 +21,8 @@ import {
   Inter_900Black,
 } from "@expo-google-fonts/inter";
 
+import { StyleSheet } from "react-native-unistyles";
+
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { AuthProvider } from "@/auth/context/AuthContext";
@@ -83,7 +85,7 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.root}>
       <AppProvider>
         <AuthProvider>
           <StatusBar hidden />
@@ -105,3 +107,7 @@ function RootNavigator() {
     </Stack>
   );
 }
+
+const styles = StyleSheet.create(() => ({
+  root: { flex: 1 },
+}));

@@ -51,7 +51,8 @@ export function CareCategorySection<
 }: Props<T, C>) {
   const primaryCategory = categories[0];
   const handleHeaderAction = () => {
-    if (primaryCategory) onAdd?.(primaryCategory);
+    if (!primaryCategory) return;
+    onAdd?.(primaryCategory);
   };
 
   const wrap = (children: ReactNode) => (

@@ -4,27 +4,6 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
-const careListCardStyles = StyleSheet.create((theme) => ({
-  card: {
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: theme.palette.brand.surfaceBorder,
-    borderRadius: theme.borderRadius.xl,
-    backgroundColor: theme.palette.white,
-  },
-  row: {
-    paddingHorizontal: theme.spacing(3.5),
-    paddingVertical: theme.spacing(2.75),
-  },
-  divider: {
-    borderTopWidth: 1,
-    borderTopColor: theme.palette.brand.surfaceBorder,
-  },
-  rowPressed: {
-    backgroundColor: theme.palette.brand.surfaceSunken,
-  },
-}));
-
 type Props<T> = {
   items: T[];
   keyExtractor: (item: T) => string;
@@ -84,3 +63,24 @@ export function CareListCard<T>({
     </View>
   );
 }
+
+const careListCardStyles = StyleSheet.create((theme) => ({
+  card: {
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.palette.brand.surfaceBorder,
+    borderRadius: theme.borderRadius.xl,
+    backgroundColor: theme.palette.white,
+  },
+  row: {
+    paddingHorizontal: theme.spacing(3.5),
+    paddingVertical: theme.spacing(2.75),
+  },
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: theme.palette.brand.surfaceBorder,
+  },
+  rowPressed: {
+    backgroundColor: theme.palette.brand.surfaceSunken,
+  },
+}));
