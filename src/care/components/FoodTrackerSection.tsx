@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
 
+import { useCareDelete } from "../hooks/useCareDelete";
 import { useDeleteFoodTrackerMutation } from "../queries/useDeleteFoodTrackerMutation";
 import { useFoodTrackerQuery } from "../queries/useFoodTrackerQuery";
 import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { FoodTracker } from "../types";
-import { CareDeleteFlow } from "./CareDeleteFlow";
+import { CareDeleteConfirmDialog } from "./CareDeleteConfirmDialog";
 import { CareSection } from "./CareSection";
 import { EmptyCareCard } from "./EmptyCareCard";
 import { FoodTrackerCard } from "./FoodTrackerCard";
@@ -19,37 +20,37 @@ export function FoodTrackerSection({ petId, onAddFood, onEditFood }: Props) {
   const { t } = useTranslation(["care"]);
   const { data: trackers, isLoading } = useFoodTrackerQuery(petId);
   const { mutateAsync: deleteTracker, isPending: isDeleting } = useDeleteFoodTrackerMutation();
+  const { requestDelete, dialogProps } = useCareDelete({
+    petId,
+    deleteItem: deleteTracker,
+    isDeleting,
+  });
 
   return (
-    <CareDeleteFlow<FoodTracker>
-      petId={petId}
-      deleteItem={deleteTracker}
-      isDeleting={isDeleting}
-      getName={(tracker) => tracker.foodName}
-    >
-      {(requestDelete) => (
-        <CareSection
-          title={t("sections.foodTracker.title")}
-          actionLabel={t("sections.foodTracker.addAction")}
-          onActionPress={onAddFood}
-        >
-          {isLoading ? (
-            <CareListSkeleton rows={2} />
-          ) : (
-            <>
-              {!trackers?.length && <EmptyCareCard onPress={onAddFood} />}
-              {trackers?.map((tracker) => (
-                <FoodTrackerCard
-                  key={tracker.id}
-                  tracker={tracker}
-                  onPress={() => onEditFood?.(tracker)}
-                  onDelete={() => requestDelete(tracker)}
-                />
-              ))}
-            </>
-          )}
-        </CareSection>
-      )}
-    </CareDeleteFlow>
+    <>
+      <CareSection
+        title={t("sections.foodTracker.title")}
+        actionLabel={t("sections.foodTracker.addAction")}
+        onActionPress={onAddFood}
+      >
+        {isLoading ? (
+          <CareListSkeleton rows={2} />
+        ) : (
+          <>
+            {!trackers?.length && <EmptyCareCard onPress={onAddFood} />}
+            {trackers?.map((tracker) => (
+              <FoodTrackerCard
+                key={tracker.id}
+                tracker={tracker}
+                onPress={() => onEditFood?.(tracker)}
+                onDelete={() => requestDelete({ id: tracker.id, name: tracker.foodName })}
+              />
+            ))}
+          </>
+        )}
+      </CareSection>
+
+      <CareDeleteConfirmDialog {...dialogProps} />
+    </>
   );
 }
