@@ -227,69 +227,69 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
       </form.Field>
 
       <form.Subscribe selector={(state) => state.values.recurrenceType}>
-        {(recurrenceType) =>
-          recurrenceType === "Weekly" ? (
-            <form.Field name="weekDays">
-              {(field) => {
-                const selectedDays = field.state.value ?? [];
-                return (
-                  <View style={styles.field}>
-                    <Text style={styles.label}>{t("care:forms.careRule.fields.weekDays")}</Text>
-                    <View style={styles.chips}>
-                      {WEEK_DAY_ORDER.map((day) => {
-                        const isSelected = selectedDays.includes(day);
-                        return (
-                          <Chip
-                            key={day}
-                            label={t(`care:daysShort.${day}`)}
-                            tone={isSelected ? "primary" : "neutral"}
-                            variant={isSelected ? "default" : "ghost"}
-                            onPress={() =>
-                              field.handleChange(
-                                isSelected
-                                  ? selectedDays.filter((value) => value !== day)
-                                  : [...selectedDays, day]
-                              )
-                            }
-                          />
-                        );
-                      })}
+        {(recurrenceType) => {
+          if (recurrenceType === "Weekly") {
+            return (
+              <form.Field name="weekDays">
+                {(field) => {
+                  const selectedDays = field.state.value ?? [];
+                  return (
+                    <View style={styles.field}>
+                      <Text style={styles.label}>{t("care:forms.careRule.fields.weekDays")}</Text>
+                      <View style={styles.chips}>
+                        {WEEK_DAY_ORDER.map((day) => {
+                          const isSelected = selectedDays.includes(day);
+                          return (
+                            <Chip
+                              key={day}
+                              label={t(`care:daysShort.${day}`)}
+                              tone={isSelected ? "primary" : "neutral"}
+                              variant={isSelected ? "default" : "ghost"}
+                              onPress={() =>
+                                field.handleChange(
+                                  isSelected
+                                    ? selectedDays.filter((value) => value !== day)
+                                    : [...selectedDays, day]
+                                )
+                              }
+                            />
+                          );
+                        })}
+                      </View>
+                      <FieldError errors={field.state.meta.errors} />
                     </View>
+                  );
+                }}
+              </form.Field>
+            );
+          }
+          if (recurrenceType === "EveryNWeeks" || recurrenceType === "EveryNMonths") {
+            return (
+              <form.Field name="intervalN">
+                {(field) => (
+                  <View style={styles.field}>
+                    <Input
+                      label={t(
+                        recurrenceType === "EveryNWeeks"
+                          ? "care:forms.careRule.fields.intervalWeeks"
+                          : "care:forms.careRule.fields.intervalMonths"
+                      )}
+                      placeholder={t("care:forms.careRule.placeholders.interval")}
+                      value={field.state.value != null ? String(field.state.value) : ""}
+                      onChangeText={(text) =>
+                        field.handleChange(text === "" ? undefined : Number(text))
+                      }
+                      onBlur={field.handleBlur}
+                      error={field.state.meta.errors.length > 0}
+                    />
                     <FieldError errors={field.state.meta.errors} />
                   </View>
-                );
-              }}
-            </form.Field>
-          ) : null
-        }
-      </form.Subscribe>
-
-      <form.Subscribe selector={(state) => state.values.recurrenceType}>
-        {(recurrenceType) =>
-          recurrenceType === "EveryNWeeks" || recurrenceType === "EveryNMonths" ? (
-            <form.Field name="intervalN">
-              {(field) => (
-                <View style={styles.field}>
-                  <Input
-                    label={t(
-                      recurrenceType === "EveryNWeeks"
-                        ? "care:forms.careRule.fields.intervalWeeks"
-                        : "care:forms.careRule.fields.intervalMonths"
-                    )}
-                    placeholder={t("care:forms.careRule.placeholders.interval")}
-                    value={field.state.value != null ? String(field.state.value) : ""}
-                    onChangeText={(text) =>
-                      field.handleChange(text === "" ? undefined : Number(text))
-                    }
-                    onBlur={field.handleBlur}
-                    error={field.state.meta.errors.length > 0}
-                  />
-                  <FieldError errors={field.state.meta.errors} />
-                </View>
-              )}
-            </form.Field>
-          ) : null
-        }
+                )}
+              </form.Field>
+            );
+          }
+          return null;
+        }}
       </form.Subscribe>
     </CareDrawerShell>
   );
