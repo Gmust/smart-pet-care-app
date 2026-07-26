@@ -6,6 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
 import { DateTimeField } from "@/common/components/DateTimeField";
+import { formatTimeOfDay, parseTimeOfDay } from "@/common/utils/timeOfDay";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
@@ -14,7 +15,6 @@ import { useCreateMealMutation } from "../../queries/useCreateMealMutation";
 import { useUpdateMealMutation } from "../../queries/useUpdateMealMutation";
 import { type MealFormValues, mealSchema } from "../../schemas/meal.schema";
 import type { MealRule } from "../../types";
-import { formatTimeOfDay, parseTimeOfDay } from "../../utils/timeOfDay";
 import { CareDrawerShell } from "./CareDrawerShell";
 
 type Props = {

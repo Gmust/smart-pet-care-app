@@ -6,6 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
 import { DateTimeField } from "@/common/components/DateTimeField";
+import { formatTimeOfDay, parseTimeOfDay } from "@/common/utils/timeOfDay";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
 import { FieldError } from "@/shadecn/ui/field-error";
@@ -18,7 +19,6 @@ import { useCreateCareRuleMutation } from "../../queries/useCreateCareRuleMutati
 import { useUpdateCareRuleMutation } from "../../queries/useUpdateCareRuleMutation";
 import { type CareRuleFormValues, careRuleSchema } from "../../schemas/care-rule.schema";
 import type { CareCategory, CareRule, DayOfWeek, RecurrenceType } from "../../types";
-import { formatTimeOfDay, parseTimeOfDay } from "../../utils/timeOfDay";
 import { CareDrawerShell } from "./CareDrawerShell";
 
 type Props = {
