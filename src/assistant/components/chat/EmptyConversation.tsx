@@ -3,7 +3,7 @@ import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { AiIcon } from "@/icons/ai-icon";
-import { ChevronRightIcon } from "@/icons/chevron-right";
+import { ChevronIcon } from "@/icons/chevron";
 import { Text } from "@/shadecn/ui/text";
 
 export function EmptyConversation({
@@ -38,7 +38,12 @@ export function EmptyConversation({
             style={({ pressed }) => [styles.promptChip, pressed && styles.pressed]}
           >
             <Text style={styles.promptText}>{prompt}</Text>
-            <ChevronRightIcon width={16} height={16} color={styles.promptChevron.color} />
+            <ChevronIcon
+              direction="right"
+              width={16}
+              height={16}
+              color={styles.promptChevron.color}
+            />
           </Pressable>
         ))}
       </View>

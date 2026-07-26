@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { Chevron } from "@/icons/arrows";
+import { ChevronIcon } from "@/icons/chevron";
 import { Button } from "@/shadecn/ui/button";
 import { palette } from "@/styles/palette";
 
@@ -27,7 +27,7 @@ export const BackButton = ({ onBackPress }: Props) => {
       accessibilityLabel={t("actions.back")}
       onPress={onBackPress ?? handleBack}
     >
-      <Chevron width={18} height={18} color={palette.brand.primaryDark} />
+      <ChevronIcon direction="left" width={18} height={18} color={palette.brand.primaryDark} />
     </Button>
   );
 };

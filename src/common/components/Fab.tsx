@@ -15,7 +15,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { ActivityIcon } from "@/icons/activity";
 import { BellPlusIcon } from "@/icons/bell";
-import { CalendarHeartIcon } from "@/icons/calendar-heart";
+import { CalendarHeartIcon } from "@/icons/calendar";
 import { HeartPulseIcon } from "@/icons/heart";
 import type { Icon } from "@/icons/icons";
 import { PlusIcon } from "@/icons/plus";

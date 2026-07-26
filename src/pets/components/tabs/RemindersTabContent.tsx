@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { CirclePlusIcon } from "@/icons/circle-plus";
+import { CirclePlusIcon } from "@/icons/plus";
 import { ReminderDrawers } from "@/reminders/components/ReminderDrawers";
 import { ReminderRow } from "@/reminders/components/ReminderRow";
 import { useReminderActions } from "@/reminders/hooks/useReminderActions";

@@ -4,7 +4,7 @@ import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import type { HealthRecordResponseDto } from "@/api/generated";
-import { ChevronDownIcon } from "@/icons/chevron-down";
+import { ChevronIcon } from "@/icons/chevron";
 import { InfoRow } from "@/pets/components/pet-profile/InfoRow";
 import { cardVariants } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
@@ -41,7 +41,12 @@ export function HealthRecordCard({ record, symptomLabelByName }: Props) {
           <Text style={styles.date}>{dayjs(record.performedAt).format("MMM D, YYYY")}</Text>
         </View>
         <View style={[isExpanded && styles.chevronExpanded]}>
-          <ChevronDownIcon width={16} height={16} color={palette.brand.textSecondary} />
+          <ChevronIcon
+            direction="down"
+            width={16}
+            height={16}
+            color={palette.brand.textSecondary}
+          />
         </View>
       </View>
 

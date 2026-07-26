@@ -1,7 +1,7 @@
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { ChevronRightIcon } from "@/icons/chevron-right";
+import { ChevronIcon } from "@/icons/chevron";
 import { PencilLineIcon } from "@/icons/pencil-line";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
@@ -31,7 +31,8 @@ export const NoteRow = ({ note }: NoteRowProps) => {
           {note.preview}
         </Text>
       </View>
-      <ChevronRightIcon
+      <ChevronIcon
+        direction="right"
         width={CHEVRON_ICON_SIZE}
         height={CHEVRON_ICON_SIZE}
         color={palette.brand.textSecondary}

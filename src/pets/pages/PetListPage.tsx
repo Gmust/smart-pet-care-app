@@ -4,7 +4,7 @@ import { FlatList, RefreshControl, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
-import { CirclePlusIcon } from "@/icons/circle-plus";
+import { CirclePlusIcon } from "@/icons/plus";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";

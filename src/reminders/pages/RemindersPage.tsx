@@ -6,8 +6,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
 import { ReminderStatus } from "@/api/generated";
-import { Chevron } from "@/icons/arrows";
-import { CirclePlusIcon } from "@/icons/circle-plus";
+import { ChevronIcon } from "@/icons/chevron";
+import { CirclePlusIcon } from "@/icons/plus";
 import { Button } from "@/shadecn/ui/button";
 import type { TabItem } from "@/shadecn/ui/tabs";
 import { Tabs, tabsContentEntering } from "@/shadecn/ui/tabs";
@@ -122,7 +122,7 @@ export default function RemindersPage() {
             accessibilityLabel={t("reminders:remindersPage.goBack")}
             onPress={handleBack}
           >
-            <Chevron width={9} height={16} color={palette.brand.textBody} />
+            <ChevronIcon direction="left" width={18} height={18} color={palette.brand.textBody} />
           </Button>
           <View style={styles.topBarCopy}>
             <Text style={styles.topBarTitle}>{t("reminders:remindersPage.title")}</Text>

@@ -2,8 +2,8 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { PillIcon } from "@/icons/health/pill";
 import { HeartPulseIcon } from "@/icons/heart";
+import { PillIcon } from "@/icons/pill";
 import { BasicsCard } from "@/pets/components/tabs/BasicsCard";
 import type { usePetQuery } from "@/pets/queries/usePetQuery";
 import { palette } from "@/styles/palette";

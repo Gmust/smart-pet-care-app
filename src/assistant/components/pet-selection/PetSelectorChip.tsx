@@ -3,7 +3,7 @@ import { TouchableOpacity, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import type { PetResponseDto } from "@/api";
-import { ChevronRightIcon } from "@/icons/chevron-right";
+import { ChevronIcon } from "@/icons/chevron";
 import { PetSpeciesImage } from "@/pets/components/PetSpeciesImage";
 import { Text } from "@/shadecn/ui/text";
 
@@ -31,7 +31,7 @@ export const PetSelectorChip = ({ selectedPet }: Props) => {
       <Text style={styles.contextName} numberOfLines={1}>
         {selectedPet.name}
       </Text>
-      <ChevronRightIcon width={16} height={16} color={styles.contextChevron.color} />
+      <ChevronIcon direction="right" width={16} height={16} color={styles.contextChevron.color} />
     </TouchableOpacity>
   );
 };

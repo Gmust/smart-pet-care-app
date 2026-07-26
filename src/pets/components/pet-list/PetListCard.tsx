@@ -5,8 +5,8 @@ import { StyleSheet } from "react-native-unistyles";
 
 import type { PetResponseDto } from "@/api/generated";
 import { ReminderType } from "@/api/generated";
-import { ChevronRightIcon } from "@/icons/chevron-right";
-import { TrendingUpIcon } from "@/icons/trending-up";
+import { ChevronIcon } from "@/icons/chevron";
+import { TrendingUpIcon } from "@/icons/trending";
 import { useGetRemindersByPet } from "@/reminders/queries/useGetReminderByPet";
 import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
@@ -123,7 +123,7 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
             <Text style={styles.actionText} numberOfLines={1}>
               {t("pets:petListCard.viewInfo")}
             </Text>
-            <ChevronRightIcon width={14} height={14} color={styles.actionText.color} />
+            <ChevronIcon direction="right" width={14} height={14} color={styles.actionText.color} />
           </View>
         </View>
       </View>

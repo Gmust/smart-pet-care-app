@@ -7,7 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { AddButton } from "@/common/components/AddButton";
 import { BackButton } from "@/common/components/BackButton";
-import { CalendarHeartIcon } from "@/icons/calendar-heart";
+import { CalendarSearchIcon } from "@/icons/calendar";
 import { usePetQuery } from "@/pets/queries/usePetQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
@@ -105,7 +105,7 @@ export default function HealthRecordListPage() {
             variant="icon"
             size="icon"
             accessibilityLabel={t("health:recordList.filters.openFilter")}
-            icon={<CalendarHeartIcon width={18} height={18} color={palette.brand.textSecondary} />}
+            icon={<CalendarSearchIcon width={18} height={18} color={palette.brand.textSecondary} />}
             onPress={() => setIsDateFilterOpen(true)}
           />
         </View>

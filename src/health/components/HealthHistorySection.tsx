@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
 
 import type { HealthRecordResponseDto } from "@/api/generated";
-import { BugOffIcon } from "@/icons/health/bug-off";
-import { WormIcon } from "@/icons/health/worm";
+import { BugOffIcon } from "@/icons/bug-off";
 import { StethoscopeIcon } from "@/icons/stethoscope";
 import { SyringeIcon } from "@/icons/syringe";
+import { WormIcon } from "@/icons/worm";
 import { palette } from "@/styles/palette";
 
 import { HEALTH_HISTORY_CATEGORIES } from "../constants";
