@@ -1,0 +1,76 @@
+@startuml
+title Smart Pet Care - Component and Ownership Diagram
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam wrapWidth 220
+top to bottom direction
+
+actor "Pet owner" as Owner
+
+package "Cross-platform mobile client\n(this repository)" as Mobile {
+  component "Expo Router\nand UI shell" as Router
+  component "Authentication\ncontext and screens" as Auth
+  component "Pet management" as Pets
+  component "Reminder management" as Reminders
+  component "Android notification\nintegration" as Notifications
+  component "Pet-scoped assistant\nclient" as Assistant
+  component "Generated API client\nAxios + OpenAPI" as ApiClient
+  component "Server-state manager\nTanStack Query" as Query
+  component "Protected local storage\nExpo SecureStore" as SecureStore
+}
+
+cloud "Google identity\nprovider" as Google
+cloud "Firebase Cloud\nMessaging" as FCM
+package "ASP.NET Core backend\nrepository: smart-pet-care-api" as BackendSystem {
+  component "Public REST API\nJWT + ownership checks" as Backend
+  component "Domain modules\npets / care / reminders" as Domain
+  component "Chat integration\nsessions / history / resilience" as Chat
+  database "PostgreSQL\nEF Core migrations" as Database
+}
+package "Python AI microservice\nrepository: pet-diseases-classifier" as AI {
+  component "Stateless /chat use case\nrouting + safety policy" as AIChat
+  component "Local condition classifier\nprediction + confidence" as Classifier
+  component "Gemini text generation\nbounded explanations" as Gemini
+}
+
+Owner --> Router : touch / keyboard /\naccessibility interaction
+Router --> Auth
+Router --> Pets
+Router --> Reminders
+Router --> Assistant
+
+Auth --> SecureStore : session material
+Auth --> Google : native sign-in
+
+Pets --> Query
+Reminders --> Query
+Assistant --> Query
+Query --> ApiClient
+Auth --> ApiClient
+Notifications --> ApiClient : token registration /\nreminder status
+
+ApiClient --> Backend : HTTPS + JSON\n(contract: OpenAPI)
+FCM --> Notifications : Android notification /\nnative token lifecycle
+Backend --> Domain
+Domain --> Database
+Backend --> Chat
+Backend --> FCM : FCM v1 push delivery
+Chat --> AIChat : POST /chat\nX-API-Key / JSON
+AIChat --> Classifier : health-mode inference
+AIChat --> Gemini : general answer /\nexplanation text
+
+note left of Backend
+  Backend main inspected through 6d79951.
+  Volodymyr leads architecture and core modules.
+  Kseniia owns identifiable photo, feeding,
+  weight, and classifier-integration changes.
+end note
+
+note right of AI
+  Unified /chat implementation inspected at
+  feature revision 74019ea, authored by Illia.
+  Final merged/deployed revision still required.
+end note
+
+@enduml

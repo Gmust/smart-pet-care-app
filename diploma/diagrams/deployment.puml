@@ -1,0 +1,50 @@
+@startuml
+
+skinparam shadowing false
+skinparam wrapWidth 220
+skinparam linetype ortho
+top to bottom direction
+
+node "Android device or emulator\nFINAL ACCEPTANCE DEVICE REQUIRED" as Android {
+  artifact "Smart Pet Care\nExpo / React Native build" as App
+  database "Android Keystore-backed\nSecureStore boundary" as Store
+  component "Google Play services /\nFCM client" as Play
+}
+
+cloud "Google-managed services" as GoogleServices {
+  component "Identity services" as Google
+  component "Firebase Cloud Messaging" as FCM
+}
+
+node "Container host\nFINAL HOST / IMAGE DIGEST REQUIRED" as BackendHost {
+  artifact "ASP.NET Core backend\nmain inspected through 6d79951" as Backend
+  database "PostgreSQL\nEF Core schema" as Database
+}
+
+node "AWS deployment boundary\nSAM definition inspected" as AIHost {
+  artifact "FastAPI + Mangum\nAWS Lambda container" as AI
+  artifact "Unified /chat branch\n74019ea\nDEPLOYED REVISION REQUIRED" as ChatRevision
+}
+
+App --> Store : protected key-value API
+App --> Google : native OAuth flow\nTLS
+App --> Backend : HTTPS + JSON
+Play --> FCM : native FCM transport
+FCM --> App : notification payload
+Backend --> FCM : FCM v1\nSERVER CREDENTIALS ONLY
+Backend --> Database : EF Core / Npgsql
+Backend --> AI : HTTPS POST /chat\nX-API-Key / timeout /\nretry + circuit breaker
+AI --> ChatRevision : implementation revision
+
+Android -[hidden]down-> GoogleServices
+GoogleServices -[hidden]down-> BackendHost
+BackendHost -[hidden]down-> AIHost
+
+legend bottom
+  |= Evidence owner |= Information still required |
+  | Volodymyr and Kseniia | Final backend host, image digest, migration state, and runtime record |
+  | Illia | Deployed AI revision/model release, Lambda record, monitoring, and evaluation |
+  | Team | Final Android build digest, device/emulator model, API level, and scenarios |
+endlegend
+
+@enduml

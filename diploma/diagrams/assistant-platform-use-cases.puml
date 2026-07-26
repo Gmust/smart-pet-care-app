@@ -1,0 +1,36 @@
+@startuml
+title Smart Pet Care - Provisional Assistant and Connectivity Use Cases
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam wrapWidth 170
+
+actor "Pet owner" as Owner
+actor "Android connectivity\nservice" as Connectivity
+actor "AI backend service\nCONFIRM BOUNDARY" as AI
+
+rectangle "Smart Pet Care system" {
+  package "Pet-scoped assistant" {
+    usecase "UC-14\nReview and decide\nassistant consent" as UCConsent
+    usecase "UC-15\nSelect pet context" as UCPetContext
+    usecase "UC-16\nManage assistant\nconversation" as UCAssistant
+    usecase "UC-17\nRetry failed\nassistant message" as UCRetry
+
+  }
+
+  package "Cross-cutting behavior" {
+    usecase "UC-18\nRecover after\nconnectivity change" as UCConnectivity
+  }
+}
+
+Owner --> UCAssistant
+Owner --> UCConnectivity
+Connectivity --> UCConnectivity
+AI ..> UCAssistant : indirect service role\nCONFIRM TOPOLOGY
+
+UCConsent .> UCAssistant : <<include>>
+UCPetContext .> UCAssistant : <<include>>
+UCRetry .> UCAssistant : <<extend>>
+
+@enduml

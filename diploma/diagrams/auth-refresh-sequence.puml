@@ -1,0 +1,80 @@
+@startuml
+title Smart Pet Care - Authentication Restoration and Refresh
+
+skinparam shadowing false
+autonumber
+
+actor "Pet owner" as Owner
+participant "Mobile UI" as UI
+participant "AuthProvider" as Auth
+database "SecureStore" as Store
+participant "Axios interceptor" as Axios
+participant "Core backend API" as Backend
+
+== Application startup ==
+Owner -> UI : launch application
+UI -> Auth : initialize
+Auth -> Store : get access token,\nrefresh token, expiry
+
+alt no stored session
+  Store --> Auth : no access token
+  Auth --> UI : unauthenticated
+else stored access token not expired
+  Store --> Auth : stored session
+  Auth -> Axios : set in-memory access token
+  Auth --> UI : authenticated
+else expired access token and refresh token exists
+  Store --> Auth : expired session
+  Auth -> Backend : POST /api/Auth/refresh
+  alt refresh succeeds
+    Backend --> Auth : rotated AuthResponse
+    Auth -> Store : persist rotated session
+    Auth -> Axios : set new in-memory access token
+    Auth --> UI : authenticated
+  else refresh fails
+    Backend --> Auth : error
+    Auth -> Store : clear stored session
+    Auth -> Axios : clear in-memory token
+    Auth --> UI : unauthenticated
+  end
+end
+
+== Authenticated request receives 401 ==
+UI -> Axios : generated API request
+Axios -> Backend : request + bearer token
+Backend --> Axios : 401 Unauthorized
+
+alt request has not already been retried
+  Axios -> Auth : refresh current session
+  note right of Auth
+    AuthProvider shares one in-flight refresh
+    promise between refresh callers.
+  end note
+  Auth -> Backend : POST /api/Auth/refresh
+  alt refresh succeeds
+    Backend --> Auth : new AuthResponse
+    Auth -> Store : persist rotated session
+    Auth --> Axios : new access token
+    Axios -> Backend : retry original request once
+    Backend --> Axios : response
+    Axios --> UI : response
+  else refresh fails
+    Backend --> Auth : error
+    Auth --> Axios : no token
+    Axios -> Auth : unauthorized handler / sign out
+    Auth -> Store : clear session
+    Axios --> UI : rejected request
+  end
+else already retried
+  Axios -> Auth : unauthorized handler / sign out
+  Axios --> UI : rejected request
+end
+
+note over Auth, Backend
+  Final thesis evidence still required:
+  restart, expiry, concurrent 401, refresh failure,
+  Google sign-in, and protected-route scenarios.
+end note
+
+@enduml
+

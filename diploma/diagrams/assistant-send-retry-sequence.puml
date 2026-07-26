@@ -1,0 +1,90 @@
+@startuml
+title Smart Pet Care - Assistant Consent, Session, Send, and Retry
+
+skinparam shadowing false
+autonumber
+
+actor "Pet owner" as Owner
+participant "AssistantPage" as Page
+database "Protected consent storage" as Consent
+participant "Pet query" as Pets
+participant "Session bootstrap" as Bootstrap
+participant "Message query" as Messages
+participant "Core backend API" as Backend
+participant "Python AI service\n/chat at feature 74019ea" as AI
+
+Owner -> Page : open assistant
+Page -> Consent : restore consent
+
+alt consent missing or invalid
+  Consent --> Page : no valid consent
+  Page -> Owner : show consent dialog
+  alt owner accepts
+    Owner -> Page : accept
+    Page -> Consent : persist consent
+  else owner declines
+    Owner -> Page : decline
+    Page --> Owner : navigate away
+  end
+else consent restored
+  Consent --> Page : accepted
+end
+
+Page -> Pets : load available pets
+Pets -> Backend : GET /api/pets
+Backend --> Pets : pet list
+Owner -> Page : select pet
+Page -> Bootstrap : bootstrap selected pet
+Bootstrap -> Backend : GET /api/sessions
+
+alt matching session exists
+  Backend --> Bootstrap : sessions
+  Bootstrap -> Messages : activate latest pet session
+else no matching session
+  Backend --> Bootstrap : no pet session
+  Bootstrap -> Backend : POST /api/sessions
+  Backend --> Bootstrap : created session
+  Bootstrap -> Messages : activate created session
+end
+
+Messages -> Backend : GET session messages\n(limit 8, optional cursor)
+Backend --> Messages : page + pagination
+Messages --> Page : merged ordered history
+
+Owner -> Page : submit non-empty message
+Page -> Page : optional conservative\nlocal urgency presentation
+Page -> Backend : POST session message
+Backend -> Backend : authorize pet/session\npersist pending user message\nbuild last-8 history
+Backend -> AI : POST /chat\nmessages + petType + symptomSummary
+AI -> AI : deterministic safety routing\nand condition analysis
+AI --> Backend : mode + answer + prediction /\nurgency + symptomSummary
+Backend -> Backend : persist assistant result\nor retryable failure
+
+alt valid backend response
+  Backend --> Page : message / urgency /\ndisclaimer data
+  Page -> Messages : invalidate message and session queries
+  Messages -> Backend : refetch as required
+  Backend --> Messages : updated history
+  Messages --> Page : render result
+else retryable failure
+  Backend --> Page : failure / retry metadata
+  Page --> Owner : render retry state
+  Owner -> Page : retry
+  Page -> Backend : POST retry endpoint
+  alt retry succeeds
+    Backend --> Page : completed response
+    Page -> Messages : invalidate queries
+  else retry fails
+    Backend --> Page : failure
+    Page --> Owner : preserve retryable failure
+  end
+end
+
+note over Page, AI
+  Mobile, C# backend, and AI branch implementations are
+  repository-supported. Final deployed revisions and live
+  acceptance results remain required. No clinical accuracy
+  claim is made.
+end note
+
+@enduml

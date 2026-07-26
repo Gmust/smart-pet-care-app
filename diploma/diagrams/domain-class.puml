@@ -1,0 +1,116 @@
+@startuml
+title Smart Pet Care - Contract-Level Conceptual Domain Classes
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam wrapWidth 190
+left to right direction
+
+class UserProfile <<OpenAPI response>> {
+  +id: UUID
+  +email: string
+  +displayName: string?
+  +phoneNumber: string?
+  +termsAccepted: boolean
+  +createdAt: date-time
+  +updatedAt: date-time?
+}
+
+class Pet <<OpenAPI response>> {
+  +id: UUID
+  +name: string
+  +species: AnimalSpecies
+  +breed: string?
+  +birthDate: date-time?
+  +weightKg: number?
+  +sex: Sex
+  +photoUrl: string?
+  +allergies: string[]?
+  +chronicConditions: string[]?
+  +behavioralNotes: string[]?
+}
+
+class Reminder <<OpenAPI response>> {
+  +id: UUID
+  +petId: UUID
+  +title: string
+  +type: ReminderType
+  +status: ReminderStatus
+  +repeatType: RepeatType
+  +startAt: date-time
+  +nextTriggerAt: date-time?
+}
+
+class ReminderRun <<OpenAPI response>> {
+  +id: UUID
+  +reminderId: UUID
+  +scheduledFor: date-time
+  +sentAt: date-time?
+  +completedAt: date-time?
+  +status: ReminderRunStatus
+}
+
+class FeedingLog <<OpenAPI response>> {
+  +id: UUID
+  +petId: UUID
+  +fedAt: date-time
+  +foodType: FoodType
+  +portionAmount: number?
+}
+
+class HealthRecord <<OpenAPI response>> {
+  +id: UUID
+  +petId: UUID
+  +type: HealthRecordType
+  +title: string
+  +performedAt: date-time
+  +nextDueAt: date-time?
+}
+
+class WeightLog <<OpenAPI response>> {
+  +id: UUID
+  +petId: UUID
+  +weightKg: number
+  +measuredAt: date-time
+}
+
+class AssistantSession <<OpenAPI response>> {
+  +sessionId: UUID
+  +petId: UUID
+  +petType: PetType
+  +symptomSummary: string?
+  +createdAt: date-time
+  +updatedAt: date-time
+}
+
+class AssistantMessage <<OpenAPI response>> {
+  +messageId: UUID
+  +role: ChatMessageRole
+  +status: ChatMessageStatus?
+  +content: string
+  +createdAt: date-time
+}
+
+UserProfile "1" .. "0..*" Pet : authorized access\nMULTIPLICITY TO CONFIRM
+Pet "1" -- "0..*" Reminder : petId
+Reminder "1" -- "0..*" ReminderRun : reminderId
+Pet "1" -- "0..*" FeedingLog : petId
+Pet "1" -- "0..*" HealthRecord : petId
+Pet "1" -- "0..*" WeightLog : petId
+Pet "1" -- "0..*" AssistantSession : petId
+AssistantSession "1" *-- "0..*" AssistantMessage : response embeds messages
+
+note bottom of UserProfile
+  The mobile API is authenticated and exposes
+  user/profile operations, but the response DTOs do
+  not directly prove the persisted User-Pet relation.
+end note
+
+note bottom of AssistantMessage
+  This is a conceptual contract model derived from
+  docs/openapi.json. It is not a backend database,
+  ORM, or storage-schema diagram. Backend owners
+  must confirm persistence classes and multiplicities.
+end note
+
+@enduml

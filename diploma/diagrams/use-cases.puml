@@ -1,0 +1,56 @@
+@startuml
+title Smart Pet Care - Provisional Account and Pet-Care Use Cases
+
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam wrapWidth 170
+
+actor "Pet owner" as Owner
+actor "Google identity\nprovider" as Google
+actor "Firebase Cloud\nMessaging" as FCM
+
+rectangle "Smart Pet Care system" {
+  package "Account access" as AccountAccess {
+    usecase "UC-01\nRegister account" as UCRegister
+    usecase "UC-02\nConfirm email account" as UCConfirm
+    usecase "UC-03\nSign in with email" as UCEmailLogin
+    usecase "UC-04\nSign in with Google" as UCGoogleLogin
+    usecase "UC-05\nResume authenticated\nsession" as UCSession
+    usecase "UC-06\nManage account profile" as UCProfile
+    usecase "UC-07\nSign out" as UCLogout
+    usecase "UC-08\nDelete account\nSCOPE DECISION" as UCDeleteAccount
+
+  }
+
+  package "Pet care" as PetCare {
+    usecase "UC-09\nManage pet profiles" as UCPets
+    usecase "UC-10\nManage pet photograph" as UCPhoto
+    usecase "UC-11\nManage reminders" as UCReminders
+    usecase "UC-12\nSynchronize Android\nnotification token" as UCToken
+    usecase "UC-13\nOpen reminder status\nfrom notification" as UCNotification
+
+  }
+
+}
+
+Owner --> UCRegister
+Owner --> UCConfirm
+Owner --> UCEmailLogin
+Owner --> UCGoogleLogin
+Owner --> UCSession
+Owner --> UCProfile
+Owner --> UCLogout
+Owner --> UCDeleteAccount
+Owner --> UCPets
+Owner --> UCReminders
+Owner --> UCNotification
+
+Google --> UCGoogleLogin
+FCM --> UCToken
+FCM --> UCNotification
+
+UCPhoto .> UCPets : <<extend>>
+UCToken .> UCSession : may follow authentication
+
+@enduml

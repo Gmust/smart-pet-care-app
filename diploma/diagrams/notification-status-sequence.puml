@@ -1,0 +1,63 @@
+@startuml
+title Smart Pet Care - Android Notification Token and Reminder Status
+
+skinparam shadowing false
+autonumber
+
+actor "Pet owner" as Owner
+participant "Android application" as App
+participant "NotificationProvider" as Provider
+participant "Expo Notifications /\nFCM client" as Native
+participant "Core backend API" as Backend
+participant "Firebase Cloud Messaging" as FCM
+participant "ReminderStatusPrompt" as Prompt
+participant "ReminderStatusDrawer" as Drawer
+
+== Token synchronization ==
+Owner -> App : sign in
+App -> Provider : authenticated state
+Provider -> Native : create channel "default"
+Provider -> Native : get permission
+alt permission can be requested
+  Provider -> Native : request permission
+end
+
+alt permission granted
+  Provider -> Native : get native device token
+  Native --> Provider : Android FCM token
+  Provider -> Backend : POST /api/notifications/device-token
+  Backend --> Provider : registration result
+  Provider -> App : store token after API success
+else permission denied or revoked
+  Provider -> Backend : DELETE previously stored token
+  Provider -> App : clear local token after allowed result
+end
+
+== Reminder notification ==
+Backend -> FCM : send notification\n(channel "default", data.reminderId)
+FCM -> Native : deliver notification
+Native -> Owner : display notification
+Owner -> Native : tap notification
+Native -> Prompt : last notification response
+
+alt data.reminderId is a string
+  Prompt -> Prompt : de-duplicate request identifier
+  Prompt -> Drawer : open with reminderId
+  Prompt -> Native : clear last response
+  Drawer -> Backend : load reminder detail
+  Backend --> Drawer : reminder
+  Owner -> Drawer : Completed / Missed / Cancelled
+  Drawer -> Backend : PATCH /api/reminders/{id}
+  Backend --> Drawer : updated result
+else identifier missing or malformed
+  Prompt -> App : no status drawer
+end
+
+note over App, FCM
+  Token branches have automated coverage.
+  Foreground, background, terminated delivery,
+  tap routing, and configured backend delivery
+  still require Android evidence.
+end note
+
+@enduml
