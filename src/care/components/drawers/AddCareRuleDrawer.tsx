@@ -55,7 +55,7 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
   const { t } = useTranslation(["care", "common"]);
   const isEditMode = !!rule;
   // Kept in sync manually with AddPlannedHealthEventDrawer.tsx (and
-  // CareCategorySection.tsx's fixedSlots title logic). If this changes,
+  // CareFixedSlotsSection.tsx's title logic). If this changes,
   // check those too.
   const labelKey = category ? CARE_CATEGORY_LABEL_KEYS[category] : undefined;
   const isFixedSlot = !!labelKey;
