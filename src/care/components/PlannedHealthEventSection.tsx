@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { CARE_CATEGORY_LABEL_KEYS, type CareSectionConfig } from "../constants";
+import { CARE_CATEGORY_LABEL_KEYS, type PlannedHealthEventSectionConfig } from "../constants";
 import { useCareDelete } from "../hooks/useCareDelete";
 import { useDeletePlannedHealthEventMutation } from "../queries/useDeletePlannedHealthEventMutation";
 import { usePlannedHealthEventsQuery } from "../queries/usePlannedHealthEventsQuery";
@@ -12,7 +12,7 @@ import { CareListSection } from "./CareListSection";
 const PLANNED_HEALTH_EVENT_RECURRENCE = "EveryNMonths" as const;
 
 type Props = {
-  config: CareSectionConfig;
+  config: PlannedHealthEventSectionConfig;
   petId: string;
   onAddEvent?: (category: PlannedHealthEventCategory) => void;
   onEditEvent?: (event: PlannedHealthEvent) => void;
@@ -31,7 +31,7 @@ export function PlannedHealthEventSection({ config, petId, onAddEvent, onEditEve
   const commonProps = {
     title: t(config.titleKey),
     actionLabel: config.headerActionLabelKey ? t(config.headerActionLabelKey) : undefined,
-    categories: config.fixedPlannedHealthCategories ?? [],
+    categories: config.fixedPlannedHealthCategories,
     items: events,
     isLoading,
     getCategory: (event: PlannedHealthEvent) => event.category,

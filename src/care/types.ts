@@ -90,16 +90,6 @@ export type FoodTracker = {
   restockDate?: string; // computed
 };
 
-export type CareSectionKey =
-  | "meals"
-  | "foodTracker"
-  | "vetVisit"
-  | "vaccination"
-  | "treatments"
-  | "weighing"
-  | "walking"
-  | "grooming";
-
 /** Recursively extracts every leaf dot-path key from the "care" translation JSON. */
 type DotPaths<T> = {
   [K in keyof T & string]: T[K] extends string

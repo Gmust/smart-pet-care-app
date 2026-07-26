@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { CARE_CATEGORY_LABEL_KEYS, type CareSectionConfig } from "../constants";
+import { CARE_CATEGORY_LABEL_KEYS, type CareRuleSectionConfig } from "../constants";
 import { useCareDelete } from "../hooks/useCareDelete";
 import { useCareRulesQuery } from "../queries/useCareRulesQuery";
 import { useDeleteCareRuleMutation } from "../queries/useDeleteCareRuleMutation";
@@ -10,7 +10,7 @@ import { CareFixedSlotsSection } from "./CareFixedSlotsSection";
 import { CareListSection } from "./CareListSection";
 
 type Props = {
-  config: CareSectionConfig;
+  config: CareRuleSectionConfig;
   petId: string;
   onAddRule?: (category: CareCategory) => void;
   onEditRule?: (rule: CareRule) => void;
@@ -29,7 +29,7 @@ export function CareRuleSection({ config, petId, onAddRule, onEditRule }: Props)
   const commonProps = {
     title: t(config.titleKey),
     actionLabel: config.headerActionLabelKey ? t(config.headerActionLabelKey) : undefined,
-    categories: config.fixedCareCategories ?? [],
+    categories: config.fixedCareCategories,
     items: rules,
     isLoading,
     getCategory: (rule: CareRule) => rule.category,

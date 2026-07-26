@@ -1,58 +1,80 @@
-import type {
-  CareCategory,
-  CareSectionKey,
-  CareTranslationKey,
-  PlannedHealthEventCategory,
-} from "./types";
+import type { CareCategory, CareTranslationKey, PlannedHealthEventCategory } from "./types";
+
+export type MealsSectionConfig = {
+  key: "meals";
+  renderer: "meals";
+  titleKey: CareTranslationKey;
+  headerActionLabelKey?: CareTranslationKey;
+};
+
+export type FoodTrackerSectionConfig = {
+  key: "foodTracker";
+  renderer: "foodTracker";
+  titleKey: CareTranslationKey;
+  headerActionLabelKey?: CareTranslationKey;
+};
 
 /**
- * "meals"        — always a list of MealRow, header action = "Edit"
- * "foodTracker"  — single FoodTrackerCard entity, header action = "Add food"
  * "single"       — max 1 rule (Vet Visit). No header action; tap card/empty
  *                   state to add or edit.
  * "growableList" — 1 rule → CareRuleCardSingle, 2+ → CareRuleCardListItem.
  *                   Has a header "Add X" action.
- * "fixedSlots"   — always renders one row per `fixedCareCategories` /
- *                   `fixedPlannedHealthCategories` entry (Grooming,
- *                   Treatments). Each row is independently "Not configured"
+ * "fixedSlots"   — always renders one row per `fixedCareCategories` entry
+ *                   (Grooming). Each row is independently "Not configured"
  *                   or filled; tapping a row opens the drawer pre-scoped to
  *                   that category.
  */
-export type CareSectionVariant = "meals" | "foodTracker" | "single" | "growableList" | "fixedSlots";
-
-export type CareSectionConfig = {
-  key: CareSectionKey;
-  variant: CareSectionVariant;
+export type CareRuleSectionConfig = {
+  key: "vetVisit" | "weighing" | "walking" | "grooming";
+  renderer: "careRule";
+  variant: "single" | "growableList" | "fixedSlots";
   titleKey: CareTranslationKey;
-  /** i18n key for the header action label (e.g. "Add walk"). Omit → no header action. */
   headerActionLabelKey?: CareTranslationKey;
-  /** For sections backed by CareRule (single / growableList / fixedSlots subset). */
-  fixedCareCategories?: CareCategory[];
-  /** For sections backed by PlannedHealthEvent (vaccination / treatments). */
-  fixedPlannedHealthCategories?: PlannedHealthEventCategory[];
+  fixedCareCategories: CareCategory[];
 };
+
+/**
+ * Same variant semantics as CareRuleSectionConfig, but backed by
+ * PlannedHealthEvent (vaccination / treatments) instead of CareRule.
+ */
+export type PlannedHealthEventSectionConfig = {
+  key: "vaccination" | "treatments";
+  renderer: "plannedHealthEvent";
+  variant: "growableList" | "fixedSlots";
+  titleKey: CareTranslationKey;
+  headerActionLabelKey?: CareTranslationKey;
+  fixedPlannedHealthCategories: PlannedHealthEventCategory[];
+};
+
+export type CareSectionConfig =
+  | MealsSectionConfig
+  | FoodTrackerSectionConfig
+  | CareRuleSectionConfig
+  | PlannedHealthEventSectionConfig;
 
 export const CARE_SECTIONS: CareSectionConfig[] = [
   {
     key: "meals",
-    variant: "meals",
+    renderer: "meals",
     titleKey: "sections.meals.title",
     headerActionLabelKey: "sections.meals.addAction",
   },
   {
     key: "foodTracker",
-    variant: "foodTracker",
+    renderer: "foodTracker",
     titleKey: "sections.foodTracker.title",
     headerActionLabelKey: "sections.foodTracker.addAction",
   },
   {
     key: "vetVisit",
+    renderer: "careRule",
     variant: "single",
     titleKey: "sections.vetVisit.title",
     fixedCareCategories: ["VetVisit"],
   },
   {
     key: "vaccination",
+    renderer: "plannedHealthEvent",
     variant: "growableList",
     titleKey: "sections.vaccination.title",
     headerActionLabelKey: "sections.vaccination.addAction",
@@ -60,12 +82,14 @@ export const CARE_SECTIONS: CareSectionConfig[] = [
   },
   {
     key: "treatments",
+    renderer: "plannedHealthEvent",
     variant: "fixedSlots",
     titleKey: "sections.treatments.title",
     fixedPlannedHealthCategories: ["Deworming", "Antiparasite"],
   },
   {
     key: "weighing",
+    renderer: "careRule",
     variant: "growableList",
     titleKey: "sections.weighing.title",
     headerActionLabelKey: "sections.weighing.addAction",
@@ -73,6 +97,7 @@ export const CARE_SECTIONS: CareSectionConfig[] = [
   },
   {
     key: "walking",
+    renderer: "careRule",
     variant: "growableList",
     titleKey: "sections.walking.title",
     headerActionLabelKey: "sections.walking.addAction",
@@ -80,6 +105,7 @@ export const CARE_SECTIONS: CareSectionConfig[] = [
   },
   {
     key: "grooming",
+    renderer: "careRule",
     variant: "fixedSlots",
     titleKey: "sections.grooming.title",
     fixedCareCategories: [
