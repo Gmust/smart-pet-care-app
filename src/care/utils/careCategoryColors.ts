@@ -4,33 +4,31 @@ import type { CareCategory, PlannedHealthEventCategory } from "../types";
 
 type CategoryColors = { background: string; iconColor: string };
 
-const DEFAULT_COLORS: CategoryColors = {
+const PEACH: CategoryColors = {
   background: palette.brand.peachIconBg,
   iconColor: palette.brand.peachDefault,
 };
 
-const GROOMING_COLORS: CategoryColors = {
+const GROOMING: CategoryColors = {
   background: palette.brand.surfaceSunken,
   iconColor: palette.brand.textBody,
 };
 
-const GROOMING_CATEGORIES: CareCategory[] = [
-  "Bathing",
-  "Brushing",
-  "EarCleaning",
-  "NailTrimming",
-  "PawCare",
-  "TeethCleaning",
-];
-
-const OVERRIDES: Partial<Record<CareCategory, CategoryColors>> = {
+const CATEGORY_COLORS: Record<CareCategory | PlannedHealthEventCategory, CategoryColors> = {
+  VetVisit: PEACH,
+  Vaccination: PEACH,
+  Deworming: PEACH,
+  Antiparasite: PEACH,
   Weighing: { background: palette.brand.dangerBg, iconColor: palette.brand.peachDefault },
   Walking: { background: palette.brand.primaryXsoft, iconColor: palette.brand.textBody },
-  ...Object.fromEntries(GROOMING_CATEGORIES.map((category) => [category, GROOMING_COLORS])),
+  Bathing: GROOMING,
+  Brushing: GROOMING,
+  EarCleaning: GROOMING,
+  NailTrimming: GROOMING,
+  PawCare: GROOMING,
+  TeethCleaning: GROOMING,
 };
 
-export function getCareCategoryColors(
+export const getCareCategoryColors = (
   category: CareCategory | PlannedHealthEventCategory
-): CategoryColors {
-  return OVERRIDES[category as CareCategory] ?? DEFAULT_COLORS;
-}
+): CategoryColors => CATEGORY_COLORS[category];
