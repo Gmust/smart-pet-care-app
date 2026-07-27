@@ -19,16 +19,18 @@ export function useCareDelete({ petId, deleteItem, isDeleting }: Params) {
   const requestDelete = (item: PendingItem) => setPendingItem(item);
   const close = () => setPendingItem(null);
 
+  const confirmDelete = async () => {
+    if (!pendingItem) return;
+    await deleteItem({ id: pendingItem.id, petId });
+  };
+
   const dialogProps: ComponentProps<typeof CareDeleteConfirmDialog> = {
     isOpen: pendingItem !== null,
     setIsOpen: (open) => !open && close(),
     title: t("deleteDialog.title"),
     description: t("deleteDialog.description", { name: pendingItem?.name ?? "" }),
     isDeleting,
-    onConfirm: async () => {
-      if (!pendingItem) return;
-      await deleteItem({ id: pendingItem.id, petId });
-    },
+    onConfirm: confirmDelete,
   };
 
   return { requestDelete, dialogProps };
