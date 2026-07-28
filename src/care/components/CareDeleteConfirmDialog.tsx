@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import Toast from "react-native-toast-message";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { Trash2Icon } from "@/icons/general";
 import { Button } from "@/shadecn/ui/button";
@@ -32,6 +32,7 @@ export function CareDeleteConfirmDialog({
   onConfirm,
 }: Props) {
   const { t } = useTranslation(["care", "common"]);
+  const { theme } = useUnistyles();
 
   const handleConfirm = async () => {
     try {
@@ -47,7 +48,11 @@ export function CareDeleteConfirmDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
         <View style={styles.iconCircle}>
-          <Trash2Icon width={24} height={24} color={styles.iconColor.color} />
+          <Trash2Icon
+            width={theme.iconSize["2xl"]}
+            height={theme.iconSize["2xl"]}
+            color={styles.iconColor.color}
+          />
         </View>
 
         <DialogHeader style={styles.header}>

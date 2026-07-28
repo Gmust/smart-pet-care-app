@@ -58,7 +58,11 @@ export function SwipeToDeleteRow({
               onPress={handlePress}
               style={({ pressed }) => [styles.circleButton, pressed && styles.circleButtonPressed]}
             >
-              <Trash2Icon width={18} height={18} color={theme.palette.white} />
+              <Trash2Icon
+                width={theme.iconSize.lg}
+                height={theme.iconSize.lg}
+                color={theme.palette.white}
+              />
             </Pressable>
           </View>
         ) : (
@@ -72,7 +76,11 @@ export function SwipeToDeleteRow({
               pressed && styles.fillActionPressed,
             ]}
           >
-            <Trash2Icon width={20} height={20} color={theme.palette.white} />
+            <Trash2Icon
+              width={theme.iconSize.xl}
+              height={theme.iconSize.xl}
+              color={theme.palette.white}
+            />
           </Pressable>
         )
       }

@@ -20,8 +20,8 @@ export function EmptyCareRowContent({ category, title, notConfiguredLabel }: Pro
       <View style={styles.iconBox}>
         <CareCategoryIcon
           category={category}
-          width={16}
-          height={16}
+          width={theme.iconSize.md}
+          height={theme.iconSize.md}
           color={theme.palette.brand.textFaint}
         />
       </View>

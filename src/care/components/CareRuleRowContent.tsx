@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
@@ -37,15 +37,18 @@ export function CareRuleRowContent({
   size = "sm",
 }: Props) {
   rowVariants.useVariants({ size });
+  const { theme } = useUnistyles();
   const colors = getCareCategoryColors(category);
+
+  const iconSize = size === "lg" ? theme.iconSize.lg : theme.iconSize.md;
 
   return (
     <View style={rowVariants.row}>
       <View style={[rowVariants.iconBox, { backgroundColor: colors.background }]}>
         <CareCategoryIcon
           category={category}
-          width={size === "lg" ? 18 : 16}
-          height={size === "lg" ? 18 : 16}
+          width={iconSize}
+          height={iconSize}
           color={colors.iconColor}
         />
       </View>
