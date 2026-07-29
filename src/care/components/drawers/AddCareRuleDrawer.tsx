@@ -196,7 +196,9 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
       <form.Field name="recurrenceType">
         {(field) => (
           <View style={styles.field}>
-            <Text style={styles.label}>{t("care:forms.careRule.fields.recurrenceType")}</Text>
+            <Text variant="bodyS" style={styles.label}>
+              {t("care:forms.careRule.fields.recurrenceType")}
+            </Text>
             <Select
               containerStyle={styles.selectContainer}
               value={{
@@ -235,7 +237,9 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
                   const selectedDays = field.state.value ?? [];
                   return (
                     <View style={styles.field}>
-                      <Text style={styles.label}>{t("care:forms.careRule.fields.weekDays")}</Text>
+                      <Text variant="bodyS" style={styles.label}>
+                        {t("care:forms.careRule.fields.weekDays")}
+                      </Text>
                       <View style={styles.chips}>
                         {WEEK_DAY_ORDER.map((day) => {
                           const isSelected = selectedDays.includes(day);
@@ -300,7 +304,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   label: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   chips: {

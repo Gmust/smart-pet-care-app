@@ -158,7 +158,9 @@ export function AddFoodTrackerDrawer({ petId, isOpen, setIsOpen, tracker }: Prop
         <form.Field name="packageWeightUnit">
           {(field) => (
             <View style={styles.field}>
-              <Text style={styles.label}> </Text>
+              <Text variant="bodyS" style={styles.label}>
+                {" "}
+              </Text>
               <BinaryToggle
                 options={["kg", "g"] as const}
                 optionLabels={["kg", "g"] as const}
@@ -221,7 +223,9 @@ export function AddFoodTrackerDrawer({ petId, isOpen, setIsOpen, tracker }: Prop
         </form.Field>
 
         <View style={styles.field}>
-          <Text style={styles.label}> </Text>
+          <Text variant="bodyS" style={styles.label}>
+            {" "}
+          </Text>
           <View style={styles.chips}>
             <Chip
               label={t("care:forms.foodTracker.units.grams")}
@@ -235,7 +239,9 @@ export function AddFoodTrackerDrawer({ petId, isOpen, setIsOpen, tracker }: Prop
       <form.Field name="feedingFrequency">
         {(field) => (
           <View style={styles.field}>
-            <Text style={styles.label}>{t("care:forms.foodTracker.fields.feedingFrequency")}</Text>
+            <Text variant="bodyS" style={styles.label}>
+              {t("care:forms.foodTracker.fields.feedingFrequency")}
+            </Text>
             <BinaryToggle
               options={["daily", "weekly"] as const}
               optionLabels={[
@@ -305,7 +311,6 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   label: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   chips: {
