@@ -1,6 +1,7 @@
 import type { CareRule } from "../../types";
 import { createMockCollection } from "./store";
 
+// TODO(care-backend): replace with real API once the CareRules endpoint exists.
 const collection = createMockCollection<CareRule>();
 
 export const careRulesMock = {

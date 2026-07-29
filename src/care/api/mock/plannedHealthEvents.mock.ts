@@ -2,12 +2,14 @@ import type { PlannedHealthEvent } from "../../types";
 import { createMockCollection } from "./store";
 import dayjs from "dayjs";
 
+// TODO(care-backend): replace with real API once the PlannedHealthEvents endpoint exists.
 const collection = createMockCollection<PlannedHealthEvent>();
 
 /**
- * The real backend computes `nextDueAt`. This mirrors that logic client-side
- * only so cards have something to render during development — delete this
- * once the endpoint exists and returns it for real.
+ * TODO(care-backend): The real backend computes `nextDueAt`. This mirrors
+ * that logic client-side only so cards have something to render during
+ * development — delete this once the endpoint exists and returns it for
+ * real.
  */
 function withComputedNextDueAt(
   event: Omit<PlannedHealthEvent, "id">

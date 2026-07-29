@@ -6,9 +6,10 @@ import dayjs from "dayjs";
 const collection = createMockCollection<FoodTracker>();
 
 /**
- * The real backend computes remainingWeight / restockDate from consumption.
- * This mirrors that logic client-side only so the card has real-looking
- * numbers during development — delete this once the endpoint returns them.
+ * TODO(care-backend): The real backend computes remainingWeight / restockDate
+ * from consumption. This mirrors that logic client-side only so the card has
+ * real-looking numbers during development — delete this once the endpoint
+ * returns them.
  */
 function withComputedFields(input: Omit<FoodTracker, "id">): Omit<FoodTracker, "id"> {
   const totalGrams = toGrams(input.packageWeight, input.packageWeightUnit) * input.packageCount;

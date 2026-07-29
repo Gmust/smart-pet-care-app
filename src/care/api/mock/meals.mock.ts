@@ -1,6 +1,7 @@
 import type { MealRule } from "../../types";
 import { createMockCollection } from "./store";
 
+// TODO(care-backend): replace with real API once the Meals endpoint exists.
 const collection = createMockCollection<MealRule>();
 
 export const mealsMock = {
