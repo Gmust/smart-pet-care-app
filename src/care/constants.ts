@@ -1,4 +1,10 @@
-import type { CareCategory, CareTranslationKey, PlannedHealthEventCategory } from "./types";
+import type {
+  CareCategory,
+  CareTranslationKey,
+  DayOfWeek,
+  PlannedHealthEventCategory,
+  RecurrenceType,
+} from "./types";
 
 export type MealsSectionConfig = {
   key: "meals";
@@ -132,4 +138,92 @@ export const CARE_CATEGORY_LABEL_KEYS: Partial<
   Antiparasite: "categoryLabels.Antiparasite",
 };
 
+/**
+ * Title field placeholder, per category. Only relevant for the categories
+ * where AddCareRuleDrawer actually renders a free-text title field
+ * (VetVisit, Weighing, Walking) — fixed-slot categories use
+ * CARE_CATEGORY_LABEL_KEYS as the title instead and never show this field.
+ * Falls back to "care:forms.careRule.placeholders.title" if a category
+ * isn't listed here.
+ */
+export const CARE_CATEGORY_TITLE_PLACEHOLDER_KEYS: Partial<
+  Record<CareCategory, CareTranslationKey>
+> = {
+  VetVisit: "forms.careRule.placeholders.titleVetVisit",
+  Weighing: "forms.careRule.placeholders.titleWeighing",
+  Walking: "forms.careRule.placeholders.titleWalking",
+};
+
 export const RECURRENCE_TYPE_DEFAULT_INTERVAL = 1;
+
+/** Defaults applied to the recurrence fields when creating a new CareRule for a category. */
+export type CareRuleRecurrenceDefaults = {
+  recurrenceType: RecurrenceType;
+  intervalN?: number;
+  weekDays?: DayOfWeek[];
+};
+
+type GroomingCategory =
+  | "Bathing"
+  | "Brushing"
+  | "EarCleaning"
+  | "NailTrimming"
+  | "PawCare"
+  | "TeethCleaning";
+
+/**
+ * Grooming sub-categories don't share a sensible "every N weeks" default —
+ * each has its own realistic cadence, so RECURRENCE_TYPE_DEFAULT_INTERVAL
+ * (a generic 1) doesn't fit all of them.
+ */
+const GROOMING_DEFAULT_INTERVAL_WEEKS: Record<GroomingCategory, number> = {
+  Bathing: 6, // every ~1.5 months
+  Brushing: 1, // weekly
+  EarCleaning: 3, // every 3 weeks
+  NailTrimming: 4, // every ~month
+  PawCare: 2, // every 2 weeks
+  TeethCleaning: 1, // weekly
+};
+
+/**
+ * Per-category recurrence defaults, prefilled when the "Add" drawer opens
+ * for a fresh rule. Editing an existing rule always uses the rule's own
+ * values instead (see AddCareRuleDrawer's reset effect).
+ */
+export const CARE_CATEGORY_DEFAULT_RECURRENCE: Partial<
+  Record<CareCategory, CareRuleRecurrenceDefaults>
+> = {
+  VetVisit: { recurrenceType: "Yearly" },
+  Weighing: { recurrenceType: "Weekly", weekDays: [] },
+  Walking: { recurrenceType: "Daily" },
+  Bathing: {
+    recurrenceType: "EveryNWeeks",
+    intervalN: GROOMING_DEFAULT_INTERVAL_WEEKS.Bathing,
+    weekDays: [],
+  },
+  Brushing: {
+    recurrenceType: "EveryNWeeks",
+    intervalN: GROOMING_DEFAULT_INTERVAL_WEEKS.Brushing,
+    weekDays: [],
+  },
+  EarCleaning: {
+    recurrenceType: "EveryNWeeks",
+    intervalN: GROOMING_DEFAULT_INTERVAL_WEEKS.EarCleaning,
+    weekDays: [],
+  },
+  NailTrimming: {
+    recurrenceType: "EveryNWeeks",
+    intervalN: GROOMING_DEFAULT_INTERVAL_WEEKS.NailTrimming,
+    weekDays: [],
+  },
+  PawCare: {
+    recurrenceType: "EveryNWeeks",
+    intervalN: GROOMING_DEFAULT_INTERVAL_WEEKS.PawCare,
+    weekDays: [],
+  },
+  TeethCleaning: {
+    recurrenceType: "EveryNWeeks",
+    intervalN: GROOMING_DEFAULT_INTERVAL_WEEKS.TeethCleaning,
+    weekDays: [],
+  },
+};

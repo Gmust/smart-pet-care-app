@@ -54,7 +54,8 @@
     "everyWeek": "Every week",
     "everyNWeeks": "Every {{n}} weeks",
     "everyMonth": "Every month",
-    "everyNMonths": "Every {{n}} months"
+    "everyNMonths": "Every {{n}} months",
+    "yearly": "Every year"
   },
   "daysShort": {
     "Sunday": "Sun",
@@ -94,20 +95,27 @@
         "time": "Reminder time",
         "recurrenceType": "Repeats",
         "weekDays": "On these days",
+        "anchorWeekDay": "On this day",
         "intervalWeeks": "Every how many weeks",
-        "intervalMonths": "Every how many months"
+        "intervalMonths": "Every how many months",
+        "startDate": "Starting from"
       },
       "placeholders": {
         "title": "e.g. Schedule vet visit",
+        "titleVetVisit": "e.g. Annual checkup",
+        "titleWeighing": "e.g. Weekly weigh-in",
+        "titleWalking": "e.g. Evening walk",
         "time": "Select time",
         "recurrenceType": "Select frequency",
-        "interval": "e.g. 3"
+        "interval": "e.g. 3",
+        "startDate": "Select date"
       },
       "recurrenceOptions": {
         "Daily": "Every day",
         "Weekly": "On specific days",
         "EveryNWeeks": "Every N weeks",
-        "EveryNMonths": "Every N months"
+        "EveryNMonths": "Every N months",
+        "Yearly": "Every year"
       },
       "createSuccess": "Rule added",
       "updateSuccess": "Rule updated",
@@ -117,7 +125,9 @@
         "titleRequired": "Title is required",
         "timeRequired": "Time is required",
         "weekDaysRequired": "Pick at least one day",
-        "intervalRequired": "Enter an interval"
+        "anchorWeekDayRequired": "Pick a day",
+        "intervalRequired": "Enter an interval",
+        "startDateRequired": "Select a start date"
       }
     },
     "plannedHealthEvent": {

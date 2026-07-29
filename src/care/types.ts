@@ -4,7 +4,7 @@ import type careEn from "@/care/locales/en.json";
 export type DayOfWeek = DaysOfWeek;
 export const WEEK_DAYS = Object.values(DaysOfWeek) as DayOfWeek[];
 
-export type RecurrenceType = "Daily" | "Weekly" | "EveryNWeeks" | "EveryNMonths";
+export type RecurrenceType = "Daily" | "Weekly" | "EveryNWeeks" | "EveryNMonths" | "Yearly";
 
 /**
  * Categories backed by CareRule. Vaccination / Deworming / Antiparasite are
@@ -54,7 +54,7 @@ export type CareRule = {
   recurrenceType: RecurrenceType;
   intervalN?: number; // for EveryNWeeks / EveryNMonths
   weekDays?: DayOfWeek[]; // Weekly (several) or EveryNWeeks (one)
-  startDate?: string; // ISO date, for EveryNMonths anchor
+  startDate?: string; // ISO date, anchor for EveryNMonths / Yearly
 };
 
 /** A planned event with history: Vaccination, Deworming, Antiparasite. */

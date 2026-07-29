@@ -6,6 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
 import { DateTimeField } from "@/common/components/DateTimeField";
+import { formatDateOfDay, parseDateOfDay } from "@/common/utils/dateOfDay";
 import { formatTimeOfDay, parseTimeOfDay } from "@/common/utils/timeOfDay";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
@@ -14,7 +15,11 @@ import { Input } from "@/shadecn/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shadecn/ui/select";
 import { Text } from "@/shadecn/ui/text";
 
-import { CARE_CATEGORY_LABEL_KEYS } from "../../constants";
+import {
+  CARE_CATEGORY_DEFAULT_RECURRENCE,
+  CARE_CATEGORY_LABEL_KEYS,
+  CARE_CATEGORY_TITLE_PLACEHOLDER_KEYS,
+} from "../../constants";
 import { useCreateCareRuleMutation } from "../../queries/useCreateCareRuleMutation";
 import { useUpdateCareRuleMutation } from "../../queries/useUpdateCareRuleMutation";
 import { type CareRuleFormValues, careRuleSchema } from "../../schemas/care-rule.schema";
@@ -29,7 +34,13 @@ type Props = {
   rule?: CareRule;
 };
 
-const RECURRENCE_TYPES: RecurrenceType[] = ["Daily", "Weekly", "EveryNWeeks", "EveryNMonths"];
+const RECURRENCE_TYPES: RecurrenceType[] = [
+  "Daily",
+  "Weekly",
+  "EveryNWeeks",
+  "EveryNMonths",
+  "Yearly",
+];
 
 const WEEK_DAY_ORDER: DayOfWeek[] = [
   "Monday",
@@ -49,6 +60,7 @@ const defaultValues: CareRuleFormValues = {
   recurrenceType: "Daily",
   intervalN: undefined,
   weekDays: [],
+  startDate: undefined,
 };
 
 export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: Props) {
@@ -60,6 +72,9 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
   const labelKey = category ? CARE_CATEGORY_LABEL_KEYS[category] : undefined;
   const isFixedSlot = !!labelKey;
   const categoryLabel = labelKey ? t(labelKey) : undefined;
+  const titlePlaceholderKey =
+    (category && CARE_CATEGORY_TITLE_PLACEHOLDER_KEYS[category]) ||
+    "care:forms.careRule.placeholders.title";
 
   const { mutateAsync: createRule, isPending: isCreating } = useCreateCareRuleMutation();
   const { mutateAsync: updateRule, isPending: isUpdating } = useUpdateCareRuleMutation();
@@ -73,6 +88,20 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
 
       const title = categoryLabel ?? value.title;
 
+      // Collapse recurrence choices that are equivalent to a simpler type,
+      // so the recurrence chip on the card doesn't end up showing e.g.
+      // "Every 12 months" when "Every year" reads better and is shorter.
+      const isEveryTwelveMonths = value.recurrenceType === "EveryNMonths" && value.intervalN === 12;
+      const isEveryWeekDay =
+        value.recurrenceType === "Weekly" && value.weekDays.length === WEEK_DAY_ORDER.length;
+      const recurrenceType = isEveryTwelveMonths
+        ? "Yearly"
+        : isEveryWeekDay
+          ? "Daily"
+          : value.recurrenceType;
+      const weekDays = isEveryWeekDay ? [] : value.weekDays;
+      const intervalN = isEveryTwelveMonths ? undefined : value.intervalN;
+
       try {
         if (rule) {
           await updateRule({
@@ -81,11 +110,18 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
             patch: {
               title,
               reminderTime: value.time,
-              recurrenceType: value.recurrenceType,
-              weekDays: value.recurrenceType === "Weekly" ? value.weekDays : undefined,
+              recurrenceType,
+              weekDays:
+                recurrenceType === "Weekly" || recurrenceType === "EveryNWeeks"
+                  ? weekDays
+                  : undefined,
               intervalN:
-                value.recurrenceType === "EveryNWeeks" || value.recurrenceType === "EveryNMonths"
-                  ? value.intervalN
+                recurrenceType === "EveryNWeeks" || recurrenceType === "EveryNMonths"
+                  ? intervalN
+                  : undefined,
+              startDate:
+                recurrenceType === "EveryNMonths" || recurrenceType === "Yearly"
+                  ? value.startDate
                   : undefined,
             },
           });
@@ -95,11 +131,18 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
             category,
             title,
             reminderTime: value.time,
-            recurrenceType: value.recurrenceType,
-            weekDays: value.recurrenceType === "Weekly" ? value.weekDays : undefined,
+            recurrenceType,
+            weekDays:
+              recurrenceType === "Weekly" || recurrenceType === "EveryNWeeks"
+                ? weekDays
+                : undefined,
             intervalN:
-              value.recurrenceType === "EveryNWeeks" || value.recurrenceType === "EveryNMonths"
-                ? value.intervalN
+              recurrenceType === "EveryNWeeks" || recurrenceType === "EveryNMonths"
+                ? intervalN
+                : undefined,
+            startDate:
+              recurrenceType === "EveryNMonths" || recurrenceType === "Yearly"
+                ? value.startDate
                 : undefined,
           });
         }
@@ -120,6 +163,7 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
 
   useEffect(() => {
     if (!isOpen) return;
+    const categoryDefaults = category ? CARE_CATEGORY_DEFAULT_RECURRENCE[category] : undefined;
     form.reset(
       rule
         ? {
@@ -128,10 +172,15 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
             recurrenceType: rule.recurrenceType,
             intervalN: rule.intervalN,
             weekDays: rule.weekDays ?? [],
+            startDate: rule.startDate,
           }
-        : { ...defaultValues, title: categoryLabel ?? "" }
+        : {
+            ...defaultValues,
+            title: categoryLabel ?? "",
+            ...categoryDefaults,
+          }
     );
-  }, [isOpen, rule, categoryLabel, form]);
+  }, [isOpen, rule, category, categoryLabel, form]);
 
   return (
     <CareDrawerShell
@@ -163,7 +212,7 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
             <View style={styles.field}>
               <Input
                 label={t("care:forms.careRule.fields.title")}
-                placeholder={t("care:forms.careRule.placeholders.title")}
+                placeholder={t(titlePlaceholderKey)}
                 value={field.state.value}
                 onChangeText={field.handleChange}
                 onBlur={field.handleBlur}
@@ -267,29 +316,85 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
               </form.Field>
             );
           }
-          if (recurrenceType === "EveryNWeeks" || recurrenceType === "EveryNMonths") {
+          if (
+            recurrenceType === "EveryNWeeks" ||
+            recurrenceType === "EveryNMonths" ||
+            recurrenceType === "Yearly"
+          ) {
             return (
-              <form.Field name="intervalN">
-                {(field) => (
-                  <View style={styles.field}>
-                    <Input
-                      label={t(
-                        recurrenceType === "EveryNWeeks"
-                          ? "care:forms.careRule.fields.intervalWeeks"
-                          : "care:forms.careRule.fields.intervalMonths"
-                      )}
-                      placeholder={t("care:forms.careRule.placeholders.interval")}
-                      value={field.state.value != null ? String(field.state.value) : ""}
-                      onChangeText={(text) =>
-                        field.handleChange(text === "" ? undefined : Number(text))
-                      }
-                      onBlur={field.handleBlur}
-                      error={field.state.meta.errors.length > 0}
-                    />
-                    <FieldError errors={field.state.meta.errors} />
-                  </View>
+              <>
+                {(recurrenceType === "EveryNWeeks" || recurrenceType === "EveryNMonths") && (
+                  <form.Field name="intervalN">
+                    {(field) => (
+                      <View style={styles.field}>
+                        <Input
+                          label={t(
+                            recurrenceType === "EveryNWeeks"
+                              ? "care:forms.careRule.fields.intervalWeeks"
+                              : "care:forms.careRule.fields.intervalMonths"
+                          )}
+                          placeholder={t("care:forms.careRule.placeholders.interval")}
+                          value={field.state.value != null ? String(field.state.value) : ""}
+                          onChangeText={(text) =>
+                            field.handleChange(text === "" ? undefined : Number(text))
+                          }
+                          onBlur={field.handleBlur}
+                          error={field.state.meta.errors.length > 0}
+                        />
+                        <FieldError errors={field.state.meta.errors} />
+                      </View>
+                    )}
+                  </form.Field>
                 )}
-              </form.Field>
+                {recurrenceType === "EveryNWeeks" && (
+                  <form.Field name="weekDays">
+                    {(field) => {
+                      const selectedDay = field.state.value?.[0];
+                      return (
+                        <View style={styles.field}>
+                          <Text variant="bodyS" style={styles.label}>
+                            {t("care:forms.careRule.fields.anchorWeekDay")}
+                          </Text>
+                          <View style={styles.chips}>
+                            {WEEK_DAY_ORDER.map((day) => {
+                              const isSelected = selectedDay === day;
+                              return (
+                                <Chip
+                                  key={day}
+                                  label={t(`care:daysShort.${day}`)}
+                                  tone={isSelected ? "primary" : "neutral"}
+                                  variant={isSelected ? "default" : "ghost"}
+                                  onPress={() => field.handleChange(isSelected ? [] : [day])}
+                                />
+                              );
+                            })}
+                          </View>
+                          <FieldError errors={field.state.meta.errors} />
+                        </View>
+                      );
+                    }}
+                  </form.Field>
+                )}
+                {(recurrenceType === "EveryNMonths" || recurrenceType === "Yearly") && (
+                  <form.Field name="startDate">
+                    {(field) => (
+                      <View style={styles.field}>
+                        <DateTimeField
+                          mode="date"
+                          label={t("care:forms.careRule.fields.startDate")}
+                          placeholder={t("care:forms.careRule.placeholders.startDate")}
+                          value={field.state.value ? parseDateOfDay(field.state.value) : null}
+                          display={formatDateOfDay}
+                          error={field.state.meta.errors.length > 0}
+                          onChange={(date) => field.handleChange(formatDateOfDay(date))}
+                          onBlur={field.handleBlur}
+                        />
+                        <FieldError errors={field.state.meta.errors} />
+                      </View>
+                    )}
+                  </form.Field>
+                )}
+              </>
             );
           }
           return null;

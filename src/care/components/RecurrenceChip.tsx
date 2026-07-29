@@ -45,9 +45,14 @@ export function RecurrenceChip({ recurrenceType, intervalN, weekDays, variant = 
       break;
     case "EveryNMonths":
       label =
-        intervalN && intervalN > 1
-          ? t("recurrence.everyNMonths", { n: intervalN })
-          : t("recurrence.everyMonth");
+        intervalN === 12
+          ? t("recurrence.yearly")
+          : intervalN && intervalN > 1
+            ? t("recurrence.everyNMonths", { n: intervalN })
+            : t("recurrence.everyMonth");
+      break;
+    case "Yearly":
+      label = t("recurrence.yearly");
       break;
   }
 
