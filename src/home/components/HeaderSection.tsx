@@ -1,5 +1,6 @@
 import { useProfileMeQuery } from "../queries/useProfileMeQuery";
 import { HeaderSectionSkeleton } from "../skeletons/HomePageSkeleton";
+
 import { HomeHeader } from "./HomeHeader";
 
 export function HeaderSection() {

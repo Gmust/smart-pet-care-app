@@ -4,6 +4,7 @@ import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
+import { useRouter } from "expo-router";
 
 import type { AuthResponse } from "@/api/generated";
 import { Button } from "@/shadecn/ui/button";
@@ -15,7 +16,6 @@ import { useRegisterMutation } from "../queries/useRegisterMutation";
 import { loginSchema, registerSchema } from "../schemas/auth.schema";
 import type { AuthMode } from "../types";
 import { getProblemMessage } from "../utils/auth-errors";
-import { useRouter } from "expo-router";
 
 interface EmailAuthFormProps {
   mode: AuthMode;

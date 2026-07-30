@@ -1,6 +1,6 @@
-import { SECURE_STORE_OPTIONS } from "@/common/utils/secureStoreOptions";
-
 import * as SecureStore from "expo-secure-store";
+
+import { SECURE_STORE_OPTIONS } from "@/common/utils/secureStoreOptions";
 
 // Sensitive auth material lives in the OS keychain/keystore via expo-secure-store,
 // never in AsyncStorage. Keys are namespaced to the app.

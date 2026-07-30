@@ -2,6 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import { CirclePlusIcon } from "@/icons/circle-plus";
 import { ReminderDrawers } from "@/reminders/components/ReminderDrawers";
@@ -16,7 +17,6 @@ import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
 import { SectionLabel } from "./SectionLabel";
-import { useRouter } from "expo-router";
 
 export function RemindersSection() {
   const { t } = useTranslation(["home", "reminders", "common"]);

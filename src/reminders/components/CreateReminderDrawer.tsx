@@ -4,6 +4,7 @@ import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
+import dayjs from "dayjs";
 
 import { DaysOfWeek, ReminderType, RepeatType } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
@@ -30,7 +31,6 @@ import { useGetReminderById } from "../queries/useGetReminderById";
 import { useUpdateRemindersMutation } from "../queries/useUpdateRemindersMutation";
 import { type CreateReminderForm, createReminderSchema } from "../schemas/create-reminder.schema";
 import { ReminderPetSelectSkeleton } from "../skeletons/CreateReminderDrawerSkeleton";
-import dayjs from "dayjs";
 
 type Props = {
   isOpen: boolean;

@@ -1,3 +1,5 @@
+import i18next from "i18next";
+
 import type { ReminderResponseDto } from "@/api/generated";
 import { ReminderStatus, ReminderType } from "@/api/generated";
 import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
@@ -8,7 +10,6 @@ import { SyringeIcon } from "@/icons/syringe";
 import { UtensilsIcon } from "@/icons/utensils";
 
 import type { Reminder, ReminderTone } from "../types";
-import i18next from "i18next";
 
 export type ReminderGroupKey =
   | "overdue"

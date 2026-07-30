@@ -4,6 +4,8 @@ import { RefreshControl, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { BackButton } from "@/common/components/BackButton";
 import { AiIcon } from "@/icons/ai-icon";
@@ -25,8 +27,6 @@ import { PetSpeciesImage } from "../components/PetSpeciesImage";
 import { usePetQuery } from "../queries/usePetQuery";
 import { petProfileParamsSchema } from "../schemas/pet-profile-params.schema";
 import { PetProfilePageSkeleton } from "../skeletons/PetProfilePageSkeleton";
-import dayjs from "dayjs";
-import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
 export default function PetProfilePage() {
   const insets = useSafeAreaInsets();

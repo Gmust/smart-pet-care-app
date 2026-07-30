@@ -1,7 +1,8 @@
 /// <reference types="jest" />
 
-import { clearAiUsingConsent, getAiUsingConsent, setAiUsingConsent } from "./aiUsingConsentStorage";
 import * as SecureStore from "expo-secure-store";
+
+import { clearAiUsingConsent, getAiUsingConsent, setAiUsingConsent } from "./aiUsingConsentStorage";
 
 jest.mock("expo-secure-store", () => ({
   AFTER_FIRST_UNLOCK: 1,

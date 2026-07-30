@@ -1,6 +1,6 @@
-import { SECURE_STORE_OPTIONS } from "@/common/utils/secureStoreOptions";
-
 import * as SecureStore from "expo-secure-store";
+
+import { SECURE_STORE_OPTIONS } from "@/common/utils/secureStoreOptions";
 
 const DEVICE_TOKEN_KEY = "spc.notifications.androidDeviceToken";
 

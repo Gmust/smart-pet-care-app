@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
+import type { AxiosResponse } from "axios";
+import { AxiosHeaders } from "axios";
 
 import {
   getApiSessions,
@@ -25,8 +27,6 @@ import { useAssistantSessionBootstrap } from "./useAssistantSessionBootstrap";
 import { useCreateAssistantSessionMutation } from "./useCreateAssistantSessionMutation";
 import { useRetryAssistantMessageMutation } from "./useRetryAssistantMessageMutation";
 import { useSendAssistantMessageMutation } from "./useSendAssistantMessageMutation";
-import type { AxiosResponse } from "axios";
-import { AxiosHeaders } from "axios";
 
 jest.mock("@/api", () => ({
   getApiSessions: jest.fn(),

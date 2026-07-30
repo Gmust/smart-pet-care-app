@@ -10,6 +10,7 @@ import { palette } from "@/styles/palette";
 
 import { AddPetCard } from "../pet-card/AddPetCard";
 import { HealthPetCard } from "../pet-card/HealthPetCard";
+
 import { DotsIndicator } from "./DotsIndicator";
 import { PetCarouselSlide } from "./PetCarouselSlide";
 

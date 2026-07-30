@@ -1,3 +1,6 @@
+import { isAxiosError } from "axios";
+import * as Notifications from "expo-notifications";
+
 import { deleteApiNotificationsDeviceTokenToken, postApiNotificationsDeviceToken } from "@/api";
 import { AnimalSpecies, DevicePlatform } from "@/api/generated";
 
@@ -6,8 +9,6 @@ import {
   getStoredDeviceToken,
   setStoredDeviceToken,
 } from "../services/notificationTokenStorage";
-import { isAxiosError } from "axios";
-import * as Notifications from "expo-notifications";
 
 export const ANDROID_NOTIFICATION_CHANNEL_ID = "default";
 
@@ -63,7 +64,7 @@ export const unregisterStoredDeviceToken = async (): Promise<void> => {
 };
 
 export const synchronizeAndroidDeviceToken = async (): Promise<void> => {
-  await Promise.all([
+  const channelResults = await Promise.allSettled([
     Notifications.setNotificationChannelAsync(ANDROID_NOTIFICATION_CHANNEL_ID, {
       name: "Default",
       importance: Notifications.AndroidImportance.DEFAULT,
@@ -109,6 +110,11 @@ export const synchronizeAndroidDeviceToken = async (): Promise<void> => {
       }
     ),
   ]);
+  channelResults.forEach((result) => {
+    if (result.status === "rejected") {
+      console.error("Failed to configure an Android notification channel.", result.reason);
+    }
+  });
 
   let permissions = await Notifications.getPermissionsAsync();
   if (permissions.status !== Notifications.PermissionStatus.GRANTED && permissions.canAskAgain) {

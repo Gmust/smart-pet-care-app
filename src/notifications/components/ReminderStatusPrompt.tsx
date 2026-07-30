@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import * as Notifications from "expo-notifications";
 
 import { ReminderStatusDrawer } from "@/reminders/components/ReminderStatusDrawer";
-
-import * as Notifications from "expo-notifications";
 
 export function ReminderStatusPrompt() {
   const lastResponse = Notifications.useLastNotificationResponse();

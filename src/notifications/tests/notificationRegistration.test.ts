@@ -1,5 +1,7 @@
 /// <reference types="jest" />
 
+import * as Notifications from "expo-notifications";
+
 import { deleteApiNotificationsDeviceTokenToken, postApiNotificationsDeviceToken } from "@/api";
 import { DevicePlatform } from "@/api/generated";
 
@@ -15,7 +17,6 @@ import {
   getStoredDeviceToken,
   setStoredDeviceToken,
 } from "../services/notificationTokenStorage";
-import * as Notifications from "expo-notifications";
 
 jest.mock("expo-notifications", () => ({
   AndroidImportance: { DEFAULT: 3 },

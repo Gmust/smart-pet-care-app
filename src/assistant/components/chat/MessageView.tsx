@@ -9,6 +9,7 @@ import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 
 import type { AssistantFailureKind, AssistantTranscriptMessage } from "../../types";
+
 import { ChatResponseView } from "./ChatResponseView";
 
 function UserMessage({ content }: { content: string }) {

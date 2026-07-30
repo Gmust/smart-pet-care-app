@@ -12,6 +12,7 @@ import { Text } from "@/shadecn/ui/text";
 
 import { PetListCardReminderSkeleton } from "../../skeletons/PetListCardSkeleton";
 import { PetSpeciesImage } from "../PetSpeciesImage";
+
 import { StatCell } from "./StatCell";
 
 type PetListCardProps = {

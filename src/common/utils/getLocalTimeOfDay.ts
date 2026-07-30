@@ -1,7 +1,8 @@
+import dayjs from "dayjs";
+
 import type { ReminderResponseDto } from "@/api/generated";
 
 import { getUtcOffsetMinutes } from "./getUtcOffsetMinutes";
-import dayjs from "dayjs";
 
 const MINUTES_PER_DAY = 24 * 60;
 

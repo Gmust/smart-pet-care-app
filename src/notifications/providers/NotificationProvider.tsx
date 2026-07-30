@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { AppState, Platform } from "react-native";
+import * as Notifications from "expo-notifications";
 
 // TODO: app icon, splash icon, android adaptive icons, and notification icon are
 // placeholders (see app.json: icon, splash-icon, android-icon-*, notification-icon).
@@ -12,7 +13,6 @@ import {
   registerAndroidDeviceToken,
   synchronizeAndroidDeviceToken,
 } from "../services/notificationRegistration";
-import * as Notifications from "expo-notifications";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
