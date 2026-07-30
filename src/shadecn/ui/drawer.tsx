@@ -18,6 +18,12 @@ import { Text } from "./text";
 import { LinearGradient } from "expo-linear-gradient";
 
 const TRANSPARENT_WHITE = "rgba(255, 255, 255, 0)";
+/**
+ * Spacing-unit height of the footer's top fade (see `footerFade` below).
+ * Scrollable drawer content needs at least this much bottom padding, or the
+ * last item can never fully scroll clear of the fade.
+ */
+export const DRAWER_FOOTER_FADE_SPACING = 30;
 type BackdropPressBehavior = React.ComponentProps<typeof BottomSheetBackdrop>["pressBehavior"];
 
 //TODO try expo ui drawer, could fix side activity problem
@@ -437,7 +443,7 @@ const styles = StyleSheet.create((theme) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    height: theme.spacing(30),
+    height: theme.spacing(DRAWER_FOOTER_FADE_SPACING),
   },
   title: {
     fontFamily: theme.fonts.black,

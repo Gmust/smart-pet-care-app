@@ -10,6 +10,7 @@ import { Button } from "@/shadecn/ui/button";
 import type { DialogHandler } from "@/shadecn/ui/dialog";
 import {
   Drawer,
+  DRAWER_FOOTER_FADE_SPACING,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
@@ -111,6 +112,6 @@ const styles = StyleSheet.create((theme) => ({
   content: {
     gap: theme.spacing(5),
     paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(20),
+    DRAWER_FOOTER_FADE_SPACING,
   },
 }));

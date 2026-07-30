@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import {
   Drawer,
+  DRAWER_FOOTER_FADE_SPACING,
   DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
@@ -54,6 +55,6 @@ const styles = StyleSheet.create((theme) => ({
   header: { gap: theme.spacing(1) },
   title: { ...theme.textStyles.titleL, letterSpacing: 0 },
   scroll: { flex: 1 },
-  content: { gap: theme.spacing(3), paddingBottom: theme.spacing(3) },
+  content: { gap: theme.spacing(3), paddingBottom: theme.spacing(DRAWER_FOOTER_FADE_SPACING) },
   footer: { paddingTop: theme.spacing(1), backgroundColor: "transparent" },
 }));

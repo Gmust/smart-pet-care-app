@@ -12,6 +12,7 @@ import { createPetSchema } from "@/pets/schemas/create-pet.schema";
 import { Button } from "@/shadecn/ui/button";
 import {
   Drawer,
+  DRAWER_FOOTER_FADE_SPACING,
   DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
@@ -373,7 +374,7 @@ const styles = StyleSheet.create((theme) => ({
   content: {
     gap: theme.spacing(5),
     paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(20),
+    paddingBottom: theme.spacing(DRAWER_FOOTER_FADE_SPACING),
   },
   field: {
     gap: theme.spacing(1.5),
