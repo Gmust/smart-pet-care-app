@@ -5,10 +5,9 @@ import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanim
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Ionicons } from "@expo/vector-icons";
 import * as DialogPrimitive from "@rn-primitives/dialog";
+import { BlurView } from "expo-blur";
 
 import { hexToRGBA } from "@/common/utils/colors";
-
-import { BlurView } from "expo-blur";
 
 export type DialogHandler = {
   isOpen: boolean;

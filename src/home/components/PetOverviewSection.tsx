@@ -1,6 +1,7 @@
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 
 import { PetOverviewSectionSkeleton } from "../skeletons/HomePageSkeleton";
+
 import { PetCarousel } from "./carousel/PetCarousel";
 
 export function PetOverviewSection() {

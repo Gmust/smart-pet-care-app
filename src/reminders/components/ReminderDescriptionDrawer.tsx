@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
+import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
 import {
   Drawer,
   DrawerCloseButton,
@@ -24,7 +24,7 @@ export const ReminderDescriptionDrawer = ({ reminderId, onClose }: Props) => {
   const { t } = useTranslation(["reminders"]);
   const { data: reminder, isLoading } = useGetReminderById(reminderId);
 
-  const timeOfDay = extractTimeOfDay(reminder?.timeOfDay);
+  const timeOfDay = getLocalTimeOfDay(reminder);
   const description = reminder?.description?.trim();
 
   return (

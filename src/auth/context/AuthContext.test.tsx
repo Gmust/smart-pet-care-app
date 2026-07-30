@@ -6,6 +6,7 @@ import { act, render, waitFor } from "@testing-library/react-native";
 
 import { useAuth } from "../hooks/useAuth";
 import type { AuthContextValue } from "../types";
+
 import { AuthProvider } from "./AuthContext";
 
 const events: string[] = [];

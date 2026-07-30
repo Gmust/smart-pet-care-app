@@ -1,13 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { TouchableOpacity, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import type { PetResponseDto } from "@/api";
 import { ChevronRightIcon } from "@/icons/chevron-right";
 import { PetSpeciesImage } from "@/pets/components/PetSpeciesImage";
 import { Text } from "@/shadecn/ui/text";
-
-import { useRouter } from "expo-router";
 
 type Props = {
   selectedPet: PetResponseDto;

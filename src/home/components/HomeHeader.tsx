@@ -1,15 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
+import { useRouter } from "expo-router";
 
 import { getDaytime } from "@/common/utils/getDaytime";
 import { AiIcon } from "@/icons/ai-icon";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
-
-import dayjs from "dayjs";
-import { useRouter } from "expo-router";
 
 type Props = {
   username: string;

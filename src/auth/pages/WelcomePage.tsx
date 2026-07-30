@@ -3,6 +3,9 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
@@ -10,9 +13,6 @@ import { palette } from "@/styles/palette";
 
 import { AgreementsDialog } from "../components/AgreementsDialog";
 import { WelcomeHero } from "../components/WelcomeHero";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
 
 const peekingCat = require("../../../assets/images/onboarding/peeking-cat.png");
 
