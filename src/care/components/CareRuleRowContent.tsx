@@ -53,8 +53,12 @@ export function CareRuleRowContent({
         />
       </View>
       <View style={rowVariants.textCol}>
-        <Text style={rowVariants.title}>{title}</Text>
-        <Text style={rowVariants.time}>{time}</Text>
+        <Text variant={size === "lg" ? "body" : "bodyS"} style={rowVariants.title}>
+          {title}
+        </Text>
+        <Text variant={size === "lg" ? "bodyS" : "caption"} style={rowVariants.time}>
+          {time}
+        </Text>
       </View>
       <RecurrenceChip recurrenceType={recurrenceType} intervalN={intervalN} weekDays={weekDays} />
     </View>
@@ -89,21 +93,9 @@ const rowVariants = StyleSheet.create((theme) => ({
   },
   title: {
     color: theme.palette.brand.textPrimary,
-    variants: {
-      size: {
-        lg: { ...theme.textStyles.body },
-        sm: { ...theme.textStyles.bodyS },
-      },
-    },
   },
   time: {
     marginTop: theme.spacing(0.5),
     color: theme.palette.brand.textSecondary,
-    variants: {
-      size: {
-        lg: { ...theme.textStyles.bodyS },
-        sm: { ...theme.textStyles.caption },
-      },
-    },
   },
 }));

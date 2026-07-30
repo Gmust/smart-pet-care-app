@@ -384,7 +384,7 @@ function DrawerScrollView({
 }
 
 function DrawerTitle({ style, ...props }: React.ComponentProps<typeof Text>) {
-  return <Text style={[styles.title, style]} {...props} />;
+  return <Text variant="titleL" style={[styles.title, style]} {...props} />;
 }
 
 function DrawerDescription({ style, ...props }: React.ComponentProps<typeof Text>) {
@@ -446,10 +446,7 @@ const styles = StyleSheet.create((theme) => ({
     height: theme.spacing(DRAWER_FOOTER_FADE_SPACING),
   },
   title: {
-    fontFamily: theme.fonts.black,
-    fontSize: theme.fontSize["2xl"],
     textTransform: "uppercase",
-    letterSpacing: -0.4,
     color: theme.palette.slate[950],
     textAlign: "center",
   },

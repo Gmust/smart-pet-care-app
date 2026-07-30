@@ -51,13 +51,19 @@ export function FoodTrackerCard({ tracker, onPress, onDelete }: Props) {
         onPress={onPress}
         style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
       >
-        <Text style={styles.title}>{tracker.foodName}</Text>
+        <Text variant="body" style={styles.title}>
+          {tracker.foodName}
+        </Text>
         <View style={styles.track}>
           <View style={[styles.fill, { width: `${percentRemaining * 100}%` }]} />
         </View>
         <View style={styles.footer}>
-          <Text style={styles.footerText}>{restockLabel}</Text>
-          <Text style={styles.footerText}>{remainingLabel}</Text>
+          <Text variant="bodyS" style={styles.footerText}>
+            {restockLabel}
+          </Text>
+          <Text variant="bodyS" style={styles.footerText}>
+            {remainingLabel}
+          </Text>
         </View>
       </Pressable>
     </SwipeToDeleteRow>
@@ -77,7 +83,6 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.surfaceSunken,
   },
   title: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textPrimary,
   },
   track: {
@@ -96,7 +101,6 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "space-between",
   },
   footerText: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
 }));

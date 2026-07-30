@@ -26,8 +26,10 @@ export function NoteRow({ note }: NoteRowProps) {
         />
       </View>
       <View style={styles.noteTexts}>
-        <Text style={styles.noteTitle}>{note.title}</Text>
-        <Text style={styles.notePreview} numberOfLines={1}>
+        <Text variant="bodyS" style={styles.noteTitle}>
+          {note.title}
+        </Text>
+        <Text variant="caption" style={styles.notePreview} numberOfLines={1}>
           {note.preview}
         </Text>
       </View>
@@ -65,11 +67,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   noteTitle: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textPrimary,
   },
   notePreview: {
-    ...theme.textStyles.caption,
     color: theme.palette.brand.textSecondary,
   },
 }));

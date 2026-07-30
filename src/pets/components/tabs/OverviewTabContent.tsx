@@ -85,7 +85,9 @@ export function OverviewTabContent({ pet }: Props) {
           accessibilityRole="button"
           accessibilityLabel={t("petProfilePage.notes.manageA11y")}
         >
-          <Text style={styles.manageText}>{t("petProfilePage.notes.manage")}</Text>
+          <Text variant="bodySemiBold" style={styles.manageText}>
+            {t("petProfilePage.notes.manage")}
+          </Text>
         </Pressable>
       </View>
 
@@ -94,7 +96,9 @@ export function OverviewTabContent({ pet }: Props) {
           notes.map((note) => <NoteRow key={note.id} note={note} />)
         ) : (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>{t("petProfilePage.notes.empty")}</Text>
+            <Text variant="body" style={styles.emptyText}>
+              {t("petProfilePage.notes.empty")}
+            </Text>
           </View>
         )}
       </View>
@@ -129,7 +133,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2),
   },
   manageText: {
-    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.primaryDefault,
   },
   emptyCard: {
@@ -138,7 +141,6 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(5),
   },
   emptyText: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
 }));

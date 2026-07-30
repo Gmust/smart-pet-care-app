@@ -11,8 +11,12 @@ type InfoRowProps = {
 export function InfoRow({ label, value }: InfoRowProps) {
   return (
     <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
+      <Text variant="body" style={styles.infoLabel}>
+        {label}
+      </Text>
+      <Text variant="body" style={styles.infoValue}>
+        {value}
+      </Text>
     </View>
   );
 }
@@ -29,14 +33,12 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(2.75),
   },
   infoLabel: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
   infoValue: {
     flex: 1,
     minWidth: 0,
     textAlign: "right",
-    ...theme.textStyles.body,
     color: theme.palette.brand.textPrimary,
   },
 }));

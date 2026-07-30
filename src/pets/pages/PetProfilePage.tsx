@@ -80,7 +80,9 @@ export default function PetProfilePage() {
       <View style={styles.screen}>
         <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
           <BackButton />
-          <Text style={styles.topBarTitle}>{petName}</Text>
+          <Text variant="titleL" style={styles.topBarTitle}>
+            {petName}
+          </Text>
           <PetProfilePageActions
             disabled={!pet}
             onEdit={() => setIsEditOpen(true)}
@@ -128,7 +130,9 @@ export default function PetProfilePage() {
               entering={FadeIn.duration(200)}
               exiting={FadeOut.duration(150)}
             >
-              <Text style={styles.emptyText}>{t("petProfilePage.notFound")}</Text>
+              <Text variant="body" style={styles.emptyText}>
+                {t("petProfilePage.notFound")}
+              </Text>
             </Animated.View>
           ))}
 
@@ -144,6 +148,7 @@ export default function PetProfilePage() {
                 onPress={() => setActiveTab(key)}
               >
                 <Text
+                  variant={isActive ? "bodySemiBold" : "bodyS"}
                   style={[styles.segmentText, isActive && styles.segmentTextActive]}
                   numberOfLines={1}
                 >
@@ -203,7 +208,6 @@ const styles = StyleSheet.create((theme) => ({
   topBarTitle: {
     flex: 1,
     minWidth: 0,
-    ...theme.textStyles.titleL,
     letterSpacing: -0.12,
     textAlign: "center",
     color: theme.palette.brand.textBody,
@@ -255,11 +259,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.primaryDefault,
   },
   segmentText: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   segmentTextActive: {
-    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.primaryDefault,
   },
   content: {
@@ -269,7 +271,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing(28),
   },
   emptyText: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
 }));
