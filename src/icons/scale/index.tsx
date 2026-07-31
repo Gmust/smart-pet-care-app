@@ -1,34 +1,39 @@
-import type { Icon, IconProps } from "../../icons";
-import { Circle, Path, StyledSvg as Svg } from "../../StyledSvg";
+import type { Icon, IconProps } from "../icons";
+import { Path, StyledSvg as Svg } from "../StyledSvg";
 
-export const SparklesIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
+export const ScaleIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
   return (
     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={style} {...props}>
       <Path
-        d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"
+        d="M12 3v18"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M20 2v4"
+        d="m19 8 3 8a5 5 0 0 1-6 0zV7"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M22 4h-4"
+        d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <Circle
-        cx="4"
-        cy="20"
-        r="2"
+      <Path
+        d="m5 8 3 8a5 5 0 0 1-6 0zV7"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M7 21h10"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"

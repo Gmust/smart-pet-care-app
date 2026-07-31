@@ -1,5 +1,5 @@
-import type { Icon, IconProps } from "../../icons";
-import { Path, StyledSvg as Svg } from "../../StyledSvg";
+import type { Icon, IconProps } from "../icons";
+import { Path, StyledSvg as Svg } from "../StyledSvg";
 
 export const CandyOffIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
   return (

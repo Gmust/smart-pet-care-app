@@ -2,17 +2,17 @@ import type { ComponentType } from "react";
 import type { SvgProps } from "react-native-svg";
 
 import { ActivityIcon } from "@/icons/activity";
-import {
-  BathIcon,
-  BrushCleaningIcon,
-  CandyOffIcon,
-  EarIcon,
-  PawPrintIcon,
-  ScissorsIcon,
-} from "@/icons/grooming";
-import { BugOffIcon, ScaleIcon, WormIcon } from "@/icons/health";
+import { BathIcon } from "@/icons/bath";
+import { BrushCleaningIcon } from "@/icons/brush-cleaning";
+import { BugOffIcon } from "@/icons/bug-off";
+import { CandyOffIcon } from "@/icons/candy-off";
+import { EarIcon } from "@/icons/ear";
+import { PawPrintIcon } from "@/icons/paw-print";
+import { ScaleIcon } from "@/icons/scale";
+import { ScissorsIcon } from "@/icons/scissors";
 import { StethoscopeIcon } from "@/icons/stethoscope";
 import { SyringeIcon } from "@/icons/syringe";
+import { WormIcon } from "@/icons/worm";
 
 import type { CareCategory, PlannedHealthEventCategory } from "../../types";
 

@@ -5,7 +5,7 @@ import { Pressable } from "react-native-gesture-handler";
 import Swipeable, { type SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { Trash2Icon } from "@/icons/general";
+import { TrashIcon } from "@/icons/trash";
 
 type Props = {
   onDelete: () => void;
@@ -58,7 +58,7 @@ export function SwipeToDeleteRow({
               onPress={handlePress}
               style={({ pressed }) => [styles.circleButton, pressed && styles.circleButtonPressed]}
             >
-              <Trash2Icon
+              <TrashIcon
                 width={theme.iconSize.lg}
                 height={theme.iconSize.lg}
                 color={theme.palette.white}
@@ -76,7 +76,7 @@ export function SwipeToDeleteRow({
               pressed && styles.fillActionPressed,
             ]}
           >
-            <Trash2Icon
+            <TrashIcon
               width={theme.iconSize.xl}
               height={theme.iconSize.xl}
               color={theme.palette.white}
@@ -104,7 +104,7 @@ const styles = StyleSheet.create((theme) => ({
     borderBottomRightRadius: isLast ? theme.borderRadius.xl : 0,
   }),
   fillAction: {
-    width: 55,
+    width: theme.spacing(13.75),
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.palette.brand.danger,
@@ -113,13 +113,13 @@ const styles = StyleSheet.create((theme) => ({
     opacity: 0.85,
   },
   circleWrap: {
-    width: 55,
+    width: theme.spacing(13.75),
     alignItems: "center",
     justifyContent: "center",
   },
   circleButton: {
-    width: 40,
-    height: 40,
+    width: theme.spacing(10),
+    height: theme.spacing(10),
     borderRadius: theme.borderRadius.full,
     alignItems: "center",
     justifyContent: "center",

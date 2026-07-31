@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-import { RepeatIcon } from "@/icons/general";
+import { RepeatIcon } from "@/icons/repeat";
 import { Chip } from "@/shadecn/ui/chip";
 
 import type { DayOfWeek, RecurrenceType } from "../types";

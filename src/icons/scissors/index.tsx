@@ -1,32 +1,43 @@
-import type { Icon, IconProps } from "../../icons";
-import { Path, StyledSvg as Svg } from "../../StyledSvg";
+import type { Icon, IconProps } from "../icons";
+import { Circle, Path, StyledSvg as Svg } from "../StyledSvg";
 
-export const BrushCleaningIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
+export const ScissorsIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
   return (
     <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={style} {...props}>
-      <Path
-        d="m16 22-1-4"
+      <Circle
+        cx="6"
+        cy="6"
+        r="3"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M19 14a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2h-3a1 1 0 0 1-1-1V4a2 2 0 0 0-4 0v5a1 1 0 0 1-1 1H6a2 2 0 0 0-2 2v1a1 1 0 0 0 1 1"
+        d="M8.12 8.12 12 12"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="M19 14H5l-1.973 6.767A1 1 0 0 0 4 22h16a1 1 0 0 0 .973-1.233z"
+        d="M20 4 8.12 15.88"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Circle
+        cx="6"
+        cy="18"
+        r="3"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <Path
-        d="m8 22 1-4"
+        d="M14.8 14.8 20 20"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"
