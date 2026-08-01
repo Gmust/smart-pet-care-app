@@ -1,7 +1,8 @@
-import type { DayOfWeek, RecurrenceType } from "../types";
-import { WEEK_DAYS } from "../types";
 import type { TFunction } from "i18next";
 import { z } from "zod";
+
+import type { DayOfWeek, RecurrenceType } from "../types";
+import { WEEK_DAYS } from "../types";
 
 export type CareRuleFormValues = {
   title: string;

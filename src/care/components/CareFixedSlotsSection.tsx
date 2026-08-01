@@ -1,5 +1,6 @@
 import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { CareCategory, PlannedHealthEventCategory } from "../types";
+
 import { CareListCard } from "./CareListCard";
 import { CareRuleRowContent } from "./CareRuleRowContent";
 import { CareSection } from "./CareSection";

@@ -1,13 +1,12 @@
 import type { ComponentType } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { Image } from "expo-image";
 
 import type { IconProps } from "@/icons/icons";
 import { CatIcon, DogIcon } from "@/icons/pets";
 import { RabbitIcon } from "@/icons/pets/rabbit";
 import { palette } from "@/styles/palette";
-
-import { Image } from "expo-image";
 
 type PetSpeciesImageVariant = "card" | "hero";
 

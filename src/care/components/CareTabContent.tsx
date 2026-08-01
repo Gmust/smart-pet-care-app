@@ -1,10 +1,11 @@
 import { CARE_SECTIONS, type CareSectionConfig } from "../constants";
 import { useCareDrawers } from "../hooks/useCareDrawers";
-import { CareRuleSection } from "./CareRuleSection";
+
 import { AddCareRuleDrawer } from "./drawers/AddCareRuleDrawer";
 import { AddFoodTrackerDrawer } from "./drawers/AddFoodTrackerDrawer";
 import { AddMealDrawer } from "./drawers/AddMealDrawer";
 import { AddPlannedHealthEventDrawer } from "./drawers/AddPlannedHealthEventDrawer";
+import { CareRuleSection } from "./CareRuleSection";
 import { FoodTrackerSection } from "./FoodTrackerSection";
 import { MealsSection } from "./MealsSection";
 import { PlannedHealthEventSection } from "./PlannedHealthEventSection";

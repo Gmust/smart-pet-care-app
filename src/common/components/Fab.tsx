@@ -12,6 +12,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import * as Haptics from "expo-haptics";
 
 import { ActivityIcon } from "@/icons/activity";
 import { BellPlusIcon } from "@/icons/bell";
@@ -26,9 +27,9 @@ import { CreateReminderDrawer } from "@/reminders/components/CreateReminderDrawe
 import { palette } from "@/styles/palette";
 
 import { hexToRGBA } from "../utils/colors";
+
 import type { FabActionTone } from "./FabMenuItem";
 import { FabMenuItem } from "./FabMenuItem";
-import * as Haptics from "expo-haptics";
 
 type FabActionId = "reminder" | "feeding" | "symptom" | "health" | "activity";
 

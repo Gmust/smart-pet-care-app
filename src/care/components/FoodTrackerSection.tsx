@@ -5,6 +5,7 @@ import { useDeleteFoodTrackerMutation } from "../queries/useDeleteFoodTrackerMut
 import { useFoodTrackerQuery } from "../queries/useFoodTrackerQuery";
 import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { FoodTracker } from "../types";
+
 import { CareDeleteConfirmDialog } from "./CareDeleteConfirmDialog";
 import { CareSection } from "./CareSection";
 import { EmptyCareCard } from "./EmptyCareCard";

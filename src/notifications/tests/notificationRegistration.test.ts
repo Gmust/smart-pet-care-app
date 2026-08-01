@@ -1,10 +1,13 @@
 /// <reference types="jest" />
 
+import * as Notifications from "expo-notifications";
+
 import { deleteApiNotificationsDeviceTokenToken, postApiNotificationsDeviceToken } from "@/api";
 import { DevicePlatform } from "@/api/generated";
 
 import {
   ANDROID_NOTIFICATION_CHANNEL_ID,
+  ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES,
   registerAndroidDeviceToken,
   synchronizeAndroidDeviceToken,
   unregisterStoredDeviceToken,
@@ -14,7 +17,6 @@ import {
   getStoredDeviceToken,
   setStoredDeviceToken,
 } from "../services/notificationTokenStorage";
-import * as Notifications from "expo-notifications";
 
 jest.mock("expo-notifications", () => ({
   AndroidImportance: { DEFAULT: 3 },
@@ -29,12 +31,28 @@ jest.mock("expo-notifications", () => ({
   setNotificationChannelAsync: jest.fn(),
 }));
 
+jest.mock("axios", () => ({
+  isAxiosError: jest.fn(() => false),
+}));
+
 jest.mock("@/api", () => ({
   deleteApiNotificationsDeviceTokenToken: jest.fn(),
   postApiNotificationsDeviceToken: jest.fn(),
 }));
 
 jest.mock("@/api/generated", () => ({
+  AnimalSpecies: {
+    Bird: "Bird",
+    Cat: "Cat",
+    Dog: "Dog",
+    Fish: "Fish",
+    GuineaPig: "GuineaPig",
+    Hamster: "Hamster",
+    Other: "Other",
+    Rabbit: "Rabbit",
+    Turtle: "Turtle",
+    Unknown: "Unknown",
+  },
   DevicePlatform: { Android: "Android", iOS: "iOS" },
 }));
 
@@ -89,7 +107,16 @@ describe("Android notification token registration", () => {
 
     await synchronizeAndroidDeviceToken();
 
-    expect(calls).toEqual(["channel", "permissions", "token"]);
+    expect(calls).toEqual([
+      "channel",
+      "channel",
+      "channel",
+      "channel",
+      "channel",
+      "channel",
+      "permissions",
+      "token",
+    ]);
     expect(mockedNotifications.getDevicePushTokenAsync.mock.invocationCallOrder[0]).toBeLessThan(
       mockedPostDeviceToken.mock.invocationCallOrder[0]
     );
@@ -100,6 +127,55 @@ describe("Android notification token registration", () => {
         name: "Default",
       }
     );
+    expect(mockedNotifications.setNotificationChannelAsync.mock.calls).toEqual([
+      [
+        ANDROID_NOTIFICATION_CHANNEL_ID,
+        {
+          importance: Notifications.AndroidImportance.DEFAULT,
+          name: "Default",
+        },
+      ],
+      [
+        ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES.Dog,
+        {
+          importance: Notifications.AndroidImportance.DEFAULT,
+          name: "Dog reminders",
+          sound: "dog.wav",
+        },
+      ],
+      [
+        ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES.Cat,
+        {
+          importance: Notifications.AndroidImportance.DEFAULT,
+          name: "Cat reminders",
+          sound: "cat.wav",
+        },
+      ],
+      [
+        ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES.GuineaPig,
+        {
+          importance: Notifications.AndroidImportance.DEFAULT,
+          name: "Guinea pig reminders",
+          sound: "guinea_pig.wav",
+        },
+      ],
+      [
+        ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES.Bird,
+        {
+          importance: Notifications.AndroidImportance.DEFAULT,
+          name: "Bird reminders",
+          sound: "bird.wav",
+        },
+      ],
+      [
+        ANDROID_NOTIFICATION_CHANNEL_ID_BY_SPECIES.Fish,
+        {
+          importance: Notifications.AndroidImportance.DEFAULT,
+          name: "Fish reminders",
+          sound: "fish.wav",
+        },
+      ],
+    ]);
     expect(mockedPostDeviceToken).toHaveBeenCalledWith({
       platform: DevicePlatform.Android,
       token: "fcm-token",

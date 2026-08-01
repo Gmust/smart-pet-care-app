@@ -1,5 +1,6 @@
-import { registerAuthInterceptors } from "./interceptors";
 import axios from "axios";
+
+import { registerAuthInterceptors } from "./interceptors";
 
 const baseURL = process.env.EXPO_PUBLIC_API_URL;
 

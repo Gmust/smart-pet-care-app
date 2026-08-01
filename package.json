@@ -12,6 +12,7 @@
     "ios": "expo run:ios --device",
     "web": "expo start --web",
     "lint": "expo lint && pnpm typecheck",
+    "lint:fix": "expo lint --fix",
     "typecheck": "tsc --noEmit",
     "test": "jest --passWithNoTests",
     "check": "pnpm lint && pnpm typecheck",

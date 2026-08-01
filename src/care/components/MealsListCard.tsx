@@ -2,6 +2,7 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import type { MealRule } from "../types";
+
 import { CareListCard } from "./CareListCard";
 import { MealRowContent } from "./MealRowContent";
 import { RecurrenceChip } from "./RecurrenceChip";

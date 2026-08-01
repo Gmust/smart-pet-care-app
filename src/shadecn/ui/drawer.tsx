@@ -13,9 +13,9 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import * as Slot from "@rn-primitives/slot";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { Text } from "./text";
-import { LinearGradient } from "expo-linear-gradient";
 
 const TRANSPARENT_WHITE = "rgba(255, 255, 255, 0)";
 /**

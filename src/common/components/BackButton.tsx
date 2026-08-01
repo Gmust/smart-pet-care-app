@@ -1,11 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { useUnistyles } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import { Chevron } from "@/icons/arrows";
 import { Button } from "@/shadecn/ui/button";
 import { palette } from "@/styles/palette";
-
-import { useRouter } from "expo-router";
 
 type Props = {
   onBackPress?: () => void;

@@ -1,13 +1,14 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
 
 import { Text } from "@/shadecn/ui/text";
 
 import type { FoodTracker } from "../types";
 import { formatWeight, toGrams } from "../utils/weight";
+
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
-import dayjs from "dayjs";
 
 type Props = {
   tracker: FoodTracker;

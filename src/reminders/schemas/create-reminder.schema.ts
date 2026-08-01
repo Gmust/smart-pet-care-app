@@ -1,8 +1,8 @@
-import { DaysOfWeek, ReminderType, RepeatType } from "@/api/generated";
-
 import dayjs from "dayjs";
 import type { TFunction } from "i18next";
 import { z } from "zod/v4";
+
+import { DaysOfWeek, ReminderType, RepeatType } from "@/api/generated";
 
 const parseReminderTime = (value: string) => {
   const [hoursValue, minutesValue] = value.split(":");

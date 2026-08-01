@@ -2,6 +2,7 @@ import { Pressable } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import type { CareCategory, DayOfWeek, PlannedHealthEventCategory, RecurrenceType } from "../types";
+
 import { CareRuleRowContent } from "./CareRuleRowContent";
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 

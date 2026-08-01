@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
@@ -15,7 +16,6 @@ import { useConfirmEmailMutation } from "../queries/useConfirmEmailMutation";
 import { useResendConfirmationMutation } from "../queries/useResendConfirmationMutation";
 import { confirmEmailSchema } from "../schemas/confirm-email.schema";
 import { getProblemMessage } from "../utils/auth-errors";
-import { useLocalSearchParams, useRouter } from "expo-router";
 
 export default function ConfirmEmailPage() {
   const { t } = useTranslation(["auth"]);

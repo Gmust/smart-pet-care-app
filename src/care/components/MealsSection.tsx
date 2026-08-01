@@ -5,6 +5,7 @@ import { useDeleteMealMutation } from "../queries/useDeleteMealMutation";
 import { useMealsQuery } from "../queries/useMealsQuery";
 import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { MealRule } from "../types";
+
 import { CareDeleteConfirmDialog } from "./CareDeleteConfirmDialog";
 import { CareSection } from "./CareSection";
 import { EmptyCareCard } from "./EmptyCareCard";

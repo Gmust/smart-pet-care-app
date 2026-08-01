@@ -5,6 +5,7 @@ import { useCareDelete } from "../hooks/useCareDelete";
 import { useCareRulesQuery } from "../queries/useCareRulesQuery";
 import { useDeleteCareRuleMutation } from "../queries/useDeleteCareRuleMutation";
 import type { CareCategory, CareRule } from "../types";
+
 import { CareDeleteConfirmDialog } from "./CareDeleteConfirmDialog";
 import { CareFixedSlotsSection } from "./CareFixedSlotsSection";
 import { CareListSection } from "./CareListSection";

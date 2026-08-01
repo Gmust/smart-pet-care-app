@@ -1,5 +1,6 @@
 import { assistantChatResponseSchema } from "../schemas/assistant.schema";
 import { hasEmergencyIndicator, normalizeAssistantInput } from "../utils/assistantEmergency";
+
 import type { AssistantService } from "./assistantService";
 import {
   assistantFixtures,

@@ -5,6 +5,7 @@ import { AccessibilityInfo, ActivityIndicator, FlatList, View } from "react-nati
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { ChatMessageStatus, ClassifierUrgency } from "@/api/generated";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
@@ -34,7 +35,6 @@ import {
 import { hasEmergencyIndicator } from "../utils/assistantEmergency";
 import { getAssistantApiError, isAssistantNotFoundError } from "../utils/assistantErrors";
 import { ASSISTANT_PERSISTENCE_STATUS } from "../utils/assistantPersistence";
-import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 const SCROLL_TO_END_THRESHOLD = 160;
 

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FlatList, RefreshControl, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import { CirclePlusIcon } from "@/icons/circle-plus";
 import { Button } from "@/shadecn/ui/button";
@@ -13,7 +14,6 @@ import { CreatePetDrawer } from "../components/actions/CreatePetDrawer";
 import { PetListCard } from "../components/pet-list/PetListCard";
 import { usePetsQuery } from "../queries/usePetsQuery";
 import { PetListPageSkeleton, PetListSubtitleSkeleton } from "../skeletons/PetListPageSkeleton";
-import { useRouter } from "expo-router";
 
 function ItemSeparator() {
   return <View style={styles.separator} />;

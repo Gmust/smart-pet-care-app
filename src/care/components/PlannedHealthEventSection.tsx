@@ -5,6 +5,7 @@ import { useCareDelete } from "../hooks/useCareDelete";
 import { useDeletePlannedHealthEventMutation } from "../queries/useDeletePlannedHealthEventMutation";
 import { usePlannedHealthEventsQuery } from "../queries/usePlannedHealthEventsQuery";
 import type { PlannedHealthEvent, PlannedHealthEventCategory } from "../types";
+
 import { CareDeleteConfirmDialog } from "./CareDeleteConfirmDialog";
 import { CareFixedSlotsSection } from "./CareFixedSlotsSection";
 import { CareListSection } from "./CareListSection";

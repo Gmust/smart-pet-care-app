@@ -1,7 +1,9 @@
+import dayjs from "dayjs";
+
 import type { FoodTracker } from "../../types";
 import { toGrams } from "../../utils/weight";
+
 import { createMockCollection } from "./store";
-import dayjs from "dayjs";
 
 const collection = createMockCollection<FoodTracker>();
 

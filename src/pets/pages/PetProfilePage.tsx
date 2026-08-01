@@ -4,6 +4,7 @@ import { Pressable, RefreshControl, View } from "react-native";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { CareTabContent } from "@/care/components/CareTabContent";
 import { BackButton } from "@/common/components/BackButton";
@@ -26,7 +27,6 @@ import { usePetQuery } from "../queries/usePetQuery";
 import { petProfileParamsSchema } from "../schemas/pet-profile-params.schema";
 import { PetProfilePageSkeleton } from "../skeletons/PetProfilePageSkeleton";
 import type { PetFlag } from "../types";
-import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
 const PROFILE_TAB_KEYS = ["overview", "health", "care", "reminders"] as const;
 type ProfileTabKey = (typeof PROFILE_TAB_KEYS)[number];

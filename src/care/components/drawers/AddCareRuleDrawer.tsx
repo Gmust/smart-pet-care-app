@@ -24,6 +24,7 @@ import { useCreateCareRuleMutation } from "../../queries/useCreateCareRuleMutati
 import { useUpdateCareRuleMutation } from "../../queries/useUpdateCareRuleMutation";
 import { type CareRuleFormValues, careRuleSchema } from "../../schemas/care-rule.schema";
 import type { CareCategory, CareRule, DayOfWeek, RecurrenceType } from "../../types";
+
 import { CareDrawerShell } from "./CareDrawerShell";
 
 type Props = {

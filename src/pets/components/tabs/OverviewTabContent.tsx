@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
 
 import { CirclePlusIcon } from "@/icons/circle-plus";
 import { Text } from "@/shadecn/ui/text";
@@ -11,7 +12,6 @@ import type { PetNote } from "../../types";
 import { InfoRow } from "../pet-profile/InfoRow";
 import { NoteRow } from "../pet-profile/NoteRow";
 import { SectionHeader } from "../pet-profile/SectionHeader";
-import dayjs from "dayjs";
 
 type Pet = NonNullable<ReturnType<typeof usePetQuery>["data"]>;
 

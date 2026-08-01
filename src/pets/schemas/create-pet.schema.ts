@@ -1,7 +1,7 @@
-import { Sex } from "@/api/generated";
-
 import type { TFunction } from "i18next";
 import { z } from "zod/v4";
+
+import { Sex } from "@/api/generated";
 
 const optionalText = z
   .string()

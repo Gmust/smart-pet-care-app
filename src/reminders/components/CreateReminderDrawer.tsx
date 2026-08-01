@@ -4,10 +4,11 @@ import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
+import dayjs from "dayjs";
 
 import { DaysOfWeek, ReminderType, RepeatType } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
-import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
+import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
 import { formatTimeOfDay, parseTimeOfDay } from "@/common/utils/timeOfDay";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
@@ -32,7 +33,6 @@ import { useGetReminderById } from "../queries/useGetReminderById";
 import { useUpdateRemindersMutation } from "../queries/useUpdateRemindersMutation";
 import { type CreateReminderForm, createReminderSchema } from "../schemas/create-reminder.schema";
 import { ReminderPetSelectSkeleton } from "../skeletons/CreateReminderDrawerSkeleton";
-import dayjs from "dayjs";
 
 type Props = {
   isOpen: boolean;
@@ -139,7 +139,7 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
       repeatType: reminder.repeatType ?? RepeatType.Weekly,
       days: reminder.days ?? [],
       date: reminder.date ?? null,
-      time: extractTimeOfDay(reminder.timeOfDay) ?? "",
+      time: getLocalTimeOfDay(reminder) ?? "",
       endAt: reminder.endAt ?? null,
     });
   }, [isEditMode, reminder, form]);

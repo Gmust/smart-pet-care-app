@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import { useDeletePet } from "@/pets/queries/useDeletePet";
 import { Button } from "@/shadecn/ui/button";
@@ -14,8 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shadecn/ui/dialog";
-
-import { useRouter } from "expo-router";
 
 type Props = DialogHandler & {
   petName: string;

@@ -4,6 +4,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Text } from "@/shadecn/ui/text";
 
 import type { CareCategory, PlannedHealthEventCategory } from "../types";
+
 import { CareCategoryIcon } from "./care-category-icon/CareCategoryIcon";
 
 type Props = {

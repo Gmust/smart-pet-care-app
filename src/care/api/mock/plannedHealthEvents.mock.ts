@@ -1,6 +1,8 @@
-import type { PlannedHealthEvent } from "../../types";
-import { createMockCollection } from "./store";
 import dayjs from "dayjs";
+
+import type { PlannedHealthEvent } from "../../types";
+
+import { createMockCollection } from "./store";
 
 // TODO(care-backend): replace with real API once the PlannedHealthEvents endpoint exists.
 const collection = createMockCollection<PlannedHealthEvent>();
