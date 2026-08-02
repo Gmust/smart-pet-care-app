@@ -35,11 +35,13 @@ export default function PetListPage() {
       <SafeAreaView style={styles.screen} edges={["top"]}>
         <View style={styles.header}>
           <View style={styles.headerCopy}>
-            <Text style={styles.title}>{t("pets:petListPage.title")}</Text>
+            <Text variant="titleL" style={styles.title}>
+              {t("pets:petListPage.title")}
+            </Text>
             {isLoading ? (
               <PetListSubtitleSkeleton />
             ) : (
-              <Text style={styles.subtitle}>
+              <Text variant="body" style={styles.subtitle}>
                 {t("pets:petListPage.companions", { count: pets?.length ?? 0 })}
               </Text>
             )}
@@ -60,7 +62,9 @@ export default function PetListPage() {
               <PetListPageSkeleton />
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>{t("pets:petListPage.emptyState")}</Text>
+                <Text variant="body" style={styles.emptyText}>
+                  {t("pets:petListPage.emptyState")}
+                </Text>
               </View>
             )
           }
@@ -104,15 +108,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   title: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
-    lineHeight: theme.fontSize["2xl"] * 1.3,
     color: theme.palette.brand.textBody,
   },
   subtitle: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.4,
     color: theme.palette.brand.textSecondary,
   },
   content: {
@@ -135,17 +133,13 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(6),
   },
   emptyText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   addButton: {
     width: "100%",
   },
   addButtonText: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
+    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.textSecondary,
   },
 }));

@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { ActivityIcon } from "@/icons/activity";
 import { HomeIcon } from "@/icons/home";
@@ -47,10 +47,14 @@ type TabBarProps = {
 export function TabBar({ state, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();
   const activeRouteName = state.routes[state.index]?.name;
+  const { theme } = useUnistyles();
 
   return (
     <View
-      style={[styles.wrapper, { paddingBottom: insets.bottom || styles.wrapper.paddingHorizontal }]}
+      style={[
+        styles.wrapper,
+        { paddingBottom: insets.bottom > 0 ? insets.bottom : styles.wrapper.paddingHorizontal },
+      ]}
       pointerEvents="box-none"
     >
       <View style={styles.bar}>
@@ -88,7 +92,7 @@ export function TabBar({ state, navigation }: TabBarProps) {
               accessibilityLabel={meta.label}
               accessibilityState={isFocused ? { selected: true } : {}}
             >
-              <Glyph width={24} height={24} color={color} />
+              <Glyph width={theme.iconSize["2xl"]} height={theme.iconSize["2xl"]} color={color} />
               <Text style={[styles.label, isFocused && styles.labelActive, { color }]}>
                 {meta.label}
               </Text>
@@ -108,6 +112,7 @@ const styles = StyleSheet.create((theme) => ({
     bottom: 0,
     alignItems: "center",
     paddingHorizontal: theme.spacing(4),
+    zIndex: 1,
   },
   bar: {
     flexDirection: "row",
@@ -133,11 +138,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: 3,
   },
   label: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.2,
+    ...theme.textStyles.tabLabelInactive,
   },
   labelActive: {
-    fontFamily: theme.fonts.semiBold,
+    ...theme.textStyles.tabLabelActive,
   },
 }));

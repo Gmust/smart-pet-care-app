@@ -1,0 +1,84 @@
+import type { ReactNode } from "react";
+import { Pressable, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+
+import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
+
+type Props<T> = {
+  items: T[];
+  keyExtractor: (item: T) => string;
+  renderItem: (item: T) => ReactNode;
+  onItemPress?: (item: T) => void;
+  onDeleteItem?: (item: T) => void;
+  isDeleteDisabled?: (item: T) => boolean;
+  footer?: ReactNode;
+};
+
+/**
+ * One bordered card, rows separated by internal dividers instead of each
+ * item getting its own outer border. Used for fixedSlots sections (always),
+ * growableList sections once they hold 2+ rules, and Meals (footer variant).
+ * FoodTracker is exempt by design — every food item stays its own standalone card.
+ */
+export function CareListCard<T>({
+  items,
+  keyExtractor,
+  renderItem,
+  onItemPress,
+  onDeleteItem,
+  isDeleteDisabled,
+  footer,
+}: Props<T>) {
+  return (
+    <View style={careListCardStyles.card}>
+      {items.map((item, index) => (
+        <SwipeToDeleteRow
+          key={keyExtractor(item)}
+          disabled={!onDeleteItem || isDeleteDisabled?.(item)}
+          onDelete={() => onDeleteItem?.(item)}
+          isFirst={index === 0}
+          isLast={!footer && index === items.length - 1}
+        >
+          <Pressable
+            disabled={!onItemPress}
+            onPress={() => onItemPress?.(item)}
+            style={({ pressed }) => [
+              careListCardStyles.row,
+              index > 0 && careListCardStyles.divider,
+              pressed && !!onItemPress && careListCardStyles.rowPressed,
+            ]}
+          >
+            {renderItem(item)}
+          </Pressable>
+        </SwipeToDeleteRow>
+      ))}
+
+      {!!footer && (
+        <View style={[careListCardStyles.row, items.length > 0 && careListCardStyles.divider]}>
+          {footer}
+        </View>
+      )}
+    </View>
+  );
+}
+
+const careListCardStyles = StyleSheet.create((theme) => ({
+  card: {
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.palette.brand.surfaceBorder,
+    borderRadius: theme.borderRadius.xl,
+    backgroundColor: theme.palette.white,
+  },
+  row: {
+    paddingHorizontal: theme.spacing(3.5),
+    paddingVertical: theme.spacing(2.75),
+  },
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: theme.palette.brand.surfaceBorder,
+  },
+  rowPressed: {
+    backgroundColor: theme.palette.brand.surfaceSunken,
+  },
+}));

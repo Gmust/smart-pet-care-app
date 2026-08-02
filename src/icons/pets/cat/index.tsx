@@ -3,9 +3,30 @@ import { Path, StyledSvg as Svg } from "../../StyledSvg";
 
 export const CatIcon: Icon = ({ style, color = "#000000", ...props }: IconProps) => {
   return (
-    <Svg width="21" height="21" viewBox="0 0 21 21" fill="none" style={style} {...props}>
+    <Svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={style} {...props}>
       <Path
-        d="M6.01033 12.1834V12.6834M14.0103 12.1834V12.6834M10.0103 3.18337C10.6803 3.18337 11.3603 3.27337 12.0103 3.44337C13.7903 1.44337 17.0403 0.603369 18.4303 1.18337C19.8303 1.76337 18.0103 8.18337 18.0103 8.18337C18.5803 9.25337 19.0103 10.4234 19.0103 11.6234C19.0103 16.0834 14.9803 19.1834 10.0103 19.1834C5.04033 19.1834 1.01033 16.1834 1.01033 11.6234C1.01033 10.3734 1.51033 9.22337 2.01033 8.18337C2.01033 8.18337 0.120332 1.76337 1.51033 1.18337C2.90033 0.603369 6.23033 1.41337 8.01033 3.41337C8.6663 3.26215 9.33716 3.185 10.0103 3.18337Z"
+        d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M8 14v.5"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M16 14v.5"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M11.25 16.25h1.5L12 17l-.75-.75Z"
         stroke={color}
         strokeWidth="2"
         strokeLinecap="round"

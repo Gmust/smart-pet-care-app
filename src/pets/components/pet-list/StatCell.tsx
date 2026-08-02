@@ -38,7 +38,12 @@ export function StatCell({ icon, value }: StatCellProps) {
           color={palette.brand.textSecondary}
         />
       )}
-      <Text style={statCellStyles.statValue} numberOfLines={2} ellipsizeMode="tail">
+      <Text
+        variant="caption"
+        style={statCellStyles.statValue}
+        numberOfLines={2}
+        ellipsizeMode="tail"
+      >
         {value}
       </Text>
     </View>
@@ -60,9 +65,6 @@ export const statCellStyles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(1.5),
   },
   statValue: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.25,
     textAlign: "center",
     color: theme.palette.brand.textPrimary,
   },

@@ -56,10 +56,8 @@
       "expo-status-bar",
       "expo-build-properties",
       [
-        "expo-navigation-bar",
-        {
-          "hidden": true
-        }
+        "react-native-edge-to-edge",
+        { "android": { "parentTheme": "Default", "enforceNavigationBarContrast": false } }
       ],
       [
         "expo-image-picker",
@@ -100,9 +98,6 @@
     },
     "extra": {
       "router": {},
-      "expo-navigation-bar": {
-        "hidden": true
-      },
       "eas": {
         "projectId": "44433327-239b-4f93-9693-f527c5f7a0ae"
       }

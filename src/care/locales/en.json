@@ -1,0 +1,183 @@
+{
+  "comingSoon": "Care sections coming soon",
+  "emptyState": {
+    "notConfigured": "Not configured"
+  },
+  "sections": {
+    "meals": {
+      "title": "Meals",
+      "addAction": "Add meal"
+    },
+    "foodTracker": {
+      "title": "Food Tracker",
+      "addAction": "Add food"
+    },
+    "vetVisit": {
+      "title": "Vet Visit"
+    },
+    "vaccination": {
+      "title": "Vaccination",
+      "addAction": "Add vaccine"
+    },
+    "treatments": {
+      "title": "Treatments"
+    },
+    "weighing": {
+      "title": "Weighing",
+      "addAction": "Add weigh-in"
+    },
+    "activity": {
+      "title": "Activity",
+      "addAction": "Add activity"
+    },
+    "grooming": {
+      "title": "Grooming"
+    }
+  },
+  "categoryLabels": {
+    "Bathing": "Bathing",
+    "Brushing": "Brushing",
+    "EarCleaning": "Ear cleaning",
+    "NailTrimming": "Nail trimming",
+    "PawCare": "Paw care",
+    "TeethCleaning": "Teeth cleaning",
+    "Deworming": "Deworming",
+    "Antiparasite": "Anti-parasite"
+  },
+  "foodTracker": {
+    "restockDate": "Restock date: {{date}}",
+    "restockDateUnknown": "Restock date: \u2014"
+  },
+  "recurrence": {
+    "daily": "Every day",
+    "byWeekDays": "By week days",
+    "everyWeek": "Every week",
+    "everyNWeeks": "Every {{n}} weeks",
+    "everyMonth": "Every month",
+    "everyNMonths": "Every {{n}} months",
+    "yearly": "Every year"
+  },
+  "daysShort": {
+    "Sunday": "Sun",
+    "Monday": "Mon",
+    "Tuesday": "Tue",
+    "Wednesday": "Wed",
+    "Thursday": "Thu",
+    "Friday": "Fri",
+    "Saturday": "Sat"
+  },
+  "forms": {
+    "meal": {
+      "createTitle": "Add meal",
+      "editTitle": "Edit meal",
+      "fields": {
+        "title": "Title",
+        "time": "Time"
+      },
+      "placeholders": {
+        "title": "Breakfast, Lunch, Dinner...",
+        "time": "Select time"
+      },
+      "createSuccess": "Meal added",
+      "updateSuccess": "Meal updated",
+      "submitCreate": "Add meal",
+      "submitEdit": "Save changes",
+      "errors": {
+        "titleRequired": "Title is required",
+        "timeRequired": "Time is required"
+      }
+    },
+    "careRule": {
+      "createTitle": "Add {{category}}",
+      "editTitle": "Edit {{category}}",
+      "fields": {
+        "title": "Title",
+        "time": "Reminder time",
+        "recurrenceType": "Repeats",
+        "weekDays": "On these days",
+        "anchorWeekDay": "On this day",
+        "intervalWeeks": "Every how many weeks",
+        "intervalMonths": "Every how many months",
+        "startDate": "Starting from"
+      },
+      "placeholders": {
+        "title": "e.g. Schedule vet visit",
+        "titleVetVisit": "e.g. Annual checkup",
+        "titleWeighing": "e.g. Weekly weigh-in",
+        "titleActivity": "e.g. Evening walk",
+        "titleVaccination": "e.g. Rabies vaccine",
+        "time": "Select time",
+        "recurrenceType": "Select frequency",
+        "interval": "e.g. 3",
+        "startDate": "Select date"
+      },
+      "recurrenceOptions": {
+        "Daily": "Every day",
+        "Weekly": "On specific days",
+        "EveryNWeeks": "Every N weeks",
+        "EveryNMonths": "Every N months",
+        "Yearly": "Every year"
+      },
+      "createSuccess": "Rule added",
+      "updateSuccess": "Rule updated",
+      "submitCreate": "Add rule",
+      "submitEdit": "Save changes",
+      "errors": {
+        "titleRequired": "Title is required",
+        "timeRequired": "Time is required",
+        "weekDaysRequired": "Pick at least one day",
+        "anchorWeekDayRequired": "Pick a day",
+        "intervalRequired": "Enter an interval",
+        "startDateRequired": "Select a start date"
+      }
+    },
+    "foodTracker": {
+      "createTitle": "Add food",
+      "editTitle": "Edit food",
+      "fields": {
+        "foodName": "Food name",
+        "packageWeight": "Package weight",
+        "packageCount": "Packages bought",
+        "openedAt": "Opened on",
+        "portionWeight": "Portion size",
+        "feedingFrequency": "Feeding frequency",
+        "feedingsPerDay": "Feedings per day",
+        "feedingsPerWeek": "Feedings per week"
+      },
+      "placeholders": {
+        "foodName": "e.g. Dry cat food",
+        "packageCount": "e.g. 1",
+        "openedAt": "Select date"
+      },
+      "frequencyOptions": {
+        "daily": "Daily",
+        "weekly": "Weekly"
+      },
+      "units": {
+        "grams": "g"
+      },
+      "createSuccess": "Food added",
+      "updateSuccess": "Food updated",
+      "submitCreate": "Add food",
+      "submitEdit": "Save changes",
+      "errors": {
+        "foodNameRequired": "Food name is required",
+        "packageWeightRequired": "Enter package weight",
+        "packageCountRequired": "Enter package count",
+        "openedAtRequired": "Select when it was opened",
+        "portionWeightRequired": "Enter portion size",
+        "feedingsPerDayRequired": "Enter feedings per day",
+        "feedingsPerWeekRequired": "Enter feedings per week"
+      }
+    }
+  },
+  "actions": {
+    "delete": "Delete"
+  },
+  "deleteDialog": {
+    "title": "Delete this entry?",
+    "description": "This will remove \"{{name}}\" and its reminder. This can't be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  }
+}

@@ -1,5 +1,5 @@
 import { Pressable, Text, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import type { Icon } from "@/icons/icons";
 import { palette } from "@/styles/palette";
@@ -28,6 +28,7 @@ export function FabMenuItem({
   onPress,
 }: FabMenuItemProps) {
   const colors = toneColors[tone];
+  const { theme } = useUnistyles();
 
   return (
     <Pressable
@@ -37,7 +38,7 @@ export function FabMenuItem({
       style={({ pressed }) => [styles.root, pressed && styles.pressed]}
     >
       <View style={[styles.icon, { backgroundColor: colors.bg }]}>
-        <IconComponent width={18} height={18} color={colors.fg} />
+        <IconComponent width={theme.iconSize.lg} height={theme.iconSize.lg} color={colors.fg} />
       </View>
       <View style={styles.texts}>
         <Text style={styles.title}>{title}</Text>

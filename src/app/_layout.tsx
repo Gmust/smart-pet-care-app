@@ -2,9 +2,13 @@
 import "@/i18n";
 
 import { useEffect } from "react";
-import { Platform, StatusBar } from "react-native";
+import { StatusBar } from "react-native";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
-import { Fraunces_400Regular, Fraunces_700Bold } from "@expo-google-fonts/fraunces";
+import {
+  Fraunces_400Regular,
+  Fraunces_600SemiBold,
+  Fraunces_700Bold,
+} from "@expo-google-fonts/fraunces";
 import {
   Inter_100Thin,
   Inter_200ExtraLight,
@@ -17,8 +21,14 @@ import {
   Inter_900Black,
 } from "@expo-google-fonts/inter";
 
+import { StyleSheet } from "react-native-unistyles";
+
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import { AuthProvider } from "@/auth/context/AuthContext";
 import AppProvider from "@/common/providers/AppProvider";
+
+import { NavigationBarScrim } from "@/common/components/NavigationBarScrim";
 
 import "@/styles/config";
 import "dayjs/locale/en.js";
@@ -31,7 +41,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { useFonts } from "expo-font";
-import { NavigationBar } from "expo-navigation-bar";
+import { SystemBars } from "react-native-edge-to-edge";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 
@@ -51,6 +61,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Fraunces_700Bold,
+    Fraunces_600SemiBold,
     Fraunces_400Regular,
     Inter_100Thin,
     Inter_200ExtraLight,
@@ -64,18 +75,6 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (Platform.OS !== "android") {
-      return;
-    }
-
-    void Promise.resolve()
-      .then(() => NavigationBar.setHidden(true))
-      .catch(() => {
-        // The current Activity can be unavailable during reload or teardown.
-      });
-  }, []);
-
-  useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync();
     }
@@ -86,12 +85,16 @@ export default function RootLayout() {
   }
 
   return (
-    <AppProvider>
-      <AuthProvider>
-        <StatusBar hidden />
-        <RootNavigator />
-      </AuthProvider>
-    </AppProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <AppProvider>
+        <AuthProvider>
+          <StatusBar hidden />
+          <SystemBars style="dark" />
+          <RootNavigator />
+          <NavigationBarScrim />
+        </AuthProvider>
+      </AppProvider>
+    </GestureHandlerRootView>
   );
 }
 
@@ -104,3 +107,7 @@ function RootNavigator() {
     </Stack>
   );
 }
+
+const styles = StyleSheet.create(() => ({
+  root: { flex: 1 },
+}));

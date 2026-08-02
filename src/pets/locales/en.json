@@ -21,8 +21,8 @@
     "notFound": "Pet not found",
     "tabs": {
       "overview": "Overview",
-      "activity": "Activity",
       "health": "Health",
+      "care": "Care",
       "reminders": "Reminders"
     },
     "basics": {
@@ -129,5 +129,8 @@
     "Unknown": "Unknown",
     "Male": "Male",
     "Female": "Female"
+  },
+  "healthTab": {
+    "comingSoon": "Coming soon"
   }
 }

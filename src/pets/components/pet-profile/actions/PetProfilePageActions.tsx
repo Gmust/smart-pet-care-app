@@ -39,7 +39,7 @@ export function PetProfilePageActions({
         accessibilityLabel={t("petProfilePage.actions.open")}
         disabled={disabled}
       >
-        <EllipsisIcon width={16} height={16} color={palette.brand.textBody} />
+        <EllipsisIcon width={16} height={16} color={palette.brand.primaryDark} />
       </Button>
     );
   }
@@ -51,7 +51,7 @@ export function PetProfilePageActions({
         accessibilityLabel={t("petProfilePage.actions.open")}
         style={(state) => [styles.trigger, state.pressed && styles.triggerPressed]}
       >
-        <EllipsisIcon width={16} height={16} color={palette.brand.textBody} />
+        <EllipsisIcon width={16} height={16} color={palette.brand.primaryDark} />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent>
