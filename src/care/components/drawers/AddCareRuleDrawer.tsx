@@ -16,8 +16,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Text } from "@/shadecn/ui/text";
 
 import {
+  CARE_CATEGORY_ALLOWED_RECURRENCE_TYPES,
   CARE_CATEGORY_DEFAULT_RECURRENCE,
   CARE_CATEGORY_LABEL_KEYS,
+  CARE_CATEGORY_NAME_KEYS,
   CARE_CATEGORY_TITLE_PLACEHOLDER_KEYS,
 } from "../../constants";
 import { useCreateCareRuleMutation } from "../../queries/useCreateCareRuleMutation";
@@ -35,7 +37,7 @@ type Props = {
   rule?: CareRule;
 };
 
-const RECURRENCE_TYPES: RecurrenceType[] = [
+const ALL_RECURRENCE_TYPES: RecurrenceType[] = [
   "Daily",
   "Weekly",
   "EveryNWeeks",
@@ -67,15 +69,16 @@ const defaultValues: CareRuleFormValues = {
 export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: Props) {
   const { t } = useTranslation(["care", "common"]);
   const isEditMode = !!rule;
-  // Kept in sync manually with AddPlannedHealthEventDrawer.tsx (and
-  // CareFixedSlotsSection.tsx's title logic). If this changes,
-  // check those too.
   const labelKey = category ? CARE_CATEGORY_LABEL_KEYS[category] : undefined;
   const isFixedSlot = !!labelKey;
   const categoryLabel = labelKey ? t(labelKey) : undefined;
   const titlePlaceholderKey =
     (category && CARE_CATEGORY_TITLE_PLACEHOLDER_KEYS[category]) ||
     "care:forms.careRule.placeholders.title";
+  const categoryName = category ? t(CARE_CATEGORY_NAME_KEYS[category]) : "";
+  const allowedRecurrenceTypes = category
+    ? (CARE_CATEGORY_ALLOWED_RECURRENCE_TYPES[category] ?? ALL_RECURRENCE_TYPES)
+    : ALL_RECURRENCE_TYPES;
 
   const { mutateAsync: createRule, isPending: isCreating } = useCreateCareRuleMutation();
   const { mutateAsync: updateRule, isPending: isUpdating } = useUpdateCareRuleMutation();
@@ -188,7 +191,9 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       snapPoints={["90%"]}
-      title={t(isEditMode ? "care:forms.careRule.editTitle" : "care:forms.careRule.createTitle")}
+      title={t(isEditMode ? "care:forms.careRule.editTitle" : "care:forms.careRule.createTitle", {
+        category: categoryName,
+      })}
       footer={
         <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
           {([canSubmit, isSubmitting]) => (
@@ -256,7 +261,7 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
                 label: t(`care:forms.careRule.recurrenceOptions.${field.state.value}`),
               }}
               onValueChange={(option) => {
-                const next = RECURRENCE_TYPES.find((type) => type === option?.value);
+                const next = allowedRecurrenceTypes.find((type) => type === option?.value);
                 if (next) field.handleChange(next);
               }}
             >
@@ -264,7 +269,7 @@ export function AddCareRuleDrawer({ petId, isOpen, setIsOpen, category, rule }: 
                 <SelectValue placeholder={t("care:forms.careRule.placeholders.recurrenceType")} />
               </SelectTrigger>
               <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
-                {RECURRENCE_TYPES.map((type) => (
+                {allowedRecurrenceTypes.map((type) => (
                   <SelectItem
                     key={type}
                     value={type}

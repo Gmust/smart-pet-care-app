@@ -1,5 +1,5 @@
 import { CareListSkeleton } from "../skeletons/CareListSkeleton";
-import type { CareCategory, PlannedHealthEventCategory } from "../types";
+import type { CareCategory } from "../types";
 
 import { CareListCard } from "./CareListCard";
 import { CareRuleCard } from "./CareRuleCard";
@@ -9,7 +9,7 @@ import { EmptyCareCard } from "./EmptyCareCard";
 
 type RowProps = Omit<React.ComponentProps<typeof CareRuleRowContent>, "size">;
 
-type Props<T extends { id: string }, C extends CareCategory | PlannedHealthEventCategory> = {
+type Props<T extends { id: string }, C extends CareCategory> = {
   title: string;
   actionLabel?: string;
   categories: C[];
@@ -22,10 +22,7 @@ type Props<T extends { id: string }, C extends CareCategory | PlannedHealthEvent
   onDelete?: (item: T) => void;
 };
 
-export function CareListSection<
-  T extends { id: string },
-  C extends CareCategory | PlannedHealthEventCategory,
->({
+export function CareListSection<T extends { id: string }, C extends CareCategory>({
   title,
   actionLabel,
   categories,

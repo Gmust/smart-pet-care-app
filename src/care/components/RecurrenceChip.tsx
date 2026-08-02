@@ -12,7 +12,7 @@ type Props = {
   weekDays?: DayOfWeek[];
   /**
    * "days" (default) lists the selected week days, e.g. "Thu · Sat" — used
-   * by Walking/Weighing/Vaccination, where the days ARE the information.
+   * by Activity/Weighing/Vaccination, where the days ARE the information.
    * "compact" collapses "Weekly" to a static "By week days" label instead —
    * used by Meals, where the chip sits under a whole row and per-day detail
    * would be noisy.

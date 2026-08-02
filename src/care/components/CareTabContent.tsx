@@ -4,11 +4,9 @@ import { useCareDrawers } from "../hooks/useCareDrawers";
 import { AddCareRuleDrawer } from "./drawers/AddCareRuleDrawer";
 import { AddFoodTrackerDrawer } from "./drawers/AddFoodTrackerDrawer";
 import { AddMealDrawer } from "./drawers/AddMealDrawer";
-import { AddPlannedHealthEventDrawer } from "./drawers/AddPlannedHealthEventDrawer";
 import { CareRuleSection } from "./CareRuleSection";
 import { FoodTrackerSection } from "./FoodTrackerSection";
 import { MealsSection } from "./MealsSection";
-import { PlannedHealthEventSection } from "./PlannedHealthEventSection";
 
 type Props = {
   petId: string;
@@ -39,16 +37,6 @@ export function CareTabContent({ petId }: Props) {
             petId={petId}
             onAddFood={drawers.openAddFoodTracker}
             onEditFood={drawers.openEditFoodTracker}
-          />
-        );
-      case "plannedHealthEvent":
-        return (
-          <PlannedHealthEventSection
-            key={config.key}
-            config={config}
-            petId={petId}
-            onAddEvent={drawers.openAddPlannedHealthEvent}
-            onEditEvent={drawers.openEditPlannedHealthEvent}
           />
         );
       case "careRule":
@@ -82,15 +70,6 @@ export function CareTabContent({ petId }: Props) {
         setIsOpen={(open) => !open && drawers.close()}
         category={drawers.drawer?.type === "careRule" ? drawers.drawer.category : undefined}
         rule={drawers.drawer?.type === "careRule" ? drawers.drawer.rule : undefined}
-      />
-      <AddPlannedHealthEventDrawer
-        petId={petId}
-        isOpen={drawers.isOpen && drawers.drawer?.type === "plannedHealthEvent"}
-        setIsOpen={(open) => !open && drawers.close()}
-        category={
-          drawers.drawer?.type === "plannedHealthEvent" ? drawers.drawer.category : undefined
-        }
-        event={drawers.drawer?.type === "plannedHealthEvent" ? drawers.drawer.event : undefined}
       />
       <AddFoodTrackerDrawer
         petId={petId}

@@ -3,7 +3,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
-import type { CareCategory, DayOfWeek, PlannedHealthEventCategory, RecurrenceType } from "../types";
+import type { CareCategory, DayOfWeek, RecurrenceType } from "../types";
 import { getCareCategoryColors } from "../utils/careCategoryColors";
 
 import { CareCategoryIcon } from "./care-category-icon/CareCategoryIcon";
@@ -12,7 +12,7 @@ import { RecurrenceChip } from "./RecurrenceChip";
 type CareRuleRowSize = "lg" | "sm";
 
 type Props = {
-  category: CareCategory | PlannedHealthEventCategory;
+  category: CareCategory;
   title: string;
   time: string;
   recurrenceType: RecurrenceType;

@@ -1,6 +1,6 @@
 import { palette } from "@/styles/palette";
 
-import type { CareCategory, PlannedHealthEventCategory } from "../types";
+import type { CareCategory } from "../types";
 
 type CategoryColors = { background: string; iconColor: string };
 
@@ -14,13 +14,13 @@ const GROOMING: CategoryColors = {
   iconColor: palette.brand.textBody,
 };
 
-const CATEGORY_COLORS: Record<CareCategory | PlannedHealthEventCategory, CategoryColors> = {
+const CATEGORY_COLORS: Record<CareCategory, CategoryColors> = {
   VetVisit: PEACH,
   Vaccination: PEACH,
   Deworming: PEACH,
   Antiparasite: PEACH,
   Weighing: { background: palette.brand.dangerBg, iconColor: palette.brand.peachDefault },
-  Walking: { background: palette.brand.primaryXsoft, iconColor: palette.brand.textBody },
+  Activity: { background: palette.brand.primaryXsoft, iconColor: palette.brand.textBody },
   Bathing: GROOMING,
   Brushing: GROOMING,
   EarCleaning: GROOMING,
@@ -29,6 +29,5 @@ const CATEGORY_COLORS: Record<CareCategory | PlannedHealthEventCategory, Categor
   TeethCleaning: GROOMING,
 };
 
-export const getCareCategoryColors = (
-  category: CareCategory | PlannedHealthEventCategory
-): CategoryColors => CATEGORY_COLORS[category];
+export const getCareCategoryColors = (category: CareCategory): CategoryColors =>
+  CATEGORY_COLORS[category];

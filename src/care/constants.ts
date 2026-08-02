@@ -1,10 +1,4 @@
-import type {
-  CareCategory,
-  CareTranslationKey,
-  DayOfWeek,
-  PlannedHealthEventCategory,
-  RecurrenceType,
-} from "./types";
+import type { CareCategory, CareTranslationKey, DayOfWeek, RecurrenceType } from "./types";
 
 export type MealsSectionConfig = {
   key: "meals";
@@ -31,7 +25,7 @@ export type FoodTrackerSectionConfig = {
  *                   that category.
  */
 export type CareRuleSectionConfig = {
-  key: "vetVisit" | "weighing" | "walking" | "grooming";
+  key: "vetVisit" | "weighing" | "activity" | "vaccination" | "treatments" | "grooming";
   renderer: "careRule";
   variant: "single" | "growableList" | "fixedSlots";
   titleKey: CareTranslationKey;
@@ -39,24 +33,10 @@ export type CareRuleSectionConfig = {
   fixedCareCategories: CareCategory[];
 };
 
-/**
- * Same variant semantics as CareRuleSectionConfig, but backed by
- * PlannedHealthEvent (vaccination / treatments) instead of CareRule.
- */
-export type PlannedHealthEventSectionConfig = {
-  key: "vaccination" | "treatments";
-  renderer: "plannedHealthEvent";
-  variant: "growableList" | "fixedSlots";
-  titleKey: CareTranslationKey;
-  headerActionLabelKey?: CareTranslationKey;
-  fixedPlannedHealthCategories: PlannedHealthEventCategory[];
-};
-
 export type CareSectionConfig =
   | MealsSectionConfig
   | FoodTrackerSectionConfig
-  | CareRuleSectionConfig
-  | PlannedHealthEventSectionConfig;
+  | CareRuleSectionConfig;
 
 export const CARE_SECTIONS: CareSectionConfig[] = [
   {
@@ -80,18 +60,18 @@ export const CARE_SECTIONS: CareSectionConfig[] = [
   },
   {
     key: "vaccination",
-    renderer: "plannedHealthEvent",
+    renderer: "careRule",
     variant: "growableList",
     titleKey: "sections.vaccination.title",
     headerActionLabelKey: "sections.vaccination.addAction",
-    fixedPlannedHealthCategories: ["Vaccination"],
+    fixedCareCategories: ["Vaccination"],
   },
   {
     key: "treatments",
-    renderer: "plannedHealthEvent",
+    renderer: "careRule",
     variant: "fixedSlots",
     titleKey: "sections.treatments.title",
-    fixedPlannedHealthCategories: ["Deworming", "Antiparasite"],
+    fixedCareCategories: ["Deworming", "Antiparasite"],
   },
   {
     key: "weighing",
@@ -102,12 +82,12 @@ export const CARE_SECTIONS: CareSectionConfig[] = [
     fixedCareCategories: ["Weighing"],
   },
   {
-    key: "walking",
+    key: "activity",
     renderer: "careRule",
     variant: "growableList",
-    titleKey: "sections.walking.title",
-    headerActionLabelKey: "sections.walking.addAction",
-    fixedCareCategories: ["Walking"],
+    titleKey: "sections.activity.title",
+    headerActionLabelKey: "sections.activity.addAction",
+    fixedCareCategories: ["Activity"],
   },
   {
     key: "grooming",
@@ -125,9 +105,29 @@ export const CARE_SECTIONS: CareSectionConfig[] = [
   },
 ];
 
-export const CARE_CATEGORY_LABEL_KEYS: Partial<
-  Record<CareCategory | PlannedHealthEventCategory, CareTranslationKey>
-> = {
+export const CARE_CATEGORY_LABEL_KEYS: Partial<Record<CareCategory, CareTranslationKey>> = {
+  Bathing: "categoryLabels.Bathing",
+  Brushing: "categoryLabels.Brushing",
+  EarCleaning: "categoryLabels.EarCleaning",
+  NailTrimming: "categoryLabels.NailTrimming",
+  PawCare: "categoryLabels.PawCare",
+  TeethCleaning: "categoryLabels.TeethCleaning",
+  Deworming: "categoryLabels.Deworming",
+  Antiparasite: "categoryLabels.Antiparasite",
+};
+
+/**
+ * Display name for every category, used to make the add/edit drawer title
+ * category-specific ("Add Deworming"). Deliberately separate from
+ * CARE_CATEGORY_LABEL_KEYS, which doubles as the "hide title field"
+ * (isFixedSlot) flag — adding VetVisit/Weighing/Activity/Vaccination there
+ * would wrongly turn them into fixed-slot categories.
+ */
+export const CARE_CATEGORY_NAME_KEYS: Record<CareCategory, CareTranslationKey> = {
+  VetVisit: "sections.vetVisit.title",
+  Weighing: "sections.weighing.title",
+  Activity: "sections.activity.title",
+  Vaccination: "sections.vaccination.title",
   Bathing: "categoryLabels.Bathing",
   Brushing: "categoryLabels.Brushing",
   EarCleaning: "categoryLabels.EarCleaning",
@@ -141,7 +141,7 @@ export const CARE_CATEGORY_LABEL_KEYS: Partial<
 /**
  * Title field placeholder, per category. Only relevant for the categories
  * where AddCareRuleDrawer actually renders a free-text title field
- * (VetVisit, Weighing, Walking) — fixed-slot categories use
+ * (VetVisit, Weighing, Activity, Vaccination) — fixed-slot categories use
  * CARE_CATEGORY_LABEL_KEYS as the title instead and never show this field.
  * Falls back to "care:forms.careRule.placeholders.title" if a category
  * isn't listed here.
@@ -151,7 +151,8 @@ export const CARE_CATEGORY_TITLE_PLACEHOLDER_KEYS: Partial<
 > = {
   VetVisit: "forms.careRule.placeholders.titleVetVisit",
   Weighing: "forms.careRule.placeholders.titleWeighing",
-  Walking: "forms.careRule.placeholders.titleWalking",
+  Activity: "forms.careRule.placeholders.titleActivity",
+  Vaccination: "forms.careRule.placeholders.titleVaccination",
 };
 
 export const RECURRENCE_TYPE_DEFAULT_INTERVAL = 1;
@@ -195,7 +196,7 @@ export const CARE_CATEGORY_DEFAULT_RECURRENCE: Partial<
 > = {
   VetVisit: { recurrenceType: "Yearly" },
   Weighing: { recurrenceType: "Weekly", weekDays: [] },
-  Walking: { recurrenceType: "Daily" },
+  Activity: { recurrenceType: "Daily" },
   Bathing: {
     recurrenceType: "EveryNWeeks",
     intervalN: GROOMING_DEFAULT_INTERVAL_WEEKS.Bathing,
@@ -226,4 +227,34 @@ export const CARE_CATEGORY_DEFAULT_RECURRENCE: Partial<
     intervalN: GROOMING_DEFAULT_INTERVAL_WEEKS.TeethCleaning,
     weekDays: [],
   },
+  Vaccination: { recurrenceType: "Yearly" },
+  Deworming: { recurrenceType: "EveryNMonths", intervalN: 3 },
+  Antiparasite: { recurrenceType: "EveryNWeeks", intervalN: 4 },
+};
+
+/**
+ * Recurrence types selectable in AddCareRuleDrawer, per category. Falls back
+ * to every RecurrenceType when a category isn't listed here.
+ *
+ * - VetVisit: Yearly / EveryNMonths (checkups don't happen weekly/daily).
+ * - Vaccination/Deworming/Antiparasite: EveryNWeeks / EveryNMonths / Yearly
+ *   — no Daily/Weekly, that cadence isn't medically meaningful for these.
+ * - Everything else (Weighing, Activity, Grooming): Daily / Weekly /
+ *   EveryNWeeks / EveryNMonths, no Yearly.
+ */
+export const CARE_CATEGORY_ALLOWED_RECURRENCE_TYPES: Partial<
+  Record<CareCategory, RecurrenceType[]>
+> = {
+  VetVisit: ["Yearly", "EveryNMonths"],
+  Vaccination: ["EveryNWeeks", "EveryNMonths", "Yearly"],
+  Deworming: ["EveryNWeeks", "EveryNMonths", "Yearly"],
+  Antiparasite: ["EveryNWeeks", "EveryNMonths", "Yearly"],
+  Weighing: ["Daily", "Weekly", "EveryNWeeks", "EveryNMonths"],
+  Activity: ["Daily", "Weekly", "EveryNWeeks", "EveryNMonths"],
+  Bathing: ["Daily", "Weekly", "EveryNWeeks", "EveryNMonths"],
+  Brushing: ["Daily", "Weekly", "EveryNWeeks", "EveryNMonths"],
+  EarCleaning: ["Daily", "Weekly", "EveryNWeeks", "EveryNMonths"],
+  NailTrimming: ["Daily", "Weekly", "EveryNWeeks", "EveryNMonths"],
+  PawCare: ["Daily", "Weekly", "EveryNWeeks", "EveryNMonths"],
+  TeethCleaning: ["Daily", "Weekly", "EveryNWeeks", "EveryNMonths"],
 };

@@ -26,9 +26,9 @@
       "title": "Weighing",
       "addAction": "Add weigh-in"
     },
-    "walking": {
-      "title": "Walking",
-      "addAction": "Add walk"
+    "activity": {
+      "title": "Activity",
+      "addAction": "Add activity"
     },
     "grooming": {
       "title": "Grooming"
@@ -88,8 +88,8 @@
       }
     },
     "careRule": {
-      "createTitle": "Add rule",
-      "editTitle": "Edit rule",
+      "createTitle": "Add {{category}}",
+      "editTitle": "Edit {{category}}",
       "fields": {
         "title": "Title",
         "time": "Reminder time",
@@ -104,7 +104,8 @@
         "title": "e.g. Schedule vet visit",
         "titleVetVisit": "e.g. Annual checkup",
         "titleWeighing": "e.g. Weekly weigh-in",
-        "titleWalking": "e.g. Evening walk",
+        "titleActivity": "e.g. Evening walk",
+        "titleVaccination": "e.g. Rabies vaccine",
         "time": "Select time",
         "recurrenceType": "Select frequency",
         "interval": "e.g. 3",
@@ -128,35 +129,6 @@
         "anchorWeekDayRequired": "Pick a day",
         "intervalRequired": "Enter an interval",
         "startDateRequired": "Select a start date"
-      }
-    },
-    "plannedHealthEvent": {
-      "createTitle": "Add planned event",
-      "editTitle": "Edit planned event",
-      "fields": {
-        "title": "Title",
-        "time": "Reminder time",
-        "intervalMonths": "Every how many months",
-        "productName": "Product (optional)",
-        "lastDoneAt": "Last done (optional)",
-        "notes": "Notes (optional)"
-      },
-      "placeholders": {
-        "title": "e.g. Rabies vaccine",
-        "time": "Select time",
-        "interval": "e.g. 12",
-        "productName": "e.g. Frontline",
-        "lastDoneAt": "Select date",
-        "notes": "Any extra detail"
-      },
-      "createSuccess": "Event added",
-      "updateSuccess": "Event updated",
-      "submitCreate": "Add event",
-      "submitEdit": "Save changes",
-      "errors": {
-        "titleRequired": "Title is required",
-        "timeRequired": "Time is required",
-        "intervalRequired": "Enter an interval"
       }
     },
     "foodTracker": {
