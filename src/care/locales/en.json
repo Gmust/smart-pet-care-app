@@ -26,9 +26,9 @@
       "title": "Weighing",
       "addAction": "Add weigh-in"
     },
-    "walking": {
-      "title": "Walking",
-      "addAction": "Add walk"
+    "activity": {
+      "title": "Activity",
+      "addAction": "Add activity"
     },
     "grooming": {
       "title": "Grooming"
@@ -54,7 +54,8 @@
     "everyWeek": "Every week",
     "everyNWeeks": "Every {{n}} weeks",
     "everyMonth": "Every month",
-    "everyNMonths": "Every {{n}} months"
+    "everyNMonths": "Every {{n}} months",
+    "yearly": "Every year"
   },
   "daysShort": {
     "Sunday": "Sun",
@@ -87,27 +88,35 @@
       }
     },
     "careRule": {
-      "createTitle": "Add rule",
-      "editTitle": "Edit rule",
+      "createTitle": "Add {{category}}",
+      "editTitle": "Edit {{category}}",
       "fields": {
         "title": "Title",
         "time": "Reminder time",
         "recurrenceType": "Repeats",
         "weekDays": "On these days",
+        "anchorWeekDay": "On this day",
         "intervalWeeks": "Every how many weeks",
-        "intervalMonths": "Every how many months"
+        "intervalMonths": "Every how many months",
+        "startDate": "Starting from"
       },
       "placeholders": {
         "title": "e.g. Schedule vet visit",
+        "titleVetVisit": "e.g. Annual checkup",
+        "titleWeighing": "e.g. Weekly weigh-in",
+        "titleActivity": "e.g. Evening walk",
+        "titleVaccination": "e.g. Rabies vaccine",
         "time": "Select time",
         "recurrenceType": "Select frequency",
-        "interval": "e.g. 3"
+        "interval": "e.g. 3",
+        "startDate": "Select date"
       },
       "recurrenceOptions": {
         "Daily": "Every day",
         "Weekly": "On specific days",
         "EveryNWeeks": "Every N weeks",
-        "EveryNMonths": "Every N months"
+        "EveryNMonths": "Every N months",
+        "Yearly": "Every year"
       },
       "createSuccess": "Rule added",
       "updateSuccess": "Rule updated",
@@ -117,36 +126,9 @@
         "titleRequired": "Title is required",
         "timeRequired": "Time is required",
         "weekDaysRequired": "Pick at least one day",
-        "intervalRequired": "Enter an interval"
-      }
-    },
-    "plannedHealthEvent": {
-      "createTitle": "Add planned event",
-      "editTitle": "Edit planned event",
-      "fields": {
-        "title": "Title",
-        "time": "Reminder time",
-        "intervalMonths": "Every how many months",
-        "productName": "Product (optional)",
-        "lastDoneAt": "Last done (optional)",
-        "notes": "Notes (optional)"
-      },
-      "placeholders": {
-        "title": "e.g. Rabies vaccine",
-        "time": "Select time",
-        "interval": "e.g. 12",
-        "productName": "e.g. Frontline",
-        "lastDoneAt": "Select date",
-        "notes": "Any extra detail"
-      },
-      "createSuccess": "Event added",
-      "updateSuccess": "Event updated",
-      "submitCreate": "Add event",
-      "submitEdit": "Save changes",
-      "errors": {
-        "titleRequired": "Title is required",
-        "timeRequired": "Time is required",
-        "intervalRequired": "Enter an interval"
+        "anchorWeekDayRequired": "Pick a day",
+        "intervalRequired": "Enter an interval",
+        "startDateRequired": "Select a start date"
       }
     },
     "foodTracker": {

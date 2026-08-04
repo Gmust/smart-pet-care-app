@@ -25,7 +25,9 @@ export function CareSection({ title, actionLabel, onActionPress, children }: Pro
             onPress={onActionPress}
             accessibilityLabel={actionLabel}
           >
-            <Text style={styles.actionText}>{actionLabel}</Text>
+            <Text variant="bodySemiBold" style={styles.actionText}>
+              {actionLabel}
+            </Text>
           </Pressable>
         )}
       </View>
@@ -52,7 +54,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   actionText: {
-    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.primaryDefault,
   },
   content: {

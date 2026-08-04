@@ -1,10 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
 
 import { DateTimeField } from "@/common/components/DateTimeField";
-
-import dayjs from "dayjs";
 
 type Props = {
   from: string | null;

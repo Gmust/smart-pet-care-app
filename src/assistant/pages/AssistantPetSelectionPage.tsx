@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useFocusEffect, useRouter } from "expo-router";
 
 import { ConsentDialog } from "@/assistant/components/dialogs/ConsentDialog";
 import { PetSelection } from "@/assistant/components/pet-selection/PetSelection";
@@ -12,8 +13,6 @@ import {
 } from "@/assistant/utils/aiUsingConsentStorage";
 import { BackButton } from "@/common/components/BackButton";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
-
-import { useFocusEffect, useRouter } from "expo-router";
 
 export default function AssistantPetSelectionPage() {
   const router = useRouter();

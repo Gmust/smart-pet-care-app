@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
 
 import type { HealthRecordResponseDto } from "@/api/generated";
 import { ChevronIcon } from "@/icons/chevron";
@@ -9,8 +10,6 @@ import { InfoRow } from "@/pets/components/pet-profile/InfoRow";
 import { cardVariants } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
-
-import dayjs from "dayjs";
 
 type Props = {
   record: HealthRecordResponseDto;

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
 
 import { SectionHeader } from "@/common/components/SectionHeader";
 import { ListCard } from "@/shadecn/ui/card";
@@ -10,7 +11,6 @@ import type { usePetQuery } from "../../queries/usePetQuery";
 import type { PetNote } from "../../types";
 import { InfoRow } from "../pet-profile/InfoRow";
 import { NoteRow } from "../pet-profile/NoteRow";
-import dayjs from "dayjs";
 
 type Pet = NonNullable<ReturnType<typeof usePetQuery>["data"]>;
 
@@ -75,7 +75,9 @@ export const OverviewTabContent = ({ pet }: Props) => {
           notes.map((note) => <NoteRow key={note.id} note={note} />)
         ) : (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyText}>{t("petProfilePage.notes.empty")}</Text>
+            <Text variant="body" style={styles.emptyText}>
+              {t("petProfilePage.notes.empty")}
+            </Text>
           </View>
         )}
       </ListCard>
@@ -119,7 +121,6 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(5),
   },
   emptyText: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
 }));

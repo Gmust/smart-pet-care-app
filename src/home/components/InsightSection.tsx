@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useRouter } from "expo-router";
 
 import { InsightSectionSkeleton } from "../skeletons/HomePageSkeleton";
 import type { AiInsight } from "../types";
+
 import { AiInsightCard } from "./AiInsightCard";
-import { useRouter } from "expo-router";
 
 //TODO add functional when Backend would be ready
 export function InsightSection() {

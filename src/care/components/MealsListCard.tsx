@@ -2,6 +2,7 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import type { MealRule } from "../types";
+
 import { CareListCard } from "./CareListCard";
 import { MealRowContent } from "./MealRowContent";
 import { RecurrenceChip } from "./RecurrenceChip";
@@ -32,7 +33,7 @@ export function MealsListCard({ meals, onEditMeal, onDeleteMeal }: Props) {
       onDeleteItem={onDeleteMeal}
       renderItem={(meal) => <MealRowContent title={meal.title} time={meal.time} />}
       footer={
-        firstMeal && (
+        !!firstMeal && (
           <View style={styles.footerRow}>
             <RecurrenceChip
               recurrenceType={firstMeal.recurrenceType}

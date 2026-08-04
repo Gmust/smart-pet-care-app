@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { BlurView } from "expo-blur";
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 
 import type { PetResponseDto } from "@/api";
 import { hexToRGBA } from "@/common/utils/colors";
@@ -8,10 +11,6 @@ import { SquareActivityIcon } from "@/icons/activity";
 import { HeartPulseIcon } from "@/icons/heart";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
-
-import { BlurView } from "expo-blur";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
 
 type Props = {
   pet: PetResponseDto;

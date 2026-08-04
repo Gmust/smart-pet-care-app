@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import { PortalHost } from "@rn-primitives/portal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
+import type { AxiosResponse } from "axios";
+import { AxiosError, AxiosHeaders } from "axios";
 
 import {
   ChatMessageRole,
@@ -15,10 +17,9 @@ import {
 import { palette } from "@/styles/palette";
 
 import * as aiConsentStorage from "../utils/aiUsingConsentStorage";
+
 import AssistantPage from "./AssistantPage";
 import AssistantPetSelectionPage from "./AssistantPetSelectionPage";
-import type { AxiosResponse } from "axios";
-import { AxiosError, AxiosHeaders } from "axios";
 
 // Interpolating passthrough so distinct pets/urgencies produce unique, assertable strings.
 const mockTranslate = (key: string, opts?: Record<string, unknown>) => {

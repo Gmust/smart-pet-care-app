@@ -1,4 +1,5 @@
 import type { Icon } from "../icons";
+
 import { TrendingDownIcon } from "./TrendingDownIcon";
 import { TrendingUpIcon } from "./TrendingUpIcon";
 

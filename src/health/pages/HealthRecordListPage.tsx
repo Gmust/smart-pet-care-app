@@ -4,6 +4,8 @@ import { View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
+import { Redirect, useLocalSearchParams } from "expo-router";
 
 import { AddButton } from "@/common/components/AddButton";
 import { BackButton } from "@/common/components/BackButton";
@@ -21,8 +23,6 @@ import { useHealthRecordsByTypeQuery } from "../queries/useHealthRecordsByTypeQu
 import { useSymptomsQuery } from "../queries/useSymptomsQuery";
 import { healthRecordListParamsSchema } from "../schemas/health-record-list-params.schema";
 import { groupHealthRecordsByYear } from "../utils/groupHealthRecordsByYear";
-import dayjs from "dayjs";
-import { Redirect, useLocalSearchParams } from "expo-router";
 
 export default function HealthRecordListPage() {
   const [search, setSearch] = useState("");

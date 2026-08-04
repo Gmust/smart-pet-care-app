@@ -2,11 +2,10 @@ import { useRef, useState } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import type { PetResponseDto } from "@/api/generated";
 import { CreatePetDrawer } from "@/pets/components/actions/CreatePetDrawer";
-
-import { useRouter } from "expo-router";
 
 export default function AssistantNewPetPage() {
   const router = useRouter();

@@ -13,6 +13,7 @@ import { Text } from "@/shadecn/ui/text";
 
 import { PetListCardReminderSkeleton } from "../../skeletons/PetListCardSkeleton";
 import { PetSpeciesImage } from "../PetSpeciesImage";
+
 import { StatCell } from "./StatCell";
 
 type PetListCardProps = {
@@ -73,6 +74,7 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
         <View style={styles.info}>
           <View style={styles.headerRow}>
             <Text
+              variant="titleL"
               style={styles.name}
               numberOfLines={1}
               adjustsFontSizeToFit
@@ -94,17 +96,23 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
           <View style={styles.metaRow}>
             {!!pet.breed && (
               <>
-                <Text style={styles.meta}>{pet.breed}</Text>
+                <Text variant="bodyS" style={styles.meta}>
+                  {pet.breed}
+                </Text>
                 <View style={styles.dot} />
               </>
             )}
             {!!pet.age && (
               <>
-                <Text style={styles.meta}>{pet.age}</Text>
+                <Text variant="bodyS" style={styles.meta}>
+                  {pet.age}
+                </Text>
                 <View style={styles.dot} />
               </>
             )}
-            <Text style={styles.meta}>{pet.sex}</Text>
+            <Text variant="bodyS" style={styles.meta}>
+              {pet.sex}
+            </Text>
           </View>
 
           <View style={styles.statsRow}>
@@ -120,7 +128,7 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
 
         <View style={styles.actionBar}>
           <View style={styles.actionItem}>
-            <Text style={styles.actionText} numberOfLines={1}>
+            <Text variant="bodyS" style={styles.actionText} numberOfLines={1}>
               {t("pets:petListCard.viewInfo")}
             </Text>
             <ChevronIcon direction="right" width={14} height={14} color={styles.actionText.color} />
@@ -173,7 +181,6 @@ const styles = StyleSheet.create((theme) => ({
   name: {
     flex: 1,
     minWidth: 0,
-    ...theme.textStyles.titleL,
     color: theme.palette.brand.textPrimary,
   },
   metaRow: {
@@ -182,7 +189,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   meta: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   dot: {
@@ -204,7 +210,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(2),
   },
   actionText: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.primaryDefault,
   },
   actionItem: {

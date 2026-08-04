@@ -1,9 +1,8 @@
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { palette } from "@/styles/palette";
-
-import { LinearGradient } from "expo-linear-gradient";
 
 export function NavigationBarScrim() {
   const insets = useSafeAreaInsets();

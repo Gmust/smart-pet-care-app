@@ -1,18 +1,10 @@
 import { useState } from "react";
 
-import type {
-  CareCategory,
-  CareRule,
-  FoodTracker,
-  MealRule,
-  PlannedHealthEvent,
-  PlannedHealthEventCategory,
-} from "../types";
+import type { CareCategory, CareRule, FoodTracker, MealRule } from "../types";
 
 type CareDrawerContent =
   | { type: "meal"; meal?: MealRule }
   | { type: "careRule"; category: CareCategory; rule?: CareRule }
-  | { type: "plannedHealthEvent"; category: PlannedHealthEventCategory; event?: PlannedHealthEvent }
   | { type: "foodTracker"; tracker?: FoodTracker };
 
 export function useCareDrawers() {
@@ -32,10 +24,6 @@ export function useCareDrawers() {
     openEditMeal: (meal: MealRule) => open({ type: "meal", meal }),
     openAddCareRule: (category: CareCategory) => open({ type: "careRule", category }),
     openEditCareRule: (rule: CareRule) => open({ type: "careRule", category: rule.category, rule }),
-    openAddPlannedHealthEvent: (category: PlannedHealthEventCategory) =>
-      open({ type: "plannedHealthEvent", category }),
-    openEditPlannedHealthEvent: (event: PlannedHealthEvent) =>
-      open({ type: "plannedHealthEvent", category: event.category, event }),
     openAddFoodTracker: () => open({ type: "foodTracker" }),
     openEditFoodTracker: (tracker: FoodTracker) => open({ type: "foodTracker", tracker }),
   };

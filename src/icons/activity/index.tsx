@@ -1,4 +1,5 @@
 import type { Icon } from "../icons";
+
 import { ActivityIcon } from "./ActivityIcon";
 import { SquareActivityIcon } from "./SquareActivityIcon";
 

@@ -4,6 +4,8 @@ import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
+import { useRouter } from "expo-router";
 
 import { useAuth } from "@/auth/hooks/useAuth";
 import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
@@ -31,8 +33,6 @@ import { SignOutDrawer } from "../components/SignOutDrawer";
 import { UpdateSelectionDialog } from "../components/update-info/UpdateSelectionDialog";
 import { useDeleteAccountMutation } from "../queries/useDeleteAccountMutation";
 import { ProfileHeroSkeleton, ProfilePageSkeleton } from "../skeletons/ProfilePageSkeleton";
-import dayjs from "dayjs";
-import { useRouter } from "expo-router";
 
 export default function ProfilePage() {
   const router = useRouter();

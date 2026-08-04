@@ -9,13 +9,14 @@ type SectionHeaderProps = {
 
 export function SectionHeader({ label, compact = false }: SectionHeaderProps) {
   return (
-    <Text style={[styles.sectionHeader, compact && styles.sectionHeaderCompact]}>{label}</Text>
+    <Text variant="label" style={[styles.sectionHeader, compact && styles.sectionHeaderCompact]}>
+      {label}
+    </Text>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   sectionHeader: {
-    ...theme.textStyles.label,
     textTransform: "uppercase",
     color: theme.palette.brand.textSecondary,
   },

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import type { AuthResponse } from "@/api/generated";
 import { Button } from "@/shadecn/ui/button";
@@ -12,7 +13,6 @@ import { EmailAuthForm } from "../components/EmailAuthForm";
 import { GoogleAuthButton } from "../components/GoogleAuthButton";
 import { useAuth } from "../hooks/useAuth";
 import type { AuthMode } from "../types";
-import { useLocalSearchParams, useRouter } from "expo-router";
 
 export default function AuthPage() {
   const { t } = useTranslation(["auth"]);

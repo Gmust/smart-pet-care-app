@@ -1,17 +1,18 @@
 import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
-import type { CareCategory, DayOfWeek, PlannedHealthEventCategory, RecurrenceType } from "../types";
-import { getCareCategoryColors } from "./care-category-icon/careCategoryColors";
+import type { CareCategory, DayOfWeek, RecurrenceType } from "../types";
+import { getCareCategoryColors } from "../utils/careCategoryColors";
+
 import { CareCategoryIcon } from "./care-category-icon/CareCategoryIcon";
 import { RecurrenceChip } from "./RecurrenceChip";
 
 type CareRuleRowSize = "lg" | "sm";
 
 type Props = {
-  category: CareCategory | PlannedHealthEventCategory;
+  category: CareCategory;
   title: string;
   time: string;
   recurrenceType: RecurrenceType;
@@ -37,21 +38,28 @@ export function CareRuleRowContent({
   size = "sm",
 }: Props) {
   rowVariants.useVariants({ size });
+  const { theme } = useUnistyles();
   const colors = getCareCategoryColors(category);
+
+  const iconSize = size === "lg" ? theme.iconSize.lg : theme.iconSize.md;
 
   return (
     <View style={rowVariants.row}>
       <View style={[rowVariants.iconBox, { backgroundColor: colors.background }]}>
         <CareCategoryIcon
           category={category}
-          width={size === "lg" ? 18 : 16}
-          height={size === "lg" ? 18 : 16}
+          width={iconSize}
+          height={iconSize}
           color={colors.iconColor}
         />
       </View>
       <View style={rowVariants.textCol}>
-        <Text style={rowVariants.title}>{title}</Text>
-        <Text style={rowVariants.time}>{time}</Text>
+        <Text variant={size === "lg" ? "body" : "bodyS"} style={rowVariants.title}>
+          {title}
+        </Text>
+        <Text variant={size === "lg" ? "bodyS" : "caption"} style={rowVariants.time}>
+          {time}
+        </Text>
       </View>
       <RecurrenceChip recurrenceType={recurrenceType} intervalN={intervalN} weekDays={weekDays} />
     </View>
@@ -86,21 +94,9 @@ const rowVariants = StyleSheet.create((theme) => ({
   },
   title: {
     color: theme.palette.brand.textPrimary,
-    variants: {
-      size: {
-        lg: { ...theme.textStyles.body },
-        sm: { ...theme.textStyles.bodyS },
-      },
-    },
   },
   time: {
     marginTop: theme.spacing(0.5),
     color: theme.palette.brand.textSecondary,
-    variants: {
-      size: {
-        lg: { ...theme.textStyles.bodyS },
-        sm: { ...theme.textStyles.caption },
-      },
-    },
   },
 }));

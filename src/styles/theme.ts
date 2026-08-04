@@ -1,7 +1,6 @@
 import { palette } from "./palette";
 
 const BASE_SPACING = 4;
-const BASE_TEXT_SIZE = 16;
 
 // ---------------------------------------------------------------------------
 // LEGACY — Tailwind-style rem scale, does not match Figma values exactly.
@@ -11,6 +10,7 @@ const BASE_TEXT_SIZE = 16;
 // getTextSize, theme.fonts (old keys), theme.fontSize (old keys) once
 // `graphify query` / grep shows zero remaining references.
 // ---------------------------------------------------------------------------
+const BASE_TEXT_SIZE = 16;
 const DISPLAY_FONT_FAMILY = "Fraunces_700Bold";
 const DISPLAY_REGULAR_FONT_FAMILY = "Fraunces_400Regular";
 
@@ -27,6 +27,37 @@ const INTER_MEDIUM = "Inter_500Medium";
 const INTER_SEMIBOLD = "Inter_600SemiBold";
 const FRAUNCES_REGULAR = "Fraunces_400Regular";
 const FRAUNCES_SEMIBOLD = "Fraunces_600SemiBold";
+
+// Raw font family primitives — exposed in case a component needs the family
+// without a full textStyle (e.g. combining with a custom size). textStyles
+// below is built from these, so there is exactly one place that defines
+// "what Frances-semibold actually is".
+const fontFamily = {
+  display: FRAUNCES_SEMIBOLD,
+  displayRegular: FRAUNCES_REGULAR,
+  regular: INTER_REGULAR,
+  medium: INTER_MEDIUM,
+  semiBold: INTER_SEMIBOLD,
+};
+
+// Raw pixel sizes actually used in the Figma file. textStyles below picks
+// from this set instead of writing sizes as bare numbers.
+const fontPx = {
+  10: 10,
+  11: 11,
+  12: 12,
+  13: 13,
+  14: 14,
+  15: 15,
+  19: 19,
+  24: 24,
+  32: 32,
+};
+
+// Line-height multiplier per size bucket, matching the Figma line-height
+// values (display/title use a tighter 1.2x, body/label/caption/chip use 1.4x).
+const LINE_HEIGHT_TIGHT = 1.2;
+const LINE_HEIGHT_NORMAL = 1.4;
 
 export const theme = {
   palette,
@@ -74,94 +105,75 @@ export const theme = {
   // Use these for all new work and when migrating existing screens.
   // ---------------------------------------------------------------------
 
-  // Raw font family primitives, exposed in case a component needs the family
-  // without a full textStyle (e.g. combining with a custom size).
-  fontFamily: {
-    display: FRAUNCES_SEMIBOLD,
-    displayRegular: FRAUNCES_REGULAR,
-    regular: INTER_REGULAR,
-    medium: INTER_MEDIUM,
-    semiBold: INTER_SEMIBOLD,
-  },
-
-  // Raw pixel sizes actually used in the Figma file
-  fontPx: {
-    "10": 10,
-    "11": 11,
-    "12": 12,
-    "13": 13,
-    "14": 14,
-    "15": 15,
-    "19": 19,
-    "24": 24,
-    "32": 32,
-  },
+  fontFamily,
+  fontPx,
 
   // Semantic text styles — mirror the named "Text styles" list in the Figma
   // Styles panel 1:1 (Display, Body, Label, Caption, Title/L, Title/M,
   // Body/S, Body/SemiBold, Chip/md, Chip/sm, TabLabel/active, TabLabel/inactive).
-  // Prefer these over composing fontFamily + fontPx + lineHeight by hand in
-  // every component — that's the duplication we're trying to get rid of.
+  // Composed from fontFamily/fontPx above — prefer these over composing
+  // fontFamily + fontPx + lineHeight by hand in every component, that's the
+  // duplication we're trying to get rid of.
   textStyles: {
     display: {
-      fontFamily: FRAUNCES_SEMIBOLD,
-      fontSize: 32,
-      lineHeight: 32 * 1.2,
+      fontFamily: fontFamily.display,
+      fontSize: fontPx[32],
+      lineHeight: fontPx[32] * LINE_HEIGHT_TIGHT,
     },
     titleL: {
-      fontFamily: FRAUNCES_REGULAR,
-      fontSize: 24,
-      lineHeight: 24 * 1.2,
+      fontFamily: fontFamily.displayRegular,
+      fontSize: fontPx[24],
+      lineHeight: fontPx[24] * LINE_HEIGHT_TIGHT,
     },
     titleM: {
-      fontFamily: FRAUNCES_REGULAR,
-      fontSize: 19,
-      lineHeight: 19 * 1.2,
+      fontFamily: fontFamily.displayRegular,
+      fontSize: fontPx[19],
+      lineHeight: fontPx[19] * LINE_HEIGHT_TIGHT,
     },
     body: {
-      fontFamily: INTER_REGULAR,
-      fontSize: 15,
-      lineHeight: 15 * 1.4,
+      fontFamily: fontFamily.regular,
+      fontSize: fontPx[15],
+      lineHeight: fontPx[15] * LINE_HEIGHT_NORMAL,
     },
     bodyS: {
-      fontFamily: INTER_REGULAR,
-      fontSize: 13,
-      lineHeight: 13 * 1.4,
+      fontFamily: fontFamily.regular,
+      fontSize: fontPx[13],
+      lineHeight: fontPx[13] * LINE_HEIGHT_NORMAL,
     },
     bodySemiBold: {
-      fontFamily: INTER_SEMIBOLD,
-      fontSize: 14,
-      lineHeight: 14 * 1.4,
+      fontFamily: fontFamily.semiBold,
+      fontSize: fontPx[14],
+      lineHeight: fontPx[14] * LINE_HEIGHT_NORMAL,
     },
     label: {
-      fontFamily: INTER_SEMIBOLD,
-      fontSize: 12,
-      lineHeight: 12 * 1.4,
+      fontFamily: fontFamily.semiBold,
+      fontSize: fontPx[12],
+      lineHeight: fontPx[12] * LINE_HEIGHT_NORMAL,
     },
     caption: {
-      fontFamily: INTER_REGULAR,
-      fontSize: 11,
-      lineHeight: 11 * 1.4,
+      fontFamily: fontFamily.regular,
+      fontSize: fontPx[11],
+      lineHeight: fontPx[11] * LINE_HEIGHT_NORMAL,
     },
     chipMd: {
-      fontFamily: INTER_SEMIBOLD,
-      fontSize: 12,
-      lineHeight: 12 * 1.4,
+      fontFamily: fontFamily.semiBold,
+      fontSize: fontPx[12],
+      lineHeight: fontPx[12] * LINE_HEIGHT_NORMAL,
     },
     chipSm: {
-      fontFamily: INTER_MEDIUM,
-      fontSize: 11,
-      lineHeight: 11 * 1.4,
+      fontFamily: fontFamily.medium,
+      fontSize: fontPx[11],
+      lineHeight: fontPx[11] * LINE_HEIGHT_NORMAL,
     },
     tabLabelActive: {
-      fontFamily: INTER_SEMIBOLD,
-      fontSize: 10,
-      lineHeight: 10 * 1.4,
+      fontFamily: fontFamily.semiBold,
+      fontSize: fontPx[10],
+      lineHeight: fontPx[10] * LINE_HEIGHT_NORMAL,
     },
     tabLabelInactive: {
-      fontFamily: INTER_MEDIUM,
-      fontSize: 10,
-      lineHeight: 10 * 1.4,
+      fontFamily: fontFamily.medium,
+      fontSize: fontPx[10],
+      lineHeight: fontPx[10] * LINE_HEIGHT_NORMAL,
     },
   },
 
@@ -170,17 +182,25 @@ export const theme = {
     md: 16,
     lg: 18,
     xl: 20,
+    "2xl": 24,
   },
 
+  // ---------------------------------------------------------------------
+  // borderRadius — own pixel scale, intentionally independent from text
+  // sizing. It previously rode on getTextSize (a text-scale helper), which
+  // meant the legacy-removal TODO above could never actually reach zero
+  // references. Values below are unchanged from before, just expressed as
+  // a standalone scale.
+  // ---------------------------------------------------------------------
   borderRadius: {
-    xs: getTextSize(0.125),
-    sm: getTextSize(0.25),
-    md: getTextSize(0.375),
-    lg: getTextSize(0.5),
-    xl: getTextSize(0.75),
-    "2xl": getTextSize(1),
-    "3xl": getTextSize(1.5),
-    "4xl": getTextSize(2),
+    xs: 2,
+    sm: 4,
+    md: 6,
+    lg: 8,
+    xl: 12,
+    "2xl": 16,
+    "3xl": 24,
+    "4xl": 32,
     full: 9999,
   },
 } as const;

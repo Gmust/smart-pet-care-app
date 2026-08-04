@@ -5,7 +5,7 @@ import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 
 import { ReminderStatus } from "@/api/generated";
-import { extractTimeOfDay } from "@/common/utils/extractTimeOfDay";
+import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
 import { Button, type ButtonVariant } from "@/shadecn/ui/button";
 import {
   Drawer,
@@ -70,7 +70,7 @@ export const ReminderStatusDrawer = ({
     onClose();
   };
 
-  const timeOfDay = extractTimeOfDay(reminder?.timeOfDay);
+  const timeOfDay = getLocalTimeOfDay(reminder);
 
   return (
     <Drawer open onOpenChange={handleOpenChange}>

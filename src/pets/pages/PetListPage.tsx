@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FlatList, RefreshControl, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import { CirclePlusIcon } from "@/icons/plus";
 import { Button } from "@/shadecn/ui/button";
@@ -13,7 +14,6 @@ import { CreatePetDrawer } from "../components/actions/CreatePetDrawer";
 import { PetListCard } from "../components/pet-list/PetListCard";
 import { usePetsQuery } from "../queries/usePetsQuery";
 import { PetListPageSkeleton, PetListSubtitleSkeleton } from "../skeletons/PetListPageSkeleton";
-import { useRouter } from "expo-router";
 
 function ItemSeparator() {
   return <View style={styles.separator} />;
@@ -35,11 +35,13 @@ export default function PetListPage() {
       <SafeAreaView style={styles.screen} edges={["top"]}>
         <View style={styles.header}>
           <View style={styles.headerCopy}>
-            <Text style={styles.title}>{t("pets:petListPage.title")}</Text>
+            <Text variant="titleL" style={styles.title}>
+              {t("pets:petListPage.title")}
+            </Text>
             {isLoading ? (
               <PetListSubtitleSkeleton />
             ) : (
-              <Text style={styles.subtitle}>
+              <Text variant="body" style={styles.subtitle}>
                 {t("pets:petListPage.companions", { count: pets?.length ?? 0 })}
               </Text>
             )}
@@ -60,7 +62,9 @@ export default function PetListPage() {
               <PetListPageSkeleton />
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>{t("pets:petListPage.emptyState")}</Text>
+                <Text variant="body" style={styles.emptyText}>
+                  {t("pets:petListPage.emptyState")}
+                </Text>
               </View>
             )
           }
@@ -104,11 +108,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   title: {
-    ...theme.textStyles.titleL,
     color: theme.palette.brand.textBody,
   },
   subtitle: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
   content: {
@@ -131,7 +133,6 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(6),
   },
   emptyText: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
   addButton: {

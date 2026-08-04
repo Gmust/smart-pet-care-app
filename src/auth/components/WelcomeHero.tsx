@@ -1,6 +1,5 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-
 import { Image } from "expo-image";
 
 const heroSilhouette = require("../../../assets/images/onboarding/hero-silhouette.png");

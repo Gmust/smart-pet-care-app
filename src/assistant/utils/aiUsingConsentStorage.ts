@@ -1,8 +1,9 @@
+import * as SecureStore from "expo-secure-store";
+import type { z } from "zod";
+
 import { SECURE_STORE_OPTIONS } from "@/common/utils/secureStoreOptions";
 
 import { assistantConsentSchema } from "../schemas/assistant.schema";
-import * as SecureStore from "expo-secure-store";
-import type { z } from "zod";
 
 const AI_USING_CONSENT_KEY = "spc.assistant.aiUsingConsent.v1";
 

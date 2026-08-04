@@ -1,6 +1,7 @@
-import type { WeightUnit } from "../types";
 import type { TFunction } from "i18next";
 import { z } from "zod";
+
+import type { WeightUnit } from "../types";
 
 export type FoodTrackerFormValues = {
   foodName: string;

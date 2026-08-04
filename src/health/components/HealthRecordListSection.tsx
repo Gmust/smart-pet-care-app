@@ -2,6 +2,7 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import type { HealthRecordYearGroup } from "../utils/groupHealthRecordsByYear";
+
 import { HealthRecordCard } from "./HealthRecordCard";
 import { YearSection } from "./YearSection";
 

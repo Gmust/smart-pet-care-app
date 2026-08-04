@@ -131,5 +131,8 @@
     "Unknown": "Unknown",
     "Male": "Male",
     "Female": "Female"
+  },
+  "healthTab": {
+    "comingSoon": "Coming soon"
   }
 }

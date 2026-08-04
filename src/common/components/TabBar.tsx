@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { ActivityIcon } from "@/icons/activity";
 import { HomeIcon } from "@/icons/home";
@@ -47,6 +47,7 @@ type TabBarProps = {
 export function TabBar({ state, navigation }: TabBarProps) {
   const insets = useSafeAreaInsets();
   const activeRouteName = state.routes[state.index]?.name;
+  const { theme } = useUnistyles();
 
   return (
     <View
@@ -91,7 +92,7 @@ export function TabBar({ state, navigation }: TabBarProps) {
               accessibilityLabel={meta.label}
               accessibilityState={isFocused ? { selected: true } : {}}
             >
-              <Glyph width={24} height={24} color={color} />
+              <Glyph width={theme.iconSize["2xl"]} height={theme.iconSize["2xl"]} color={color} />
               <Text style={[styles.label, isFocused && styles.labelActive, { color }]}>
                 {meta.label}
               </Text>

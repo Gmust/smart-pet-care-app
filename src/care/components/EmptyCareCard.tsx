@@ -24,7 +24,9 @@ export const EmptyCareCard = ({ onPress }: Props) => {
         pressed && styles.cardPressed,
       ]}
     >
-      <Text style={styles.centeredText}>{t("emptyState.notConfigured")}</Text>
+      <Text variant="bodyS" style={styles.centeredText}>
+        {t("emptyState.notConfigured")}
+      </Text>
     </Pressable>
   );
 };
@@ -36,7 +38,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(6),
   },
   centeredText: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   cardPressed: {

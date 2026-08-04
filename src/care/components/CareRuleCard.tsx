@@ -1,9 +1,10 @@
 import { Pressable } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { cardVariants } from "@/shadecn/ui/card";
 
-import type { CareCategory, DayOfWeek, PlannedHealthEventCategory, RecurrenceType } from "../types";
+import type { CareCategory, DayOfWeek, RecurrenceType } from "../types";
+
 import { CareRuleRowContent } from "./CareRuleRowContent";
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
@@ -15,7 +16,7 @@ const CARD_PADDING_BY_SIZE: Record<CareRuleCardSize, "standalone" | "compact"> =
 };
 
 type Props = {
-  category: CareCategory | PlannedHealthEventCategory;
+  category: CareCategory;
   title: string;
   time: string;
   recurrenceType: RecurrenceType;
@@ -37,15 +38,14 @@ export const CareRuleCard = ({
   onPress,
   onDelete,
 }: Props) => {
-  const { theme } = useUnistyles();
   cardVariants.useVariants({ padding: CARD_PADDING_BY_SIZE[size], radius: "standalone" });
 
   return (
     <SwipeToDeleteRow
       disabled={!onDelete}
       onDelete={() => onDelete?.()}
-      topRadius={theme.borderRadius.xl}
-      bottomRadius={theme.borderRadius.xl}
+      isFirst
+      isLast
       actionVariant="circle"
     >
       <Pressable

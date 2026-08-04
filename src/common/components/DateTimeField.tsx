@@ -63,6 +63,17 @@ export function DateTimeField({
           onBlur?.();
           endNativeActivity?.();
         },
+        // Without these the dialog reports nothing when it is cancelled, the drawer
+        // stays suspended on a native activity, and it can never be re-presented.
+        onDismiss: () => {
+          onBlur?.();
+          endNativeActivity?.();
+        },
+        onError: (error) => {
+          console.error("Failed to open the Android date/time picker.", error);
+          onBlur?.();
+          endNativeActivity?.();
+        },
       });
       return;
     }

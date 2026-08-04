@@ -1,11 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 
 import { postApiProfileAvatar } from "@/api";
 import { asFormFile } from "@/api/rnFormFile";
 import type { ImagePickerValue } from "@/common/components/ImagePicker";
 import { toSourceUri } from "@/common/utils/toSourceUri";
-
-import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 
 // Avatars render small, so cap the long edge and recompress as JPEG before
 // upload. Full-resolution camera photos otherwise blow past the server body

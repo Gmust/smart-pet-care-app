@@ -1,4 +1,5 @@
 import { initReactI18next } from "react-i18next";
+import i18next from "i18next";
 
 import enAssistant from "@/assistant/locales/en.json";
 import enAuth from "@/auth/locales/en.json";
@@ -9,8 +10,6 @@ import enHome from "@/home/locales/en.json";
 import enPets from "@/pets/locales/en.json";
 import enProfile from "@/profile/locales/en.json";
 import enReminders from "@/reminders/locales/en.json";
-
-import i18next from "i18next";
 
 export enum Languages {
   en = "en",

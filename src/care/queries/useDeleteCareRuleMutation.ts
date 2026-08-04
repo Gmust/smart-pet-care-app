@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { careRulesMock } from "../api/mock/careRules.mock";
+
 import { careQueryKeys } from "./queryKeys";
 
 type DeleteCareRuleInput = { id: string; petId: string };

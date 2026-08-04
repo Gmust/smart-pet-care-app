@@ -1,6 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import dayjs from "dayjs";
 
 import { postApiAuthRefresh } from "@/api";
 import type { AuthResponse } from "@/api/generated";
@@ -14,7 +15,6 @@ import { NotificationProvider } from "@/notifications/providers/NotificationProv
 import { unregisterStoredDeviceToken } from "@/notifications/services/notificationRegistration";
 
 import type { AuthContextValue, AuthSession, AuthStatus } from "../types";
-import dayjs from "dayjs";
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
 

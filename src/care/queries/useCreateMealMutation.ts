@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { mealsMock } from "../api/mock/meals.mock";
 import type { MealRule } from "../types";
+
 import { careQueryKeys } from "./queryKeys";
 
 export function useCreateMealMutation() {

@@ -6,20 +6,6 @@ import { cardVariants } from "@/shadecn/ui/card";
 
 import { SwipeToDeleteRow } from "./SwipeToDeleteRow";
 
-const careListCardStyles = StyleSheet.create((theme) => ({
-  row: {
-    paddingHorizontal: theme.spacing(3.5),
-    paddingVertical: theme.spacing(2.75),
-  },
-  divider: {
-    borderTopWidth: 1,
-    borderTopColor: theme.palette.brand.surfaceBorder,
-  },
-  rowPressed: {
-    backgroundColor: theme.palette.brand.surfaceSunken,
-  },
-}));
-
 type Props<T> = {
   items: T[];
   keyExtractor: (item: T) => string;
@@ -49,8 +35,9 @@ export function CareListCard<T>({
           key={keyExtractor(item)}
           disabled={!onDeleteItem || isDeleteDisabled?.(item)}
           onDelete={() => onDeleteItem?.(item)}
-          topRadius={index === 0 ? theme.borderRadius["2xl"] : 0}
-          bottomRadius={!footer && index === items.length - 1 ? theme.borderRadius["2xl"] : 0}
+          isFirst={index === 0}
+          isLast={!footer && index === items.length - 1}
+          radius={theme.borderRadius["2xl"]}
         >
           <Pressable
             disabled={!onItemPress}
@@ -74,3 +61,17 @@ export function CareListCard<T>({
     </View>
   );
 }
+
+const careListCardStyles = StyleSheet.create((theme) => ({
+  row: {
+    paddingHorizontal: theme.spacing(3.5),
+    paddingVertical: theme.spacing(2.75),
+  },
+  divider: {
+    borderTopWidth: 1,
+    borderTopColor: theme.palette.brand.surfaceBorder,
+  },
+  rowPressed: {
+    backgroundColor: theme.palette.brand.surfaceSunken,
+  },
+}));

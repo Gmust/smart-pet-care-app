@@ -1,3 +1,10 @@
+/**
+ * TODO(care-backend): This entire mock layer is a stand-in for the real
+ * Care API. Swap by replacing `createMockCollection` usages in
+ * `care/api/mock/*.mock.ts` with real query/mutation calls in
+ * `care/queries/*` — this file itself can be deleted once nothing imports
+ * it.
+ */
 const DEFAULT_DELAY_MS = 300;
 
 function delay(ms: number = DEFAULT_DELAY_MS): Promise<void> {

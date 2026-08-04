@@ -4,6 +4,7 @@ import { RefreshControl, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import { ReminderStatus } from "@/api/generated";
 import { ChevronIcon } from "@/icons/chevron";
@@ -22,7 +23,6 @@ import { RemindersSectionSkeleton } from "../skeletons/RemindersSectionSkeleton"
 import type { Reminder } from "../types";
 import type { ReminderGroupKey } from "../utils/reminderGroups";
 import { toReminderGroups } from "../utils/reminderGroups";
-import { useRouter } from "expo-router";
 
 type ReminderFilter = "all" | "active" | "completed" | "missed";
 

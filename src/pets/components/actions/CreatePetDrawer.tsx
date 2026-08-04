@@ -3,6 +3,7 @@ import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
+import dayjs from "dayjs";
 
 import { AnimalSpecies, type PetResponseDto, Sex } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
@@ -12,6 +13,7 @@ import { createPetSchema } from "@/pets/schemas/create-pet.schema";
 import { Button } from "@/shadecn/ui/button";
 import {
   Drawer,
+  DRAWER_FOOTER_FADE_SPACING,
   DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
@@ -23,8 +25,6 @@ import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shadecn/ui/select";
 import { Text } from "@/shadecn/ui/text";
-
-import dayjs from "dayjs";
 
 type Props = {
   isOpen: boolean;
@@ -373,7 +373,7 @@ const styles = StyleSheet.create((theme) => ({
   content: {
     gap: theme.spacing(5),
     paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(20),
+    paddingBottom: theme.spacing(DRAWER_FOOTER_FADE_SPACING),
   },
   field: {
     gap: theme.spacing(1.5),

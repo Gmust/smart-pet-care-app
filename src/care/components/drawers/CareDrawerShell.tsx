@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import {
   Drawer,
+  DRAWER_FOOTER_FADE_SPACING,
   DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
@@ -33,7 +34,7 @@ export function CareDrawerShell({ isOpen, setIsOpen, snapPoints, title, footer, 
         <DrawerCloseButton />
 
         <DrawerHeader style={styles.header}>
-          <DrawerTitle style={styles.title}>{title}</DrawerTitle>
+          <DrawerTitle>{title}</DrawerTitle>
         </DrawerHeader>
 
         <DrawerScrollView
@@ -52,8 +53,11 @@ export function CareDrawerShell({ isOpen, setIsOpen, snapPoints, title, footer, 
 
 const styles = StyleSheet.create((theme) => ({
   header: { gap: theme.spacing(1) },
-  title: { ...theme.textStyles.titleL, letterSpacing: 0 },
   scroll: { flex: 1 },
-  content: { gap: theme.spacing(3), paddingBottom: theme.spacing(3) },
+  content: {
+    gap: theme.spacing(3),
+    paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(DRAWER_FOOTER_FADE_SPACING),
+  },
   footer: { paddingTop: theme.spacing(1), backgroundColor: "transparent" },
 }));

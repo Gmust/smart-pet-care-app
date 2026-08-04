@@ -2,12 +2,11 @@ import { type ReactNode, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { Image } from "expo-image";
+import * as ExpoImagePicker from "expo-image-picker";
 
 import { useDrawerSetOpen } from "@/shadecn/ui/drawer";
 import { Text } from "@/shadecn/ui/text";
-
-import { Image } from "expo-image";
-import * as ExpoImagePicker from "expo-image-picker";
 
 export type ImagePickerValue = {
   uri: string;

@@ -4,25 +4,21 @@ import type careEn from "@/care/locales/en.json";
 export type DayOfWeek = DaysOfWeek;
 export const WEEK_DAYS = Object.values(DaysOfWeek) as DayOfWeek[];
 
-export type RecurrenceType = "Daily" | "Weekly" | "EveryNWeeks" | "EveryNMonths";
+export type RecurrenceType = "Daily" | "Weekly" | "EveryNWeeks" | "EveryNMonths" | "Yearly";
 
-/**
- * Categories backed by CareRule. Vaccination / Deworming / Antiparasite are
- * NOT here — they're PlannedHealthEvent categories (see below), since they
- * carry history (lastDoneAt, productName) that plain CareRule doesn't need.
- */
 export type CareCategory =
   | "VetVisit"
   | "Weighing"
-  | "Walking"
+  | "Activity"
   | "Bathing"
   | "Brushing"
   | "EarCleaning"
   | "NailTrimming"
   | "PawCare"
-  | "TeethCleaning";
-
-export type PlannedHealthEventCategory = "Vaccination" | "Deworming" | "Antiparasite";
+  | "TeethCleaning"
+  | "Vaccination"
+  | "Deworming"
+  | "Antiparasite";
 
 export type WeightUnit = "g" | "kg";
 
@@ -44,7 +40,7 @@ export type MealRule = {
   weekDays?: DayOfWeek[];
 };
 
-/** A regular care rule: Vet Visit, Weighing, Walking, Grooming sub-categories. */
+/** A care rule: schedule/config only. No history fields (last done, product, notes). */
 export type CareRule = {
   id: string;
   petId: string;
@@ -54,21 +50,8 @@ export type CareRule = {
   recurrenceType: RecurrenceType;
   intervalN?: number; // for EveryNWeeks / EveryNMonths
   weekDays?: DayOfWeek[]; // Weekly (several) or EveryNWeeks (one)
-  startDate?: string; // ISO date, for EveryNMonths anchor
-};
-
-/** A planned event with history: Vaccination, Deworming, Antiparasite. */
-export type PlannedHealthEvent = {
-  id: string;
-  petId: string;
-  category: PlannedHealthEventCategory;
-  title: string;
-  reminderTime: string;
-  intervalN: number; // every N months
-  lastDoneAt?: string;
-  productName?: string;
-  notes?: string;
-  nextDueAt?: string; // computed server-side (mocked client-side for now)
+  startDate?: string; // ISO date, anchor for EveryNMonths / Yearly
+  nextDueAt?: string; // read-only display field, populated by a future API response — never computed client-side
 };
 
 /** Food stock tracker — separate entity, not a reminder rule. */
@@ -89,16 +72,6 @@ export type FoodTracker = {
   remainingWeightUnit?: WeightUnit; // computed
   restockDate?: string; // computed
 };
-
-export type CareSectionKey =
-  | "meals"
-  | "foodTracker"
-  | "vetVisit"
-  | "vaccination"
-  | "treatments"
-  | "weighing"
-  | "walking"
-  | "grooming";
 
 /** Recursively extracts every leaf dot-path key from the "care" translation JSON. */
 type DotPaths<T> = {

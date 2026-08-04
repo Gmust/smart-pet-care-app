@@ -3,11 +3,12 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { Text } from "@/shadecn/ui/text";
 
-import type { CareCategory, PlannedHealthEventCategory } from "../types";
+import type { CareCategory } from "../types";
+
 import { CareCategoryIcon } from "./care-category-icon/CareCategoryIcon";
 
 type Props = {
-  category: CareCategory | PlannedHealthEventCategory;
+  category: CareCategory;
   title: string;
   notConfiguredLabel: string;
 };
@@ -20,14 +21,18 @@ export function EmptyCareRowContent({ category, title, notConfiguredLabel }: Pro
       <View style={styles.iconBox}>
         <CareCategoryIcon
           category={category}
-          width={16}
-          height={16}
+          width={theme.iconSize.md}
+          height={theme.iconSize.md}
           color={theme.palette.brand.textFaint}
         />
       </View>
       <View style={styles.textCol}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{notConfiguredLabel}</Text>
+        <Text variant="bodyS" style={styles.title}>
+          {title}
+        </Text>
+        <Text variant="caption" style={styles.subtitle}>
+          {notConfiguredLabel}
+        </Text>
       </View>
     </View>
   );
@@ -52,12 +57,10 @@ const styles = StyleSheet.create((theme) => ({
     minWidth: 0,
   },
   title: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
   subtitle: {
     marginTop: theme.spacing(0.5),
-    ...theme.textStyles.caption,
     color: theme.palette.brand.textFaint,
   },
 }));

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { foodTrackerMock } from "../api/mock/foodTracker.mock";
 import type { FoodTracker } from "../types";
+
 import { careQueryKeys } from "./queryKeys";
 
 export function useCreateFoodTrackerMutation() {

@@ -6,6 +6,7 @@ import { getApiSessionsSessionIdMessages } from "@/api";
 import type { SessionMessagesPageResponseDto } from "@/api/generated";
 
 import { mergeMessagePages } from "../utils/assistantMessages";
+
 import { assistantQueryKeys } from "./assistantQueryKeys";
 
 type AssistantMessagesData = InfiniteData<SessionMessagesPageResponseDto, string>;

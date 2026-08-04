@@ -10,8 +10,9 @@ import { TrashIcon } from "@/icons/trash";
 type Props = {
   onDelete: () => void;
   disabled?: boolean;
-  topRadius?: number;
-  bottomRadius?: number;
+  isFirst?: boolean;
+  isLast?: boolean;
+  radius?: number;
   actionVariant?: "circle" | "fill";
   children: ReactNode;
 };
@@ -19,8 +20,9 @@ type Props = {
 export function SwipeToDeleteRow({
   onDelete,
   disabled,
-  topRadius = 0,
-  bottomRadius = 0,
+  isFirst = false,
+  isLast = false,
+  radius,
   actionVariant = "fill",
   children,
 }: Props) {
@@ -35,12 +37,7 @@ export function SwipeToDeleteRow({
     onDelete();
   };
 
-  const cornerStyle = {
-    borderTopLeftRadius: topRadius,
-    borderTopRightRadius: topRadius,
-    borderBottomLeftRadius: bottomRadius,
-    borderBottomRightRadius: bottomRadius,
-  };
+  const cornerStyle = styles.corners(isFirst, isLast, radius ?? theme.borderRadius.xl);
 
   return (
     <Swipeable
@@ -49,7 +46,7 @@ export function SwipeToDeleteRow({
       overshootRight={false}
       rightThreshold={40}
       // Transparent, unrounded — purely a gesture container, not a visual layer.
-      containerStyle={[styles.container, topRadius === 0 && styles.overlapSeam]}
+      containerStyle={[styles.container, !isFirst && styles.overlapSeam]}
       childrenContainerStyle={[
         { backgroundColor: theme.palette.white, overflow: "hidden" },
         cornerStyle,
@@ -63,7 +60,11 @@ export function SwipeToDeleteRow({
               onPress={handlePress}
               style={({ pressed }) => [styles.circleButton, pressed && styles.circleButtonPressed]}
             >
-              <TrashIcon width={18} height={18} color={theme.palette.white} />
+              <TrashIcon
+                width={theme.iconSize.lg}
+                height={theme.iconSize.lg}
+                color={theme.palette.white}
+              />
             </Pressable>
           </View>
         ) : (
@@ -77,7 +78,11 @@ export function SwipeToDeleteRow({
               pressed && styles.fillActionPressed,
             ]}
           >
-            <TrashIcon width={20} height={20} color={theme.palette.white} />
+            <TrashIcon
+              width={theme.iconSize.xl}
+              height={theme.iconSize.xl}
+              color={theme.palette.white}
+            />
           </Pressable>
         )
       }
@@ -94,8 +99,14 @@ const styles = StyleSheet.create((theme) => ({
   overlapSeam: {
     marginTop: -1,
   },
+  corners: (isFirst: boolean, isLast: boolean, radius: number) => ({
+    borderTopLeftRadius: isFirst ? radius : 0,
+    borderTopRightRadius: isFirst ? radius : 0,
+    borderBottomLeftRadius: isLast ? radius : 0,
+    borderBottomRightRadius: isLast ? radius : 0,
+  }),
   fillAction: {
-    width: 55,
+    width: theme.spacing(13.75),
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: theme.palette.brand.danger,
@@ -104,13 +115,13 @@ const styles = StyleSheet.create((theme) => ({
     opacity: 0.85,
   },
   circleWrap: {
-    width: 55,
+    width: theme.spacing(13.75),
     alignItems: "center",
     justifyContent: "center",
   },
   circleButton: {
-    width: 40,
-    height: 40,
+    width: theme.spacing(10),
+    height: theme.spacing(10),
     borderRadius: theme.borderRadius.full,
     alignItems: "center",
     justifyContent: "center",

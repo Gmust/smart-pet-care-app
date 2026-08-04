@@ -12,7 +12,7 @@ type Props = {
   weekDays?: DayOfWeek[];
   /**
    * "days" (default) lists the selected week days, e.g. "Thu · Sat" — used
-   * by Walking/Weighing/Vaccination, where the days ARE the information.
+   * by Activity/Weighing/Vaccination, where the days ARE the information.
    * "compact" collapses "Weekly" to a static "By week days" label instead —
    * used by Meals, where the chip sits under a whole row and per-day detail
    * would be noisy.
@@ -45,9 +45,14 @@ export function RecurrenceChip({ recurrenceType, intervalN, weekDays, variant = 
       break;
     case "EveryNMonths":
       label =
-        intervalN && intervalN > 1
-          ? t("recurrence.everyNMonths", { n: intervalN })
-          : t("recurrence.everyMonth");
+        intervalN === 12
+          ? t("recurrence.yearly")
+          : intervalN && intervalN > 1
+            ? t("recurrence.everyNMonths", { n: intervalN })
+            : t("recurrence.everyMonth");
+      break;
+    case "Yearly":
+      label = t("recurrence.yearly");
       break;
   }
 

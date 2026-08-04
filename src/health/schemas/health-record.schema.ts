@@ -1,7 +1,7 @@
-import { SymptomType } from "@/api/generated";
-
 import type { TFunction } from "i18next";
 import { z } from "zod";
+
+import { SymptomType } from "@/api/generated";
 
 export type HealthRecordFormValues = {
   title: string;

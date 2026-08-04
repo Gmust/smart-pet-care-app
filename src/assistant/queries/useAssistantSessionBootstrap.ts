@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { ChatSessionResponseDto } from "@/api/generated";
 
 import { selectLatestPetSession } from "../utils/assistantMessages";
+
 import { assistantQueryKeys } from "./assistantQueryKeys";
 import { useAssistantSessionsQuery } from "./useAssistantSessionsQuery";
 import { useCreateAssistantSessionMutation } from "./useCreateAssistantSessionMutation";

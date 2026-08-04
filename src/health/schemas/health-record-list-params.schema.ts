@@ -1,7 +1,8 @@
+import { z } from "zod";
+
 import { HealthRecordType } from "@/api/generated";
 
 import type { HealthHistoryCategory } from "../types";
-import { z } from "zod";
 
 // Kept in sync manually with HEALTH_HISTORY_CATEGORIES in ../constants.ts —
 // zod needs a literal tuple for z.enum, so it can't just read the array.

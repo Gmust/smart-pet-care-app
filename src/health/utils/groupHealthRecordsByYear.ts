@@ -1,6 +1,6 @@
-import type { HealthRecordResponseDto } from "@/api/generated";
-
 import dayjs from "dayjs";
+
+import type { HealthRecordResponseDto } from "@/api/generated";
 
 export type HealthRecordYearGroup = {
   year: number;

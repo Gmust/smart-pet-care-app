@@ -1,8 +1,9 @@
 /// <reference types="jest" />
 
-import { getAssistantApiError, isAssistantNotFoundError } from "./assistantErrors";
 import type { AxiosResponse } from "axios";
 import { AxiosError, AxiosHeaders } from "axios";
+
+import { getAssistantApiError, isAssistantNotFoundError } from "./assistantErrors";
 
 const axiosError = (status: number, data: unknown): AxiosError => {
   const headers = new AxiosHeaders();

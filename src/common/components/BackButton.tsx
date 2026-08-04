@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
+import { useUnistyles } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import { ChevronIcon } from "@/icons/chevron";
 import { Button } from "@/shadecn/ui/button";
 import { palette } from "@/styles/palette";
-
-import { useRouter } from "expo-router";
 
 type Props = {
   onBackPress?: () => void;
@@ -12,6 +12,7 @@ type Props = {
 
 export const BackButton = ({ onBackPress }: Props) => {
   const { t } = useTranslation(["common"]);
+  const { theme } = useUnistyles();
 
   const router = useRouter();
 
@@ -27,7 +28,12 @@ export const BackButton = ({ onBackPress }: Props) => {
       accessibilityLabel={t("actions.back")}
       onPress={onBackPress ?? handleBack}
     >
-      <ChevronIcon direction="left" width={18} height={18} color={palette.brand.primaryDark} />
+      <ChevronIcon
+        direction="left"
+        width={theme.iconSize.lg}
+        height={theme.iconSize.lg}
+        color={palette.brand.primaryDark}
+      />
     </Button>
   );
 };

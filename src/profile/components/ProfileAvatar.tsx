@@ -1,13 +1,12 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { Image } from "expo-image";
 
 import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
 import { UserIcon } from "@/icons/user";
 import { useGetAvatarById } from "@/profile/queries/useGetAvatarById";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
-
-import { Image } from "expo-image";
 
 const getInitials = (displayName?: string | null, email?: string | null): string => {
   const source = displayName?.trim() || email?.trim();

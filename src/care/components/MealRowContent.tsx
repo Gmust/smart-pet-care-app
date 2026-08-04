@@ -11,8 +11,12 @@ type Props = {
 export function MealRowContent({ title, time }: Props) {
   return (
     <View style={styles.row}>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.time}>{time}</Text>
+      <Text variant="body" style={styles.title}>
+        {title}
+      </Text>
+      <Text variant="body" style={styles.time}>
+        {time}
+      </Text>
     </View>
   );
 }
@@ -25,11 +29,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(3),
   },
   title: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textPrimary,
   },
   time: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textSecondary,
   },
 }));

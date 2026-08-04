@@ -1,4 +1,6 @@
 import { useTranslation } from "react-i18next";
+import dayjs from "dayjs";
+import { useRouter } from "expo-router";
 
 import type { HealthRecordResponseDto } from "@/api/generated";
 import { BugOffIcon } from "@/icons/bug-off";
@@ -9,10 +11,9 @@ import { palette } from "@/styles/palette";
 
 import { HEALTH_HISTORY_CATEGORIES } from "../constants";
 import type { HealthHistoryCategory } from "../types";
+
 import { HistoryCard } from "./HistoryCard";
 import { HistoryGrid } from "./HistoryGrid";
-import dayjs from "dayjs";
-import { useRouter } from "expo-router";
 
 const CATEGORY_ICON: Record<
   HealthHistoryCategory,

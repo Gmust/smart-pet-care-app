@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { careRulesMock } from "../api/mock/careRules.mock";
 import type { CareRule } from "../types";
+
 import { careQueryKeys } from "./queryKeys";
 
 export function useCreateCareRuleMutation() {
