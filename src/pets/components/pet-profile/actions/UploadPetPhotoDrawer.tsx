@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
@@ -10,11 +11,9 @@ import { Button } from "@/shadecn/ui/button";
 import type { DialogHandler } from "@/shadecn/ui/dialog";
 import {
   Drawer,
-  DRAWER_FOOTER_FADE_SPACING,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
-  DrawerScrollView,
   DrawerTitle,
 } from "@/shadecn/ui/drawer";
 
@@ -53,21 +52,12 @@ export const UploadPetPhotoDrawer = ({ isOpen, setIsOpen, petId }: Props) => {
         setIsOpen(open);
       }}
     >
-      <DrawerContent
-        scrollable
-        snapPoints={["55%"]}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-      >
+      <DrawerContent snapPoints={["55%"]} enableDynamicSizing={false} enablePanDownToClose={false}>
         <DrawerHeader style={styles.header}>
           <DrawerTitle style={styles.title}>{t("uploadPhotoDrawer.title")}</DrawerTitle>
         </DrawerHeader>
 
-        <DrawerScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator
-        >
+        <View style={styles.content}>
           <form.Field name="file">
             {(field) => (
               <ImagePicker
@@ -78,7 +68,7 @@ export const UploadPetPhotoDrawer = ({ isOpen, setIsOpen, petId }: Props) => {
               />
             )}
           </form.Field>
-        </DrawerScrollView>
+        </View>
 
         <DrawerFooter>
           <form.Subscribe selector={(s) => ({ isSubmitting: s.isSubmitting, file: s.values.file })}>
@@ -106,12 +96,8 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.fontSize.xl,
     letterSpacing: 0,
   },
-  scroll: {
-    flex: 1,
-  },
   content: {
     gap: theme.spacing(5),
     paddingTop: theme.spacing(3),
-    DRAWER_FOOTER_FADE_SPACING,
   },
 }));

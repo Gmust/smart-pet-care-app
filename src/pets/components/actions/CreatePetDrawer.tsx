@@ -391,10 +391,6 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "space-between",
   },
   footer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: theme.spacing(2),
     paddingTop: theme.spacing(2),
     backgroundColor: "transparent",
   },

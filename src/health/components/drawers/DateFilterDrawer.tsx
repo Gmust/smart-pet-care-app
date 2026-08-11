@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet } from "react-native-unistyles";
 
-import { Button } from "@/shadecn/ui/button";
 import {
   Drawer,
   DrawerCloseButton,
@@ -13,6 +12,8 @@ import {
 } from "@/shadecn/ui/drawer";
 
 import { DateRangeFilter } from "../DateRangeFilter";
+
+import { DateFilterDrawerFooter } from "./DateFilterDrawerFooter";
 
 type Props = {
   isOpen: boolean;
@@ -50,29 +51,15 @@ export function DateFilterDrawer({ isOpen, setIsOpen, from, to, onApply }: Props
         />
 
         <DrawerFooter style={styles.footer}>
-          <Button
-            variant="text"
-            size="lg"
-            onPress={() => {
+          <DateFilterDrawerFooter
+            pendingFrom={pendingFrom}
+            pendingTo={pendingTo}
+            onApply={onApply}
+            onClearPending={() => {
               setPendingFrom(null);
               setPendingTo(null);
-              onApply(null, null);
-              setIsOpen(false);
             }}
-          >
-            {t("health:recordList.filters.clear")}
-          </Button>
-          <Button
-            variant="primary"
-            size="lg"
-            style={styles.applyButton}
-            onPress={() => {
-              onApply(pendingFrom, pendingTo);
-              setIsOpen(false);
-            }}
-          >
-            {t("health:recordList.filters.apply")}
-          </Button>
+          />
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
@@ -93,8 +80,5 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(4),
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(2),
-  },
-  applyButton: {
-    flex: 1,
   },
 }));

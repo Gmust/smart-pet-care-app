@@ -156,10 +156,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   footer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: theme.spacing(2),
     paddingTop: theme.spacing(2),
     backgroundColor: "transparent",
   },
