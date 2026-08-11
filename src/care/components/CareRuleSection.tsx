@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
 
+import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
+
 import { CARE_CATEGORY_LABEL_KEYS, type CareRuleSectionConfig } from "../constants";
 import { useCareDelete } from "../hooks/useCareDelete";
 import { useCareRulesQuery } from "../queries/useCareRulesQuery";
 import { useDeleteCareRuleMutation } from "../queries/useDeleteCareRuleMutation";
 import type { CareCategory, CareRule } from "../types";
 
-import { CareDeleteConfirmDialog } from "./CareDeleteConfirmDialog";
 import { CareFixedSlotsSection } from "./CareFixedSlotsSection";
 import { CareListSection } from "./CareListSection";
 
@@ -62,7 +63,7 @@ export function CareRuleSection({ config, petId, onAddRule, onEditRule }: Props)
         <CareListSection<CareRule, CareCategory> {...commonProps} />
       )}
 
-      <CareDeleteConfirmDialog {...dialogProps} />
+      <DeleteConfirmDialog {...dialogProps} />
     </>
   );
 }

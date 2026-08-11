@@ -451,7 +451,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.white,
   },
   textArea: {
-    alignItems: "flex-start",
+    alignItems: "stretch",
     minHeight: theme.spacing(30),
   },
   textAreaInput: {

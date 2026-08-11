@@ -29,7 +29,7 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
       accessibilityRole="button"
       accessibilityLabel={t("healthPetCard.title", { petName })}
       style={[styles.card, backgroundColor ? { backgroundColor } : null]}
-      onPress={() => router.push({ pathname: "/(tabs)/pet-profile", params: { petId } })}
+      onPress={() => router.push({ pathname: "/(tabs)/pets/pet-profile", params: { petId } })}
     >
       {!!photoUrl && (
         <>

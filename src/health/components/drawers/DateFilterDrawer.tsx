@@ -40,7 +40,7 @@ export function DateFilterDrawer({ isOpen, setIsOpen, from, to, onApply }: Props
         <DrawerCloseButton />
 
         <DrawerHeader style={styles.header}>
-          <DrawerTitle style={styles.title}>{t("health:recordList.filters.title")}</DrawerTitle>
+          <DrawerTitle>{t("health:recordList.filters.title")}</DrawerTitle>
         </DrawerHeader>
 
         <DateRangeFilter
@@ -69,10 +69,6 @@ export function DateFilterDrawer({ isOpen, setIsOpen, from, to, onApply }: Props
 const styles = StyleSheet.create((theme) => ({
   header: {
     gap: theme.spacing(1),
-  },
-  title: {
-    fontSize: theme.fontSize.xl,
-    letterSpacing: 0,
   },
   footer: {
     flexDirection: "row",

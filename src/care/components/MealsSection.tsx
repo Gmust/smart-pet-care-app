@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
 
+import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
+
 import { useCareDelete } from "../hooks/useCareDelete";
 import { useDeleteMealMutation } from "../queries/useDeleteMealMutation";
 import { useMealsQuery } from "../queries/useMealsQuery";
 import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { MealRule } from "../types";
 
-import { CareDeleteConfirmDialog } from "./CareDeleteConfirmDialog";
 import { CareSection } from "./CareSection";
 import { EmptyCareCard } from "./EmptyCareCard";
 import { MealsListCard } from "./MealsListCard";
@@ -47,7 +48,7 @@ export function MealsSection({ petId, onAddMeal, onEditMeal }: Props) {
         )}
       </CareSection>
 
-      <CareDeleteConfirmDialog {...dialogProps} />
+      <DeleteConfirmDialog {...dialogProps} />
     </>
   );
 }

@@ -27,7 +27,7 @@ export default function PetListPage() {
   const { data: pets, isLoading, refetch, isRefetching } = usePetsQuery();
 
   const handleOpenPet = (petId: string) => {
-    router.push({ pathname: "/(tabs)/pet-profile", params: { petId } });
+    router.push({ pathname: "/(tabs)/pets/pet-profile", params: { petId } });
   };
 
   return (

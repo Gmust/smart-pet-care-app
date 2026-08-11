@@ -26,7 +26,7 @@ export function CareListCard<T>({
   footer,
 }: Props<T>) {
   const { theme } = useUnistyles();
-  cardVariants.useVariants({ padding: "none", radius: "list" });
+  cardVariants.useVariants({ padding: "none", radius: "loose" });
 
   return (
     <View style={[cardVariants.card]}>

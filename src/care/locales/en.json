@@ -176,8 +176,6 @@
   },
   "deleteDialog": {
     "title": "Delete this entry?",
-    "description": "This will remove \"{{name}}\" and its reminder. This can't be undone.",
-    "confirm": "Delete",
-    "cancel": "Cancel"
+    "description": "This will remove \"{{name}}\" and its reminder. This can't be undone."
   }
 }

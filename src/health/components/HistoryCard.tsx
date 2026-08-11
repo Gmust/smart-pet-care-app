@@ -20,7 +20,7 @@ export function HistoryCard({
   variant = "default",
   onPress,
 }: HistoryCardProps) {
-  cardVariants.useVariants({ padding: "none", radius: "standalone" });
+  cardVariants.useVariants({ padding: "none", radius: "loose" });
 
   return (
     <Pressable
@@ -30,8 +30,13 @@ export function HistoryCard({
       style={({ pressed }) => [cardVariants.card, styles.card, pressed && styles.cardPressed]}
     >
       <View style={styles.iconBg}>{icon}</View>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={[styles.subtitle, variant === "overdue" && styles.subtitleOverdue]}>
+      <Text variant="titleM" style={styles.title}>
+        {title}
+      </Text>
+      <Text
+        variant="bodyS"
+        style={[styles.subtitle, variant === "overdue" && styles.subtitleOverdue]}
+      >
         {subtitle}
       </Text>
     </Pressable>
@@ -60,12 +65,10 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.peachIconBg,
   },
   title: {
-    ...theme.textStyles.titleM,
     color: theme.palette.brand.textPrimary,
     textAlign: "center",
   },
   subtitle: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
     textAlign: "center",
   },

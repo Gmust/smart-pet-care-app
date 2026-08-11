@@ -3,7 +3,7 @@ import { View, type ViewStyle } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 type CardPadding = "standalone" | "compact" | "none";
-type CardRadius = "standalone" | "list";
+type CardRadius = "standalone" | "loose";
 
 type CardProps = {
   padding?: CardPadding;
@@ -32,7 +32,7 @@ export const cardVariants = StyleSheet.create((theme) => ({
     variants: {
       radius: {
         standalone: { borderRadius: theme.borderRadius.xl },
-        list: { borderRadius: theme.borderRadius["2xl"] },
+        loose: { borderRadius: theme.borderRadius["2xl"] },
       },
       padding: {
         standalone: {
@@ -55,7 +55,7 @@ type ListCardProps = {
 };
 
 export const ListCard = ({ style, children }: ListCardProps) => {
-  cardVariants.useVariants({ padding: "none", radius: "list" });
+  cardVariants.useVariants({ padding: "none", radius: "loose" });
   const items = Children.toArray(children);
 
   return (

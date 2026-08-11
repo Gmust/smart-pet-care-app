@@ -1,6 +1,8 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import type { HealthRecordResponseDto } from "@/api/generated";
+
 import type { HealthRecordYearGroup } from "../utils/groupHealthRecordsByYear";
 
 import { HealthRecordCard } from "./HealthRecordCard";
@@ -10,9 +12,17 @@ type Props = {
   groups: HealthRecordYearGroup[];
   resolveLabel: (year: number) => string;
   symptomLabelByName: Map<string, string>;
+  onEdit: (record: HealthRecordResponseDto) => void;
+  onRequestDelete: (record: HealthRecordResponseDto) => void;
 };
 
-export function HealthRecordListSection({ groups, resolveLabel, symptomLabelByName }: Props) {
+export function HealthRecordListSection({
+  groups,
+  resolveLabel,
+  symptomLabelByName,
+  onEdit,
+  onRequestDelete,
+}: Props) {
   return (
     <View style={styles.stack}>
       {groups.map((group) => (
@@ -23,6 +33,8 @@ export function HealthRecordListSection({ groups, resolveLabel, symptomLabelByNa
                 key={record.id ?? `${record.title}-${record.performedAt}`}
                 record={record}
                 symptomLabelByName={symptomLabelByName}
+                onEdit={onEdit}
+                onRequestDelete={onRequestDelete}
               />
             ))}
           </View>

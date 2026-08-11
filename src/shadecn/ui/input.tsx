@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from "react-native";
 import { TextInput, View } from "react-native";
 import type { UnistylesVariants } from "react-native-unistyles";
@@ -71,6 +71,7 @@ const inputVariants = StyleSheet.create((theme) => ({
 
 type InputProps = Omit<TextInputProps, "size"> &
   UnistylesVariants<typeof inputVariants> & {
+    ref?: RefObject<TextInput | null>;
     showStatusIcon?: boolean;
     showClearButton?: boolean;
     onClear?: () => void;
@@ -86,6 +87,7 @@ type InputProps = Omit<TextInputProps, "size"> &
   };
 
 function Input({
+  ref,
   size,
   label,
   helperText,
@@ -118,6 +120,7 @@ function Input({
         {leftSlot ? <View style={inputVariants.slot}>{leftSlot}</View> : null}
         <TextInput
           {...props}
+          ref={ref}
           value={value}
           editable={editable}
           multiline={multiline}

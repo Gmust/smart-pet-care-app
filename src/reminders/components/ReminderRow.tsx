@@ -97,7 +97,7 @@ export function ReminderRow({
           )}
         </Pressable>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={-20}>
+      <DropdownMenuContent align="end" sideOffset={-theme.spacing(5)}>
         <DropdownMenuItem onPress={onEdit}>
           <Text style={styles.menuItemText}>{t("reminders:actionsDrawer.edit")}</Text>
         </DropdownMenuItem>

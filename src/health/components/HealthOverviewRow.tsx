@@ -34,8 +34,12 @@ export function HealthOverviewRow({
         {icon}
       </View>
       <View style={styles.texts}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <Text variant="body" style={styles.title}>
+          {title}
+        </Text>
+        <Text variant="bodyS" style={styles.subtitle}>
+          {subtitle}
+        </Text>
       </View>
     </Pressable>
   );
@@ -69,11 +73,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(0.5),
   },
   title: {
-    ...theme.textStyles.body,
     color: theme.palette.brand.textPrimary,
   },
   subtitle: {
-    ...theme.textStyles.bodyS,
     color: theme.palette.brand.textSecondary,
   },
 }));

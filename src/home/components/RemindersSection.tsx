@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
+import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
 import { CirclePlusIcon } from "@/icons/plus";
 import { ReminderDrawers } from "@/reminders/components/ReminderDrawers";
 import { ReminderRow } from "@/reminders/components/ReminderRow";
@@ -35,7 +36,8 @@ export function RemindersSection() {
     setDescriptionReminderId,
     isDeleting,
     deletingId,
-    handleDeleteReminder,
+    requestDeleteReminder,
+    deleteDialogProps,
   } = useReminderActions();
 
   const reminderGroupTitle: Record<ReminderGroupKey, string> = {
@@ -87,7 +89,9 @@ export function RemindersSection() {
                     onEdit={() => setEditReminderId(reminder.id)}
                     onChangeStatus={() => setStatusReminderId(reminder.id)}
                     onShowDescription={() => setDescriptionReminderId(reminder.id)}
-                    onDelete={() => handleDeleteReminder(reminder.id)}
+                    onDelete={() =>
+                      requestDeleteReminder({ id: reminder.id, title: reminder.title })
+                    }
                     isDeleting={isDeleting && deletingId === reminder.id}
                     muted={group.key === "passed"}
                   />
@@ -108,6 +112,8 @@ export function RemindersSection() {
         descriptionReminderId={descriptionReminderId}
         setDescriptionReminderId={setDescriptionReminderId}
       />
+
+      <DeleteConfirmDialog {...deleteDialogProps} />
     </>
   );
 }

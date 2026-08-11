@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
 
+import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
+
 import { useCareDelete } from "../hooks/useCareDelete";
 import { useDeleteFoodTrackerMutation } from "../queries/useDeleteFoodTrackerMutation";
 import { useFoodTrackerQuery } from "../queries/useFoodTrackerQuery";
 import { CareListSkeleton } from "../skeletons/CareListSkeleton";
 import type { FoodTracker } from "../types";
 
-import { CareDeleteConfirmDialog } from "./CareDeleteConfirmDialog";
 import { CareSection } from "./CareSection";
 import { EmptyCareCard } from "./EmptyCareCard";
 import { FoodTrackerCard } from "./FoodTrackerCard";
@@ -51,7 +52,7 @@ export function FoodTrackerSection({ petId, onAddFood, onEditFood }: Props) {
         )}
       </CareSection>
 
-      <CareDeleteConfirmDialog {...dialogProps} />
+      <DeleteConfirmDialog {...dialogProps} />
     </>
   );
 }

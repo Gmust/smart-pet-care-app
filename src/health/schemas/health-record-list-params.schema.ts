@@ -6,7 +6,8 @@ import type { HealthHistoryCategory } from "../types";
 
 // Kept in sync manually with HEALTH_HISTORY_CATEGORIES in ../constants.ts —
 // zod needs a literal tuple for z.enum, so it can't just read the array.
-const HISTORY_CATEGORIES = [
+// Exported for reuse elsewhere in health/ schemas — avoids a third copy of this list.
+export const HISTORY_CATEGORIES = [
   HealthRecordType.VetVisit,
   HealthRecordType.Vaccination,
   HealthRecordType.Deworming,

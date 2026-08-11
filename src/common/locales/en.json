@@ -20,6 +20,10 @@
     "screenErrorDescription": "An unexpected error occurred on this screen. Please try again.",
     "tryAgain": "Try again"
   },
+  "deleteDialog": {
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  },
   "offline": {
     "bannerMessage": "No internet connection",
     "dismiss": "Dismiss offline notice",

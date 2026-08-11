@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
 import { ReminderStatus } from "@/api/generated";
+import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
 import { ChevronIcon } from "@/icons/chevron";
 import { CirclePlusIcon } from "@/icons/plus";
 import { Button } from "@/shadecn/ui/button";
@@ -85,7 +86,8 @@ export default function RemindersPage() {
     setDescriptionReminderId,
     isDeleting,
     deletingId,
-    handleDeleteReminder,
+    requestDeleteReminder,
+    deleteDialogProps,
   } = useReminderActions();
 
   const handleBack = useCallback(() => {
@@ -172,7 +174,9 @@ export default function RemindersPage() {
                   onEdit={() => setEditReminderId(item.reminder.id)}
                   onChangeStatus={() => setStatusReminderId(item.reminder.id)}
                   onShowDescription={() => setDescriptionReminderId(item.reminder.id)}
-                  onDelete={() => handleDeleteReminder(item.reminder.id)}
+                  onDelete={() =>
+                    requestDeleteReminder({ id: item.reminder.id, title: item.reminder.title })
+                  }
                   isDeleting={isDeleting && deletingId === item.reminder.id}
                   muted={item.groupKey === "passed"}
                 />
@@ -230,6 +234,8 @@ export default function RemindersPage() {
         descriptionReminderId={descriptionReminderId}
         setDescriptionReminderId={setDescriptionReminderId}
       />
+
+      <DeleteConfirmDialog {...deleteDialogProps} />
     </>
   );
 }

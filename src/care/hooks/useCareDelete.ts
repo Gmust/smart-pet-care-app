@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { CareDeleteConfirmDialog } from "../components/CareDeleteConfirmDialog";
+import type { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
 
 type PendingItem = { id: string; name: string };
 
@@ -24,7 +24,7 @@ export function useCareDelete({ petId, deleteItem, isDeleting }: Params) {
     await deleteItem({ id: pendingItem.id, petId });
   };
 
-  const dialogProps: ComponentProps<typeof CareDeleteConfirmDialog> = {
+  const dialogProps: ComponentProps<typeof DeleteConfirmDialog> = {
     isOpen: pendingItem !== null,
     setIsOpen: (open) => !open && close(),
     title: t("deleteDialog.title"),

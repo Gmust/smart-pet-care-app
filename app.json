@@ -64,11 +64,17 @@
         {
           "photosPermission": "The app accesses your photos to upload pictures",
           "colors": {
-            "cropToolbarColor": "#000000"
+            "cropToolbarColor": "#000000",
+            "cropToolbarIconColor": "#f5f1ea",
+            "cropToolbarActionTextColor": "#f5f1ea",
+            "cropBackButtonIconColor": "#f5f1ea"
           },
           "dark": {
             "colors": {
-              "cropToolbarColor": "#000000"
+              "cropToolbarColor": "#000000",
+              "cropToolbarIconColor": "#f5f1ea",
+              "cropToolbarActionTextColor": "#f5f1ea",
+              "cropBackButtonIconColor": "#f5f1ea"
             }
           }
         }

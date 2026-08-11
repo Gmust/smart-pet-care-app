@@ -16,6 +16,10 @@
     "Deworming": "Deworming",
     "AntiParasiteTreatment": "Anti-parasite"
   },
+  "deleteDialog": {
+    "title": "Delete this record?",
+    "description": "This will remove \"{{name}}\". This can't be undone."
+  },
   "overview": {
     "sections": {
       "meds": "Meds",
@@ -37,9 +41,16 @@
   },
   "recordList": {
     "searchPlaceholder": "Search by title, description, provider",
-    "loading": "Loading...",
+    "clearSearch": "Clear search",
+    "toggleDetails": "Show or hide details",
     "empty": "No records found",
     "addRecord": "Add record",
+    "menu": {
+      "viewInfo": "View info",
+      "hideInfo": "Hide info",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
     "filters": {
       "title": "Date range",
       "openFilter": "Filter by date",
@@ -65,9 +76,14 @@
   "forms": {
     "healthRecord": {
       "createTitle": "Add {{category}} record",
+      "createTitleGeneric": "Add health record",
+      "editTitle": "Edit {{category}} record",
       "createSuccess": "Record added",
+      "updateSuccess": "Record updated",
       "submit": "Save record",
       "fields": {
+        "pet": "Pet",
+        "type": "Record type",
         "title": "Title",
         "performedAt": "Date",
         "provider": "Provider",
@@ -77,7 +93,12 @@
         "symptoms": "Symptoms"
       },
       "placeholders": {
-        "title": "e.g. Annual checkup",
+        "pet": "Select a pet",
+        "type": "Select record type",
+        "titleVetVisit": "e.g. Annual checkup",
+        "titleVaccination": "e.g. Rabies vaccine",
+        "titleDeworming": "e.g. Deworming treatment",
+        "titleAntiParasiteTreatment": "e.g. Flea & tick treatment",
         "performedAt": "Select a date",
         "provider": "e.g. Dr. Smith / Sunny Vet Clinic",
         "dosage": "e.g. 1 tablet",
@@ -85,6 +106,8 @@
         "description": "Notes about this visit"
       },
       "errors": {
+        "petRequired": "Pet is required",
+        "typeRequired": "Record type is required",
         "titleRequired": "Title is required",
         "performedAtRequired": "Date is required"
       }
