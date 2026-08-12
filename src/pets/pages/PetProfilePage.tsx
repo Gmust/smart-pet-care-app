@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
-import { CareTabContent } from "@/care/components/CareTabContent";
 import { BackButton } from "@/common/components/BackButton";
 import { HealthTabContent } from "@/health/components/HealthTabContent";
 import { AiIcon } from "@/icons/ai-icon";
@@ -21,6 +20,7 @@ import { PetProfilePageActions } from "../components/pet-profile/actions/PetProf
 import { UploadPetPhotoDrawer } from "../components/pet-profile/actions/UploadPetPhotoDrawer";
 import { FlagChip } from "../components/pet-profile/FlagChip";
 import { PetSpeciesImage } from "../components/PetSpeciesImage";
+import { EmptyTabPlaceholder } from "../components/tabs/EmptyTabPlaceholder";
 import { OverviewTabContent } from "../components/tabs/OverviewTabContent";
 import { RemindersTabContent } from "../components/tabs/RemindersTabContent";
 import { usePetQuery } from "../queries/usePetQuery";
@@ -170,7 +170,9 @@ export default function PetProfilePage() {
         >
           {!!pet && activeTab === "overview" && <OverviewTabContent pet={pet} />}
           {!!pet && activeTab === "health" && <HealthTabContent pet={pet} />}
-          {!!pet && activeTab === "care" && <CareTabContent petId={pet.id ?? ""} />}
+          {!!pet && activeTab === "care" && (
+            <EmptyTabPlaceholder label={t("petProfilePage.careComingSoon")} />
+          )}
           {!!pet && activeTab === "reminders" && <RemindersTabContent petId={pet.id ?? ""} />}
         </Animated.ScrollView>
       </View>

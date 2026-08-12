@@ -19,6 +19,7 @@
   "petProfilePage": {
     "goBack": "Go back",
     "notFound": "Pet not found",
+    "careComingSoon": "Coming soon",
     "tabs": {
       "overview": "Overview",
       "health": "Health",

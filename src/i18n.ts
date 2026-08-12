@@ -3,7 +3,6 @@ import i18next from "i18next";
 
 import enAssistant from "@/assistant/locales/en.json";
 import enAuth from "@/auth/locales/en.json";
-import enCare from "@/care/locales/en.json";
 import enCommon from "@/common/locales/en.json";
 import enHealth from "@/health/locales/en.json";
 import enHome from "@/home/locales/en.json";
@@ -25,7 +24,6 @@ const modules = [
   "reminders",
   "pets",
   "profile",
-  "care",
   "health",
   "assistant",
 ] as const;
@@ -41,7 +39,6 @@ const enResources = {
   reminders: enReminders,
   pets: enPets,
   profile: enProfile,
-  care: enCare,
   health: enHealth,
   assistant: enAssistant,
 } as const satisfies Record<I18nModule, TranslationJson>;
