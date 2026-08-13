@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useUnistyles } from "react-native-unistyles";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 
@@ -19,6 +20,7 @@ type Props = {
 export function HealthHistorySection({ petId, records, isLoading }: Props) {
   const { t } = useTranslation(["health"]);
   const router = useRouter();
+  const { theme } = useUnistyles();
 
   return (
     <HistoryGrid>
@@ -28,7 +30,6 @@ export function HealthHistorySection({ petId, records, isLoading }: Props) {
           .sort((a, b) => dayjs(b.performedAt).valueOf() - dayjs(a.performedAt).valueOf())[0];
 
         const Icon = HEALTH_CATEGORY_ICON[category];
-        const title = t(`health:categoryLabels.${category}`);
 
         const isOverdue = latest?.nextDueAt ? dayjs(latest.nextDueAt).isBefore(dayjs()) : false;
         const subtitle = !latest
@@ -42,10 +43,16 @@ export function HealthHistorySection({ petId, records, isLoading }: Props) {
         return (
           <HistoryCard
             key={category}
-            title={title}
+            title={t(`health:categoryLabels.${category}`)}
             subtitle={isLoading ? t("health:history.loading") : subtitle}
             variant={isOverdue ? "overdue" : "default"}
-            icon={<Icon width={20} height={20} color={palette.brand.peachDefault} />}
+            icon={
+              <Icon
+                width={theme.iconSize.xl}
+                height={theme.iconSize.xl}
+                color={palette.brand.peachDefault}
+              />
+            }
             onPress={() =>
               router.push({
                 pathname: "/(tabs)/pets/health-record-list",

@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -7,6 +7,7 @@ import { HomeIcon } from "@/icons/home";
 import type { Icon } from "@/icons/icons";
 import { CatIcon } from "@/icons/pets";
 import { UserIcon } from "@/icons/user";
+import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
 const ACTIVE_COLOR = palette.brand.primaryDefault;
@@ -90,7 +91,7 @@ export function TabBar({ state, navigation }: TabBarProps) {
               accessibilityState={isFocused ? { selected: true } : {}}
             >
               <Glyph width={theme.iconSize["2xl"]} height={theme.iconSize["2xl"]} color={color} />
-              <Text style={[styles.label, isFocused && styles.labelActive, { color }]}>
+              <Text variant={isFocused ? "tabLabelActive" : "tabLabelInactive"} style={{ color }}>
                 {meta.label}
               </Text>
             </Pressable>
@@ -133,11 +134,5 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     gap: 3,
-  },
-  label: {
-    ...theme.textStyles.tabLabelInactive,
-  },
-  labelActive: {
-    ...theme.textStyles.tabLabelActive,
   },
 }));

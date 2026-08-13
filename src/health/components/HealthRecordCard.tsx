@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
-import { Line, Svg } from "react-native-svg";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import dayjs from "dayjs";
 
 import type { HealthRecordResponseDto } from "@/api/generated";
+import { DashedDividerIcon } from "@/icons/dashed-divider";
 import { EyeClosedIcon, EyeIcon } from "@/icons/eye";
 import { cardVariants } from "@/shadecn/ui/card";
 import {
@@ -101,17 +101,7 @@ export function HealthRecordCard({ record, symptomLabelByName, onEdit, onRequest
 
           {isExpanded && (
             <>
-              <Svg height={1} width="100%">
-                <Line
-                  x1="0"
-                  y1="0.5"
-                  x2="100%"
-                  y2="0.5"
-                  stroke={palette.brand.surfaceBorder}
-                  strokeWidth={1}
-                  strokeDasharray="5,5"
-                />
-              </Svg>
+              <DashedDividerIcon color={palette.brand.surfaceBorder} />
 
               <View style={styles.contentBlock}>
                 {!!record.provider && (
