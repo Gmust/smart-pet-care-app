@@ -1,0 +1,67 @@
+import { useTranslation } from "react-i18next";
+import { useUnistyles } from "react-native-unistyles";
+import dayjs from "dayjs";
+import { useRouter } from "expo-router";
+
+import type { HealthRecordResponseDto } from "@/api/generated";
+import { palette } from "@/styles/palette";
+
+import { HEALTH_CATEGORY_ICON, HEALTH_HISTORY_CATEGORIES } from "../constants";
+
+import { HistoryCard } from "./HistoryCard";
+import { HistoryGrid } from "./HistoryGrid";
+
+type Props = {
+  petId: string;
+  records: HealthRecordResponseDto[] | undefined;
+  isLoading: boolean;
+};
+
+export function HealthHistorySection({ petId, records, isLoading }: Props) {
+  const { t } = useTranslation(["health"]);
+  const router = useRouter();
+  const { theme } = useUnistyles();
+
+  return (
+    <HistoryGrid>
+      {HEALTH_HISTORY_CATEGORIES.map((category) => {
+        const latest = records
+          ?.filter((record) => record.type === category)
+          .sort((a, b) => dayjs(b.performedAt).valueOf() - dayjs(a.performedAt).valueOf())[0];
+
+        const Icon = HEALTH_CATEGORY_ICON[category];
+
+        const isOverdue = latest?.nextDueAt ? dayjs(latest.nextDueAt).isBefore(dayjs()) : false;
+        const subtitle = !latest
+          ? t("health:history.noRecords")
+          : isOverdue
+            ? t("health:history.overdue", { date: dayjs(latest.nextDueAt).format("YYYY-MM-DD") })
+            : latest.nextDueAt
+              ? t("health:history.next", { date: dayjs(latest.nextDueAt).format("YYYY-MM-DD") })
+              : t("health:history.last", { date: dayjs(latest.performedAt).format("YYYY-MM-DD") });
+
+        return (
+          <HistoryCard
+            key={category}
+            title={t(`health:categoryLabels.${category}`)}
+            subtitle={isLoading ? t("health:history.loading") : subtitle}
+            variant={isOverdue ? "overdue" : "default"}
+            icon={
+              <Icon
+                width={theme.iconSize.xl}
+                height={theme.iconSize.xl}
+                color={palette.brand.peachDefault}
+              />
+            }
+            onPress={() =>
+              router.push({
+                pathname: "/(tabs)/pets/health-record-list",
+                params: { petId, type: category },
+              })
+            }
+          />
+        );
+      })}
+    </HistoryGrid>
+  );
+}

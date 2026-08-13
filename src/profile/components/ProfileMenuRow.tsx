@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { ChevronRightIcon } from "@/icons/chevron-right";
+import { ChevronIcon } from "@/icons/chevron";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
@@ -38,7 +38,8 @@ export function ProfileMenuRow({
         <Text style={[styles.label, isDanger && styles.labelDanger]}>{label}</Text>
         {!!description && <Text style={styles.description}>{description}</Text>}
       </View>
-      <ChevronRightIcon
+      <ChevronIcon
+        direction="right"
         width={18}
         height={18}
         color={isDanger ? palette.brand.danger : palette.brand.textSecondary}

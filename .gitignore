@@ -18,6 +18,7 @@ openspec
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+.idea/
 # Native
 .kotlin/
 *.orig.*

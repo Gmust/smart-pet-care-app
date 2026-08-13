@@ -9,11 +9,13 @@ import dayjs from "dayjs";
 import { DaysOfWeek, ReminderType, RepeatType } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
+import { formatTimeOfDay, parseTimeOfDay } from "@/common/utils/timeOfDay";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
 import {
   Drawer,
+  DRAWER_FOOTER_FADE_SPACING,
   DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
@@ -51,21 +53,6 @@ const DAY_ORDER: DaysOfWeek[] = [
 const REMINDER_TYPES: ReminderType[] = Object.values(ReminderType);
 const REPEAT_TYPES: RepeatType[] = Object.values(RepeatType);
 const SELECT_PORTAL_HOST = "select";
-
-const parseTime = (value: string): Date => {
-  const date = new Date();
-  const [hours, minutes] = value.split(":").map(Number);
-  if (!Number.isNaN(hours) && !Number.isNaN(minutes)) {
-    date.setHours(hours, minutes, 0, 0);
-  }
-  return date;
-};
-
-const formatTime = (date: Date): string => {
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
-};
 
 const defaultValues: CreateReminderForm = {
   petId: "",
@@ -399,10 +386,10 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
                   mode="time"
                   label={t("reminders:createReminderDrawer.fields.time")}
                   placeholder={t("reminders:createReminderDrawer.placeholders.time")}
-                  value={field.state.value ? parseTime(field.state.value) : null}
-                  display={formatTime}
+                  value={field.state.value ? parseTimeOfDay(field.state.value) : null}
+                  display={formatTimeOfDay}
                   error={field.state.meta.errors.length > 0}
-                  onChange={(date) => field.handleChange(formatTime(date))}
+                  onChange={(date) => field.handleChange(formatTimeOfDay(date))}
                   onBlur={field.handleBlur}
                   containerStyle={styles.inputSurface}
                 />
@@ -450,7 +437,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   content: {
     gap: theme.spacing(3),
-    paddingBottom: theme.spacing(20),
+    paddingBottom: theme.spacing(DRAWER_FOOTER_FADE_SPACING),
   },
   field: {
     gap: theme.spacing(1),
@@ -464,7 +451,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.white,
   },
   textArea: {
-    alignItems: "flex-start",
+    alignItems: "stretch",
     minHeight: theme.spacing(30),
   },
   textAreaInput: {

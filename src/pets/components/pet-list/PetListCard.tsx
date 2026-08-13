@@ -5,9 +5,10 @@ import { StyleSheet } from "react-native-unistyles";
 
 import type { PetResponseDto } from "@/api/generated";
 import { ReminderType } from "@/api/generated";
-import { ChevronRightIcon } from "@/icons/chevron-right";
-import { TrendingUpIcon } from "@/icons/trending-up";
+import { ChevronIcon } from "@/icons/chevron";
+import { TrendingUpIcon } from "@/icons/trending";
 import { useGetRemindersByPet } from "@/reminders/queries/useGetReminderByPet";
+import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 
 import { PetListCardReminderSkeleton } from "../../skeletons/PetListCardSkeleton";
@@ -73,6 +74,7 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
         <View style={styles.info}>
           <View style={styles.headerRow}>
             <Text
+              variant="titleL"
               style={styles.name}
               numberOfLines={1}
               adjustsFontSizeToFit
@@ -82,26 +84,35 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
               {pet.name}
             </Text>
             {/* TODO wire real status once backend health signal is ready */}
-            <View style={styles.statusChip}>
-              <TrendingUpIcon width={16} height={16} color={styles.statusText.color} />
-              <Text style={styles.statusText}>{t("pets:petListCard.statusStable")}</Text>
-            </View>
+            <Chip
+              label={t("pets:petListCard.statusStable")}
+              tone="ok"
+              variant="ghost"
+              size="sm"
+              icon={TrendingUpIcon}
+            />
           </View>
 
           <View style={styles.metaRow}>
             {!!pet.breed && (
               <>
-                <Text style={styles.meta}>{pet.breed}</Text>
+                <Text variant="bodyS" style={styles.meta}>
+                  {pet.breed}
+                </Text>
                 <View style={styles.dot} />
               </>
             )}
             {!!pet.age && (
               <>
-                <Text style={styles.meta}>{pet.age}</Text>
+                <Text variant="bodyS" style={styles.meta}>
+                  {pet.age}
+                </Text>
                 <View style={styles.dot} />
               </>
             )}
-            <Text style={styles.meta}>{pet.sex}</Text>
+            <Text variant="bodyS" style={styles.meta}>
+              {pet.sex}
+            </Text>
           </View>
 
           <View style={styles.statsRow}>
@@ -117,10 +128,10 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
 
         <View style={styles.actionBar}>
           <View style={styles.actionItem}>
-            <Text style={styles.actionText} numberOfLines={1}>
+            <Text variant="bodyS" style={styles.actionText} numberOfLines={1}>
               {t("pets:petListCard.viewInfo")}
             </Text>
-            <ChevronRightIcon width={14} height={14} color={styles.actionText.color} />
+            <ChevronIcon direction="right" width={14} height={14} color={styles.actionText.color} />
           </View>
         </View>
       </View>
@@ -170,29 +181,7 @@ const styles = StyleSheet.create((theme) => ({
   name: {
     flex: 1,
     minWidth: 0,
-    fontFamily: theme.fonts.displayRegular,
-    fontSize: theme.fontSize.xl,
-    lineHeight: theme.fontSize.xl * 1.2,
-    letterSpacing: -0.12,
     color: theme.palette.brand.textPrimary,
-  },
-  statusChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: theme.spacing(1),
-    borderWidth: 1,
-    borderColor: theme.palette.brand.primarySoft,
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.palette.brand.primaryXsoft,
-    paddingHorizontal: theme.spacing(2),
-    paddingVertical: theme.spacing(1),
-  },
-  statusText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: 11,
-    lineHeight: 11 * 1.3,
-    color: theme.palette.brand.ok,
   },
   metaRow: {
     flexDirection: "row",
@@ -200,9 +189,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   meta: {
-    fontFamily: theme.fonts.regular,
-    fontSize: 13,
-    lineHeight: 13 * 1.3,
     color: theme.palette.brand.textSecondary,
   },
   dot: {
@@ -224,9 +210,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(2),
   },
   actionText: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.3,
     color: theme.palette.brand.primaryDefault,
   },
   actionItem: {

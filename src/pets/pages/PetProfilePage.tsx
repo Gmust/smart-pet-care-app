@@ -1,18 +1,16 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshControl, View } from "react-native";
-import Animated from "react-native-reanimated";
+import { Pressable, RefreshControl, View } from "react-native";
+import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
-import dayjs from "dayjs";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { BackButton } from "@/common/components/BackButton";
+import { HealthTabContent } from "@/health/components/HealthTabContent";
 import { AiIcon } from "@/icons/ai-icon";
-import { CirclePlusIcon } from "@/icons/circle-plus";
 import { Button } from "@/shadecn/ui/button";
-import type { TabItem } from "@/shadecn/ui/tabs";
-import { Tabs, tabsContentEntering } from "@/shadecn/ui/tabs";
+import { tabsContentEntering } from "@/shadecn/ui/tabs";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
@@ -20,22 +18,29 @@ import { DeletePetConfirmation } from "../components/pet-profile/actions/DeleteP
 import { EditPetDrawer } from "../components/pet-profile/actions/EditPetDrawer";
 import { PetProfilePageActions } from "../components/pet-profile/actions/PetProfilePageActions";
 import { UploadPetPhotoDrawer } from "../components/pet-profile/actions/UploadPetPhotoDrawer";
-import { InfoRow } from "../components/pet-profile/InfoRow";
-import { PetRemindersTab } from "../components/pet-profile/PetRemindersTab";
-import { SectionHeader } from "../components/pet-profile/SectionHeader";
+import { FlagChip } from "../components/pet-profile/FlagChip";
 import { PetSpeciesImage } from "../components/PetSpeciesImage";
+import { EmptyTabPlaceholder } from "../components/tabs/EmptyTabPlaceholder";
+import { OverviewTabContent } from "../components/tabs/OverviewTabContent";
+import { RemindersTabContent } from "../components/tabs/RemindersTabContent";
 import { usePetQuery } from "../queries/usePetQuery";
 import { petProfileParamsSchema } from "../schemas/pet-profile-params.schema";
 import { PetProfilePageSkeleton } from "../skeletons/PetProfilePageSkeleton";
+import type { PetFlag } from "../types";
+
+const PROFILE_TAB_KEYS = ["overview", "health", "care", "reminders"] as const;
+type ProfileTabKey = (typeof PROFILE_TAB_KEYS)[number];
 
 export default function PetProfilePage() {
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const { t } = useTranslation(["pets", "common"]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState<ProfileTabKey>("overview");
+
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { t } = useTranslation(["pets", "common"]);
+
   const parsedParams = petProfileParamsSchema.safeParse(useLocalSearchParams());
   const petId = parsedParams.success ? parsedParams.data.petId : undefined;
   const { data: pet, isLoading: isPetLoading, refetch, isRefetching } = usePetQuery(petId);
@@ -46,29 +51,25 @@ export default function PetProfilePage() {
     return <Redirect href="/(tabs)/pets" />;
   }
 
-  const tabs: TabItem[] = [
-    { key: "overview", label: t("petProfilePage.tabs.overview") },
-    { key: "activity", label: t("petProfilePage.tabs.activity") },
-    { key: "health", label: t("petProfilePage.tabs.health") },
-    { key: "reminders", label: t("petProfilePage.tabs.reminders") },
-  ];
+  const flags: PetFlag[] = [];
+  if (pet) {
+    const hasAllergies = (pet.allergies ?? []).some(Boolean);
+    const hasChronicConditions = (pet.chronicConditions ?? []).some(Boolean);
 
-  const birthDate = pet?.birthDate ? dayjs(pet.birthDate) : null;
-  const birthdayValue = birthDate?.isValid()
-    ? birthDate.format("MMM D, YYYY")
-    : t("petProfilePage.fallbacks.notAdded");
-
-  const weightValue = !pet?.weightKg
-    ? t("petProfilePage.fallbacks.notAdded")
-    : t("petProfilePage.weightValue", { value: pet?.weightKg });
-
-  const handleOpenEdit = () => {
-    setIsEditOpen(true);
-  };
-
-  const handleOpenDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
-  };
+    if (hasAllergies) {
+      flags.push({ id: "allergies", label: t("petProfilePage.flags.allergies"), tone: "warn" });
+    }
+    if (hasChronicConditions) {
+      flags.push({
+        id: "chronic-conditions",
+        label: t("petProfilePage.flags.chronicCondition"),
+        tone: "warn",
+      });
+    }
+    if (!flags.length && pet.species) {
+      flags.push({ id: "species", label: pet.species, tone: "ok" });
+    }
+  }
 
   if (isPetLoading) {
     return <PetProfilePageSkeleton />;
@@ -79,38 +80,85 @@ export default function PetProfilePage() {
       <View style={styles.screen}>
         <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
           <BackButton />
-          <Text style={styles.topBarTitle}>{petName}</Text>
+          <Text variant="titleL" style={styles.topBarTitle}>
+            {petName}
+          </Text>
           <PetProfilePageActions
             disabled={!pet}
-            onEdit={handleOpenEdit}
+            onEdit={() => setIsEditOpen(true)}
             onChangePhoto={() => setIsPhotoOpen(true)}
-            onDelete={handleOpenDeleteDialog}
+            onDelete={() => setIsDeleteDialogOpen(true)}
           />
         </View>
 
-        {pet ? (
-          <View style={styles.hero}>
-            <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} variant="hero" />
-            <View style={styles.aiButton}>
-              <Button
-                accessibilityLabel="ai-assistant"
-                variant="icon"
-                size="icon"
-                disabled={!pet?.id}
-                icon={<AiIcon width={20} height={20} color={palette.brand.textPrimary} />}
-                onPress={() =>
-                  router.navigate({ pathname: "/(tabs)/assistant", params: { petId: pet?.id } })
-                }
-              />
-            </View>
-          </View>
-        ) : (
-          <View style={[styles.hero, styles.heroEmpty]}>
-            <Text style={styles.emptyText}>{t("petProfilePage.notFound")}</Text>
-          </View>
-        )}
+        {activeTab === "overview" &&
+          (pet ? (
+            <Animated.View
+              style={styles.hero}
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(150)}
+            >
+              {pet.photoUrl ? (
+                <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} variant="hero" />
+              ) : (
+                <PetSpeciesImage species={pet.species} variant="hero" />
+              )}
+              <View style={styles.aiButton}>
+                <Button
+                  accessibilityLabel="ai-assistant"
+                  variant="icon"
+                  size="icon"
+                  disabled={!pet?.id}
+                  icon={<AiIcon width={20} height={20} color={palette.brand.textPrimary} />}
+                  onPress={() =>
+                    router.navigate({
+                      pathname: "/(tabs)/assistant",
+                      params: { petId: pet?.id },
+                    })
+                  }
+                />
+              </View>
+              <View style={styles.flagRow}>
+                {flags.map((flag) => (
+                  <FlagChip key={flag.id} flag={flag} />
+                ))}
+              </View>
+            </Animated.View>
+          ) : (
+            <Animated.View
+              style={[styles.hero, styles.heroEmpty]}
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(150)}
+            >
+              <Text variant="body" style={styles.emptyText}>
+                {t("petProfilePage.notFound")}
+              </Text>
+            </Animated.View>
+          ))}
 
-        <Tabs items={tabs} value={activeTab} onChange={setActiveTab} variant="segmented" />
+        <Animated.View style={styles.segmentedTabs} layout={LinearTransition.duration(200)}>
+          {PROFILE_TAB_KEYS.map((key) => {
+            const isActive = key === activeTab;
+            return (
+              <Pressable
+                key={key}
+                style={styles.segmentTab}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: isActive }}
+                onPress={() => setActiveTab(key)}
+              >
+                <Text
+                  variant={isActive ? "bodySemiBold" : "bodyS"}
+                  style={[styles.segmentText, isActive && styles.segmentTextActive]}
+                  numberOfLines={1}
+                >
+                  {t(`petProfilePage.tabs.${key}`)}
+                </Text>
+                {isActive && <View style={styles.activeIndicator} />}
+              </Pressable>
+            );
+          })}
+        </Animated.View>
 
         <Animated.ScrollView
           key={activeTab}
@@ -120,39 +168,12 @@ export default function PetProfilePage() {
           contentContainerStyle={styles.content}
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
         >
-          {!!pet && activeTab === "overview" && (
-            <>
-              <SectionHeader label={t("petProfilePage.basics.title")} />
-              <View style={styles.listCard}>
-                <InfoRow
-                  label={t("petProfilePage.basics.species")}
-                  value={pet.species ?? t("petProfilePage.fallbacks.speciesUnknown")}
-                />
-                <InfoRow
-                  label={t("petProfilePage.basics.breed")}
-                  value={pet.breed ?? t("petProfilePage.fallbacks.breedUnknown")}
-                />
-                <InfoRow label={t("petProfilePage.basics.birthday")} value={birthdayValue} />
-                <InfoRow
-                  label={t("petProfilePage.basics.sex")}
-                  value={pet.sex ?? t("sex.Unknown")}
-                />
-                <InfoRow label={t("petProfilePage.basics.weight")} value={weightValue} />
-              </View>
-
-              <View style={styles.notesHeader}>
-                <View style={styles.notesLabelRow}>
-                  <SectionHeader label={t("petProfilePage.notes.title")} compact />
-                  <CirclePlusIcon width={20} height={20} color={palette.brand.textSecondary} />
-                </View>
-                <Button variant="text" accessibilityLabel={t("petProfilePage.notes.manageA11y")}>
-                  <Text style={styles.manageText}>{t("petProfilePage.notes.manage")}</Text>
-                </Button>
-              </View>
-            </>
+          {!!pet && activeTab === "overview" && <OverviewTabContent pet={pet} />}
+          {!!pet && activeTab === "health" && <HealthTabContent pet={pet} />}
+          {!!pet && activeTab === "care" && (
+            <EmptyTabPlaceholder label={t("petProfilePage.careComingSoon")} />
           )}
-
-          {!!pet?.id && activeTab === "reminders" && <PetRemindersTab petId={pet.id} />}
+          {!!pet && activeTab === "reminders" && <RemindersTabContent petId={pet.id ?? ""} />}
         </Animated.ScrollView>
       </View>
       {!!pet && <EditPetDrawer pet={pet} isOpen={isEditOpen} setIsOpen={setIsEditOpen} />}
@@ -189,9 +210,6 @@ const styles = StyleSheet.create((theme) => ({
   topBarTitle: {
     flex: 1,
     minWidth: 0,
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
-    lineHeight: theme.fontSize["2xl"],
     letterSpacing: -0.12,
     textAlign: "center",
     color: theme.palette.brand.textBody,
@@ -218,51 +236,43 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     gap: theme.spacing(2),
   },
+  segmentedTabs: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderWidth: 1,
+    borderColor: theme.palette.brand.surfaceBorder,
+    backgroundColor: theme.palette.white,
+    paddingHorizontal: theme.spacing(5),
+  },
+  segmentTab: {
+    flex: 1,
+    minWidth: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: theme.spacing(2.5),
+    paddingHorizontal: theme.spacing(1),
+  },
+  activeIndicator: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 2,
+    backgroundColor: theme.palette.brand.primaryDefault,
+  },
+  segmentText: {
+    color: theme.palette.brand.textSecondary,
+  },
+  segmentTextActive: {
+    color: theme.palette.brand.primaryDefault,
+  },
   content: {
     gap: theme.spacing(2),
     paddingHorizontal: theme.spacing(4),
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(28),
   },
-  listCard: {
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: theme.palette.brand.surfaceBorder,
-    borderRadius: theme.borderRadius["2xl"],
-    backgroundColor: theme.palette.white,
-    shadowColor: theme.palette.brand.primaryDark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-    marginBottom: theme.spacing(5),
-  },
-  notesHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing(2),
-  },
-  notesLabelRow: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing(2),
-  },
-  manageText: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
-    color: theme.palette.brand.primaryDefault,
-  },
-  emptyCard: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: theme.spacing(5),
-  },
   emptyText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
 }));

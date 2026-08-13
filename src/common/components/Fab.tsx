@@ -14,9 +14,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import * as Haptics from "expo-haptics";
 
+import { AddHealthRecordDrawer } from "@/health/components/drawers/AddHealthRecordDrawer";
 import { ActivityIcon } from "@/icons/activity";
 import { BellPlusIcon } from "@/icons/bell";
-import { CalendarHeartIcon } from "@/icons/calendar-heart";
+import { CalendarHeartIcon } from "@/icons/calendar";
 import { HeartPulseIcon } from "@/icons/heart";
 import type { Icon } from "@/icons/icons";
 import { PlusIcon } from "@/icons/plus";
@@ -57,6 +58,7 @@ export function Fab({ onAction }: FabProps) {
   const { data: pets } = usePetsQuery();
   const [open, setOpen] = useState(false);
   const [isReminderOpen, setIsReminderOpen] = useState(false);
+  const [isHealthRecordOpen, setIsHealthRecordOpen] = useState(false);
   const [isCreatePetOpen, setIsCreatePetOpen] = useState(false);
   const rotation = useSharedValue(0);
 
@@ -88,6 +90,9 @@ export function Fab({ onAction }: FabProps) {
     toggle(false);
     if (id === "reminder") {
       setIsReminderOpen(true);
+    }
+    if (id === "health") {
+      setIsHealthRecordOpen(true);
     }
     onAction?.(id);
   };
@@ -142,6 +147,7 @@ export function Fab({ onAction }: FabProps) {
       </Pressable>
 
       <CreateReminderDrawer isOpen={isReminderOpen} setIsOpen={setIsReminderOpen} />
+      <AddHealthRecordDrawer isOpen={isHealthRecordOpen} setIsOpen={setIsHealthRecordOpen} />
       <CreatePetDrawer isOpen={isCreatePetOpen} setIsOpen={setIsCreatePetOpen} />
     </View>
   );

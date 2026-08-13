@@ -72,7 +72,7 @@ These require interactive login / secrets and can't be done from this session.
 
 4. **Add the token as a GitHub secret**:
    - GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**.
-   - Name: `EXPO_TOKEN`  — Value: the token from step 3.
+   - Name: `EXPO_TOKEN` — Value: the token from step 3.
 
 5. **Create the working branch** the workflows watch:
 

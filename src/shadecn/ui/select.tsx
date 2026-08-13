@@ -5,7 +5,7 @@ import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import * as SelectPrimitive from "@rn-primitives/select";
 
-import { Chevron } from "@/icons/arrows";
+import { ChevronIcon } from "@/icons/chevron";
 
 import { Text } from "./text";
 
@@ -59,7 +59,7 @@ function SelectTrigger({
       {...props}
     >
       {triggerChildren}
-      <Chevron color={theme.palette.brand.textPrimary} style={styles.chevron} />
+      <ChevronIcon direction="down" color={theme.palette.brand.textPrimary} />
     </SelectPrimitive.Trigger>
   );
 }
@@ -169,9 +169,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   triggerPressed: {
     backgroundColor: theme.palette.brand.surfaceSunken,
-  },
-  chevron: {
-    transform: [{ rotate: "-90deg" }],
   },
   valueText: {
     flexShrink: 1,

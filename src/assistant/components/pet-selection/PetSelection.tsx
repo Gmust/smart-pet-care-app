@@ -5,7 +5,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import type { PetResponseDto } from "@/api/generated";
 import { AiIcon } from "@/icons/ai-icon";
-import { ChevronRightIcon } from "@/icons/chevron-right";
+import { ChevronIcon } from "@/icons/chevron";
 import { PetSpeciesImage } from "@/pets/components/PetSpeciesImage";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
@@ -74,7 +74,12 @@ export function PetSelection({
                   </Text>
                 </View>
                 <View style={styles.petOptionAction}>
-                  <ChevronRightIcon width={20} height={20} color={styles.petOptionChevron.color} />
+                  <ChevronIcon
+                    direction="right"
+                    width={20}
+                    height={20}
+                    color={styles.petOptionChevron.color}
+                  />
                 </View>
               </Pressable>
             ))}

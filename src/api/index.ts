@@ -12,6 +12,11 @@ export const {
   getApiAuthOauthGoogleCallback,
   getApiPets,
   getApiPetsId,
+  getApiPetsPetIdHealthRecords,
+  postApiPetsPetIdHealthRecords,
+  getApiPetsPetIdHealthRecordsRecordId,
+  patchApiPetsPetIdHealthRecordsRecordId,
+  deleteApiPetsPetIdHealthRecordsRecordId,
   getApiProfileMe,
   getApiReminders,
   getApiRemindersId,
@@ -41,4 +46,6 @@ export const {
   patchApiPetsIdPhoto,
   deleteApiNotificationsDeviceTokenToken,
   postApiNotificationsDeviceToken,
+  getApiSymptoms,
+  getApiSymptomsId,
 } = getSmartPetCareAPI(api);

@@ -2,10 +2,10 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { TriangleAlertIcon } from "@/icons/alert";
 import { EllipsisIcon } from "@/icons/ellipsis";
 import { ImageEdit } from "@/icons/image-edit";
 import { PencilLineIcon } from "@/icons/pencil-line";
-import { TriangleAlertIcon } from "@/icons/triangle-alert";
 import { Button } from "@/shadecn/ui/button";
 import {
   DropdownMenu,
@@ -39,7 +39,7 @@ export function PetProfilePageActions({
         accessibilityLabel={t("petProfilePage.actions.open")}
         disabled={disabled}
       >
-        <EllipsisIcon width={16} height={16} color={palette.brand.textBody} />
+        <EllipsisIcon width={16} height={16} color={palette.brand.primaryDark} />
       </Button>
     );
   }
@@ -51,7 +51,7 @@ export function PetProfilePageActions({
         accessibilityLabel={t("petProfilePage.actions.open")}
         style={(state) => [styles.trigger, state.pressed && styles.triggerPressed]}
       >
-        <EllipsisIcon width={16} height={16} color={palette.brand.textBody} />
+        <EllipsisIcon width={16} height={16} color={palette.brand.primaryDark} />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent>

@@ -1,0 +1,116 @@
+{
+  "emptyState": {
+    "notConfigured": "Not configured"
+  },
+  "history": {
+    "title": "History",
+    "last": "Last: {{date}}",
+    "noRecords": "No records",
+    "next": "Next: {{date}}",
+    "overdue": "Overdue: {{date}}",
+    "loading": "Loading..."
+  },
+  "categoryLabels": {
+    "VetVisit": "Vet visits",
+    "Vaccination": "Vaccinations",
+    "Deworming": "Deworming",
+    "AntiParasiteTreatment": "Anti-parasite"
+  },
+  "deleteDialog": {
+    "title": "Delete this record?",
+    "description": "This will remove \"{{name}}\". This can't be undone."
+  },
+  "overview": {
+    "sections": {
+      "meds": "Meds",
+      "symptoms": "Symptoms",
+      "files": "Files"
+    },
+    "meds": {
+      "title": "Active meds: {{active}}",
+      "subtitle": "past: {{past}}"
+    },
+    "symptoms": {
+      "title": "All symptoms: {{all}}",
+      "subtitle": "last month: {{lastMonth}}"
+    },
+    "files": {
+      "title": "Medical files",
+      "subtitle": "Total: {{total}}"
+    }
+  },
+  "recordList": {
+    "searchPlaceholder": "Search by title, description, provider",
+    "clearSearch": "Clear search",
+    "toggleDetails": "Show or hide details",
+    "empty": "No records found",
+    "addRecord": "Add record",
+    "menu": {
+      "viewInfo": "View info",
+      "hideInfo": "Hide info",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "filters": {
+      "title": "Date range",
+      "openFilter": "Filter by date",
+      "from": "From",
+      "fromPlaceholder": "Start date",
+      "to": "To",
+      "toPlaceholder": "End date",
+      "clear": "Clear dates",
+      "apply": "Apply"
+    },
+    "yearSections": {
+      "thisYear": "This year",
+      "lastYear": "Last year"
+    },
+    "fields": {
+      "provider": "Provider",
+      "description": "Description",
+      "dosage": "Dosage",
+      "nextDueAt": "Next due",
+      "symptoms": "Symptoms"
+    }
+  },
+  "forms": {
+    "healthRecord": {
+      "createTitle": "Add {{category}} record",
+      "createTitleGeneric": "Add health record",
+      "editTitle": "Edit {{category}} record",
+      "createSuccess": "Record added",
+      "updateSuccess": "Record updated",
+      "submit": "Save record",
+      "fields": {
+        "pet": "Pet",
+        "type": "Record type",
+        "title": "Title",
+        "performedAt": "Date",
+        "provider": "Provider",
+        "dosage": "Dosage",
+        "nextDueAt": "Next due date",
+        "description": "Description",
+        "symptoms": "Symptoms"
+      },
+      "placeholders": {
+        "pet": "Select a pet",
+        "type": "Select record type",
+        "titleVetVisit": "e.g. Annual checkup",
+        "titleVaccination": "e.g. Rabies vaccine",
+        "titleDeworming": "e.g. Deworming treatment",
+        "titleAntiParasiteTreatment": "e.g. Flea & tick treatment",
+        "performedAt": "Select a date",
+        "provider": "e.g. Dr. Smith / Sunny Vet Clinic",
+        "dosage": "e.g. 1 tablet",
+        "nextDueAt": "Select a date",
+        "description": "Notes about this visit"
+      },
+      "errors": {
+        "petRequired": "Pet is required",
+        "typeRequired": "Record type is required",
+        "titleRequired": "Title is required",
+        "performedAtRequired": "Date is required"
+      }
+    }
+  }
+}

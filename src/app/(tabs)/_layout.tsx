@@ -43,7 +43,6 @@ export default function TabLayout() {
         {tabs.map((item) => (
           <Tabs.Screen key={item} name={item} options={{ title: t(`navigationTabs.${item}`) }} />
         ))}
-        <Tabs.Screen name="pet-profile" options={{ href: null }} />
         <Tabs.Screen name="reminders" options={{ href: null }} />
         <Tabs.Screen name="assistant" options={{ href: null }} />
         <Tabs.Screen name="assistant-pet-selection" options={{ href: null }} />

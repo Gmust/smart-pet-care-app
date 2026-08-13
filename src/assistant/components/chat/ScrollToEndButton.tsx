@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { TouchableOpacity } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-import { ChevronDownIcon } from "@/icons/chevron-down";
+import { ChevronIcon } from "@/icons/chevron";
 import { palette } from "@/styles/palette";
 
 type ScrollToEndButtonProps = {
@@ -25,7 +25,7 @@ export const ScrollToEndButton = forwardRef<
       onPress={onPress}
       style={styles.scrollToEndButton}
     >
-      <ChevronDownIcon width={20} height={20} color={palette.brand.primaryDefault} />
+      <ChevronIcon direction="down" width={20} height={20} color={palette.brand.primaryDefault} />
     </TouchableOpacity>
   );
 });

@@ -29,7 +29,7 @@ export function HomeHeader({ username }: Props) {
         accessibilityLabel="ai-assistant"
         variant="icon"
         size="icon"
-        icon={<AiIcon width={20} height={20} color={palette.brand.textPrimary} />}
+        icon={<AiIcon width={16} height={16} color={palette.brand.textPrimary} />}
         onPress={() => router.navigate("/assistant-pet-selection")}
       />
     </View>

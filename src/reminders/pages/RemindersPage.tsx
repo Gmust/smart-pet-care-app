@@ -7,8 +7,9 @@ import { StyleSheet } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
 import { ReminderStatus } from "@/api/generated";
-import { Chevron } from "@/icons/arrows";
-import { CirclePlusIcon } from "@/icons/circle-plus";
+import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
+import { ChevronIcon } from "@/icons/chevron";
+import { CirclePlusIcon } from "@/icons/plus";
 import { Button } from "@/shadecn/ui/button";
 import type { TabItem } from "@/shadecn/ui/tabs";
 import { Tabs, tabsContentEntering } from "@/shadecn/ui/tabs";
@@ -85,7 +86,8 @@ export default function RemindersPage() {
     setDescriptionReminderId,
     isDeleting,
     deletingId,
-    handleDeleteReminder,
+    requestDeleteReminder,
+    deleteDialogProps,
   } = useReminderActions();
 
   const handleBack = useCallback(() => {
@@ -122,7 +124,7 @@ export default function RemindersPage() {
             accessibilityLabel={t("reminders:remindersPage.goBack")}
             onPress={handleBack}
           >
-            <Chevron width={9} height={16} color={palette.brand.textBody} />
+            <ChevronIcon direction="left" width={18} height={18} color={palette.brand.textBody} />
           </Button>
           <View style={styles.topBarCopy}>
             <Text style={styles.topBarTitle}>{t("reminders:remindersPage.title")}</Text>
@@ -172,7 +174,9 @@ export default function RemindersPage() {
                   onEdit={() => setEditReminderId(item.reminder.id)}
                   onChangeStatus={() => setStatusReminderId(item.reminder.id)}
                   onShowDescription={() => setDescriptionReminderId(item.reminder.id)}
-                  onDelete={() => handleDeleteReminder(item.reminder.id)}
+                  onDelete={() =>
+                    requestDeleteReminder({ id: item.reminder.id, title: item.reminder.title })
+                  }
                   isDeleting={isDeleting && deletingId === item.reminder.id}
                   muted={item.groupKey === "passed"}
                 />
@@ -230,6 +234,8 @@ export default function RemindersPage() {
         descriptionReminderId={descriptionReminderId}
         setDescriptionReminderId={setDescriptionReminderId}
       />
+
+      <DeleteConfirmDialog {...deleteDialogProps} />
     </>
   );
 }

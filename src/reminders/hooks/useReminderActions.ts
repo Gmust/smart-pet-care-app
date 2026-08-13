@@ -1,8 +1,13 @@
 import { useCallback, useState } from "react";
+import type { ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
 
+import type { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
+
 import { useDeleteRemindersMutation } from "../queries/useDeleteRemindersMutation";
+
+type PendingReminder = { id: string; title: string };
 
 export function useReminderActions() {
   const { t } = useTranslation(["reminders", "common"]);
@@ -11,6 +16,7 @@ export function useReminderActions() {
   const [editReminderId, setEditReminderId] = useState<string | null>(null);
   const [statusReminderId, setStatusReminderId] = useState<string | null>(null);
   const [descriptionReminderId, setDescriptionReminderId] = useState<string | null>(null);
+  const [pendingDeleteReminder, setPendingDeleteReminder] = useState<PendingReminder | null>(null);
 
   const {
     mutateAsync: deleteReminder,
@@ -18,18 +24,27 @@ export function useReminderActions() {
     variables: deletingId,
   } = useDeleteRemindersMutation();
 
-  const handleDeleteReminder = useCallback(
-    async (id: string) => {
-      try {
-        await deleteReminder(id);
-        Toast.show({ type: "success", text1: t("reminders:deleteSuccessMessage") });
-      } catch (e) {
-        console.error(e);
-        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
-      }
-    },
-    [deleteReminder, t]
+  const requestDeleteReminder = useCallback(
+    (reminder: PendingReminder) => setPendingDeleteReminder(reminder),
+    []
   );
+
+  const confirmDeleteReminder = useCallback(async () => {
+    if (!pendingDeleteReminder) return;
+    await deleteReminder(pendingDeleteReminder.id);
+    Toast.show({ type: "success", text1: t("reminders:deleteSuccessMessage") });
+  }, [deleteReminder, pendingDeleteReminder, t]);
+
+  const deleteDialogProps: ComponentProps<typeof DeleteConfirmDialog> = {
+    isOpen: pendingDeleteReminder !== null,
+    setIsOpen: (open) => !open && setPendingDeleteReminder(null),
+    title: t("reminders:deleteDialog.title"),
+    description: t("reminders:deleteDialog.description", {
+      name: pendingDeleteReminder?.title ?? "",
+    }),
+    isDeleting,
+    onConfirm: confirmDeleteReminder,
+  };
 
   return {
     isCreateOpen,
@@ -42,6 +57,7 @@ export function useReminderActions() {
     setDescriptionReminderId,
     isDeleting,
     deletingId,
-    handleDeleteReminder,
+    requestDeleteReminder,
+    deleteDialogProps,
   };
 }

@@ -44,6 +44,10 @@
   "successMessage": "Reminder created successfully!",
   "updateSuccessMessage": "Reminder updated successfully!",
   "deleteSuccessMessage": "Reminder deleted.",
+  "deleteDialog": {
+    "title": "Delete this reminder?",
+    "description": "This will remove \"{{name}}\". This can't be undone."
+  },
   "actionsDrawer": {
     "title": "Reminder actions",
     "edit": "Edit reminder",

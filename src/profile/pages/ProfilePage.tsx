@@ -9,8 +9,8 @@ import { useRouter } from "expo-router";
 
 import { useAuth } from "@/auth/hooks/useAuth";
 import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
+import { TriangleAlertIcon } from "@/icons/alert";
 import { PencilLineIcon } from "@/icons/pencil-line";
-import { TriangleAlertIcon } from "@/icons/triangle-alert";
 import { UserIcon } from "@/icons/user";
 import { Button } from "@/shadecn/ui/button";
 import {

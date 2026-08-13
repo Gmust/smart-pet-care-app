@@ -56,21 +56,25 @@
       "expo-status-bar",
       "expo-build-properties",
       [
-        "expo-navigation-bar",
-        {
-          "hidden": true
-        }
+        "react-native-edge-to-edge",
+        { "android": { "parentTheme": "Default", "enforceNavigationBarContrast": false } }
       ],
       [
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to upload pictures",
           "colors": {
-            "cropToolbarColor": "#000000"
+            "cropToolbarColor": "#000000",
+            "cropToolbarIconColor": "#f5f1ea",
+            "cropToolbarActionTextColor": "#f5f1ea",
+            "cropBackButtonIconColor": "#f5f1ea"
           },
           "dark": {
             "colors": {
-              "cropToolbarColor": "#000000"
+              "cropToolbarColor": "#000000",
+              "cropToolbarIconColor": "#f5f1ea",
+              "cropToolbarActionTextColor": "#f5f1ea",
+              "cropBackButtonIconColor": "#f5f1ea"
             }
           }
         }
@@ -100,9 +104,6 @@
     },
     "extra": {
       "router": {},
-      "expo-navigation-bar": {
-        "hidden": true
-      },
       "eas": {
         "projectId": "44433327-239b-4f93-9693-f527c5f7a0ae"
       }

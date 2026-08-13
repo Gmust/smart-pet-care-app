@@ -19,10 +19,11 @@
   "petProfilePage": {
     "goBack": "Go back",
     "notFound": "Pet not found",
+    "careComingSoon": "Coming soon",
     "tabs": {
       "overview": "Overview",
-      "activity": "Activity",
       "health": "Health",
+      "care": "Care",
       "reminders": "Reminders"
     },
     "basics": {
@@ -31,7 +32,9 @@
       "breed": "Breed",
       "birthday": "Birthday",
       "sex": "Sex",
-      "weight": "Weight"
+      "weight": "Weight",
+      "allergies": "Allergies",
+      "chronicConditions": "Chronic conditions"
     },
     "fallbacks": {
       "notAdded": "Not added",
@@ -41,8 +44,8 @@
     "weightValue": "{{value}} kg",
     "notes": {
       "title": "Notes",
-      "manage": "Manage",
-      "manageA11y": "Manage notes",
+      "addNote": "Add note",
+      "addNoteA11y": "Add note",
       "empty": "No notes yet"
     },
     "flags": {
@@ -129,5 +132,8 @@
     "Unknown": "Unknown",
     "Male": "Male",
     "Female": "Female"
+  },
+  "healthTab": {
+    "comingSoon": "Coming soon"
   }
 }
