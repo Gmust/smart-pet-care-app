@@ -76,14 +76,12 @@ export default function RemindersPage() {
   }, [groups]);
 
   const {
-    isCreateOpen,
+    drawerProps,
     setIsCreateOpen,
-    editReminderId,
     setEditReminderId,
-    statusReminderId,
     setStatusReminderId,
-    descriptionReminderId,
     setDescriptionReminderId,
+    setHistoryReminderId,
     isDeleting,
     deletingId,
     requestDeleteReminder,
@@ -174,6 +172,7 @@ export default function RemindersPage() {
                   onEdit={() => setEditReminderId(item.reminder.id)}
                   onChangeStatus={() => setStatusReminderId(item.reminder.id)}
                   onShowDescription={() => setDescriptionReminderId(item.reminder.id)}
+                  onShowHistory={() => setHistoryReminderId(item.reminder.id)}
                   onDelete={() =>
                     requestDeleteReminder({ id: item.reminder.id, title: item.reminder.title })
                   }
@@ -224,16 +223,7 @@ export default function RemindersPage() {
         />
       </View>
 
-      <ReminderDrawers
-        isCreateOpen={isCreateOpen}
-        setIsCreateOpen={setIsCreateOpen}
-        editReminderId={editReminderId}
-        setEditReminderId={setEditReminderId}
-        statusReminderId={statusReminderId}
-        setStatusReminderId={setStatusReminderId}
-        descriptionReminderId={descriptionReminderId}
-        setDescriptionReminderId={setDescriptionReminderId}
-      />
+      <ReminderDrawers {...drawerProps} />
 
       <DeleteConfirmDialog {...deleteDialogProps} />
     </>

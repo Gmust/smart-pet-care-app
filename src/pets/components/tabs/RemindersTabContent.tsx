@@ -26,14 +26,12 @@ export function RemindersTabContent({ petId }: Props) {
   const groups = useMemo(() => toReminderGroups(reminders ?? []), [reminders]);
 
   const {
-    isCreateOpen,
+    drawerProps,
     setIsCreateOpen,
-    editReminderId,
     setEditReminderId,
-    statusReminderId,
     setStatusReminderId,
-    descriptionReminderId,
     setDescriptionReminderId,
+    setHistoryReminderId,
     isDeleting,
     deletingId,
     requestDeleteReminder,
@@ -68,6 +66,7 @@ export function RemindersTabContent({ petId }: Props) {
                   onEdit={() => setEditReminderId(reminder.id)}
                   onChangeStatus={() => setStatusReminderId(reminder.id)}
                   onShowDescription={() => setDescriptionReminderId(reminder.id)}
+                  onShowHistory={() => setHistoryReminderId(reminder.id)}
                   onDelete={() => requestDeleteReminder({ id: reminder.id, title: reminder.title })}
                   isDeleting={isDeleting && deletingId === reminder.id}
                   muted={group.key === "passed"}
@@ -90,16 +89,7 @@ export function RemindersTabContent({ petId }: Props) {
         </Button>
       </View>
 
-      <ReminderDrawers
-        isCreateOpen={isCreateOpen}
-        setIsCreateOpen={setIsCreateOpen}
-        editReminderId={editReminderId}
-        setEditReminderId={setEditReminderId}
-        statusReminderId={statusReminderId}
-        setStatusReminderId={setStatusReminderId}
-        descriptionReminderId={descriptionReminderId}
-        setDescriptionReminderId={setDescriptionReminderId}
-      />
+      <ReminderDrawers {...drawerProps} />
 
       <DeleteConfirmDialog {...deleteDialogProps} />
     </>

@@ -39,6 +39,7 @@ export const {
   postApiAuthRegister,
   postApiPets,
   postApiReminders,
+  postApiRemindersIdComplete,
   postApiRemindersRunsRunIdAcknowledge,
   postApiSessions,
   postApiSessionsSessionIdMessages,

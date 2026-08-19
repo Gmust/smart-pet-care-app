@@ -8,10 +8,10 @@ import {
 } from "@react-native-google-signin/google-signin";
 
 import type { AuthResponse } from "@/api/generated";
+import { getProblemMessage } from "@/common/utils/getProblemMessage";
 import { Button } from "@/shadecn/ui/button";
 
 import { useGoogleMobileAuthMutation } from "../queries/useGoogleMobileAuthMutation";
-import { getProblemMessage } from "../utils/auth-errors";
 
 // The id_token's audience is the Web client ID — this is what the backend
 // verifies. The native Android/iOS client is matched automatically by Google

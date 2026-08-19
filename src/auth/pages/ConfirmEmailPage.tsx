@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
+import { getProblemMessage } from "@/common/utils/getProblemMessage";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
@@ -15,7 +16,6 @@ import { Text } from "@/shadecn/ui/text";
 import { useConfirmEmailMutation } from "../queries/useConfirmEmailMutation";
 import { useResendConfirmationMutation } from "../queries/useResendConfirmationMutation";
 import { confirmEmailSchema } from "../schemas/confirm-email.schema";
-import { getProblemMessage } from "../utils/auth-errors";
 
 export default function ConfirmEmailPage() {
   const { t } = useTranslation(["auth"]);

@@ -2,7 +2,45 @@ import dayjs from "dayjs";
 import type { TFunction } from "i18next";
 import { z } from "zod/v4";
 
-import { DaysOfWeek, ReminderType, RepeatType } from "@/api/generated";
+import { DaysOfWeek, RecalcStrategy, ReminderType, RepeatType } from "@/api/generated";
+
+export const REPEAT_TYPE_RULES: Record<
+  RepeatType,
+  {
+    usesDays: boolean;
+    usesDate: boolean;
+    intervalUnit?: "Daily" | "Weekly" | "Monthly";
+    recalcStrategies: readonly RecalcStrategy[];
+  }
+> = {
+  [RepeatType.Once]: {
+    usesDays: false,
+    usesDate: true,
+    recalcStrategies: [],
+  },
+  [RepeatType.Daily]: {
+    usesDays: false,
+    usesDate: false,
+    intervalUnit: "Daily",
+    recalcStrategies: [RecalcStrategy.Calendar, RecalcStrategy.FromCompletion],
+  },
+  [RepeatType.Weekly]: {
+    usesDays: true,
+    usesDate: false,
+    intervalUnit: "Weekly",
+    recalcStrategies: [
+      RecalcStrategy.Calendar,
+      RecalcStrategy.FromCompletion,
+      RecalcStrategy.FromCompletionAlignedToWeekday,
+    ],
+  },
+  [RepeatType.Monthly]: {
+    usesDays: false,
+    usesDate: true,
+    intervalUnit: "Monthly",
+    recalcStrategies: [RecalcStrategy.Calendar, RecalcStrategy.FromCompletion],
+  },
+};
 
 const parseReminderTime = (value: string) => {
   const [hoursValue, minutesValue] = value.split(":");
@@ -35,13 +73,22 @@ export const createReminderSchema = (t: TFunction<"reminders">) =>
       repeatType: z.enum(RepeatType, {
         error: t("validation.repeatTypeRequired"),
       }),
+      intervalN: z
+        .string()
+        .regex(/^\d+$/, t("validation.intervalInvalid"))
+        .refine((value) => Number(value) >= 1, t("validation.intervalInvalid")),
+      recalcStrategy: z.enum(RecalcStrategy, {
+        error: t("validation.recalcStrategyRequired"),
+      }),
       days: z.array(z.enum(DaysOfWeek)).default([]),
       date: z.iso.date(t("validation.dateInvalid")).nullish(),
       time: z.string().regex(/^\d{2}:\d{2}$/, t("validation.timeInvalid")),
       endAt: z.iso.datetime(t("validation.endAtInvalid")).nullish(),
     })
     .superRefine((value, ctx) => {
-      if (value.repeatType === RepeatType.Weekly && value.days.length === 0) {
+      const rules = REPEAT_TYPE_RULES[value.repeatType];
+
+      if (rules.usesDays && value.days.length === 0) {
         ctx.addIssue({
           code: "custom",
           message: t("validation.daysRequired"),
@@ -49,10 +96,18 @@ export const createReminderSchema = (t: TFunction<"reminders">) =>
         });
       }
 
-      const needsDate =
-        value.repeatType === RepeatType.Once || value.repeatType === RepeatType.Monthly;
+      if (
+        rules.recalcStrategies.length > 0 &&
+        !rules.recalcStrategies.includes(value.recalcStrategy)
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message: t("validation.recalcStrategyWeekdayRequiresDays"),
+          path: ["recalcStrategy"],
+        });
+      }
 
-      if (needsDate && !value.date) {
+      if (rules.usesDate && !value.date) {
         ctx.addIssue({
           code: "custom",
           message: t("validation.dateRequired"),

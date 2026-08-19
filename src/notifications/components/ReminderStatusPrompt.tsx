@@ -5,7 +5,7 @@ import { ReminderStatusDrawer } from "@/reminders/components/ReminderStatusDrawe
 
 export function ReminderStatusPrompt() {
   const lastResponse = Notifications.useLastNotificationResponse();
-  const [reminderId, setReminderId] = useState<string | null>(null);
+  const [target, setTarget] = useState<{ reminderId: string; runId?: string } | null>(null);
   const handledIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -18,17 +18,22 @@ export function ReminderStatusPrompt() {
     const nextReminderId = typeof data?.reminderId === "string" ? data.reminderId : null;
     if (!nextReminderId) return;
 
+    // `runId` is only present once the API attaches the reminder run to the push
+    // payload; without it the drawer simply skips acknowledging the run.
+    const nextRunId = typeof data?.runId === "string" ? data.runId : undefined;
+
     handledIdRef.current = request.identifier;
-    setReminderId(nextReminderId);
+    setTarget({ reminderId: nextReminderId, runId: nextRunId });
     void Notifications.clearLastNotificationResponseAsync();
   }, [lastResponse]);
 
-  if (!reminderId) return null;
+  if (!target) return null;
 
   return (
     <ReminderStatusDrawer
-      reminderId={reminderId}
-      onClose={() => setReminderId(null)}
+      reminderId={target.reminderId}
+      runId={target.runId}
+      onClose={() => setTarget(null)}
       markMissedOnDismiss
     />
   );

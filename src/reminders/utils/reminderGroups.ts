@@ -3,11 +3,18 @@ import i18next from "i18next";
 import type { ReminderResponseDto } from "@/api/generated";
 import { ReminderStatus, ReminderType } from "@/api/generated";
 import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
+import { BathIcon } from "@/icons/bath";
 import { BellIcon } from "@/icons/bell";
+import { BrushCleaningIcon } from "@/icons/brush-cleaning";
+import { EarIcon } from "@/icons/ear";
 import type { Icon } from "@/icons/icons";
+import { PawPrintIcon } from "@/icons/paw-print";
+import { ScaleIcon } from "@/icons/scale";
+import { ScissorsIcon } from "@/icons/scissors";
 import { StethoscopeIcon } from "@/icons/stethoscope";
 import { SyringeIcon } from "@/icons/syringe";
 import { UtensilsIcon } from "@/icons/utensils";
+import { WormIcon } from "@/icons/worm";
 
 import type { Reminder, ReminderTone } from "../types";
 
@@ -24,10 +31,18 @@ const REMINDER_TONE: Record<ReminderType, ReminderTone> = {
   [ReminderType.Medication]: "warn",
   [ReminderType.Vaccination]: "warn",
   [ReminderType.ParasiteTreatment]: "warn",
+  [ReminderType.Deworming]: "warn",
   [ReminderType.VetVisit]: "warn",
   [ReminderType.Feeding]: "peach",
+  [ReminderType.Weighing]: "peach",
   [ReminderType.Grooming]: "primary",
   [ReminderType.Activity]: "primary",
+  [ReminderType.Bathing]: "primary",
+  [ReminderType.Brushing]: "primary",
+  [ReminderType.EarCleaning]: "primary",
+  [ReminderType.NailTrimming]: "primary",
+  [ReminderType.PawCare]: "primary",
+  [ReminderType.TeethCleaning]: "primary",
 };
 
 const getReminderTone = (type: ReminderResponseDto["type"]): ReminderTone =>
@@ -36,7 +51,13 @@ const getReminderTone = (type: ReminderResponseDto["type"]): ReminderTone =>
 const isReminderOverdue = (reminder: ReminderResponseDto): boolean => {
   if (reminder.status === ReminderStatus.Missed) return true;
 
-  if (reminder.status !== ReminderStatus.Active || !reminder.nextTriggerAt) return false;
+  if (reminder.status !== ReminderStatus.Active) return false;
+
+  if (reminder.overdueSince) {
+    return new Date(reminder.overdueSince).getTime() <= Date.now();
+  }
+
+  if (!reminder.nextTriggerAt) return false;
 
   return new Date(reminder.nextTriggerAt).getTime() < Date.now();
 };
@@ -55,8 +76,16 @@ const REMINDER_ICON: Record<ReminderType, Icon> = {
   [ReminderType.Medication]: SyringeIcon,
   [ReminderType.Vaccination]: SyringeIcon,
   [ReminderType.ParasiteTreatment]: SyringeIcon,
+  [ReminderType.Deworming]: WormIcon,
   [ReminderType.VetVisit]: StethoscopeIcon,
-  [ReminderType.Grooming]: StethoscopeIcon,
+  [ReminderType.Grooming]: ScissorsIcon,
+  [ReminderType.Weighing]: ScaleIcon,
+  [ReminderType.Bathing]: BathIcon,
+  [ReminderType.Brushing]: BrushCleaningIcon,
+  [ReminderType.EarCleaning]: EarIcon,
+  [ReminderType.NailTrimming]: ScissorsIcon,
+  [ReminderType.PawCare]: PawPrintIcon,
+  [ReminderType.TeethCleaning]: BrushCleaningIcon,
 };
 
 const formatReminderTime = (reminder: ReminderResponseDto): string => {
@@ -73,7 +102,6 @@ const formatReminderTime = (reminder: ReminderResponseDto): string => {
     }
   }
 
-  // Fallback to the recurring time-of-day, shifted into the device timezone.
   return getLocalTimeOfDay(reminder) ?? i18next.t("reminders:noTime");
 };
 
@@ -82,13 +110,14 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const startOfDay = (date: Date): number =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 
-// Whole calendar days between `target` and now, ignoring the time of day.
 const calendarDayOffset = (target: Date): number =>
   Math.round((startOfDay(target) - startOfDay(new Date())) / MS_PER_DAY);
 
 const getReminderGroupKey = (reminder: ReminderResponseDto): ReminderGroupKey => {
-  // No next trigger means the reminder is finished (completed/missed, non-repeatable)
-  // and will not fire again, so it belongs in the historical "passed" group.
+  if (isReminderOverdue(reminder) && reminder.status === ReminderStatus.Active) {
+    return "overdue";
+  }
+
   if (!reminder.nextTriggerAt) {
     return "passed";
   }
