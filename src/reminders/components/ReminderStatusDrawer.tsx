@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, View } from "react-native";
 import Toast from "react-native-toast-message";
@@ -6,6 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { ReminderStatus } from "@/api/generated";
 import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
+import { getProblemMessage } from "@/common/utils/getProblemMessage";
 import { Button, type ButtonVariant } from "@/shadecn/ui/button";
 import {
   Drawer,
@@ -16,6 +17,8 @@ import {
 } from "@/shadecn/ui/drawer";
 import { Text } from "@/shadecn/ui/text";
 
+import { useAcknowledgeReminderRunMutation } from "../queries/useAcknowledgeReminderRunMutation";
+import { useCompleteReminderMutation } from "../queries/useCompleteReminderMutation";
 import { useGetReminderById } from "../queries/useGetReminderById";
 import { useUpdateRemindersMutation } from "../queries/useUpdateRemindersMutation";
 
@@ -23,6 +26,8 @@ type Props = {
   reminderId: string;
   onClose: () => void;
   markMissedOnDismiss?: boolean;
+  /** Set when the drawer is opened from a notification that carried a run id. */
+  runId?: string;
 };
 
 const STATUS_OPTIONS: { status: ReminderStatus; variant: ButtonVariant }[] = [
@@ -35,29 +40,47 @@ export const ReminderStatusDrawer = ({
   reminderId,
   onClose,
   markMissedOnDismiss = false,
+  runId,
 }: Props) => {
   const { t } = useTranslation(["reminders", "common"]);
   const { data: reminder, isLoading: isReminderLoading } = useGetReminderById(reminderId);
-  const { mutateAsync: updateReminder, isPending } = useUpdateRemindersMutation();
+  const { mutateAsync: updateReminder, isPending: isUpdating } = useUpdateRemindersMutation();
+  const { mutateAsync: completeReminder, isPending: isCompleting } = useCompleteReminderMutation();
+  const { mutate: acknowledgeRun } = useAcknowledgeReminderRunMutation();
+
+  const isPending = isUpdating || isCompleting;
 
   const resolvedRef = useRef(false);
+  const acknowledgedRunRef = useRef<string | null>(null);
+
+  // Opening the drawer means the run reached the user, so mark it delivered.
+  useEffect(() => {
+    if (!runId || acknowledgedRunRef.current === runId) return;
+    acknowledgedRunRef.current = runId;
+    acknowledgeRun({ runId, reminderId });
+  }, [runId, reminderId, acknowledgeRun]);
 
   const applyStatus = async (status: ReminderStatus) => {
     if (resolvedRef.current) return;
     resolvedRef.current = true;
     try {
-      await updateReminder({ id: reminderId, payload: { status } });
+      if (status === ReminderStatus.Completed) {
+        await completeReminder(reminderId);
+      } else {
+        await updateReminder({ id: reminderId, payload: { status } });
+      }
       Toast.show({ type: "success", text1: t("reminders:statusPrompt.successMessage") });
       onClose();
     } catch (e) {
       console.error(e);
       resolvedRef.current = false;
-      Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+      Toast.show({
+        type: "error",
+        text1: getProblemMessage(e, t("common:errors.somethingWentWrong")),
+      });
     }
   };
 
-  // From a notification tap, dismissing without choosing marks the reminder as
-  // missed. A manual status change just closes without touching the status.
   const handleOpenChange = (open: boolean) => {
     if (open || resolvedRef.current) return;
     resolvedRef.current = true;

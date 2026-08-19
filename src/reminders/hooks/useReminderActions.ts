@@ -5,6 +5,7 @@ import Toast from "react-native-toast-message";
 
 import type { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
 
+import type { ReminderDrawers } from "../components/ReminderDrawers";
 import { useDeleteRemindersMutation } from "../queries/useDeleteRemindersMutation";
 
 type PendingReminder = { id: string; title: string };
@@ -16,6 +17,7 @@ export function useReminderActions() {
   const [editReminderId, setEditReminderId] = useState<string | null>(null);
   const [statusReminderId, setStatusReminderId] = useState<string | null>(null);
   const [descriptionReminderId, setDescriptionReminderId] = useState<string | null>(null);
+  const [historyReminderId, setHistoryReminderId] = useState<string | null>(null);
   const [pendingDeleteReminder, setPendingDeleteReminder] = useState<PendingReminder | null>(null);
 
   const {
@@ -46,7 +48,7 @@ export function useReminderActions() {
     onConfirm: confirmDeleteReminder,
   };
 
-  return {
+  const drawerProps: ComponentProps<typeof ReminderDrawers> = {
     isCreateOpen,
     setIsCreateOpen,
     editReminderId,
@@ -55,6 +57,17 @@ export function useReminderActions() {
     setStatusReminderId,
     descriptionReminderId,
     setDescriptionReminderId,
+    historyReminderId,
+    setHistoryReminderId,
+  };
+
+  return {
+    drawerProps,
+    setIsCreateOpen,
+    setEditReminderId,
+    setStatusReminderId,
+    setDescriptionReminderId,
+    setHistoryReminderId,
     isDeleting,
     deletingId,
     requestDeleteReminder,

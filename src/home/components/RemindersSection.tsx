@@ -26,14 +26,12 @@ export function RemindersSection() {
   const groups = useMemo(() => toReminderGroups(reminders ?? []), [reminders]);
 
   const {
-    isCreateOpen,
+    drawerProps,
     setIsCreateOpen,
-    editReminderId,
     setEditReminderId,
-    statusReminderId,
     setStatusReminderId,
-    descriptionReminderId,
     setDescriptionReminderId,
+    setHistoryReminderId,
     isDeleting,
     deletingId,
     requestDeleteReminder,
@@ -89,6 +87,7 @@ export function RemindersSection() {
                     onEdit={() => setEditReminderId(reminder.id)}
                     onChangeStatus={() => setStatusReminderId(reminder.id)}
                     onShowDescription={() => setDescriptionReminderId(reminder.id)}
+                    onShowHistory={() => setHistoryReminderId(reminder.id)}
                     onDelete={() =>
                       requestDeleteReminder({ id: reminder.id, title: reminder.title })
                     }
@@ -102,16 +101,7 @@ export function RemindersSection() {
         )}
       </View>
 
-      <ReminderDrawers
-        isCreateOpen={isCreateOpen}
-        setIsCreateOpen={setIsCreateOpen}
-        editReminderId={editReminderId}
-        setEditReminderId={setEditReminderId}
-        statusReminderId={statusReminderId}
-        setStatusReminderId={setStatusReminderId}
-        descriptionReminderId={descriptionReminderId}
-        setDescriptionReminderId={setDescriptionReminderId}
-      />
+      <ReminderDrawers {...drawerProps} />
 
       <DeleteConfirmDialog {...deleteDialogProps} />
     </>

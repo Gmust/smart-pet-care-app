@@ -7,6 +7,7 @@ import { useForm } from "@tanstack/react-form";
 import { useRouter } from "expo-router";
 
 import type { AuthResponse } from "@/api/generated";
+import { getProblemMessage } from "@/common/utils/getProblemMessage";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
@@ -15,7 +16,6 @@ import { useLoginMutation } from "../queries/useLoginMutation";
 import { useRegisterMutation } from "../queries/useRegisterMutation";
 import { loginSchema, registerSchema } from "../schemas/auth.schema";
 import type { AuthMode } from "../types";
-import { getProblemMessage } from "../utils/auth-errors";
 
 interface EmailAuthFormProps {
   mode: AuthMode;

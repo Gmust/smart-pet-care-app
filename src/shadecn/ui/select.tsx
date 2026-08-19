@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
 import type { LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
-import { View } from "react-native";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import * as SelectPrimitive from "@rn-primitives/select";
 
@@ -76,6 +77,11 @@ function SelectValue({ placeholder }: { placeholder?: string }) {
 const overlayEntering = FadeIn.duration(150);
 const overlayExiting = FadeOut.duration(120);
 
+const CONTENT_MAX_HEIGHT_RATIO = 0.5;
+const CONTENT_EDGE_SPACING = 8;
+
+const returnFalse = () => false;
+
 function SelectContent({
   children,
   portalHost,
@@ -86,22 +92,54 @@ function SelectContent({
   ref?: React.RefObject<SelectPrimitive.ContentRef>;
 }) {
   const { width } = useContext(SelectWidthContext);
+  const safeAreaInsets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const contentStyle = typeof style === "function" ? undefined : style;
-  const mergedContentStyle = [
-    styles.content,
-    width > 0 ? { width } : undefined,
-    contentStyle,
-  ].filter(Boolean) as unknown as ViewStyle;
+  const maxHeight = windowHeight * CONTENT_MAX_HEIGHT_RATIO;
+  const mergedContentStyle = useMemo(
+    () =>
+      [styles.content, { maxHeight }, width > 0 ? { width } : undefined, contentStyle].filter(
+        Boolean
+      ) as unknown as ViewStyle,
+    [maxHeight, width, contentStyle]
+  );
+  const collisionInsets = useMemo(
+    () => ({
+      top: safeAreaInsets.top + CONTENT_EDGE_SPACING,
+      bottom: safeAreaInsets.bottom + CONTENT_EDGE_SPACING,
+      left: CONTENT_EDGE_SPACING,
+      right: CONTENT_EDGE_SPACING,
+    }),
+    [safeAreaInsets.top, safeAreaInsets.bottom]
+  );
 
   return (
     <SelectPortal hostName={portalHost}>
-      <SelectPrimitive.Overlay style={StyleSheet.absoluteFill}>
-        <Animated.View entering={overlayEntering} exiting={overlayExiting}>
-          <SelectPrimitive.Content style={mergedContentStyle} {...props}>
-            <SelectPrimitive.Viewport>{children}</SelectPrimitive.Viewport>
-          </SelectPrimitive.Content>
-        </Animated.View>
-      </SelectPrimitive.Overlay>
+      <SelectPrimitive.Overlay style={StyleSheet.absoluteFill} />
+      <Animated.View
+        style={StyleSheet.absoluteFill}
+        pointerEvents="box-none"
+        entering={overlayEntering}
+        exiting={overlayExiting}
+      >
+        <SelectPrimitive.Content
+          onStartShouldSetResponder={returnFalse}
+          insets={collisionInsets}
+          style={mergedContentStyle}
+          {...props}
+        >
+          <SelectPrimitive.Viewport>
+            <ScrollView
+              bounces={false}
+              nestedScrollEnabled
+              showsVerticalScrollIndicator
+              keyboardShouldPersistTaps="handled"
+            >
+              {children}
+            </ScrollView>
+          </SelectPrimitive.Viewport>
+        </SelectPrimitive.Content>
+      </Animated.View>
     </SelectPortal>
   );
 }

@@ -909,6 +909,395 @@
         }
       }
     },
+    "/api/reminders/{id}/complete": {
+      "post": {
+        "tags": ["Reminder"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CompleteReminderDto"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CompleteReminderDto"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CompleteReminderDto"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderCompletionResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderCompletionResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderCompletionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reminders/occurrences": {
+      "get": {
+        "tags": ["Reminder"],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "petId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReminderOccurrenceDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReminderOccurrenceDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReminderOccurrenceDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reminders/runs": {
+      "get": {
+        "tags": ["Reminder"],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ReminderType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReminderRunHistoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReminderRunHistoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReminderRunHistoryDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/reminders/runs/{runId}/acknowledge": {
       "post": {
         "tags": ["Reminder"],
@@ -6044,6 +6433,24 @@
       "ClassifierUrgency": {
         "enum": ["MONITOR", "CONSULT_SOON", "URGENT", "EMERGENCY", null]
       },
+      "CompleteReminderDto": {
+        "type": "object",
+        "properties": {
+          "performedAt": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          },
+          "note": {
+            "type": ["null", "string"]
+          },
+          "dosage": {
+            "type": ["null", "string"]
+          },
+          "provider": {
+            "type": ["null", "string"]
+          }
+        }
+      },
       "ConfirmEmailRequest": {
         "required": ["email", "code"],
         "type": "object",
@@ -6070,6 +6477,10 @@
       "CreateFeedingLogDto": {
         "type": "object",
         "properties": {
+          "reminderId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
           "fedAt": {
             "type": "string",
             "format": "date-time"
@@ -6108,6 +6519,10 @@
       "CreateHealthRecordDto": {
         "type": "object",
         "properties": {
+          "reminderId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
           "type": {
             "$ref": "#/components/schemas/HealthRecordType"
           },
@@ -6235,6 +6650,10 @@
         "required": ["measuredAt"],
         "type": "object",
         "properties": {
+          "reminderId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
           "weightKg": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": ["number", "string"],
@@ -6268,6 +6687,14 @@
           },
           "repeatType": {
             "$ref": "#/components/schemas/RepeatType"
+          },
+          "intervalN": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "recalcStrategy": {
+            "$ref": "#/components/schemas/RecalcStrategy"
           },
           "days": {
             "type": "array",
@@ -6370,6 +6797,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "reminderId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
           "fedAt": {
             "type": "string",
             "format": "date-time"
@@ -6436,6 +6867,10 @@
           },
           "petId": {
             "type": "string",
+            "format": "uuid"
+          },
+          "reminderId": {
+            "type": ["null", "string"],
             "format": "uuid"
           },
           "type": {
@@ -7013,6 +7448,21 @@
               }
             ]
           },
+          "intervalN": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["null", "integer", "string"],
+            "format": "int32"
+          },
+          "recalcStrategy": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RecalcStrategy"
+              }
+            ]
+          },
           "days": {
             "type": ["null", "array"],
             "items": {
@@ -7140,6 +7590,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "reminderId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
           "weightKg": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": ["number", "string"],
@@ -7211,6 +7665,9 @@
           }
         }
       },
+      "RecalcStrategy": {
+        "enum": ["Calendar", "FromCompletion", "FromCompletionAlignedToWeekday"]
+      },
       "RefreshTokenRequest": {
         "type": "object",
         "properties": {
@@ -7251,6 +7708,75 @@
           }
         }
       },
+      "ReminderCompletionResponseDto": {
+        "type": "object",
+        "properties": {
+          "run": {
+            "$ref": "#/components/schemas/ReminderRunResponseDto"
+          },
+          "reminder": {
+            "$ref": "#/components/schemas/ReminderResponseDto"
+          },
+          "healthRecordId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
+          "alreadyRecorded": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ReminderOccurrenceDto": {
+        "type": "object",
+        "properties": {
+          "reminderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "petId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ReminderType"
+          },
+          "scheduledFor": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "runId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReminderRunStatus"
+              }
+            ]
+          },
+          "completedAt": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          },
+          "performedAt": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          },
+          "isMaterialized": {
+            "type": "boolean"
+          },
+          "isOverdue": {
+            "type": "boolean"
+          }
+        }
+      },
       "ReminderResponseDto": {
         "type": "object",
         "properties": {
@@ -7287,6 +7813,14 @@
           "repeatType": {
             "$ref": "#/components/schemas/RepeatType"
           },
+          "intervalN": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "recalcStrategy": {
+            "$ref": "#/components/schemas/RecalcStrategy"
+          },
           "days": {
             "type": "array",
             "items": {
@@ -7313,6 +7847,18 @@
             "type": ["null", "string"],
             "format": "date-time"
           },
+          "scheduleAnchorAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "overdueSince": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          },
+          "lastCompletedAt": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          },
           "isSystemGenerated": {
             "type": "boolean"
           },
@@ -7323,6 +7869,54 @@
           "updatedAt": {
             "type": ["null", "string"],
             "format": "date-time"
+          }
+        }
+      },
+      "ReminderRunHistoryDto": {
+        "type": "object",
+        "properties": {
+          "runId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reminderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "petId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReminderType"
+              }
+            ]
+          },
+          "scheduledFor": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "performedAt": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReminderRunStatus"
+          },
+          "note": {
+            "type": ["null", "string"]
           }
         }
       },
@@ -7348,6 +7942,23 @@
           "completedAt": {
             "type": ["null", "string"],
             "format": "date-time"
+          },
+          "performedAt": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ReminderType"
+              }
+            ]
+          },
+          "note": {
+            "type": ["null", "string"]
           },
           "status": {
             "$ref": "#/components/schemas/ReminderRunStatus"
@@ -7375,7 +7986,15 @@
           "Vaccination",
           "ParasiteTreatment",
           "VetVisit",
-          "Grooming"
+          "Grooming",
+          "Weighing",
+          "Deworming",
+          "Bathing",
+          "Brushing",
+          "EarCleaning",
+          "NailTrimming",
+          "PawCare",
+          "TeethCleaning"
         ]
       },
       "RepeatType": {

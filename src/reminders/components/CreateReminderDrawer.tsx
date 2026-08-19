@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 import dayjs from "dayjs";
 
-import { DaysOfWeek, ReminderType, RepeatType } from "@/api/generated";
+import { DaysOfWeek, RecalcStrategy, ReminderType, RepeatType } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
 import { formatTimeOfDay, parseTimeOfDay } from "@/common/utils/timeOfDay";
@@ -31,7 +31,11 @@ import { Text } from "@/shadecn/ui/text";
 import { useCreateRemindersMutation } from "../queries/useCreateRemindersMutation";
 import { useGetReminderById } from "../queries/useGetReminderById";
 import { useUpdateRemindersMutation } from "../queries/useUpdateRemindersMutation";
-import { type CreateReminderForm, createReminderSchema } from "../schemas/create-reminder.schema";
+import {
+  type CreateReminderForm,
+  createReminderSchema,
+  REPEAT_TYPE_RULES,
+} from "../schemas/create-reminder.schema";
 import { ReminderPetSelectSkeleton } from "../skeletons/CreateReminderDrawerSkeleton";
 
 type Props = {
@@ -60,6 +64,8 @@ const defaultValues: CreateReminderForm = {
   description: null,
   type: ReminderType.Feeding,
   repeatType: RepeatType.Weekly,
+  intervalN: "1",
+  recalcStrategy: RecalcStrategy.Calendar,
   days: [],
   date: null,
   time: "",
@@ -87,32 +93,24 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
     defaultValues,
     validators: { onChange: createReminderSchema(t), onSubmit: createReminderSchema(t) },
     onSubmit: async ({ value }) => {
+      const rules = REPEAT_TYPE_RULES[value.repeatType];
+      const schedule = {
+        title: value.title,
+        description: value.description ?? null,
+        repeatType: value.repeatType,
+        intervalN: Number(value.intervalN),
+        recalcStrategy: value.recalcStrategy,
+        days: rules.usesDays ? (value.days ?? []) : [],
+        date: rules.usesDate ? (value.date ?? null) : null,
+        time: value.time,
+        endAt: value.endAt ?? null,
+      };
+
       try {
         if (isEditMode && reminderId) {
-          await updateReminder({
-            id: reminderId,
-            payload: {
-              title: value.title,
-              description: value.description ?? null,
-              repeatType: value.repeatType,
-              days: value.days ?? [],
-              date: value.date ?? null,
-              time: value.time,
-              endAt: value.endAt ?? null,
-            },
-          });
+          await updateReminder({ id: reminderId, payload: schedule });
         } else {
-          await createReminder({
-            petId: value.petId,
-            title: value.title,
-            description: value.description ?? null,
-            type: value.type,
-            repeatType: value.repeatType,
-            days: value.days ?? [],
-            date: value.date ?? null,
-            time: value.time,
-            endAt: value.endAt ?? null,
-          });
+          await createReminder({ ...schedule, petId: value.petId, type: value.type });
         }
         Toast.show({
           type: "success",
@@ -137,6 +135,8 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
       description: reminder.description ?? null,
       type: reminder.type ?? ReminderType.Feeding,
       repeatType: reminder.repeatType ?? RepeatType.Weekly,
+      intervalN: String(reminder.intervalN ?? 1),
+      recalcStrategy: reminder.recalcStrategy ?? RecalcStrategy.Calendar,
       days: reminder.days ?? [],
       date: reminder.date ?? null,
       time: getLocalTimeOfDay(reminder) ?? "",
@@ -292,7 +292,14 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
                   }}
                   onValueChange={(option) => {
                     const next = REPEAT_TYPES.find((type) => type === option?.value);
-                    if (next) field.handleChange(next);
+                    if (!next) return;
+                    field.handleChange(next);
+                    const nextRules = REPEAT_TYPE_RULES[next];
+                    if (!nextRules.usesDays) form.setFieldValue("days", []);
+                    if (!nextRules.usesDate) form.setFieldValue("date", null);
+                    if (!nextRules.recalcStrategies.includes(form.state.values.recalcStrategy)) {
+                      form.setFieldValue("recalcStrategy", RecalcStrategy.Calendar);
+                    }
                   }}
                 >
                   <SelectTrigger style={styles.selectTrigger}>
@@ -316,67 +323,145 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
           </form.Field>
 
           <form.Subscribe selector={(state) => state.values.repeatType}>
-            {(repeatType) => (
-              <>
-                {repeatType === RepeatType.Weekly && (
-                  <form.Field name="days">
-                    {(field) => {
-                      const selectedDays = field.state.value ?? [];
-                      return (
+            {(repeatType) => {
+              const rules = REPEAT_TYPE_RULES[repeatType];
+              const { intervalUnit } = rules;
+
+              return (
+                <>
+                  {intervalUnit != null && (
+                    <form.Field name="intervalN">
+                      {(field) => (
                         <View style={styles.field}>
-                          <Text style={styles.label}>
-                            {t("reminders:createReminderDrawer.fields.days")}
-                          </Text>
-                          <View style={styles.chips}>
-                            {DAY_ORDER.map((day) => {
-                              const isSelected = selectedDays.includes(day);
-                              return (
-                                <Chip
-                                  key={day}
-                                  label={t(`reminders:days.${day}`)}
-                                  tone={isSelected ? "primary" : "neutral"}
-                                  variant={isSelected ? "default" : "ghost"}
-                                  onPress={() =>
-                                    field.handleChange(
-                                      isSelected
-                                        ? selectedDays.filter((value) => value !== day)
-                                        : [...selectedDays, day]
-                                    )
-                                  }
-                                />
-                              );
+                          <Input
+                            label={t("reminders:createReminderDrawer.fields.interval")}
+                            placeholder={t("reminders:createReminderDrawer.placeholders.interval")}
+                            keyboardType="number-pad"
+                            value={field.state.value}
+                            onChangeText={(text) => field.handleChange(text.replace(/\D/g, ""))}
+                            onBlur={field.handleBlur}
+                            error={field.state.meta.errors.length > 0}
+                            containerStyle={styles.inputSurface}
+                          />
+                          <Text style={styles.hint}>
+                            {t(`reminders:intervalUnits.${intervalUnit}`, {
+                              count: Number(field.state.value) || 1,
                             })}
-                          </View>
+                          </Text>
                           <FieldError errors={field.state.meta.errors} />
                         </View>
-                      );
-                    }}
-                  </form.Field>
-                )}
+                      )}
+                    </form.Field>
+                  )}
 
-                {(repeatType === RepeatType.Once || repeatType === RepeatType.Monthly) && (
-                  <form.Field name="date">
-                    {(field) => (
-                      <View style={styles.field}>
-                        <DateTimeField
-                          mode="date"
-                          label={t("reminders:createReminderDrawer.fields.date")}
-                          placeholder={t("reminders:createReminderDrawer.placeholders.date")}
-                          value={field.state.value ? dayjs(field.state.value).toDate() : null}
-                          display={(date) => dayjs(date).format("DD/MM/YYYY")}
-                          minimumDate={new Date()}
-                          error={field.state.meta.errors.length > 0}
-                          onChange={(date) => field.handleChange(dayjs(date).format("YYYY-MM-DD"))}
-                          onBlur={field.handleBlur}
-                          containerStyle={styles.inputSurface}
-                        />
-                        <FieldError errors={field.state.meta.errors} />
-                      </View>
-                    )}
-                  </form.Field>
-                )}
-              </>
-            )}
+                  {rules.recalcStrategies.length > 0 && (
+                    <form.Field name="recalcStrategy">
+                      {(field) => (
+                        <View style={styles.field}>
+                          <Text style={styles.label}>
+                            {t("reminders:createReminderDrawer.fields.recalcStrategy")}
+                          </Text>
+                          <Select
+                            containerStyle={styles.selectContainer}
+                            value={{
+                              value: field.state.value,
+                              label: t(`reminders:recalcStrategies.${field.state.value}`),
+                            }}
+                            onValueChange={(option) => {
+                              const next = rules.recalcStrategies.find(
+                                (strategy) => strategy === option?.value
+                              );
+                              if (next) field.handleChange(next);
+                            }}
+                          >
+                            <SelectTrigger style={styles.selectTrigger}>
+                              <SelectValue
+                                placeholder={t(
+                                  "reminders:createReminderDrawer.placeholders.recalcStrategy"
+                                )}
+                              />
+                            </SelectTrigger>
+                            <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
+                              {rules.recalcStrategies.map((strategy) => (
+                                <SelectItem
+                                  key={strategy}
+                                  value={strategy}
+                                  label={t(`reminders:recalcStrategies.${strategy}`)}
+                                />
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Text style={styles.hint}>
+                            {t(`reminders:recalcStrategyHints.${field.state.value}`)}
+                          </Text>
+                          <FieldError errors={field.state.meta.errors} />
+                        </View>
+                      )}
+                    </form.Field>
+                  )}
+
+                  {rules.usesDays && (
+                    <form.Field name="days">
+                      {(field) => {
+                        const selectedDays = field.state.value ?? [];
+                        return (
+                          <View style={styles.field}>
+                            <Text style={styles.label}>
+                              {t("reminders:createReminderDrawer.fields.days")}
+                            </Text>
+                            <View style={styles.chips}>
+                              {DAY_ORDER.map((day) => {
+                                const isSelected = selectedDays.includes(day);
+                                return (
+                                  <Chip
+                                    key={day}
+                                    label={t(`reminders:days.${day}`)}
+                                    tone={isSelected ? "primary" : "neutral"}
+                                    variant={isSelected ? "default" : "ghost"}
+                                    onPress={() =>
+                                      field.handleChange(
+                                        isSelected
+                                          ? selectedDays.filter((value) => value !== day)
+                                          : [...selectedDays, day]
+                                      )
+                                    }
+                                  />
+                                );
+                              })}
+                            </View>
+                            <FieldError errors={field.state.meta.errors} />
+                          </View>
+                        );
+                      }}
+                    </form.Field>
+                  )}
+
+                  {rules.usesDate && (
+                    <form.Field name="date">
+                      {(field) => (
+                        <View style={styles.field}>
+                          <DateTimeField
+                            mode="date"
+                            label={t("reminders:createReminderDrawer.fields.date")}
+                            placeholder={t("reminders:createReminderDrawer.placeholders.date")}
+                            value={field.state.value ? dayjs(field.state.value).toDate() : null}
+                            display={(date) => dayjs(date).format("DD/MM/YYYY")}
+                            minimumDate={new Date()}
+                            error={field.state.meta.errors.length > 0}
+                            onChange={(date) =>
+                              field.handleChange(dayjs(date).format("YYYY-MM-DD"))
+                            }
+                            onBlur={field.handleBlur}
+                            containerStyle={styles.inputSurface}
+                          />
+                          <FieldError errors={field.state.meta.errors} />
+                        </View>
+                      )}
+                    </form.Field>
+                  )}
+                </>
+              );
+            }}
           </form.Subscribe>
 
           <form.Field name="time">
@@ -445,6 +530,11 @@ const styles = StyleSheet.create((theme) => ({
   label: {
     fontFamily: theme.fonts.regular,
     fontSize: theme.fontSize.sm,
+    color: theme.palette.brand.textSecondary,
+  },
+  hint: {
+    fontFamily: theme.fonts.regular,
+    fontSize: theme.fontSize.xs,
     color: theme.palette.brand.textSecondary,
   },
   inputSurface: {

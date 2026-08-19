@@ -9,7 +9,10 @@
     "dateInvalid": "Enter a valid date.",
     "timeInvalid": "Enter a time in HH:mm format.",
     "timePast": "Choose a time that is later than now.",
-    "endAtInvalid": "Enter a valid end date."
+    "endAtInvalid": "Enter a valid end date.",
+    "intervalInvalid": "Enter a whole number of 1 or more.",
+    "recalcStrategyRequired": "Pick how the next date is calculated.",
+    "recalcStrategyWeekdayRequiresDays": "Weekday-aligned repeats need at least one day selected."
   },
   "addReminder": "Add reminder",
   "noTime": "No time",
@@ -53,6 +56,7 @@
     "edit": "Edit reminder",
     "changeStatus": "Change status",
     "showDescription": "Show description",
+    "showHistory": "Show history",
     "delete": "Delete reminder"
   },
   "descriptionDrawer": {
@@ -83,6 +87,8 @@
       "type": "Type",
       "days": "Repeat on",
       "repeat": "Repeat",
+      "interval": "Repeat every",
+      "recalcStrategy": "Next date is based on",
       "date": "Date",
       "time": "Time"
     },
@@ -92,6 +98,8 @@
       "description": "Add any details, notes or instructions",
       "type": "Select a type",
       "repeat": "Select how often",
+      "interval": "1",
+      "recalcStrategy": "Select how to recalculate",
       "date": "Select a date",
       "time": "HH:mm"
     },
@@ -106,6 +114,14 @@
     "Saturday": "Sat",
     "Sunday": "Sun"
   },
+  "intervalUnits": {
+    "Daily_one": "day",
+    "Daily_other": "days",
+    "Weekly_one": "week",
+    "Weekly_other": "weeks",
+    "Monthly_one": "month",
+    "Monthly_other": "months"
+  },
   "repeatTypes": {
     "Weekly": "Weekly",
     "Monthly": "Monthly",
@@ -119,6 +135,38 @@
     "Vaccination": "Vaccination",
     "ParasiteTreatment": "Parasite treatment",
     "VetVisit": "Vet visit",
-    "Grooming": "Grooming"
+    "Grooming": "Grooming",
+    "Weighing": "Weighing",
+    "Deworming": "Deworming",
+    "Bathing": "Bathing",
+    "Brushing": "Brushing",
+    "EarCleaning": "Ear cleaning",
+    "NailTrimming": "Nail trimming",
+    "PawCare": "Paw care",
+    "TeethCleaning": "Teeth cleaning"
+  },
+  "recalcStrategies": {
+    "Calendar": "Fixed schedule",
+    "FromCompletion": "From completion",
+    "FromCompletionAlignedToWeekday": "From completion, same weekday"
+  },
+  "recalcStrategyHints": {
+    "Calendar": "Next date always follows the calendar, even if you complete it late.",
+    "FromCompletion": "Next date is counted from the moment you complete it.",
+    "FromCompletionAlignedToWeekday": "Counted from completion, then moved to the same weekday."
+  },
+  "runsDrawer": {
+    "title": "History",
+    "empty": "No history yet for this reminder.",
+    "status": {
+      "Pending": "Pending",
+      "Sent": "Sent",
+      "Delivered": "Delivered",
+      "Failed": "Failed",
+      "Missed": "Missed",
+      "Completed": "Completed",
+      "Cancelled": "Cancelled"
+    },
+    "performedAt": "Done {{value}}"
   }
 }
