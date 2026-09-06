@@ -1,6 +1,7 @@
 import { initReactI18next } from "react-i18next";
 import i18next from "i18next";
 
+import enActivity from "@/activity/locales/en.json";
 import enAssistant from "@/assistant/locales/en.json";
 import enAuth from "@/auth/locales/en.json";
 import enCommon from "@/common/locales/en.json";
@@ -26,6 +27,7 @@ const modules = [
   "profile",
   "health",
   "assistant",
+  "activity",
 ] as const;
 
 export type I18nModule = (typeof modules)[number];
@@ -41,6 +43,7 @@ const enResources = {
   profile: enProfile,
   health: enHealth,
   assistant: enAssistant,
+  activity: enActivity,
 } as const satisfies Record<I18nModule, TranslationJson>;
 
 const resources: Record<Lang, Record<I18nModule, TranslationJson>> = {

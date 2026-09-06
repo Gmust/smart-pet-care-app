@@ -77,3 +77,36 @@ The client is provided at the root of the tree via `AppProvider`.
 ## Generated API Client
 
 `src/api/generated/` contains a typed Axios client auto-generated from the OpenAPI spec (`docs/openapi.json`). **Do not edit files in `src/api/generated/` by hand** — regenerate them from the spec instead.
+
+## Activity log `location` encoding
+
+> **This is a client-side convention. The backend does not validate, parse, or
+> understand it.**
+
+`ActivityLogResponseDto.location` and `CreateActivityLogDto.location` are a
+single nullable `string`. The API exposes no latitude/longitude fields, so the
+app encodes an optional coordinate pair as a suffix on that string:
+
+```
+"Riverside Park@50.450100,30.523400"   label + coordinates
+"@50.450100,30.523400"                 coordinates, no label
+"Riverside Park"                       label only
+```
+
+Rules, implemented in `src/activity/utils/activityLocation.ts`:
+
+- Coordinates are written with fixed 6-decimal precision.
+- Decoding splits on the **last** `@`, so labels may contain `@`.
+- Latitude must be within ±90 and longitude within ±180. Anything failing that,
+  or failing to parse as a number, degrades to a plain text label with no
+  coordinates.
+- The decoder never throws and never surfaces an error — an unrecognized string
+  is simply a label.
+
+That tolerance is deliberate: a `location` written by any other client, or by a
+backend that later assigns the field its own meaning, still renders correctly as
+text rather than breaking the screen.
+
+**Migration path.** If the backend adds real `latitude`/`longitude` fields,
+move to them and drop this encoding. Existing values remain valid plain strings
+for every other consumer, so no data cleanup is required.

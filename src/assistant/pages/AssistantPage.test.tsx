@@ -38,6 +38,10 @@ const mockRouter = {
 let mockSearchParams: Record<string, unknown> = {};
 const mockPetsQuery = jest.fn();
 
+jest.mock("expo-crypto", () => ({
+  randomUUID: () => "test-client-message-id",
+}));
+
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({ t: mockTranslate, i18n: { language: "en" } }),
 }));
@@ -360,7 +364,10 @@ describe("AssistantPage – server-backed conversation", () => {
     await sendText(utils, "routine checkup");
     await waitFor(() => expect(utils.getByText("routine checkup")).toBeTruthy());
     await waitFor(() => expect(utils.getByText(assistantResponse.answer)).toBeTruthy());
-    expect(sendMessageMock).toHaveBeenCalledWith(session.sessionId, { text: "routine checkup" });
+    expect(sendMessageMock).toHaveBeenCalledWith(session.sessionId, {
+      clientMessageId: "test-client-message-id",
+      text: "routine checkup",
+    });
     expect(utils.getByText("⚕ assessment.urgency:urgency.MONITOR")).toBeTruthy();
     expect(utils.getByText("• Offer water")).toBeTruthy();
     expect(utils.getByTestId("assistant-response-card")).toHaveStyle({
@@ -445,6 +452,7 @@ describe("AssistantPage – server-backed conversation", () => {
     await sendText(utils, "Milo cannot breathe");
     expect(utils.getAllByText("emergency.body").length).toBeGreaterThan(0);
     expect(sendMessageMock).toHaveBeenCalledWith(session.sessionId, {
+      clientMessageId: "test-client-message-id",
       text: "Milo cannot breathe",
     });
   });

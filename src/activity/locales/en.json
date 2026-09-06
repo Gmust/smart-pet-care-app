@@ -1,0 +1,130 @@
+{
+  "screen": {
+    "title": "Activity",
+    "addActivity": "Add activity",
+    "openFilters": "Filters",
+    "openMap": "Map",
+    "openList": "List"
+  },
+  "petSelector": {
+    "label": "Showing activity for {{name}}",
+    "hint": "Change pet",
+    "drawerTitle": "Choose a pet",
+    "select": "Select {{name}}"
+  },
+  "list": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "empty": "No activity recorded yet. Add the first walk, play, or training session.",
+    "emptyFiltered": "No activity matches the current filters.",
+    "clearFilters": "Clear filters",
+    "noPets": "Add a pet first, then you can start tracking their activity.",
+    "goToPets": "Go to pets",
+    "deleteActivity": "Delete activity",
+    "openActions": "{{type}} — open actions"
+  },
+  "metrics": {
+    "duration_one": "{{count}} min",
+    "duration_other": "{{count}} min",
+    "steps_one": "{{count}} step",
+    "steps_other": "{{count}} steps",
+    "activeMinutes_one": "{{count}} active min",
+    "activeMinutes_other": "{{count}} active min"
+  },
+  "types": {
+    "Walk": "Walk",
+    "Play": "Play",
+    "Training": "Training",
+    "Swimming": "Swimming",
+    "Run": "Run",
+    "Other": "Other"
+  },
+  "intensities": {
+    "Low": "Low",
+    "Moderate": "Moderate",
+    "High": "High"
+  },
+  "filters": {
+    "title": "Filter activity",
+    "dateRange": "Date range",
+    "type": "Activity type",
+    "intensity": "Intensity",
+    "apply": "Apply",
+    "clearAll": "Clear all",
+    "activeCount": "{{count}} active",
+    "nullIntensityNote": "Entries without a recorded intensity are hidden while an intensity filter is active.",
+    "from": "From",
+    "to": "To",
+    "fromPlaceholder": "Start date",
+    "toPlaceholder": "End date"
+  },
+  "map": {
+    "title": "Activity locations",
+    "empty": "None of the matching activities has a saved location.",
+    "unavailable": "The map could not be loaded. Check that the Google Maps API key is configured.",
+    "markerLabel": "{{type}} at {{time}}",
+    "retry": "Try again"
+  },
+  "forms": {
+    "activity": {
+      "createTitle": "Add activity",
+      "submit": "Save activity",
+      "createSuccess": "Activity saved",
+      "fields": {
+        "type": "Activity type",
+        "recordedAt": "When",
+        "intensity": "Intensity",
+        "durationMinutes": "Duration (minutes)",
+        "steps": "Steps",
+        "location": "Location",
+        "note": "Note"
+      },
+      "placeholders": {
+        "durationMinutes": "e.g. 30",
+        "steps": "e.g. 2400",
+        "recordedAt": "Select date and time",
+        "locationLabel": "e.g. Riverside Park",
+        "note": "Anything worth remembering",
+        "recordedAtTime": "Time"
+      },
+      "errors": {
+        "typeRequired": "Choose an activity type",
+        "recordedAtRequired": "Choose when this happened",
+        "recordedAtFuture": "This can't be in the future",
+        "durationInvalid": "Enter a whole number of minutes",
+        "stepsInvalid": "Enter a whole number of steps",
+        "intensityRequired": "Choose an intensity"
+      },
+      "editTitle": "Edit activity",
+      "updateSuccess": "Activity updated"
+    }
+  },
+  "location": {
+    "useCurrent": "Use my current location",
+    "pickOnMap": "Pick on map",
+    "clear": "Remove location",
+    "permissionDenied": "Location permission was denied. You can still pick a point on the map, or save without a location.",
+    "currentFailed": "Couldn't get your current location",
+    "selected": "Location selected",
+    "none": "No location"
+  },
+  "deleteDialog": {
+    "title": "Delete this activity?",
+    "description": "{{name}} will be removed permanently. This can't be undone."
+  },
+  "actions": {
+    "showDetails": "Show full info",
+    "delete": "Delete",
+    "edit": "Edit"
+  },
+  "details": {
+    "recordedAt": "When",
+    "intensity": "Intensity",
+    "duration": "Duration",
+    "steps": "Steps",
+    "activeMinutes": "Active minutes",
+    "location": "Location",
+    "source": "Source",
+    "note": "Note"
+  }
+}

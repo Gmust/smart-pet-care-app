@@ -108,6 +108,53 @@ eas update --branch preview --message "quick fix"      # publish an OTA update n
 eas build -p android --profile preview                 # native rebuild now
 ```
 
+## Development builds (required since the activity tracker landed)
+
+The app now depends on `expo-maps` and `expo-location`, which are native
+modules. **Expo Go no longer works** — it does not contain them, and the
+activity screen will fail there.
+
+Use a development build instead:
+
+```bash
+# 1. regenerate the native project so config-plugin changes (permissions,
+#    the Maps API key, newly added native modules) reach AndroidManifest.xml.
+#    Gradle will autolink new Expo modules on its own, but it will NOT re-run
+#    config plugins — a stale android/ keeps an old manifest indefinitely.
+pnpm exec expo prebuild -p android
+
+# 2. build and install
+pnpm android
+
+# then, day to day
+pnpm start   # and open the dev build, not Expo Go
+```
+
+If `prebuild` refuses to overwrite an existing project, add `--clean`. The
+`android/` directory is gitignored and fully generated, so regenerating it loses
+nothing — but check for hand-edits first if you have made any.
+
+OTA updates still work as before for JS-only changes. A change that adds or
+upgrades a native module needs a new development build, because the runtime
+fingerprint changes.
+
+### Google Maps API key
+
+The activity map needs an Android Maps SDK key, which is **not** the same as the
+FCM credentials in `google-services.json`:
+
+1. In the Google Cloud project, enable **Maps SDK for Android**.
+2. Create an API key and restrict it to the app's package name
+   (`com.anonymous.smartpetcareapp`) and signing certificate fingerprint.
+3. Set `GOOGLE_MAPS_API_KEY` locally in `.env`, and as an EAS secret for builds:
+
+```bash
+pnpm exec eas secret:create --name GOOGLE_MAPS_API_KEY --value "<key>"
+```
+
+Without the key the app still builds and runs; the map area renders an explicit
+"map unavailable" message rather than a blank grey rectangle.
+
 ## Notes
 
 - SDK 56 / React Native 0.85 with the New Architecture — all compatible with EAS Update.
