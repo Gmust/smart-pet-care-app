@@ -44,9 +44,12 @@ export default function ActivityTrackerPage() {
   const [actionsActivity, setActionsActivity] = useState<ActivityLogResponseDto | null>(null);
   const [detailsActivity, setDetailsActivity] = useState<ActivityLogResponseDto | null>(null);
   const [editActivity, setEditActivity] = useState<ActivityLogResponseDto | null>(null);
-  const [from, setFrom] = useState<string | null>(
+  // Held in state so "clear filters" can restore it and the empty state can
+  // tell a default range apart from one the user chose.
+  const [defaultFrom] = useState(() =>
     dayjs().subtract(DEFAULT_RANGE_DAYS, "day").startOf("day").toISOString()
   );
+  const [from, setFrom] = useState<string | null>(defaultFrom);
   const [to, setTo] = useState<string | null>(null);
   const [filters, setFilters] = useState<ActivityFilters>(NO_FILTERS);
 
@@ -63,11 +66,12 @@ export default function ActivityTrackerPage() {
   const tabBarOverlay =
     theme.spacing(15) + Math.max(insets.bottom, theme.spacing(4)) - insets.bottom;
 
-  const { data: pets, isLoading: isPetsLoading } = usePetsQuery();
+  const { data: pets, isLoading: isPetsLoading, isError: isPetsError } = usePetsQuery();
   const {
     data: activities,
     isLoading,
     isFetching,
+    isError: isActivitiesError,
     refetch,
   } = useActivityLogsQuery({
     petId: selectedPetId,
@@ -106,18 +110,35 @@ export default function ActivityTrackerPage() {
     [filteredActivities, t]
   );
 
-  const activeFilterCount = filters.types.length + filters.intensities.length;
+  // A non-default range is a filter too: without counting it, a range that
+  // matches nothing reads as "nothing was ever recorded" and offers no way out.
+  const hasDateFilter = from !== defaultFrom || to !== null;
+  const activeFilterCount =
+    filters.types.length + filters.intensities.length + (hasDateFilter ? 1 : 0);
 
-  // Auto-select when there is exactly one pet; there is nothing to choose.
+  // Select the first pet when nothing is selected, and re-select when the
+  // chosen pet is gone (deleted elsewhere) — otherwise every request keeps
+  // targeting a pet that no longer exists and the selector disappears.
   useEffect(() => {
-    if (selectedPetId || isPetsLoading) return;
-    const firstPetId = pets?.[0]?.id;
-    if (firstPetId) setSelectedPetId(firstPetId);
+    if (isPetsLoading) return;
+    if (selectedPetId && pets?.some((pet) => pet.id === selectedPetId)) return;
+    setSelectedPetId(pets?.[0]?.id);
   }, [pets, isPetsLoading, selectedPetId]);
 
-  const clearFilters = () => setFilters(NO_FILTERS);
+  const clearFilters = () => {
+    setFilters(NO_FILTERS);
+    setFrom(defaultFrom);
+    setTo(null);
+  };
 
-  const emptyReason = !hasPets ? "noPets" : activeFilterCount > 0 ? "noMatches" : "noActivity";
+  const isError = isPetsError || isActivitiesError;
+  const emptyReason = isError
+    ? "error"
+    : !hasPets
+      ? "noPets"
+      : activeFilterCount > 0
+        ? "noMatches"
+        : "noActivity";
 
   return (
     <>
@@ -182,6 +203,7 @@ export default function ActivityTrackerPage() {
                 reason={emptyReason}
                 onClearFilters={clearFilters}
                 onGoToPets={() => router.push("/(tabs)/pets")}
+                onRetry={refetch}
               />
             }
           />

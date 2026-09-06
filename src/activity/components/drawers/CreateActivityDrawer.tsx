@@ -85,7 +85,14 @@ export const CreateActivityDrawer = ({ isOpen, setIsOpen, petId, activity }: Pro
       );
 
       try {
-        if (isEditMode && activity?.id) {
+        if (isEditMode) {
+          // A log the API returned without an id cannot be PATCHed. Falling
+          // through would POST a duplicate and still report "Activity updated".
+          if (!activity?.id) {
+            Toast.show({ type: "error", text1: t("activity:forms.activity.missingId") });
+            return;
+          }
+
           // PATCH semantics: an omitted key is left unchanged, null clears it.
           // Only send what actually changed so a concurrent edit elsewhere is
           // not silently overwritten with stale form values.
@@ -105,7 +112,12 @@ export const CreateActivityDrawer = ({ isOpen, setIsOpen, petId, activity }: Pro
           const steps = toNullableNumber(value.steps);
           if (steps !== toNullableNumber(String(activity.steps ?? ""))) dto.steps = steps;
 
-          if (location !== (activity.location ?? null)) dto.location = location;
+          // Compare like for like: the stored value may use another valid
+          // spelling of the same place ("Park@1,2"), and encoding normalises it
+          // to 6 decimals. A raw string compare would resend an untouched
+          // location and clobber a concurrent edit.
+          const currentLocation = encodeActivityLocation(decodeActivityLocation(activity.location));
+          if (location !== currentLocation) dto.location = location;
 
           const note = value.note.trim() || null;
           if (note !== (activity.note ?? null)) dto.note = note;

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { TouchableOpacity, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import type { PetResponseDto } from "@/api/generated";
@@ -42,7 +42,7 @@ export const ActivityPetSelector = ({ selectedPet, canSwitch, onPress }: Props) 
   }
 
   return (
-    <TouchableOpacity
+    <Pressable
       accessibilityRole="button"
       accessibilityLabel={t("activity:petSelector.label", { name: selectedPet.name })}
       accessibilityHint={t("activity:petSelector.hint")}
@@ -50,13 +50,15 @@ export const ActivityPetSelector = ({ selectedPet, canSwitch, onPress }: Props) 
       style={styles.chip}
     >
       {content}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create((theme) => ({
   chip: {
-    minHeight: theme.spacing(9),
+    // 44 is the minimum reliable touch target; this chip is the only way to
+    // reach the pet picker.
+    minHeight: theme.spacing(11),
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing(2),

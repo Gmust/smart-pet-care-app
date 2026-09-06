@@ -43,7 +43,7 @@ export const ActivityCard = ({ activity, onPress }: Props) => {
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.iconCircle}>
-        {TypeIcon && (
+        {!!TypeIcon && (
           <TypeIcon
             width={theme.iconSize.xl}
             height={theme.iconSize.xl}

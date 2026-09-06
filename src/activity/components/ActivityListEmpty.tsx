@@ -7,26 +7,35 @@ import { Text } from "@/shadecn/ui/text";
 
 type Props = {
   /** Which empty state to show — they carry different copy and actions. */
-  reason: "noPets" | "noActivity" | "noMatches";
+  reason: "noPets" | "noActivity" | "noMatches" | "error";
   onClearFilters: () => void;
   onGoToPets: () => void;
+  onRetry: () => void;
 };
 
-export const ActivityListEmpty = ({ reason, onClearFilters, onGoToPets }: Props) => {
+export const ActivityListEmpty = ({ reason, onClearFilters, onGoToPets, onRetry }: Props) => {
   const { t } = useTranslation(["activity"]);
 
   const message =
-    reason === "noPets"
-      ? t("activity:list.noPets")
-      : reason === "noMatches"
-        ? t("activity:list.emptyFiltered")
-        : t("activity:list.empty");
+    reason === "error"
+      ? t("activity:list.error")
+      : reason === "noPets"
+        ? t("activity:list.noPets")
+        : reason === "noMatches"
+          ? t("activity:list.emptyFiltered")
+          : t("activity:list.empty");
 
   return (
     <View style={styles.container}>
       <Text variant="body" style={styles.message}>
         {message}
       </Text>
+
+      {reason === "error" && (
+        <Button variant="secondary" size="md" onPress={onRetry}>
+          {t("activity:list.retry")}
+        </Button>
+      )}
 
       {reason === "noMatches" && (
         <Button variant="secondary" size="md" onPress={onClearFilters}>

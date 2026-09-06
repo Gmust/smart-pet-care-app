@@ -296,6 +296,34 @@ describe("CreateActivityDrawer", () => {
       expect(createMock).not.toHaveBeenCalled();
     });
 
+    it("does not resend an untouched location written in another spelling", async () => {
+      patchMock.mockResolvedValue(apiResponse(existing));
+      // Same place, fewer decimals: encoding normalises it, so a raw string
+      // compare would call this a change and clobber a concurrent edit.
+      const { getByText } = renderDrawer(jest.fn(), {
+        ...existing,
+        location: "Riverside Park@50.4501,30.5234",
+      });
+
+      await act(async () => {
+        fireEvent.press(getByText("activity:forms.activity.submit"));
+      });
+
+      await waitFor(() => expect(patchMock).toHaveBeenCalledTimes(1));
+      expect(patchMock.mock.calls[0][2]).toEqual({});
+    });
+
+    it("refuses to save an entry that has no id instead of creating a duplicate", async () => {
+      const { getByText } = renderDrawer(jest.fn(), { ...existing, id: undefined });
+
+      await act(async () => {
+        fireEvent.press(getByText("activity:forms.activity.submit"));
+      });
+
+      expect(patchMock).not.toHaveBeenCalled();
+      expect(createMock).not.toHaveBeenCalled();
+    });
+
     it("sends only the field that changed", async () => {
       patchMock.mockResolvedValue(apiResponse(existing));
       const { getByText } = renderDrawer(jest.fn(), existing);

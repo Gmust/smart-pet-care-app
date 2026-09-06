@@ -17,6 +17,8 @@
     "yesterday": "Yesterday",
     "empty": "No activity recorded yet. Add the first walk, play, or training session.",
     "emptyFiltered": "No activity matches the current filters.",
+    "error": "We could not load this activity. Check your connection and try again.",
+    "retry": "Try again",
     "clearFilters": "Clear filters",
     "noPets": "Add a pet first, then you can start tracking their activity.",
     "goToPets": "Go to pets",
@@ -96,6 +98,7 @@
         "intensityRequired": "Choose an intensity"
       },
       "editTitle": "Edit activity",
+      "missingId": "This entry is missing its id and cannot be edited.",
       "updateSuccess": "Activity updated"
     }
   },
