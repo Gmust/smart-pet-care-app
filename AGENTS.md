@@ -56,7 +56,7 @@ pnpm web            # Run in browser (do not use for default validation)
 pnpm lint           # ESLint
 pnpm typecheck      # TypeScript check
 pnpm test           # Jest
-pnpm check          # Lint + typecheck
+pnpm check          # Lint + typecheck + test (the full gate)
 ```
 
 ## Code Conventions
@@ -189,11 +189,13 @@ Conventions and traps, all of which have bitten before:
 
 Before reporting work complete:
 
-1. `pnpm check` (lint + typecheck) and `pnpm test` pass — the same gates `pre-push` and CI run.
+1. `pnpm check` (lint + typecheck + test) passes — the same gate `pre-push` and CI run.
 2. No `as` type assertion added without a comment explaining why no safer narrowing works.
 3. New user-visible strings are translated; new endpoints are exported from `src/api/index.ts`.
 4. `graphify update .` run if code changed.
-5. **Anything touching native modules, permissions, or platform UI is verified on a device.**
+5. `docs/HANDOFF.md` updated with outcome, checks run, what was and was not verified,
+   and the next bounded task.
+6. **Anything touching native modules, permissions, or platform UI is verified on a device.**
    Say plainly what was verified and what was not — a green suite is not evidence that a native
    feature works.
 
