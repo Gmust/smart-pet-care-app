@@ -39,14 +39,14 @@ You can start developing by editing the files inside the **app** directory. This
 
 Configured via `.env` (gitignored). Copy `.env.example` to get started.
 
-| Variable                                | Used by          | Purpose                                                                        |
-| --------------------------------------- | ---------------- | ------------------------------------------------------------------------------ |
-| `EXPO_PUBLIC_API_URL`                   | App runtime      | Backend host the app calls. Set in `src/api/config.ts` as the axios `baseURL`. |
+| Variable                                | Used by          | Purpose                                                                                     |
+| --------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| `EXPO_PUBLIC_API_URL`                   | App runtime      | Backend host the app calls. Set in `src/api/config.ts` as the axios `baseURL`.              |
 | `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`      | App runtime      | Google OAuth Web client ID (all three client IDs must be in the same Google Cloud project). |
-| `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`      | App runtime      | Google OAuth iOS client ID.                                                    |
-| `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`  | App runtime      | Google OAuth Android client ID.                                                |
-| `OPENAPI_USERNAME` / `OPENAPI_PASSWORD` | `pnpm api:fetch` | Basic-auth creds for the spec endpoint (maintainer-only).                      |
-| `OPENAPI_URL`                           | `pnpm api:fetch` | Optional override for the spec URL.                                            |
+| `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`      | App runtime      | Google OAuth iOS client ID.                                                                 |
+| `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`  | App runtime      | Google OAuth Android client ID.                                                             |
+| `OPENAPI_USERNAME` / `OPENAPI_PASSWORD` | `pnpm api:fetch` | Basic-auth creds for the spec endpoint (maintainer-only).                                   |
+| `OPENAPI_URL`                           | `pnpm api:fetch` | Optional override for the spec URL.                                                         |
 
 `EXPO_PUBLIC_*` variables are inlined by Expo at build time and shipped in the client bundle — never put secrets in them.
 
@@ -107,6 +107,17 @@ Do not edit generated files manually. Update the backend spec, refresh `docs/ope
 
 - API layer: `docs/api.md`
 - Compass PR automation: `docs/compass-pr-automation.md`
+
+## Project authorship and licensing
+
+This repository is part of **Smart Pet Care App**, a collaborative student diploma project
+consisting of a mobile client, a backend API, AI services, designs and project documentation.
+It is also the canonical location of the project's authorship documentation.
+
+- [`PROJECT_AGREEMENT.md`](PROJECT_AGREEMENT.md) — authorship and internal project usage terms
+- [`PROJECT_COMPONENTS.md`](PROJECT_COMPONENTS.md) — the components that make up the project
+- [`CONTRIBUTORS.md`](CONTRIBUTORS.md) — contributors, based on repository history
+- [`LICENSE`](LICENSE) — copyright notice; this project is not released under an open-source licence
 
 ## Get a fresh project
 
