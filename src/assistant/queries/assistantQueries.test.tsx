@@ -28,6 +28,10 @@ import { useCreateAssistantSessionMutation } from "./useCreateAssistantSessionMu
 import { useRetryAssistantMessageMutation } from "./useRetryAssistantMessageMutation";
 import { useSendAssistantMessageMutation } from "./useSendAssistantMessageMutation";
 
+jest.mock("expo-crypto", () => ({
+  randomUUID: () => "test-client-message-id",
+}));
+
 jest.mock("@/api", () => ({
   getApiSessions: jest.fn(),
   getApiSessionsSessionIdMessages: jest.fn(),
@@ -200,7 +204,10 @@ describe("assistant query hooks", () => {
       });
     });
 
-    expect(sendMessageMock).toHaveBeenCalledWith("session-1", { text: "Question" });
+    expect(sendMessageMock).toHaveBeenCalledWith("session-1", {
+      clientMessageId: "test-client-message-id",
+      text: "Question",
+    });
     expect(retryMessageMock).toHaveBeenCalledWith("session-1", "message-1");
   });
 });

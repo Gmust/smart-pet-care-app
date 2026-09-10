@@ -57,7 +57,12 @@
       "expo-build-properties",
       [
         "react-native-edge-to-edge",
-        { "android": { "parentTheme": "Default", "enforceNavigationBarContrast": false } }
+        {
+          "android": {
+            "parentTheme": "Default",
+            "enforceNavigationBarContrast": false
+          }
+        }
       ],
       [
         "expo-image-picker",
@@ -96,7 +101,14 @@
         }
       ],
       "@react-native-google-signin/google-signin",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-maps",
+        {
+          "requestLocationPermission": true,
+          "locationPermission": "Allow Miso to use your location so you can save where an activity happened."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

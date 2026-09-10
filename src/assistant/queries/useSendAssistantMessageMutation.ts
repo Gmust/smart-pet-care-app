@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { randomUUID } from "expo-crypto";
 
 import { postApiSessionsSessionIdMessages } from "@/api";
 
@@ -15,7 +16,14 @@ export const useSendAssistantMessageMutation = () => {
   return useMutation({
     mutationKey: ["assistant", "send-message"],
     mutationFn: async ({ sessionId, text }: SendAssistantMessageVariables) => {
-      const response = await postApiSessionsSessionIdMessages(sessionId, { text });
+      // The backend requires a client-generated id on every send. It must be
+      // globally unique to work as an idempotency key, so it cannot reuse
+      // AssistantPage's `requestId`, which is a per-mount counter
+      // (`request-1` recurs on every app launch).
+      const response = await postApiSessionsSessionIdMessages(sessionId, {
+        clientMessageId: randomUUID(),
+        text,
+      });
       return response.data;
     },
     onSuccess: (_response, variables) => {

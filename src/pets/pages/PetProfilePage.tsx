@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, RefreshControl, View } from "react-native";
+import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
@@ -70,6 +71,24 @@ export default function PetProfilePage() {
       flags.push({ id: "species", label: pet.species, tone: "ok" });
     }
   }
+
+  const goToTabBy = (offset: number) => {
+    const nextIndex = PROFILE_TAB_KEYS.indexOf(activeTab) + offset;
+    if (nextIndex >= 0 && nextIndex < PROFILE_TAB_KEYS.length) {
+      setActiveTab(PROFILE_TAB_KEYS[nextIndex]);
+    }
+  };
+
+  const swipeTabs = Gesture.Race(
+    Gesture.Fling()
+      .direction(Directions.LEFT)
+      .runOnJS(true)
+      .onEnd(() => goToTabBy(1)),
+    Gesture.Fling()
+      .direction(Directions.RIGHT)
+      .runOnJS(true)
+      .onEnd(() => goToTabBy(-1))
+  );
 
   if (isPetLoading) {
     return <PetProfilePageSkeleton />;
@@ -160,21 +179,23 @@ export default function PetProfilePage() {
           })}
         </Animated.View>
 
-        <Animated.ScrollView
-          key={activeTab}
-          entering={tabsContentEntering}
-          showsVerticalScrollIndicator={false}
-          contentInsetAdjustmentBehavior="automatic"
-          contentContainerStyle={styles.content}
-          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
-        >
-          {!!pet && activeTab === "overview" && <OverviewTabContent pet={pet} />}
-          {!!pet && activeTab === "health" && <HealthTabContent pet={pet} />}
-          {!!pet && activeTab === "care" && (
-            <EmptyTabPlaceholder label={t("petProfilePage.careComingSoon")} />
-          )}
-          {!!pet && activeTab === "reminders" && <RemindersTabContent petId={pet.id ?? ""} />}
-        </Animated.ScrollView>
+        <GestureDetector gesture={swipeTabs}>
+          <Animated.ScrollView
+            key={activeTab}
+            entering={tabsContentEntering}
+            showsVerticalScrollIndicator={false}
+            contentInsetAdjustmentBehavior="automatic"
+            contentContainerStyle={styles.content}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+          >
+            {!!pet && activeTab === "overview" && <OverviewTabContent pet={pet} />}
+            {!!pet && activeTab === "health" && <HealthTabContent pet={pet} />}
+            {!!pet && activeTab === "care" && (
+              <EmptyTabPlaceholder label={t("petProfilePage.careComingSoon")} />
+            )}
+            {!!pet && activeTab === "reminders" && <RemindersTabContent petId={pet.id ?? ""} />}
+          </Animated.ScrollView>
+        </GestureDetector>
       </View>
       {!!pet && <EditPetDrawer pet={pet} isOpen={isEditOpen} setIsOpen={setIsEditOpen} />}
 
