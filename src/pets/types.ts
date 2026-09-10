@@ -3,7 +3,9 @@ type PetStatusTone = "ok" | "warn";
 export type PetNote = {
   id: string;
   title: string;
-  preview: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type PetFlag = {

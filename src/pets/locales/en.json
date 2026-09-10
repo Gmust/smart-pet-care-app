@@ -52,10 +52,6 @@
       "allergies": "Allergies",
       "chronicCondition": "Chronic condition"
     },
-    "noteTitles": {
-      "chronicConditions": "Chronic conditions",
-      "behavioralNotes": "Behavioral notes"
-    },
     "actions": {
       "open": "Open pet actions",
       "close": "Close pet actions",
@@ -70,6 +66,18 @@
       "cancel": "Cancel"
     }
   },
+  "singleNotePage": {
+    "untitled": "Untitled",
+    "contentPlaceholder": "Start typing…",
+    "deleteA11y": "Delete note",
+    "undoA11y": "Undo",
+    "redoA11y": "Redo",
+    "deleteDialog": {
+      "title": "Delete note?",
+      "description": "This will permanently remove this note.",
+      "success": "Note deleted"
+    }
+  },
   "createPetDrawer": {
     "title": "Add a new Pet",
     "fields": {
@@ -80,8 +88,7 @@
       "weight": "Weight (kg)",
       "sex": "Sex",
       "allergies": "Allergies",
-      "chronicConditions": "Chronic conditions",
-      "behavioralNotes": "Behavioral notes"
+      "chronicConditions": "Chronic conditions"
     },
     "placeholders": {
       "name": "e.g. Miso",
@@ -91,16 +98,13 @@
       "weight": "e.g. 3.8",
       "sex": "Select",
       "allergies": "Anything they react to",
-      "chronicConditions": "Ongoing health conditions",
-      "behavioralNotes": "Quirks, training notes, temperament"
+      "chronicConditions": "Ongoing health conditions"
     },
     "addAllergy": "Add allergy",
     "addChronicCondition": "Add chronic condition",
-    "addBehavioralNote": "Add behavioral note",
     "remove": "Remove",
     "removeAllergy": "Remove allergy",
     "removeChronicCondition": "Remove chronic condition",
-    "removeBehavioralNote": "Remove behavioral note",
     "submit": "Add pet"
   },
   "editPetDrawer": {

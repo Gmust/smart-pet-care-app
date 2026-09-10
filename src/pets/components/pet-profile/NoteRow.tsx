@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -10,14 +11,25 @@ import type { PetNote } from "../../types";
 
 type NoteRowProps = {
   note: PetNote;
+  onPress: () => void;
 };
 
 const NOTE_ICON_SIZE = 16;
 const CHEVRON_ICON_SIZE = 18;
 
-export const NoteRow = ({ note }: NoteRowProps) => {
+export const NoteRow = ({ note, onPress }: NoteRowProps) => {
+  const { t } = useTranslation(["pets"]);
+
+  const title = note.title.trim() || t("pets:singleNotePage.untitled");
+  const preview = note.content.trim();
+
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={note.title} style={styles.noteRow}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      style={styles.noteRow}
+      onPress={onPress}
+    >
       <View style={styles.noteIconBg}>
         <PencilLineIcon
           width={NOTE_ICON_SIZE}
@@ -26,11 +38,14 @@ export const NoteRow = ({ note }: NoteRowProps) => {
         />
       </View>
       <View style={styles.noteTexts}>
-        <Text variant="bodyS" style={styles.noteTitle}>
-          {note.title}
+        <Text
+          variant="bodyS"
+          style={note.title.trim() ? styles.noteTitle : styles.noteTitlePlaceholder}
+        >
+          {title}
         </Text>
         <Text variant="caption" style={styles.notePreview} numberOfLines={1}>
-          {note.preview}
+          {preview}
         </Text>
       </View>
       <ChevronIcon
@@ -67,6 +82,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   noteTitle: {
     color: theme.palette.brand.textPrimary,
+  },
+  noteTitlePlaceholder: {
+    color: theme.palette.brand.textSecondary,
   },
   notePreview: {
     color: theme.palette.brand.textSecondary,

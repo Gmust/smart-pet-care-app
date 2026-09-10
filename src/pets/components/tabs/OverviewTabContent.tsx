@@ -2,15 +2,17 @@ import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import dayjs from "dayjs";
+import { useRouter } from "expo-router";
 
 import { SectionHeader } from "@/common/components/SectionHeader";
 import { ListCard } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 
+import { useNotesQuery } from "../../queries/notes/useNotesQuery";
 import type { usePetQuery } from "../../queries/usePetQuery";
-import type { PetNote } from "../../types";
 import { InfoRow } from "../pet-profile/InfoRow";
-import { NoteRow } from "../pet-profile/NoteRow";
+
+import { NotesCard } from "./NotesCard";
 
 type Pet = NonNullable<ReturnType<typeof usePetQuery>["data"]>;
 
@@ -20,17 +22,9 @@ type Props = {
 
 export const OverviewTabContent = ({ pet }: Props) => {
   const { t } = useTranslation(["pets", "common"]);
+  const router = useRouter();
 
-  const notes: PetNote[] = [];
-
-  const behavioralNotesText = (pet.behavioralNotes ?? []).filter(Boolean).join(", ");
-  if (behavioralNotesText) {
-    notes.push({
-      id: "behavioral-notes",
-      title: t("petProfilePage.noteTitles.behavioralNotes"),
-      preview: behavioralNotesText,
-    });
-  }
+  const { data: notes = [] } = useNotesQuery(pet.id);
 
   const birthDate = pet.birthDate ? dayjs(pet.birthDate) : null;
   const birthdayValue = birthDate?.isValid()
@@ -40,6 +34,12 @@ export const OverviewTabContent = ({ pet }: Props) => {
   const weightValue = !pet.weightKg
     ? t("petProfilePage.fallbacks.notAdded")
     : t("petProfilePage.weightValue", { value: pet.weightKg });
+
+  const openNote = (noteId?: string) =>
+    router.push({
+      pathname: "/(tabs)/pets/note",
+      params: noteId ? { petId: pet.id ?? "", noteId } : { petId: pet.id ?? "" },
+    });
 
   return (
     <>
@@ -65,22 +65,13 @@ export const OverviewTabContent = ({ pet }: Props) => {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t("petProfilePage.notes.addNoteA11y")}
+          onPress={() => openNote()}
         >
           <Text style={styles.addText}>{t("petProfilePage.notes.addNote")}</Text>
         </Pressable>
       </View>
 
-      <ListCard style={styles.listCard}>
-        {notes.length ? (
-          notes.map((note) => <NoteRow key={note.id} note={note} />)
-        ) : (
-          <View style={styles.emptyCard}>
-            <Text variant="body" style={styles.emptyText}>
-              {t("petProfilePage.notes.empty")}
-            </Text>
-          </View>
-        )}
-      </ListCard>
+      <NotesCard notes={notes} onOpenNote={openNote} />
     </>
   );
 };
@@ -114,13 +105,5 @@ const styles = StyleSheet.create((theme) => ({
   addText: {
     ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.primaryDefault,
-  },
-  emptyCard: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: theme.spacing(5),
-  },
-  emptyText: {
-    color: theme.palette.brand.textSecondary,
   },
 }));
