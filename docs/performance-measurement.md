@@ -6,7 +6,7 @@ energy and reliability of platform-dependent features. Output is CSV under
 
 ## Prerequisites
 
-- Android device (or emulator) connected via `adb`; report model + Android version from `perf-out/device.txt`.
+- Android device (or emulator) connected via `adb`; report model + Android version from `device.txt` in the run folder.
 - [Maestro](https://maestro.mobile.dev) CLI: `curl -Ls https://get.maestro.mobile.dev | bash`.
 - Release build with perf marks enabled — dev builds are not valid for measurement:
 
@@ -29,6 +29,12 @@ pnpm perf energy                  # batterystats over ENERGY_LOOPS × all flows
 pnpm perf flashlight              # FPS / CPU / RAM score (npx @perf-profiler/cli)
 pnpm perf summary                 # recompute perf-out/summary.csv
 ```
+
+`pnpm perf all` writes to a fresh `perf-out/run-<timestamp>/`, so each full run is summarised on
+its own. Single subcommands append to `$OUT` (default `perf-out/`) so a run can be built up step
+by step. Point them at a new folder when the build or device changes, for example
+`OUT=perf-out/pixel7-v2 pnpm perf startup` and then `OUT=perf-out/pixel7-v2 pnpm perf summary`.
+Mixing samples from different builds in one folder corrupts the medians and the PSS slope.
 
 Flows live in `.maestro/`. Run one directly: `maestro test -e PET_NAME=Rex .maestro/02-load-pet-records.yaml`.
 The system photo picker, crop editor and time picker vary by Android version — tune those steps once with `maestro studio`.

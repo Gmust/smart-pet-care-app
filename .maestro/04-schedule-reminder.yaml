@@ -16,10 +16,11 @@ env:
 - hideKeyboard
 - tapOn: "Select a type"
 - tapOn: "Feeding"
+# Daily, not Once: a Once reminder confirmed at the picker defaults (today, the
+# current minute) is rejected as being in the past, so the flow could never pass.
+# Daily has no date and no past-time check.
 - tapOn: "Select how often"
-- tapOn: "Once"
-- tapOn: "Date"
-- tapOn: "OK"
+- tapOn: "Daily"
 - tapOn: "Time"
 - tapOn: "OK"
 - tapOn: "Create reminder"

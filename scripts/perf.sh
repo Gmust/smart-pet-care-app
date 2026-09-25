@@ -9,7 +9,8 @@
 #   scripts/perf.sh energy             # batterystats over a fixed session
 #   scripts/perf.sh flashlight         # FPS/CPU/RAM score via @perf-profiler/cli
 #   scripts/perf.sh summary            # median/p90/95% CI over out/*.csv, first run discarded, PSS slope
-# Env: N (iterations, default 10), PET_NAME (default Rex), OUT (default perf-out),
+# Env: N (iterations, default 10), PET_NAME (default Rex),
+#      OUT (default perf-out/run-<timestamp> for `all`, perf-out otherwise),
 #      ENERGY_LOOPS (flow loops for energy run, default 5).
 set -euo pipefail
 
@@ -17,6 +18,13 @@ PKG="com.anonymous.smartpetcareapp"
 ACTIVITY="$PKG/.MainActivity"
 N="${N:-10}"
 PET_NAME="${PET_NAME:-Rex}"
+# A full run gets its own folder: the CSVs are append-only, so re-running into
+# the same folder would silently mix samples from an earlier build or device
+# into the summary. Single subcommands still append to $OUT on purpose, so a
+# run can be built up step by step (and summarised with the same OUT).
+if [[ "${1:-all}" == "all" && -z "${OUT:-}" ]]; then
+  OUT="perf-out/run-$(date +%Y%m%d-%H%M%S)"
+fi
 OUT="${OUT:-perf-out}"
 ENERGY_LOOPS="${ENERGY_LOOPS:-5}"
 FLOWS=".maestro"
