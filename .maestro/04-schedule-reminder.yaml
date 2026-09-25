@@ -1,0 +1,28 @@
+appId: com.anonymous.smartpetcareapp
+name: Schedule a reminder (push notification)
+env:
+  PET_NAME: Rex
+# Time is set via the native Android clock dialog; the tap sequence below
+# assumes the default Material time picker ("OK" confirms). Tune once with
+# `maestro studio` if the device uses a different picker.
+---
+- launchApp
+- tapOn: "Pets"
+- tapOn: "View ${PET_NAME}"
+- tapOn: "Reminders"
+- tapOn: "Add reminder"
+- tapOn: "e.g. Morning feeding"
+- inputText: "Perf reminder ${TS}"
+- hideKeyboard
+- tapOn: "Select a type"
+- tapOn: "Feeding"
+- tapOn: "Select how often"
+- tapOn: "Once"
+- tapOn: "Date"
+- tapOn: "OK"
+- tapOn: "Time"
+- tapOn: "OK"
+- tapOn: "Create reminder"
+- assertVisible:
+    text: "Reminder created successfully!"
+    timeout: 20000

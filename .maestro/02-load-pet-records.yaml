@@ -1,0 +1,20 @@
+appId: com.anonymous.smartpetcareapp
+name: Load pet records
+env:
+  PET_NAME: Rex
+---
+- launchApp
+- tapOn: "Pets"
+- tapOn: "View ${PET_NAME}"
+- assertVisible:
+    text: "Overview"
+    timeout: 15000
+- tapOn: "Health"
+- assertVisible:
+    text: "Health"
+    timeout: 15000
+- tapOn: "Reminders"
+- assertVisible:
+    text: "Reminders"
+    timeout: 15000
+- tapOn: "Go back"

@@ -1,0 +1,4 @@
+# Shared Maestro settings. Flows assume the app is already signed in and has
+# at least one pet named ${PET_NAME} (pass with `maestro test -e PET_NAME=Rex`).
+flows:
+  - "*.yaml"
