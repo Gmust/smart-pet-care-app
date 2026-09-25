@@ -10,6 +10,7 @@ import enHome from "@/home/locales/en.json";
 import enPets from "@/pets/locales/en.json";
 import enProfile from "@/profile/locales/en.json";
 import enReminders from "@/reminders/locales/en.json";
+import enWellness from "@/wellness/locales/en.json";
 
 export enum Languages {
   en = "en",
@@ -28,6 +29,7 @@ const modules = [
   "health",
   "assistant",
   "activity",
+  "wellness",
 ] as const;
 
 export type I18nModule = (typeof modules)[number];
@@ -44,6 +46,7 @@ const enResources = {
   health: enHealth,
   assistant: enAssistant,
   activity: enActivity,
+  wellness: enWellness,
 } as const satisfies Record<I18nModule, TranslationJson>;
 
 const resources: Record<Lang, Record<I18nModule, TranslationJson>> = {

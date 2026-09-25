@@ -1,0 +1,78 @@
+{
+  "title": "Wellness",
+  "score": {
+    "outOf": "/100",
+    "unavailable": "—",
+    "label": "Wellness score"
+  },
+  "status": {
+    "COMPLETE": "Based on complete data",
+    "PARTIAL": "Based on partial data",
+    "INSUFFICIENT_DATA": "Not enough data yet"
+  },
+  "band": {
+    "EXCELLENT": "Excellent",
+    "GOOD": "Good",
+    "FAIR": "Fair",
+    "CONCERNING": "Needs attention",
+    "CRITICAL": "Critical",
+    "unknown": "No score yet"
+  },
+  "states": {
+    "title": "Signals",
+    "labels": {
+      "activity": "Activity",
+      "sleep": "Sleep",
+      "diet": "Diet",
+      "symptoms": "Symptoms",
+      "preventiveCare": "Preventive care",
+      "baseline": "Baseline"
+    },
+    "codes": {
+      "ACTIVITY_DATA_MISSING": "No activity logged",
+      "ACTIVITY_TARGET_MET": "On target",
+      "ACTIVITY_BELOW_TARGET": "Below target",
+      "ACTIVITY_NOT_APPLICABLE": "Not applicable",
+      "SLEEP_DATA_MISSING": "No sleep logged",
+      "SLEEP_WITHIN_RANGE": "Within range",
+      "SLEEP_OUTSIDE_RANGE": "Outside range",
+      "SLEEP_NOT_APPLICABLE": "Not applicable",
+      "DIET_DATA_MISSING": "No meals logged",
+      "DIET_TRACKING_STRONG": "Well tracked",
+      "DIET_TRACKING_NEEDS_ATTENTION": "Needs attention",
+      "SYMPTOMS_NOT_REPORTED": "None reported",
+      "SYMPTOM_CLASSIFIER_UNAVAILABLE": "Check unavailable",
+      "SYMPTOM_CLASSIFIER_FAILED": "Check failed",
+      "SYMPTOM_RESULT_AVAILABLE": "Symptoms reported",
+      "PREVENTIVE_CARE_DATA_MISSING": "No records",
+      "PREVENTIVE_CARE_CURRENT": "Up to date",
+      "PREVENTIVE_CARE_NEEDS_ATTENTION": "Needs attention",
+      "BASELINE_DATA_MISSING": "No baseline",
+      "BASELINE_STABLE": "Stable",
+      "BASELINE_NEEDS_ATTENTION": "Needs attention"
+    }
+  },
+  "sections": {
+    "summary": "Summary",
+    "recommendations": "Recommendations",
+    "reminderSuggestions": "Suggested reminders"
+  },
+  "suggestions": {
+    "addReminder": "Add reminder"
+  },
+  "empty": {
+    "title": "No wellness score yet",
+    "description": "Log activity, meals and health records for {{petName}} and a score will appear here."
+  },
+  "error": {
+    "title": "Couldn't load wellness",
+    "description": "Check your connection and try again.",
+    "rateLimited": "Too many requests. Try again later.",
+    "rateLimitedRetryAfter": "Too many requests. Try again in {{seconds}} seconds.",
+    "unavailable": "The wellness service is temporarily unavailable. Try again later.",
+    "codes": {
+      "request_validation_failed": "This request was invalid. Reopen the pet and try again."
+    }
+  },
+  "updateNote": "The score updates once every 3 days, when all health conditions for measurement are met."
+}

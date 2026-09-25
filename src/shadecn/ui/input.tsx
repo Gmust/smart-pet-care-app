@@ -84,6 +84,11 @@ type InputProps = Omit<TextInputProps, "size"> &
     inputStyle?: StyleProp<TextStyle>;
     leftSlot?: ReactNode;
     rightSlot?: ReactNode;
+    /** Render the value as single-line, tail-ellipsised `Text` instead of a
+     * `TextInput`, for fields that are a tap target rather than a text field
+     * (DateTimeField). Opt-in and static, so `editable` stays a plain TextInput
+     * prop that can toggle without remounting and losing focus. */
+    displayOnly?: boolean;
   };
 
 function Input({
@@ -102,6 +107,7 @@ function Input({
   leftSlot,
   rightSlot,
   placeholderTextColor,
+  displayOnly = false,
   ...props
 }: InputProps) {
   inputVariants.useVariants({ size });
@@ -118,24 +124,44 @@ function Input({
 
       <View style={[inputVariants.root(focused, error, disabled, hasValue), containerStyle]}>
         {leftSlot ? <View style={inputVariants.slot}>{leftSlot}</View> : null}
-        <TextInput
-          {...props}
-          ref={ref}
-          value={value}
-          editable={editable}
-          multiline={multiline}
-          onFocus={(event) => {
-            setFocused(true);
-            onFocus?.(event);
-          }}
-          onBlur={(event) => {
-            setFocused(false);
-            onBlur?.(event);
-          }}
-          placeholderTextColor={placeholderTextColor ?? theme.palette.brand.textFaint}
-          selectionColor={theme.palette.brand.primaryDefault}
-          style={[inputVariants.input(multiline), inputStyle]}
-        />
+        {displayOnly ? (
+          // A display-only field is a tap target, not a text field, and
+          // Android's single-line TextInput scrolls an overflowing value to keep
+          // its tail visible — which cut the first character off the date shown
+          // in narrow half-width DateTimeFields ("ep 13, 2026"). Text truncates
+          // from the tail with an ellipsis instead. Same style, so metrics,
+          // colour and layout are unchanged.
+          <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={[
+              inputVariants.input(multiline),
+              !hasValue && { color: placeholderTextColor ?? theme.palette.brand.textFaint },
+              inputStyle,
+            ]}
+          >
+            {hasValue ? value : props.placeholder}
+          </Text>
+        ) : (
+          <TextInput
+            {...props}
+            ref={ref}
+            value={value}
+            editable={editable}
+            multiline={multiline}
+            onFocus={(event) => {
+              setFocused(true);
+              onFocus?.(event);
+            }}
+            onBlur={(event) => {
+              setFocused(false);
+              onBlur?.(event);
+            }}
+            placeholderTextColor={placeholderTextColor ?? theme.palette.brand.textFaint}
+            selectionColor={theme.palette.brand.primaryDefault}
+            style={[inputVariants.input(multiline), inputStyle]}
+          />
+        )}
         {rightSlot ? <View style={inputVariants.slot}>{rightSlot}</View> : null}
       </View>
 

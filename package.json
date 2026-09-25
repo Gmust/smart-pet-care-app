@@ -17,6 +17,7 @@
     "test": "jest --passWithNoTests",
     "check": "pnpm lint && pnpm typecheck && pnpm test",
     "design:lint": "node scripts/lint-design.mjs",
+    "perf": "bash scripts/perf.sh",
     "api:fetch": "node --env-file-if-exists=.env ./scripts/fetch-openapi.mjs",
     "api:generate": "orval",
     "api:update": "pnpm api:fetch && pnpm api:generate",

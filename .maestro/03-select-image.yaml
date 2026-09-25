@@ -1,0 +1,28 @@
+appId: com.anonymous.smartpetcareapp
+name: Select pet photo from gallery
+env:
+  PET_NAME: Rex
+# Requires at least one image on the device: `adb push photo.jpg /sdcard/Pictures/`
+# then `adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/Pictures/photo.jpg`.
+# System photo picker + crop UI differ per Android version — tune the two
+# "system" steps below once with `maestro studio`.
+---
+- launchApp
+- tapOn: "Pets"
+- tapOn: "View ${PET_NAME}"
+- tapOn: "Open pet actions"
+- tapOn: "Set pet photo"
+- tapOn: "Add Photo"
+# system: photo picker — first thumbnail
+- tapOn:
+    id: "com.google.android.providers.media.module:id/icon_thumbnail"
+    index: 0
+    optional: true
+# system: crop editor confirm (label varies: "Done" / "Crop" / "Save")
+- tapOn:
+    text: "Done|Crop|Save"
+    optional: true
+- tapOn: "Save photo"
+- assertVisible:
+    text: "Pet photo updated successfully!"
+    timeout: 20000

@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { AccessibilityInfo, ActivityIndicator, FlatList, View } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, useKeyboardState } from "react-native-keyboard-controller";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { ChatMessageStatus, ClassifierUrgency } from "@/api/generated";
+import { getApiError } from "@/common/utils/getApiError";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
@@ -33,7 +34,6 @@ import {
   setAiUsingConsent,
 } from "../utils/aiUsingConsentStorage";
 import { hasEmergencyIndicator } from "../utils/assistantEmergency";
-import { getAssistantApiError, isAssistantNotFoundError } from "../utils/assistantErrors";
 import { ASSISTANT_PERSISTENCE_STATUS } from "../utils/assistantPersistence";
 
 const SCROLL_TO_END_THRESHOLD = 160;
@@ -53,6 +53,9 @@ export default function AssistantPage() {
   const [consent, setConsent] = useState<boolean | null>(null);
   const [consentChecked, setConsentChecked] = useState(false);
   const [consentDialogOpen, setConsentDialogOpen] = useState(false);
+
+  const insets = useSafeAreaInsets();
+  const isKeyboardVisible = useKeyboardState((state) => state.isVisible);
 
   const listRef = useRef<FlatList<AssistantTranscriptMessage>>(null);
   const chatInputRef = useRef<ChatInputHandle>(null);
@@ -181,7 +184,7 @@ export default function AssistantPage() {
       );
     } catch (error) {
       if (activeSessionIdRef.current !== sessionId) return;
-      const apiError = getAssistantApiError(error);
+      const apiError = getApiError(error);
       if (apiError.status === 404) recoverMissingSession(sessionId);
       if (apiError.retryable && !apiError.messageId) void messagesQuery.refetch();
       setLocalTranscript((current) => ({
@@ -274,7 +277,7 @@ export default function AssistantPage() {
       );
     } catch (error) {
       if (activeSessionIdRef.current !== sessionId) return;
-      const apiError = getAssistantApiError(error);
+      const apiError = getApiError(error);
       if (apiError.status === 404) recoverMissingSession(sessionId);
       const failedMessage: AssistantTranscriptMessage = {
         kind: "failed-assistant",
@@ -358,7 +361,7 @@ export default function AssistantPage() {
   }, [consentChecked, isPetsLoading, router, selectedPet]);
 
   useEffect(() => {
-    if (activeSessionId && messagesQuery.error && isAssistantNotFoundError(messagesQuery.error))
+    if (activeSessionId && messagesQuery.error && getApiError(messagesQuery.error).status === 404)
       recoverMissingSession(activeSessionId);
   }, [activeSessionId, messagesQuery.error, recoverMissingSession]);
 
@@ -467,7 +470,17 @@ export default function AssistantPage() {
                 />
               )}
             </View>
-            <View style={styles.composer}>
+            {/* The screen's SafeAreaView is top-edge only, so the bottom inset
+                is applied here — otherwise the disclaimer below the input sits
+                under the Android gesture bar whenever the keyboard is closed.
+                With the keyboard up it covers the gesture bar, and the inset
+                would only leave a gap above it. */}
+            <View
+              style={[
+                styles.composer,
+                { paddingBottom: (isKeyboardVisible ? 0 : insets.bottom) + 8 },
+              ]}
+            >
               <View style={styles.trayCorner}>
                 <PetSelectorChip selectedPet={selectedPet} />
               </View>
@@ -535,7 +548,10 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(4),
     paddingHorizontal: theme.spacing(4),
     paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(5),
+    // Clears the PetSelectorChip, which floats spacing(14) above the composer
+    // (see trayCorner) — without the room reserved here it sat on top of the
+    // last message and hid a line of the reply mid-sentence.
+    paddingBottom: theme.spacing(17),
   },
   trayCorner: {
     position: "absolute",

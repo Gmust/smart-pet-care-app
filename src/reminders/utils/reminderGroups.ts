@@ -62,7 +62,14 @@ const isReminderOverdue = (reminder: ReminderResponseDto): boolean => {
   return new Date(reminder.nextTriggerAt).getTime() < Date.now();
 };
 
-const getReminderStatus = (reminder: ReminderResponseDto): ReminderStatus => {
+/**
+ * The status a reminder is *shown* with, which is not always the one the API
+ * stores: a reminder still `Active` server-side reads as `Missed` here once its
+ * `overdueSince` has passed. Exported so list filtering agrees with the badge —
+ * filtering on the raw `status` instead put an overdue reminder under "Active"
+ * while its own card said "Missed", and left it out of "Missed" entirely.
+ */
+export const getReminderStatus = (reminder: ReminderResponseDto): ReminderStatus => {
   if (isReminderOverdue(reminder)) {
     return ReminderStatus.Missed;
   }
@@ -89,11 +96,21 @@ const REMINDER_ICON: Record<ReminderType, Icon> = {
 };
 
 const formatReminderTime = (reminder: ReminderResponseDto): string => {
-  if (reminder.nextTriggerAt) {
-    const triggerDate = new Date(reminder.nextTriggerAt);
+  // An overdue reminder is shown for the occurrence it actually missed, not for
+  // its next one. `nextTriggerAt` has already rolled forward by then, so using
+  // it here paired the "Missed" badge with a date in the future — the card read
+  // "Sep 14 · Missed" on Sep 13, while the run history showed the real miss at
+  // Sep 13 19:55.
+  const shownAt =
+    isReminderOverdue(reminder) && reminder.overdueSince
+      ? reminder.overdueSince
+      : reminder.nextTriggerAt;
 
-    if (!Number.isNaN(triggerDate.getTime())) {
-      return triggerDate.toLocaleString([], {
+  if (shownAt) {
+    const shownDate = new Date(shownAt);
+
+    if (!Number.isNaN(shownDate.getTime())) {
+      return shownDate.toLocaleString([], {
         month: "short",
         day: "numeric",
         hour: "2-digit",

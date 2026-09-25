@@ -1,0 +1,8 @@
+appId: com.anonymous.smartpetcareapp
+name: Open app (cold)
+---
+- stopApp
+- launchApp
+- assertVisible:
+    text: "Home"
+    timeout: 20000

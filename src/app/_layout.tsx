@@ -29,6 +29,7 @@ import { AuthProvider } from "@/auth/context/AuthContext";
 import AppProvider from "@/common/providers/AppProvider";
 
 import { NavigationBarScrim } from "@/common/components/NavigationBarScrim";
+import { PerfLogger } from "@/common/components/PerfLogger";
 
 import "@/styles/config";
 import "dayjs/locale/en.js";
@@ -92,6 +93,7 @@ export default function RootLayout() {
           <SystemBars style="dark" />
           <RootNavigator />
           <NavigationBarScrim />
+          {process.env.EXPO_PUBLIC_PERF_LOG === "1" && <PerfLogger />}
         </AuthProvider>
       </AppProvider>
     </GestureHandlerRootView>

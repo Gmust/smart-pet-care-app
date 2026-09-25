@@ -96,6 +96,7 @@ export function DateTimeField({
             placeholder={placeholder}
             value={value ? display(value) : ""}
             editable={false}
+            displayOnly
             error={error}
             containerStyle={containerStyle}
           />

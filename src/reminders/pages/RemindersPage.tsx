@@ -23,7 +23,7 @@ import { useGetReminders } from "../queries/useGetReminders";
 import { RemindersSectionSkeleton } from "../skeletons/RemindersSectionSkeleton";
 import type { Reminder } from "../types";
 import type { ReminderGroupKey } from "../utils/reminderGroups";
-import { toReminderGroups } from "../utils/reminderGroups";
+import { getReminderStatus, toReminderGroups } from "../utils/reminderGroups";
 
 type ReminderFilter = "all" | "active" | "completed" | "missed";
 
@@ -55,7 +55,9 @@ export default function RemindersPage() {
   const filtered = useMemo(() => {
     const status = FILTER_STATUS[filter];
     return status
-      ? (reminders ?? []).filter((reminder) => reminder.status === status)
+      ? // Filter on the same derived status the cards badge themselves with, not
+        // the raw API one — see getReminderStatus.
+        (reminders ?? []).filter((reminder) => getReminderStatus(reminder) === status)
       : (reminders ?? []);
   }, [reminders, filter]);
   const groups = useMemo(() => toReminderGroups(filtered), [filtered]);
@@ -128,7 +130,7 @@ export default function RemindersPage() {
             <Text style={styles.topBarTitle}>{t("reminders:remindersPage.title")}</Text>
             {!isLoading && (
               <Text style={styles.topBarSubtitle}>
-                {t("reminders:remindersPage.subtitle", { count: reminders?.length ?? 0 })}
+                {t("reminders:remindersPage.subtitle", { count: filtered.length })}
               </Text>
             )}
           </View>
