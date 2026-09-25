@@ -38,8 +38,11 @@ jest.mock("@/shadecn/ui/drawer", () => {
   };
 });
 
+// One stable array, like React Query's structural sharing: a fresh array per
+// render would re-run the pet auto-select effect on every render and hide bugs.
+const mockPets = [{ id: "pet-1", name: "Rex" }];
 jest.mock("@/pets/queries/usePetsQuery", () => ({
-  usePetsQuery: () => ({ data: [{ id: "pet-1", name: "Rex" }], isLoading: false }),
+  usePetsQuery: () => ({ data: mockPets, isLoading: false }),
 }));
 
 jest.mock("../../queries/useSymptomsQuery", () => ({
@@ -79,7 +82,7 @@ describe("AddHealthRecordDrawer", () => {
     expect(queryByText("health:forms.healthRecord.fields.nextDueAt")).toBeNull();
   });
 
-  it("edits a record without offering or sending a type change", async () => {
+  it("edits a record by sending only the changed fields", async () => {
     const record: HealthRecordResponseDto = {
       id: "record-1",
       petId: "pet-1",
@@ -89,19 +92,19 @@ describe("AddHealthRecordDrawer", () => {
       symptoms: [SymptomType.Fever],
     };
 
-    const { getByText, queryByText } = render(
+    const { getByDisplayValue, getByText, queryByText } = render(
       <AddHealthRecordDrawer record={record} isOpen setIsOpen={jest.fn()} />
     );
 
     expect(queryByText("health:forms.healthRecord.fields.type")).toBeNull();
     expect(queryByText("health:forms.healthRecord.fields.pet")).toBeNull();
 
+    fireEvent.changeText(getByDisplayValue("Hot nose"), "Warm nose");
     fireEvent.press(getByText("health:forms.healthRecord.submit"));
 
     await waitFor(() => expect(mockUpdate).toHaveBeenCalledTimes(1));
-    const { dto } = mockUpdate.mock.calls[0][0];
-    // PATCH semantics: an omitted key is left unchanged, so the type can't drift.
-    expect(dto).not.toHaveProperty("type");
-    expect(dto.symptoms).toEqual([SymptomType.Fever]);
+    // PATCH leaves omitted keys unchanged: anything else sent from this stale
+    // form would overwrite a concurrent edit, and `type` could re-type the record.
+    expect(mockUpdate.mock.calls[0][0].dto).toEqual({ title: "Warm nose" });
   });
 });

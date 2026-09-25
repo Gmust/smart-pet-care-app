@@ -99,28 +99,42 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
     onSubmit: async ({ value }) => {
       if (!value.type) return;
       try {
-        const commonFields = {
-          title: value.title,
-          performedAt: value.performedAt,
-          description: value.description || null,
-          dosage: value.dosage || null,
-          provider: value.provider || null,
-          symptoms: value.symptoms.length ? value.symptoms : null,
-        };
-
         if (isEditMode && record?.id) {
+          // PATCH leaves an omitted key unchanged, so send only what the user
+          // changed — a stale form must not overwrite someone else's newer edit.
+          // `type` is never sent, so an edit cannot re-type a record.
+          const changed = (key: keyof HealthRecordFormValues) =>
+            JSON.stringify(value[key]) !== JSON.stringify(defaultValues[key]);
           await updateRecord({
             petId: value.petId,
             recordId: record.id,
-            // `type` is omitted so an edit can never change the record's type.
-            // PatchHealthRecordDto's nextDueAt can't be cleared via null (unlike
-            // create) — omit the field entirely when empty instead of sending null.
-            dto: { ...commonFields, ...(value.nextDueAt ? { nextDueAt: value.nextDueAt } : {}) },
+            dto: {
+              ...(changed("title") ? { title: value.title } : {}),
+              ...(changed("performedAt") ? { performedAt: value.performedAt } : {}),
+              ...(changed("description") ? { description: value.description || null } : {}),
+              ...(changed("dosage") ? { dosage: value.dosage || null } : {}),
+              ...(changed("provider") ? { provider: value.provider || null } : {}),
+              ...(changed("symptoms")
+                ? { symptoms: value.symptoms.length ? value.symptoms : null }
+                : {}),
+              // PatchHealthRecordDto's nextDueAt can't be cleared via null
+              // (unlike create), so an emptied date is not sent at all.
+              ...(changed("nextDueAt") && value.nextDueAt ? { nextDueAt: value.nextDueAt } : {}),
+            },
           });
         } else {
           await createRecord({
             petId: value.petId,
-            dto: { ...commonFields, type: value.type, nextDueAt: value.nextDueAt || null },
+            dto: {
+              type: value.type,
+              title: value.title,
+              performedAt: value.performedAt,
+              description: value.description || null,
+              dosage: value.dosage || null,
+              provider: value.provider || null,
+              symptoms: value.symptoms.length ? value.symptoms : null,
+              nextDueAt: value.nextDueAt || null,
+            },
           });
         }
 
@@ -141,13 +155,16 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
     },
   });
 
+  // Runs on every open, not just on mount: callers like the Fab keep the drawer
+  // mounted, and the reset after a save clears petId. With one pet the picker
+  // is hidden, so without this the next save is blocked by an invisible error.
   useEffect(() => {
-    if (!showPetStep || isPetsLoading || pets?.length !== 1) return;
+    if (!isOpen || !showPetStep || isPetsLoading || pets?.length !== 1) return;
     const onlyPetId = pets[0].id;
     if (onlyPetId && !form.getFieldValue("petId")) {
       form.setFieldValue("petId", onlyPetId);
     }
-  }, [showPetStep, isPetsLoading, pets, form]);
+  }, [isOpen, showPetStep, isPetsLoading, pets, form]);
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
