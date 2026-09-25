@@ -1,7 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import dayjs from "dayjs";
+import { useRouter } from "expo-router";
 
+import { HealthRecordType } from "@/api/generated";
 import { HeartPulseIcon } from "@/icons/heart";
 import { PillIcon } from "@/icons/pill";
 import { BasicsCard } from "@/pets/components/tabs/BasicsCard";
@@ -22,7 +25,12 @@ type Props = {
 
 export function HealthTabContent({ pet }: Props) {
   const { t } = useTranslation(["health", "pets"]);
+  const router = useRouter();
   const { data: records, isLoading } = useHealthRecordsQuery(pet.id);
+
+  const symptomRecords =
+    records?.filter((record) => record.type === HealthRecordType.Symptom) ?? [];
+  const monthAgo = dayjs().subtract(1, "month");
 
   const allergies = (pet.allergies ?? []).filter(Boolean);
   const chronicConditions = (pet.chronicConditions ?? []).filter(Boolean);
@@ -49,11 +57,20 @@ export function HealthTabContent({ pet }: Props) {
 
       <HealthSection title={t("health:overview.sections.symptoms")}>
         <HealthOverviewRow
-          title={t("health:overview.symptoms.title", { all: 0 })}
-          subtitle={t("health:overview.symptoms.subtitle", { lastMonth: 0 })}
+          title={t("health:overview.symptoms.title", { all: symptomRecords.length })}
+          subtitle={t("health:overview.symptoms.subtitle", {
+            lastMonth: symptomRecords.filter((record) =>
+              dayjs(record.performedAt).isAfter(monthAgo)
+            ).length,
+          })}
           tone="peach"
           icon={<HeartPulseIcon width={18} height={18} color={palette.brand.peachDefault} />}
-          onPress={() => {}}
+          onPress={() =>
+            router.push({
+              pathname: "/(tabs)/pets/health-record-list",
+              params: { petId: pet.id ?? "", type: HealthRecordType.Symptom },
+            })
+          }
         />
       </HealthSection>
 

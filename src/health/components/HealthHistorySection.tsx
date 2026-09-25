@@ -11,6 +11,10 @@ import { HEALTH_CATEGORY_ICON, HEALTH_HISTORY_CATEGORIES } from "../constants";
 import { HistoryCard } from "./HistoryCard";
 import { HistoryGrid } from "./HistoryGrid";
 
+/** Matches the date style used on the pet profile and reminder cards — this
+ * grid previously rendered a raw ISO date ("Last: 2026-09-12"). */
+const HISTORY_DATE_FORMAT = "MMM D, YYYY";
+
 type Props = {
   petId: string;
   records: HealthRecordResponseDto[] | undefined;
@@ -35,10 +39,16 @@ export function HealthHistorySection({ petId, records, isLoading }: Props) {
         const subtitle = !latest
           ? t("health:history.noRecords")
           : isOverdue
-            ? t("health:history.overdue", { date: dayjs(latest.nextDueAt).format("YYYY-MM-DD") })
+            ? t("health:history.overdue", {
+                date: dayjs(latest.nextDueAt).format(HISTORY_DATE_FORMAT),
+              })
             : latest.nextDueAt
-              ? t("health:history.next", { date: dayjs(latest.nextDueAt).format("YYYY-MM-DD") })
-              : t("health:history.last", { date: dayjs(latest.performedAt).format("YYYY-MM-DD") });
+              ? t("health:history.next", {
+                  date: dayjs(latest.nextDueAt).format(HISTORY_DATE_FORMAT),
+                })
+              : t("health:history.last", {
+                  date: dayjs(latest.performedAt).format(HISTORY_DATE_FORMAT),
+                });
 
         return (
           <HistoryCard

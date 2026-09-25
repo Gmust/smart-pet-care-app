@@ -17,6 +17,7 @@ export const {
   getApiPetsPetIdActivityLogsActivityLogId,
   patchApiPetsPetIdActivityLogsActivityLogId,
   deleteApiPetsPetIdActivityLogsActivityLogId,
+  getApiPetsPetIdWellnessEvaluation,
   getApiPetsPetIdHealthRecords,
   postApiPetsPetIdHealthRecords,
   getApiPetsPetIdHealthRecordsRecordId,

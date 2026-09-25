@@ -3,7 +3,7 @@
 import type { AxiosResponse } from "axios";
 import { AxiosError, AxiosHeaders } from "axios";
 
-import { getAssistantApiError, isAssistantNotFoundError } from "./assistantErrors";
+import { getApiError } from "./getApiError";
 
 const axiosError = (status: number, data: unknown): AxiosError => {
   const headers = new AxiosHeaders();
@@ -18,10 +18,10 @@ const axiosError = (status: number, data: unknown): AxiosError => {
   return new AxiosError("Request failed", undefined, config, undefined, response);
 };
 
-describe("assistant API error guards", () => {
+describe("getApiError", () => {
   it("narrows classifier errors and normalizes string retry delays", () => {
     expect(
-      getAssistantApiError(
+      getApiError(
         axiosError(429, {
           messageId: "message-1",
           code: "rate_limit",
@@ -34,6 +34,7 @@ describe("assistant API error guards", () => {
       kind: "classifier",
       status: 429,
       code: "rate_limit",
+      params: null,
       message: "Wait",
       messageId: "message-1",
       retryable: true,
@@ -41,19 +42,37 @@ describe("assistant API error guards", () => {
     });
   });
 
-  it("narrows problem details and detects not-found responses", () => {
+  it("narrows problem details", () => {
     const error = axiosError(404, { title: "Not found", detail: "Session missing" });
-    expect(getAssistantApiError(error)).toMatchObject({
+    expect(getApiError(error)).toMatchObject({
       kind: "problem",
       status: 404,
+      code: null,
       message: "Session missing",
       retryable: false,
     });
-    expect(isAssistantNotFoundError(error)).toBe(true);
+  });
+
+  it("keeps the code alias, params and retry delay of an ApiErrorResponse", () => {
+    // The unified backend shape: no `retryable`, but `code` is what the UI
+    // translates on — dropping it here would push every screen back to status codes.
+    const error = axiosError(429, {
+      code: "too_many_requests",
+      message: "Slow down.",
+      params: { limit: 5 },
+      retryAfterSeconds: "30",
+    });
+    expect(getApiError(error)).toMatchObject({
+      kind: "problem",
+      status: 429,
+      code: "too_many_requests",
+      params: { limit: 5 },
+      retryAfterSeconds: 30,
+    });
   });
 
   it("treats non-Axios failures as retryable network errors", () => {
-    expect(getAssistantApiError(new Error("offline"))).toMatchObject({
+    expect(getApiError(new Error("offline"))).toMatchObject({
       kind: "network",
       status: null,
       message: "offline",

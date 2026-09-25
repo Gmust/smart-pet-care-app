@@ -14,7 +14,8 @@
     "VetVisit": "Vet visits",
     "Vaccination": "Vaccinations",
     "Deworming": "Deworming",
-    "AntiParasiteTreatment": "Anti-parasite"
+    "AntiParasiteTreatment": "Anti-parasite",
+    "Symptom": "Symptoms"
   },
   "deleteDialog": {
     "title": "Delete this record?",
@@ -103,7 +104,9 @@
         "provider": "e.g. Dr. Smith / Sunny Vet Clinic",
         "dosage": "e.g. 1 tablet",
         "nextDueAt": "Select a date",
-        "description": "Notes about this visit"
+        "description": "Notes about this visit",
+        "titleSymptom": "e.g. Limping on left paw",
+        "descriptionSymptom": "What did you notice, and when did it start?"
       },
       "errors": {
         "petRequired": "Pet is required",

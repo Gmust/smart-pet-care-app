@@ -42,6 +42,9 @@ type Props = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   reminderId?: string;
+  /** Create mode only: fields to seed the form with when the drawer opens
+   * (e.g. a wellness reminder suggestion). Ignored in edit mode. */
+  initialValues?: Partial<CreateReminderForm>;
 };
 
 const DAY_ORDER: DaysOfWeek[] = [
@@ -72,7 +75,7 @@ const defaultValues: CreateReminderForm = {
   endAt: null,
 };
 
-export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) => {
+export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId, initialValues }: Props) => {
   const { t } = useTranslation(["reminders", "common"]);
   const { data: pets, isLoading: isPetsLoading } = usePetsQuery();
 
@@ -129,20 +132,30 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
     if (!isEditMode || !reminder || hasHydratedForm.current) return;
     hasHydratedForm.current = true;
 
-    form.reset({
-      petId: reminder.petId ?? "",
-      title: reminder.title ?? "",
-      description: reminder.description ?? null,
-      type: reminder.type ?? ReminderType.Feeding,
-      repeatType: reminder.repeatType ?? RepeatType.Weekly,
-      intervalN: String(reminder.intervalN ?? 1),
-      recalcStrategy: reminder.recalcStrategy ?? RecalcStrategy.Calendar,
-      days: reminder.days ?? [],
-      date: reminder.date ?? null,
-      time: getLocalTimeOfDay(reminder) ?? "",
-      endAt: reminder.endAt ?? null,
-    });
+    form.reset(
+      {
+        petId: reminder.petId ?? "",
+        title: reminder.title ?? "",
+        description: reminder.description ?? null,
+        type: reminder.type ?? ReminderType.Feeding,
+        repeatType: reminder.repeatType ?? RepeatType.Weekly,
+        intervalN: String(reminder.intervalN ?? 1),
+        recalcStrategy: reminder.recalcStrategy ?? RecalcStrategy.Calendar,
+        days: reminder.days ?? [],
+        date: reminder.date ?? null,
+        time: getLocalTimeOfDay(reminder) ?? "",
+        endAt: reminder.endAt ?? null,
+      },
+      // Without this, reset() adopts these values as the form's defaults and the
+      // next render's useForm update (blank defaults, form untouched) wipes them.
+      { keepDefaultValues: true }
+    );
   }, [isEditMode, reminder, form]);
+
+  useEffect(() => {
+    if (isEditMode || !isOpen || !initialValues) return;
+    form.reset({ ...defaultValues, ...initialValues }, { keepDefaultValues: true });
+  }, [isEditMode, isOpen, initialValues, form]);
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>

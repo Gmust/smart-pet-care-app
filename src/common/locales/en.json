@@ -41,10 +41,6 @@
         "title": "Reminder",
         "subtitle": "Feed, med, vet"
       },
-      "feeding": {
-        "title": "Log feeding",
-        "subtitle": "Quick meal log"
-      },
       "symptom": {
         "title": "Log symptom",
         "subtitle": "Health note"

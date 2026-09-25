@@ -1,11 +1,15 @@
 import axios from "axios";
 
-type AssistantApiErrorKind = "classifier" | "network" | "problem";
+type ApiErrorKind = "classifier" | "network" | "problem";
 
-export interface AssistantApiError {
-  kind: AssistantApiErrorKind;
+export interface ParsedApiError {
+  kind: ApiErrorKind;
   status: number | null;
+  /** The backend's stable alias for the error (e.g. "request_validation_failed") —
+   * translate on this, not on `message`, which is server-side English. */
   code: string | null;
+  /** Values for interpolating the translated `code` message. */
+  params: Record<string, unknown> | null;
   message: string | null;
   messageId: string | null;
   retryable: boolean;
@@ -24,12 +28,13 @@ const retryDelay = (value: unknown): number | null => {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 };
 
-export const getAssistantApiError = (error: unknown): AssistantApiError => {
+export const getApiError = (error: unknown): ParsedApiError => {
   if (!axios.isAxiosError(error)) {
     return {
       kind: "network",
       status: null,
       code: null,
+      params: null,
       message: error instanceof Error ? error.message : null,
       messageId: null,
       retryable: true,
@@ -44,6 +49,7 @@ export const getAssistantApiError = (error: unknown): AssistantApiError => {
       kind: "classifier",
       status,
       code: optionalString(data.code),
+      params: isRecord(data.params) ? data.params : null,
       message: optionalString(data.message),
       messageId: optionalString(data.messageId),
       retryable: data.retryable,
@@ -55,11 +61,12 @@ export const getAssistantApiError = (error: unknown): AssistantApiError => {
     return {
       kind: "problem",
       status,
-      code: null,
+      code: optionalString(data.code),
+      params: isRecord(data.params) ? data.params : null,
       message: optionalString(data.detail) ?? optionalString(data.title),
       messageId: null,
       retryable: status === null || status >= 500,
-      retryAfterSeconds: null,
+      retryAfterSeconds: retryDelay(data.retryAfterSeconds),
     };
   }
 
@@ -67,12 +74,10 @@ export const getAssistantApiError = (error: unknown): AssistantApiError => {
     kind: error.response ? "problem" : "network",
     status,
     code: null,
+    params: null,
     message: error.message || null,
     messageId: null,
     retryable: status === null || status >= 500,
     retryAfterSeconds: null,
   };
 };
-
-export const isAssistantNotFoundError = (error: unknown): boolean =>
-  getAssistantApiError(error).status === 404;
