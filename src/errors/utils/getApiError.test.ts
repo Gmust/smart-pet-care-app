@@ -62,9 +62,12 @@ describe("getApiError", () => {
     expect(getApiError(error)).toMatchObject({ code: "internal_error", retryable: false });
   });
 
-  it("treats 429 and 503 as retryable when the server omits the flag", () => {
+  it("treats 429 and 502+ as retryable when the server omits the flag", () => {
     expect(getApiError(axiosError(429, { code: "rate_limit_exceeded" })).retryable).toBe(true);
     expect(getApiError(axiosError(503, { code: "request_timeout" })).retryable).toBe(true);
+    // A gateway's own page: no contract body at all.
+    expect(getApiError(axiosError(502, "<html>Bad Gateway</html>")).retryable).toBe(true);
+    expect(getApiError(axiosError(504, "<html>Gateway Timeout</html>")).retryable).toBe(true);
   });
 
   it("honours an explicit retryable: false on a dependency failure", () => {

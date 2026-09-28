@@ -21,7 +21,13 @@ export const getApiErrorMessage = (
 ): string => {
   if (!axios.isAxiosError(error)) return fallback;
 
-  const { status, code, params, message, retryAfterSeconds } = getApiError(error);
+  const { status, code, params, message, retryAfterSeconds, fieldErrors } = getApiError(error);
+
+  // A validation failure names its rule per field. The first translated one
+  // says more than "some details aren't valid", and reaches the user even when
+  // the form has no input for that field.
+  const fieldAlias = Object.values(fieldErrors).flat().find(isTranslatedCode);
+  if (fieldAlias) return i18next.t(`errors:codes.${fieldAlias}`);
 
   if (isTranslatedCode(code)) {
     // Nested, never spread: top-level keys are i18next options (lng, ns,
@@ -40,7 +46,7 @@ export const getApiErrorMessage = (
       ? i18next.t("errors:rateLimitedRetryAfter", { seconds: retryAfterSeconds })
       : i18next.t("errors:rateLimited");
   }
-  if (status === 502 || status === 503) return i18next.t("errors:unavailable");
+  if (status >= 502) return i18next.t("errors:unavailable");
 
   return message ?? fallback;
 };

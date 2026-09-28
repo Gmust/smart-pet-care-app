@@ -66,12 +66,12 @@ export const registerAuthInterceptors = (client: AxiosInstance = axios): void =>
 
       const originalRequest = error.config;
 
-      // Refresh on exactly one alias. Every other 401 (refresh token spent,
-      // account gone, token without a user id) ends the session: refreshing
-      // would loop, and a 401 from the refresh call itself would wait on its
-      // own in-flight refresh forever.
+      // Refresh on the one alias that means "token expired", or on a 401 with
+      // no contract body (a proxy, a framework default) where a refresh is the
+      // safe guess. Every other alias (refresh token spent, account gone, token
+      // without a user id) ends the session: refreshing would only loop.
       if (
-        code === "auth_authentication_required" &&
+        (code === "auth_authentication_required" || code === null) &&
         originalRequest &&
         refreshAuthSession &&
         Reflect.get(originalRequest, AUTH_RETRIED) !== true

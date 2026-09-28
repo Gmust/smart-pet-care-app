@@ -27,16 +27,14 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const optionalString = (value: unknown): string | null =>
   typeof value === "string" && value.length > 0 ? value : null;
 
-const retryDelay = (value: unknown): number | null => {
-  if (typeof value !== "number" && typeof value !== "string") return null;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
-};
-
 export const getApiError = (error: unknown): ParsedApiError => {
   const status = axios.isAxiosError(error) ? (error.response?.status ?? null) : null;
   const data: unknown = axios.isAxiosError(error) ? error.response?.data : null;
   const body = isRecord(data) ? data : {};
+  const retryAfter =
+    typeof body.retryAfterSeconds === "number" || typeof body.retryAfterSeconds === "string"
+      ? Number(body.retryAfterSeconds)
+      : NaN;
 
   return {
     status,
@@ -55,12 +53,13 @@ export const getApiError = (error: unknown): ParsedApiError => {
         )
       : {},
     // The server only sends `retryable` on dependency failures. Without it, a
-    // missing response and a rate limit are worth repeating; a 500 is a bug
+    // missing response, a rate limit and a gateway failure (502+, often a
+    // proxy page with no contract body) are worth repeating; a 500 is a bug
     // and fails identically, and a 4xx needs a different request.
     retryable:
       typeof body.retryable === "boolean"
         ? body.retryable
-        : status === null || status === 429 || status === 503,
-    retryAfterSeconds: retryDelay(body.retryAfterSeconds),
+        : status === null || status === 429 || status >= 502,
+    retryAfterSeconds: Number.isFinite(retryAfter) && retryAfter >= 0 ? retryAfter : null,
   };
 };

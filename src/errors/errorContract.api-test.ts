@@ -75,9 +75,10 @@ const expectTranslated = (aliases: string[]) => {
 
 /**
  * The app's real interceptor on a fresh client, with a refresh handler that
- * mirrors AuthContext.refreshSessionWithToken: it refreshes through the same
- * intercepted client, hands a re-entrant caller the in-flight promise, and
- * installs the new access token before resolving.
+ * mirrors AuthContext.refreshSessionWithToken: it refreshes past the
+ * interceptor (like the app's noAuthApi-bound postApiAuthRefresh), hands a
+ * re-entrant caller the in-flight promise, and installs the new access token
+ * before resolving.
  */
 const createSignedInClient = (
   refreshToken: string,
@@ -89,7 +90,7 @@ const createSignedInClient = (
 
   let inFlight: Promise<string | null> | null = null;
   const refresh = jest.fn(() => {
-    inFlight ??= api
+    inFlight ??= bare
       .postApiAuthRefresh({ refreshToken })
       .then(({ data }) => {
         onRefreshed(data);

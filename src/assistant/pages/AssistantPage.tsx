@@ -187,32 +187,38 @@ export default function AssistantPage() {
       if (activeSessionIdRef.current !== sessionId) return;
       const apiError = getApiError(error);
       if (apiError.code === "chat_session_not_found") recoverMissingSession(sessionId);
-      // A 409 means the server already holds another state for this turn: re-read it.
-      if ((apiError.retryable && !apiError.messageId) || apiError.status === 409)
-        void messagesQuery.refetch();
+      // 409: the server already holds another state for this turn (in flight,
+      // answered). Re-read it instead of a failure bubble, whose messageId
+      // would hide that state from the transcript.
+      const isStale = apiError.status === 409;
+      if ((apiError.retryable && !apiError.messageId) || isStale) void messagesQuery.refetch();
       setLocalTranscript((current) => ({
         sessionId,
         messages:
           current.sessionId === sessionId
-            ? current.messages.map((message) =>
+            ? current.messages.flatMap((message): AssistantTranscriptMessage[] =>
                 message.kind === "pending-assistant" && message.requestId === requestId
-                  ? {
-                      kind: "failed-assistant",
-                      id: message.id,
-                      requestId,
-                      role: "assistant",
-                      messageId: apiError.messageId,
-                      serverMessageId: apiError.messageId,
-                      failure: getAssistantFailureKind(apiError),
-                      retryable: apiError.retryable,
-                      retryAfterSeconds: apiError.retryAfterSeconds,
-                      localEmergency,
-                    }
-                  : message
+                  ? isStale
+                    ? []
+                    : [
+                        {
+                          kind: "failed-assistant",
+                          id: message.id,
+                          requestId,
+                          role: "assistant",
+                          messageId: apiError.messageId,
+                          serverMessageId: apiError.messageId,
+                          failure: getAssistantFailureKind(apiError),
+                          retryable: apiError.retryable,
+                          retryAfterSeconds: apiError.retryAfterSeconds,
+                          localEmergency,
+                        },
+                      ]
+                  : [message]
               )
             : [],
       }));
-      AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
+      if (!isStale) AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
     } finally {
       isSendingRef.current = false;
     }

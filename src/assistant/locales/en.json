@@ -114,7 +114,6 @@
     "request": "We could not prepare guidance. Your message is saved.",
     "retry": "Retry",
     "retryAfter": "Try again in {{seconds}} seconds.",
-    "conflict": "This message was already handled. The chat has been refreshed.",
     "sessionMissing": "This chat is no longer available. We are restoring the latest chat for this pet.",
     "rateLimited": "The assistant is receiving too many requests right now.",
     "dismiss": "Dismiss",

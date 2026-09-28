@@ -125,10 +125,10 @@ describe("EmailAuthForm", () => {
     expect(utils.getByText(/errors:codes\.auth_password_too_short/)).toBeTruthy();
     expect(utils.getByText(/errors:codes\.auth_password_too_weak/)).toBeTruthy();
     expect(utils.queryByText(/auth_terms_not_accepted/)).toBeNull();
-    // The toast still carries the form-level alias.
+    // The toast names the first failed rule, not the generic form-level alias.
     expect(toastMock).toHaveBeenCalledWith({
       type: "error",
-      text1: "errors:codes.request_validation_failed",
+      text1: "errors:codes.auth_email_invalid",
     });
   });
 
@@ -143,10 +143,11 @@ describe("EmailAuthForm", () => {
     );
     const utils = signInWith("milo@example.com");
 
+    // Not shown under any field, so the toast is where it reaches the user.
     await waitFor(() =>
       expect(toastMock).toHaveBeenCalledWith({
         type: "error",
-        text1: "errors:codes.request_validation_failed",
+        text1: "errors:codes.auth_password_confirm_required",
       })
     );
     expect(utils.getByRole("button", { name: "auth:actions.login" })).toBeEnabled();

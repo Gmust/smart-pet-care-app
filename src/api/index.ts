@@ -1,4 +1,4 @@
-import { api } from "./axios";
+import { api, noAuthApi } from "./axios";
 import { getSmartPetCareAPI } from "./generated";
 
 export { api, noAuthApi } from "./axios";
@@ -41,7 +41,6 @@ export const {
   postApiAuthLogout,
   postApiAuthResendConfirmation,
   postApiAuthOauthGoogleMobile,
-  postApiAuthRefresh,
   postApiAuthRegister,
   postApiPets,
   postApiReminders,
@@ -56,3 +55,8 @@ export const {
   getApiSymptoms,
   getApiSymptomsId,
 } = getSmartPetCareAPI(api);
+
+// Bypasses the auth interceptor: a 401 from the refresh call must end the
+// session. Through the interceptor it would refresh the refresh, which then
+// waits on its own in-flight promise and every request hangs.
+export const { postApiAuthRefresh } = getSmartPetCareAPI(noAuthApi);

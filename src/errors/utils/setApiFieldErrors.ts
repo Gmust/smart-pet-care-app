@@ -17,8 +17,9 @@ interface FormWithFields<TFormData> {
  * Shows the server's per-field validation aliases under the matching fields.
  * The server keys `errors` by DTO property ("Email") and forms use camelCase
  * ("email"), so names match case-insensitively. Set as an `onSubmit` error, it
- * clears as soon as the user enters a valid value. Fields the form does not
- * have, and aliases with no translation, are left to the caller's toast.
+ * clears as soon as the user enters a valid value. A field the form does not
+ * show still reaches the user: getApiErrorMessage puts the first translated
+ * field alias in the caller's toast.
  */
 export const setApiFieldErrors = <TFormData extends object>(
   form: FormWithFields<TFormData>,

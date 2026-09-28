@@ -517,7 +517,7 @@ describe("AssistantPage – server-backed conversation", () => {
     await waitFor(() => expect(utils.getByText("Answered meanwhile")).toBeTruthy());
     expect(retryMessageMock).toHaveBeenCalledWith(session.sessionId, "conflict-message");
     expect(utils.queryByLabelText("errors.retry")).toBeNull();
-    expect(utils.queryByText("errors.conflict")).toBeNull();
+    expect(utils.queryByText("errors.requestTitle")).toBeNull();
   });
 
   it("drops a failure whose message no longer exists", async () => {
@@ -682,17 +682,32 @@ describe("AssistantPage – server-backed conversation", () => {
     expect(createSessionMock).not.toHaveBeenCalled();
   });
 
-  it("re-reads the transcript when a send conflicts", async () => {
+  it("shows the re-read answer when a send conflicts, not a failure over it", async () => {
+    // The 409 names the message it belongs to. A failure bubble carrying that
+    // messageId used to hide the very answer the re-read brought back.
+    getMessagesMock.mockResolvedValueOnce(transcriptOf()).mockResolvedValue(
+      transcriptOf({
+        messageId: "answered-message",
+        role: ChatMessageRole.assistant,
+        status: ChatMessageStatus.Completed,
+        content: "Answered meanwhile",
+        createdAt: "2026-07-15T10:02:00Z",
+      })
+    );
     sendMessageMock.mockImplementation(() =>
       Promise.reject(
-        apiError(409, { code: "chat_message_processing_or_retry_required", message: "Busy." })
+        apiError(409, {
+          code: "chat_message_processing_or_retry_required",
+          message: "Busy.",
+          messageId: "answered-message",
+        })
       )
     );
     const utils = await renderConversation();
     await sendText(utils, "routine checkup");
 
-    await waitFor(() => expect(utils.getByText("errors.conflict")).toBeTruthy());
-    await waitFor(() => expect(getMessagesMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(utils.getByText("Answered meanwhile")).toBeTruthy());
+    expect(utils.queryByText("errors.requestTitle")).toBeNull();
   });
 });
 

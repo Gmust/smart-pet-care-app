@@ -2,6 +2,8 @@ import { AxiosError, AxiosHeaders } from "axios";
 
 import i18n from "@/i18n";
 
+import errorsEn from "../locales/en.json";
+
 import { getApiErrorMessage } from "./getApiErrorMessage";
 
 const t = i18n.getFixedT(null, ["errors", "common"]);
@@ -67,6 +69,25 @@ describe("getApiErrorMessage", () => {
     expect(message).toBe(t("errors:unavailable"));
   });
 
+  it("reads a gateway timeout with no contract body as unavailable", () => {
+    expect(getApiErrorMessage(apiFailure(504, "<html>Gateway Timeout</html>"))).toBe(
+      t("errors:unavailable")
+    );
+  });
+
+  it("names the failed rule of a field the form may not even show", () => {
+    // The reminder form has no time-zone input; the generic "some details
+    // aren't valid" would leave the user nothing to act on.
+    const message = getApiErrorMessage(
+      apiFailure(400, {
+        code: "request_validation_failed",
+        errors: { UtcOffsetMinutes: ["reminder_utc_offset_required"] },
+      })
+    );
+
+    expect(message).toBe(t("errors:codes.reminder_utc_offset_required"));
+  });
+
   it("shows the retry delay on 429, even when it arrives as a string", () => {
     const message = getApiErrorMessage(apiFailure(429, { retryAfterSeconds: "12" }));
 
@@ -88,5 +109,37 @@ describe("getApiErrorMessage", () => {
   it("uses the caller's fallback for a failure that never reached the API", () => {
     expect(getApiErrorMessage(new Error("DEVELOPER_ERROR"), "Google failed")).toBe("Google failed");
     expect(getApiErrorMessage(new Error("boom"))).toBe(t("common:errors.somethingWentWrong"));
+  });
+});
+
+// The field-level aliases from the error contract. They arrive as bare strings
+// inside `errors`, never with `params`.
+const FIELD_ALIASES = [
+  "auth_email_required",
+  "auth_email_invalid",
+  "auth_password_required",
+  "auth_password_too_short",
+  "auth_password_too_weak",
+  "auth_password_confirm_required",
+  "auth_passwords_do_not_match",
+  "auth_terms_not_accepted",
+  "auth_confirmation_code_required",
+  "auth_confirmation_code_malformed",
+  "chat_pet_id_required",
+  "chat_client_message_id_required",
+  "chat_message_text_required",
+  "chat_message_text_too_long",
+  "pet_species_required",
+  "reminder_utc_offset_required",
+];
+
+describe("field alias copy", () => {
+  it("never needs params, because field aliases arrive without them", () => {
+    // Otherwise the form shows "Use {{params.maxLength}} characters" verbatim.
+    const needingParams = Object.entries(errorsEn.codes)
+      .filter(([alias, text]) => FIELD_ALIASES.includes(alias) && text.includes("{{"))
+      .map(([alias]) => alias);
+
+    expect(needingParams).toEqual([]);
   });
 });

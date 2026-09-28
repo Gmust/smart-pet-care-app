@@ -3,6 +3,8 @@
 import type { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import axios, { AxiosError } from "axios";
 
+import type * as ApiModule from "@/api";
+
 import {
   registerAuthInterceptors,
   setAuthToken,
@@ -12,18 +14,20 @@ import {
 
 type Reply = { status: number; data?: unknown };
 
+type Route = (config: InternalAxiosRequestConfig) => Reply;
+
 // A fake server: every request is answered by `route` without touching the network.
-const createClient = (route: (config: InternalAxiosRequestConfig) => Reply): AxiosInstance => {
-  const client = axios.create({
-    adapter: async (config) => {
-      const { status, data } = route(config);
-      const response: AxiosResponse = { status, data, statusText: "", headers: {}, config };
-      if (status >= 400) {
-        throw new AxiosError("Request failed", "ERR_BAD_REQUEST", config, null, response);
-      }
-      return response;
-    },
-  });
+const fakeAdapter = (route: Route) => async (config: InternalAxiosRequestConfig) => {
+  const { status, data } = route(config);
+  const response: AxiosResponse = { status, data, statusText: "", headers: {}, config };
+  if (status >= 400) {
+    throw new AxiosError("Request failed", "ERR_BAD_REQUEST", config, null, response);
+  }
+  return response;
+};
+
+const createClient = (route: Route): AxiosInstance => {
+  const client = axios.create({ adapter: fakeAdapter(route) });
   registerAuthInterceptors(client);
   return client;
 };
@@ -127,6 +131,38 @@ describe("auth interceptor", () => {
     expect(refresh).toHaveBeenCalledTimes(1);
     expect(onUnauthorized).toHaveBeenCalled();
   }, 1000);
+
+  it("refreshes once on a 401 without a contract body, like a proxy's", async () => {
+    const client = createClient((config) => {
+      if (config.url === "/api/auth/refresh") return { status: 200, data: {} };
+      return config.headers.get("Authorization") === "Bearer fresh-token"
+        ? { status: 200, data: ["pet"] }
+        : { status: 401 };
+    });
+    const refresh = installRefresh(client);
+
+    await expect(client.get("/api/pets")).resolves.toMatchObject({ data: ["pet"] });
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(onUnauthorized).not.toHaveBeenCalled();
+  });
+
+  it("sends the app's refresh call past the interceptor, so its 401 cannot refresh", async () => {
+    // src/api/axios.ts warns that EXPO_PUBLIC_API_URL is unset under Jest.
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+    const { api, noAuthApi, postApiAuthRefresh }: typeof ApiModule = require("@/api");
+    warn.mockRestore();
+    // An empty 401 is exactly what makes the interceptor refresh. Bound to
+    // `api`, the refresh would refresh itself and wait on its own promise.
+    const emptyUnauthorized = fakeAdapter(() => ({ status: 401 }));
+    api.defaults.adapter = emptyUnauthorized;
+    noAuthApi.defaults.adapter = emptyUnauthorized;
+    const refresh = jest.fn(() => Promise.resolve(null));
+    setRefreshAuthSessionHandler(refresh);
+
+    await expect(postApiAuthRefresh({ refreshToken: "spent" })).rejects.toBeInstanceOf(AxiosError);
+    expect(refresh).not.toHaveBeenCalled();
+    expect(onUnauthorized).not.toHaveBeenCalled();
+  });
 
   it("does not refresh a replayed request a second time", async () => {
     // Capped so a regression fails here instead of refreshing until OOM.
