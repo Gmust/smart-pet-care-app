@@ -9,6 +9,7 @@ import { useRouter } from "expo-router";
 import type { AuthResponse } from "@/api/generated";
 import { getApiError } from "@/errors/utils/getApiError";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
@@ -77,6 +78,7 @@ export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: Email
           router.push({ pathname: "/(auth)/confirm-email", params: { email: value.email } });
           return;
         }
+        setApiFieldErrors(form, error);
         Toast.show({ type: "error", text1: getApiErrorMessage(error) });
       }
     },

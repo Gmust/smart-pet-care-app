@@ -9,6 +9,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { getApiError } from "@/errors/utils/getApiError";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
@@ -58,6 +59,7 @@ export default function ConfirmEmailPage() {
         if (code === "CONFIRMATION_CODE_EXPIRED" || code === "CONFIRMATION_TOO_MANY_ATTEMPTS") {
           form.reset();
         }
+        setApiFieldErrors(form, error);
         Toast.show({ type: "error", text1: getApiErrorMessage(error) });
       }
     },

@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
 import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
 import { useUpdateProfileMutation } from "@/profile/queries/useUpdateProfileMutation";
 import { editProfileSchema } from "@/profile/schemas/edit-profile.schema";
@@ -49,6 +50,7 @@ export const EditProfileDrawer = ({ isOpen, setIsOpen }: Props) => {
         setIsOpen(false);
       } catch (e) {
         console.error(e);
+        setApiFieldErrors(form, e);
         Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },

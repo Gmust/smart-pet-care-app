@@ -14,6 +14,9 @@ export interface ParsedApiError {
   message: string | null;
   /** Chat only: the message the failure belongs to. */
   messageId: string | null;
+  /** Per-field aliases from request validation, keyed by DTO property name
+   * as the server sends it (PascalCase: "Email"). */
+  fieldErrors: Record<string, string[]>;
   retryable: boolean;
   retryAfterSeconds: number | null;
 }
@@ -41,6 +44,16 @@ export const getApiError = (error: unknown): ParsedApiError => {
     params: isRecord(body.params) ? body.params : null,
     message: optionalString(body.message),
     messageId: optionalString(body.messageId),
+    fieldErrors: isRecord(body.errors)
+      ? Object.fromEntries(
+          Object.entries(body.errors).map(([field, aliases]) => [
+            field,
+            Array.isArray(aliases)
+              ? aliases.filter((alias): alias is string => typeof alias === "string")
+              : [],
+          ])
+        )
+      : {},
     // The server only sends `retryable` on dependency failures. Without it, a
     // missing response and a rate limit are worth repeating; a 500 is a bug
     // and fails identically, and a 4xx needs a different request.

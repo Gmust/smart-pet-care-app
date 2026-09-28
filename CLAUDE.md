@@ -126,6 +126,10 @@ const styles = StyleSheet.create((theme) => ({
   ```
 - Mutations invalidate; they do not fire toasts. Toasts belong at the call site (drawer/dialog),
   so one hook can serve several surfaces.
+- Errors: branch on `getApiError(error).code`, never on status or `message`. In a form's submit
+  catch, call `setApiFieldErrors(form, error)` and toast `getApiErrorMessage(error)`; alias copy
+  lives in `src/errors/locales/en.json`. Field aliases arrive without `params`, so their copy
+  must not use any.
 - **PATCH endpoints use `PatchFieldOf<T>` semantics: an omitted key is left unchanged, `null`
   clears the value.** Send only the fields that actually changed, or a stale form will silently
   overwrite someone else's concurrent edit.

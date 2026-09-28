@@ -11,6 +11,7 @@ import { DateTimeField } from "@/common/components/DateTimeField";
 import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
 import { formatTimeOfDay, parseTimeOfDay } from "@/common/utils/timeOfDay";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
@@ -124,6 +125,7 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId, initialVal
         setIsOpen(false);
       } catch (e) {
         console.error(e);
+        setApiFieldErrors(form, e);
         Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },

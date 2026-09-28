@@ -16,6 +16,7 @@
  * every write is one the server must reject.
  */
 
+import { FieldApi, FormApi } from "@tanstack/react-form";
 import axios from "axios";
 
 import type { AuthResponse } from "@/api/generated";
@@ -28,6 +29,8 @@ import {
 } from "@/api/interceptors";
 import errorsEn from "@/errors/locales/en.json";
 import { getApiError } from "@/errors/utils/getApiError";
+import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
+import i18n from "@/i18n";
 
 const baseURL = process.env.EXPO_PUBLIC_API_URL;
 if (!baseURL) throw new Error("EXPO_PUBLIC_API_URL is not set. Add it to .env.");
@@ -61,8 +64,14 @@ const expectFailure = async (request: Promise<unknown>, status: number, code: st
 };
 
 /** Every alias in `errors` must be translatable too: forms show them per field. */
-const expectTranslated = (aliases: string[]) =>
+const expectTranslated = (aliases: string[]) => {
   expect(Object.keys(errorsEn.codes)).toEqual(expect.arrayContaining(aliases));
+  // Field aliases arrive without params, so their copy must not need any.
+  const needingParams = Object.entries(errorsEn.codes)
+    .filter(([alias, text]) => aliases.includes(alias) && text.includes("{{"))
+    .map(([alias]) => alias);
+  expect(needingParams).toEqual([]);
+};
 
 /**
  * The app's real interceptor on a fresh client, with a refresh handler that
@@ -160,6 +169,30 @@ describe("error contract: anonymous", () => {
       errors: { Email: ["auth_email_required"], Password: ["auth_password_required"] },
     });
     expectTranslated(["auth_email_required", "auth_password_required"]);
+  });
+
+  it("lands real field aliases on the matching fields of a form", async () => {
+    // The login screen's form: passwordConfirm is in the values but not rendered.
+    const form = new FormApi({ defaultValues: { email: "", password: "", passwordConfirm: "" } });
+    form.mount();
+    new FieldApi({ form, name: "email" }).mount();
+    new FieldApi({ form, name: "password" }).mount();
+
+    let failure: unknown;
+    try {
+      await bare.postApiAuthLogin({ email: "", password: "" });
+    } catch (error) {
+      failure = error;
+    }
+    setApiFieldErrors(form, failure);
+
+    expect(form.getFieldMeta("email")?.errors).toEqual([
+      i18n.t("errors:codes.auth_email_required"),
+    ]);
+    expect(form.getFieldMeta("password")?.errors).toEqual([
+      i18n.t("errors:codes.auth_password_required"),
+    ]);
+    expect(form.getFieldMeta("passwordConfirm")).toBeUndefined();
   });
 
   it("400 lists every rule a field failed on register", async () => {

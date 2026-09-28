@@ -46,10 +46,10 @@ jest.mock("../queries/useResendConfirmationMutation", () => ({
 
 const toastMock = jest.mocked(Toast.show);
 
-const apiFailure = (status: number, code: string) => {
+const apiFailure = (status: number, code: string, errors?: Record<string, string[]>) => {
   const error = new AxiosError("Request failed", "ERR_BAD_REQUEST");
   error.response = {
-    data: { code, message: code, traceId: "trace" },
+    data: { code, message: code, traceId: "trace", errors },
     status,
     statusText: "",
     headers: {},
@@ -112,6 +112,24 @@ describe("ConfirmEmailPage", () => {
     );
     expect(utils.getByPlaceholderText("auth:confirmEmail.codePlaceholder").props.value).toBe(
       "123456"
+    );
+  });
+
+  it("shows the server's field alias under the code and clears it on the next edit", async () => {
+    // Keyed "Code" by the server, "code" by the form.
+    mockConfirm.mockImplementation(() =>
+      Promise.reject(
+        apiFailure(400, "request_validation_failed", {
+          Code: ["auth_confirmation_code_malformed"],
+        })
+      )
+    );
+    const utils = submitCode("123456");
+
+    expect(await utils.findByText("errors:codes.auth_confirmation_code_malformed")).toBeTruthy();
+    fireEvent.changeText(utils.getByPlaceholderText("auth:confirmEmail.codePlaceholder"), "654321");
+    await waitFor(() =>
+      expect(utils.queryByText("errors:codes.auth_confirmation_code_malformed")).toBeNull()
     );
   });
 

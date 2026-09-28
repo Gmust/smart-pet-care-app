@@ -30,6 +30,7 @@ describe("getApiError", () => {
           retryable: true,
           retryAfterSeconds: "12",
           messageId: "message-1",
+          errors: { Email: ["auth_email_invalid", 7], Broken: "not-a-list" },
         })
       )
     ).toEqual({
@@ -38,6 +39,8 @@ describe("getApiError", () => {
       params: { limit: 5 },
       message: "Classifier unreachable.",
       messageId: "message-1",
+      // Non-string aliases are dropped rather than rendered.
+      fieldErrors: { Email: ["auth_email_invalid"], Broken: [] },
       retryable: true,
       retryAfterSeconds: 12,
     });

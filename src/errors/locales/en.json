@@ -23,7 +23,7 @@
     "chat_pet_id_required": "Choose a pet to start a chat.",
     "chat_client_message_id_required": "Your message couldn't be sent. Please try again.",
     "chat_message_text_required": "Type a message first.",
-    "chat_message_text_too_long": "Message is too long. Use {{params.maxLength}} characters or fewer.",
+    "chat_message_text_too_long": "Message is too long. Shorten it and try again.",
     "pet_species_required": "Choose a species.",
     "reminder_utc_offset_required": "Your device's time zone couldn't be read. Please try again.",
 

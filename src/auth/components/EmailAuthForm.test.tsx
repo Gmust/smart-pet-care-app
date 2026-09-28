@@ -9,6 +9,7 @@ import { EmailAuthForm } from "./EmailAuthForm";
 const mockTranslate = (key: string) => key;
 const mockRouter = { replace: jest.fn(), push: jest.fn() };
 const mockLogin = jest.fn();
+const mockRegister = jest.fn();
 
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({ t: mockTranslate, i18n: { language: "en" } }),
@@ -34,15 +35,15 @@ jest.mock("../queries/useLoginMutation", () => ({
 }));
 
 jest.mock("../queries/useRegisterMutation", () => ({
-  useRegisterMutation: () => ({ mutateAsync: jest.fn() }),
+  useRegisterMutation: () => ({ mutateAsync: mockRegister }),
 }));
 
 const toastMock = jest.mocked(Toast.show);
 
-const apiFailure = (status: number, code: string) => {
+const apiFailure = (status: number, code: string, errors?: Record<string, string[]>) => {
   const error = new AxiosError("Request failed", "ERR_BAD_REQUEST");
   error.response = {
-    data: { code, message: code, traceId: "trace" },
+    data: { code, message: code, traceId: "trace", errors },
     status,
     statusText: "",
     headers: {},
@@ -91,5 +92,63 @@ describe("EmailAuthForm", () => {
       })
     );
     expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
+  it("puts every failed rule under its field on register, ignoring fields the form lacks", async () => {
+    // Real server shape: PascalCase keys, a duplicated alias, and a field
+    // (Terms) that has no input on this form.
+    mockRegister.mockImplementation(() =>
+      Promise.reject(
+        apiFailure(400, "request_validation_failed", {
+          Email: ["auth_email_invalid", "auth_email_invalid"],
+          Password: ["auth_password_too_short", "auth_password_too_weak"],
+          TermsAccepted: ["auth_terms_not_accepted"],
+        })
+      )
+    );
+    const utils = render(
+      <EmailAuthForm mode="register" termsPreAccepted onAuthenticated={jest.fn()} />
+    );
+    fireEvent.changeText(utils.getByPlaceholderText("auth:fields.emailPlaceholder"), "a@b.co");
+    fireEvent.changeText(
+      utils.getByPlaceholderText("auth:fields.passwordPlaceholder"),
+      "Secret-1!"
+    );
+    fireEvent.changeText(
+      utils.getByPlaceholderText("auth:fields.passwordConfirmPlaceholder"),
+      "Secret-1!"
+    );
+    fireEvent.press(utils.getByText("auth:actions.register"));
+
+    expect(await utils.findByText("errors:codes.auth_email_invalid")).toBeTruthy();
+    expect(utils.getAllByText("errors:codes.auth_email_invalid")).toHaveLength(1);
+    expect(utils.getByText(/errors:codes\.auth_password_too_short/)).toBeTruthy();
+    expect(utils.getByText(/errors:codes\.auth_password_too_weak/)).toBeTruthy();
+    expect(utils.queryByText(/auth_terms_not_accepted/)).toBeNull();
+    // The toast still carries the form-level alias.
+    expect(toastMock).toHaveBeenCalledWith({
+      type: "error",
+      text1: "errors:codes.request_validation_failed",
+    });
+  });
+
+  it("ignores a server error for a field that is not on screen, so it cannot block submit", async () => {
+    // Login renders no password-confirm input, but the form still holds its value.
+    mockLogin.mockImplementation(() =>
+      Promise.reject(
+        apiFailure(400, "request_validation_failed", {
+          PasswordConfirm: ["auth_password_confirm_required"],
+        })
+      )
+    );
+    const utils = signInWith("milo@example.com");
+
+    await waitFor(() =>
+      expect(toastMock).toHaveBeenCalledWith({
+        type: "error",
+        text1: "errors:codes.request_validation_failed",
+      })
+    );
+    expect(utils.getByRole("button", { name: "auth:actions.login" })).toBeEnabled();
   });
 });

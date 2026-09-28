@@ -10,6 +10,7 @@ import type { ActivityLogResponseDto, PatchActivityLogDto } from "@/api/generate
 import { ActivitySource } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
 import {
@@ -160,6 +161,7 @@ export const CreateActivityDrawer = ({ isOpen, setIsOpen, petId, activity }: Pro
         setIsOpen(false);
       } catch (e) {
         console.error(e);
+        setApiFieldErrors(form, e);
         Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },

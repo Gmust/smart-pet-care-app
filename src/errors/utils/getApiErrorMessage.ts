@@ -8,7 +8,7 @@ import { getApiError } from "./getApiError";
 // A type guard, not an inline check: Object.hasOwn alone does not narrow `code`
 // to a key the typed `t` accepts. The English locale doubles as the list of
 // backend aliases we translate, so supporting a new code is one line in en.json.
-const isTranslatedCode = (code: string | null): code is keyof typeof errorsEn.codes =>
+export const isTranslatedCode = (code: string | null): code is keyof typeof errorsEn.codes =>
   code !== null && Object.hasOwn(errorsEn.codes, code);
 
 /** User-facing text for a failed request: the translated `code`, then a
