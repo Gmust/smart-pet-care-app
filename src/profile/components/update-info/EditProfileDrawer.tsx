@@ -4,6 +4,7 @@ import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
 import { useUpdateProfileMutation } from "@/profile/queries/useUpdateProfileMutation";
 import { editProfileSchema } from "@/profile/schemas/edit-profile.schema";
@@ -48,7 +49,7 @@ export const EditProfileDrawer = ({ isOpen, setIsOpen }: Props) => {
         setIsOpen(false);
       } catch (e) {
         console.error(e);
-        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+        Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },
   });

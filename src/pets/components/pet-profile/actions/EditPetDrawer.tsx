@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 
 import { AnimalSpecies, type PetResponseDto, Sex } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { useUpdatePetMutation } from "@/pets/queries/useUpdatePetMutation";
 import type { CreatePetForm } from "@/pets/schemas/create-pet.schema";
 import { createPetSchema } from "@/pets/schemas/create-pet.schema";
@@ -95,7 +96,7 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
         setIsOpen(false);
       } catch (e) {
         console.error(e);
-        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+        Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },
   });

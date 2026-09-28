@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/auth/hooks/useAuth";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
 import { TriangleAlertIcon } from "@/icons/alert";
 import { PencilLineIcon } from "@/icons/pencil-line";
@@ -73,7 +74,7 @@ export default function ProfilePage() {
       router.replace("/(auth)/welcome");
     } catch (e) {
       console.error(e);
-      Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+      Toast.show({ type: "error", text1: getApiErrorMessage(e) });
     }
   };
 

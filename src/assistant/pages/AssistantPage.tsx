@@ -8,7 +8,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { ChatMessageStatus, ClassifierUrgency } from "@/api/generated";
-import { getApiError } from "@/common/utils/getApiError";
+import { getApiError } from "@/errors/utils/getApiError";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";

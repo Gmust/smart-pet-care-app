@@ -1,6 +1,8 @@
 import type { AxiosInstance } from "axios";
 import axios from "axios";
 
+import { getApiError } from "@/errors/utils/getApiError";
+
 // The generated client still uses the global axios export, while app-owned API
 // objects use configured instances from src/api/axios.ts.
 
@@ -29,7 +31,12 @@ export const setRefreshAuthSessionHandler = (
 };
 
 const installedClients = new WeakSet<AxiosInstance>();
-const retriedRequests = new WeakSet<object>();
+
+// Marks a request already replayed after a refresh. A flag on the config, not a
+// WeakSet of configs: axios copies the config on `client.request`, so identity
+// never matches on the replay, and a replay that 401s again refreshed forever.
+// Reflect keeps it off the axios types; custom keys survive the copy.
+const AUTH_RETRIED = "authRetried";
 
 export const registerAuthInterceptors = (client: AxiosInstance = axios): void => {
   if (installedClients.has(client)) return;
@@ -50,10 +57,26 @@ export const registerAuthInterceptors = (client: AxiosInstance = axios): void =>
         return Promise.reject(error);
       }
 
+      const { code } = getApiError(error);
+
+      // Wrong credentials at login are a form error, not a session problem.
+      if (code === "auth_invalid_credentials" || code === "auth_google_failed") {
+        return Promise.reject(error);
+      }
+
       const originalRequest = error.config;
 
-      if (originalRequest && refreshAuthSession && !retriedRequests.has(originalRequest)) {
-        retriedRequests.add(originalRequest);
+      // Refresh on exactly one alias. Every other 401 (refresh token spent,
+      // account gone, token without a user id) ends the session: refreshing
+      // would loop, and a 401 from the refresh call itself would wait on its
+      // own in-flight refresh forever.
+      if (
+        code === "auth_authentication_required" &&
+        originalRequest &&
+        refreshAuthSession &&
+        Reflect.get(originalRequest, AUTH_RETRIED) !== true
+      ) {
+        Reflect.set(originalRequest, AUTH_RETRIED, true);
 
         const nextAccessToken = await refreshAuthSession();
         if (nextAccessToken) {

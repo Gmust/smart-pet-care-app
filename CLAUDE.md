@@ -56,6 +56,7 @@ pnpm web            # Run in browser (do not use for default validation)
 pnpm lint           # ESLint
 pnpm typecheck      # TypeScript check
 pnpm test           # Jest
+pnpm test:api       # Error-contract tests against the real API (.env URL; API_TEST_EMAIL/PASSWORD for signed-in cases)
 pnpm check          # Lint + typecheck
 ```
 

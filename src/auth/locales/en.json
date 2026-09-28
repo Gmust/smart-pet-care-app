@@ -53,13 +53,9 @@
     "codeInvalid": "Enter the 6-digit code from your email."
   },
   "errors": {
-    "registerFailed": "We couldn't create your account. Please try again.",
-    "loginFailed": "Incorrect email or password.",
     "confirmFailed": "We couldn't confirm your email. Check the code and try again.",
-    "resendFailed": "We couldn't resend the code. Please try again.",
     "googleFailed": "Google sign-in didn't complete. Please try again.",
-    "googleUnavailable": "Google sign-in isn't configured yet.",
-    "generic": "Something went wrong. Please try again."
+    "googleUnavailable": "Google sign-in isn't configured yet."
   },
   "success": {
     "accountCreatedTitle": "Account created",

@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 
 import type { HealthRecordResponseDto } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
@@ -150,7 +151,7 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
         setIsOpen(false);
       } catch (e) {
         console.error(e);
-        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+        Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },
   });

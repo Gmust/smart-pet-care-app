@@ -7,7 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import { getProblemMessage } from "@/common/utils/getProblemMessage";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
@@ -46,8 +46,7 @@ export default function ConfirmEmailPage() {
         });
         router.replace({ pathname: "/(auth)/sign-in", params: { mode: "login" } });
       } catch (error) {
-        const message = getProblemMessage(error, t("auth:errors.confirmFailed"));
-        Toast.show({ type: "error", text1: message });
+        Toast.show({ type: "error", text1: getApiErrorMessage(error) });
       }
     },
   });
@@ -62,8 +61,7 @@ export default function ConfirmEmailPage() {
       await resendConfirmation({ email });
       Toast.show({ type: "success", text1: t("auth:success.codeResentTitle") });
     } catch (error) {
-      const message = getProblemMessage(error, t("auth:errors.resendFailed"));
-      Toast.show({ type: "error", text1: message });
+      Toast.show({ type: "error", text1: getApiErrorMessage(error) });
     }
   };
 

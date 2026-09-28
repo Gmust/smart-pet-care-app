@@ -11,6 +11,7 @@ import type { WellnessReminderSuggestionDto } from "@/api/generated";
 import { ClassifierWellnessBand } from "@/api/generated";
 import { BackButton } from "@/common/components/BackButton";
 import { SectionHeader } from "@/common/components/SectionHeader";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { CircleAlertIcon } from "@/icons/alert";
 import { usePetQuery } from "@/pets/queries/usePetQuery";
 import { CreateReminderDrawer } from "@/reminders/components/CreateReminderDrawer";
@@ -24,7 +25,6 @@ import { isWellnessStateOk, WELLNESS_STATE_KEYS } from "../constants";
 import { useWellnessQuery } from "../queries/useWellnessQuery";
 import { wellnessParamsSchema } from "../schemas/wellness-params.schema";
 import { WellnessPageSkeleton } from "../skeletons/WellnessPageSkeleton";
-import { getWellnessErrorMessage } from "../utils/getWellnessErrorMessage";
 import { parseWellnessScore } from "../utils/parseWellnessScore";
 
 const BAND_STYLE_KEY = {
@@ -110,7 +110,7 @@ export default function WellnessPage() {
                 Toast.show({
                   type: "error",
                   text1: t("wellness:error.title"),
-                  text2: getWellnessErrorMessage(result.error, t),
+                  text2: getApiErrorMessage(result.error),
                 });
               }
             }}
@@ -125,7 +125,7 @@ export default function WellnessPage() {
           <Card>
             <Text variant="titleM">{t("wellness:error.title")}</Text>
             <Text variant="bodyS" style={styles.muted}>
-              {getWellnessErrorMessage(error, t)}
+              {getApiErrorMessage(error)}
             </Text>
           </Card>
         ) : !wellness ? (

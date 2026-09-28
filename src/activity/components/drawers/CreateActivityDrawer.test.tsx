@@ -22,6 +22,12 @@ jest.mock("react-i18next", () => ({
   useTranslation: () => ({ t: mockTranslate, i18n: { language: "en" } }),
 }));
 
+// getApiErrorMessage translates through the global instance, not the hook.
+jest.mock("i18next", () => ({
+  __esModule: true,
+  default: { t: (key: string) => mockTranslate(key) },
+}));
+
 jest.mock("react-native-toast-message", () => ({
   __esModule: true,
   default: { show: jest.fn(), hide: jest.fn() },

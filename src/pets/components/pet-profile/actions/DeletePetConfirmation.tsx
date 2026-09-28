@@ -3,6 +3,7 @@ import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { useDeletePet } from "@/pets/queries/useDeletePet";
 import { Button } from "@/shadecn/ui/button";
 import type { DialogHandler } from "@/shadecn/ui/dialog";
@@ -41,7 +42,7 @@ export const DeletePetConfirmation = ({ isOpen, setIsOpen, petId, petName }: Pro
       router.replace("/(tabs)/pets");
     } catch (e) {
       console.error(e);
-      Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+      Toast.show({ type: "error", text1: getApiErrorMessage(e) });
     }
   };
   return (

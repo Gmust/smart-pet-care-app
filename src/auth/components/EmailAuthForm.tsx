@@ -7,7 +7,7 @@ import { useForm } from "@tanstack/react-form";
 import { useRouter } from "expo-router";
 
 import type { AuthResponse } from "@/api/generated";
-import { getProblemMessage } from "@/common/utils/getProblemMessage";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
 import { Input } from "@/shadecn/ui/input";
@@ -70,11 +70,7 @@ export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: Email
         await new Promise((resolve) => setTimeout(resolve, 350));
         onAuthenticated(response);
       } catch (error) {
-        const message = getProblemMessage(
-          error,
-          isRegister ? t("auth:errors.registerFailed") : t("auth:errors.loginFailed")
-        );
-        Toast.show({ type: "error", text1: message });
+        Toast.show({ type: "error", text1: getApiErrorMessage(error) });
       }
     },
   });

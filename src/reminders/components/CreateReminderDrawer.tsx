@@ -10,6 +10,7 @@ import { DaysOfWeek, RecalcStrategy, ReminderType, RepeatType } from "@/api/gene
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
 import { formatTimeOfDay, parseTimeOfDay } from "@/common/utils/timeOfDay";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
@@ -123,7 +124,7 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId, initialVal
         setIsOpen(false);
       } catch (e) {
         console.error(e);
-        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+        Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },
   });

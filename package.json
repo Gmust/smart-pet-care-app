@@ -15,6 +15,7 @@
     "lint:fix": "expo lint --fix",
     "typecheck": "tsc --noEmit",
     "test": "jest --passWithNoTests",
+    "test:api": "jest --config jest.api.config.js",
     "check": "pnpm lint && pnpm typecheck",
     "design:lint": "node scripts/lint-design.mjs",
     "perf": "bash scripts/perf.sh",

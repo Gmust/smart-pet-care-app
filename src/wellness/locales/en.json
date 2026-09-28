@@ -65,14 +65,7 @@
     "description": "Log activity, meals and health records for {{petName}} and a score will appear here."
   },
   "error": {
-    "title": "Couldn't load wellness",
-    "description": "Check your connection and try again.",
-    "rateLimited": "Too many requests. Try again later.",
-    "rateLimitedRetryAfter": "Too many requests. Try again in {{seconds}} seconds.",
-    "unavailable": "The wellness service is temporarily unavailable. Try again later.",
-    "codes": {
-      "request_validation_failed": "This request was invalid. Reopen the pet and try again."
-    }
+    "title": "Couldn't load wellness"
   },
   "updateNote": "The score updates once every 3 days, when all health conditions for measurement are met."
 }
