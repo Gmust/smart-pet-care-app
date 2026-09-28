@@ -81,7 +81,7 @@ function FailedMessage({
         <Text style={styles.failureTitle}>{t("errors.requestTitle")}</Text>
         <Text style={styles.failureText}>
           {failure === "conflict"
-            ? t("errors.retryConflict")
+            ? t("errors.conflict")
             : failure === "not-found"
               ? t("errors.sessionMissing")
               : failure === "rate-limited"

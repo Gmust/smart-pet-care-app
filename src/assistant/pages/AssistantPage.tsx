@@ -34,6 +34,7 @@ import {
   setAiUsingConsent,
 } from "../utils/aiUsingConsentStorage";
 import { hasEmergencyIndicator } from "../utils/assistantEmergency";
+import { getAssistantFailureKind } from "../utils/assistantFailure";
 import { ASSISTANT_PERSISTENCE_STATUS } from "../utils/assistantPersistence";
 
 const SCROLL_TO_END_THRESHOLD = 160;
@@ -185,8 +186,10 @@ export default function AssistantPage() {
     } catch (error) {
       if (activeSessionIdRef.current !== sessionId) return;
       const apiError = getApiError(error);
-      if (apiError.status === 404) recoverMissingSession(sessionId);
-      if (apiError.retryable && !apiError.messageId) void messagesQuery.refetch();
+      if (apiError.code === "chat_session_not_found") recoverMissingSession(sessionId);
+      // A 409 means the server already holds another state for this turn: re-read it.
+      if ((apiError.retryable && !apiError.messageId) || apiError.status === 409)
+        void messagesQuery.refetch();
       setLocalTranscript((current) => ({
         sessionId,
         messages:
@@ -200,14 +203,7 @@ export default function AssistantPage() {
                       role: "assistant",
                       messageId: apiError.messageId,
                       serverMessageId: apiError.messageId,
-                      failure:
-                        apiError.status === 409
-                          ? "conflict"
-                          : apiError.status === 404
-                            ? "not-found"
-                            : apiError.status === 429
-                              ? "rate-limited"
-                              : "unavailable",
+                      failure: getAssistantFailureKind(apiError),
                       retryable: apiError.retryable,
                       retryAfterSeconds: apiError.retryAfterSeconds,
                       localEmergency,
@@ -278,7 +274,11 @@ export default function AssistantPage() {
     } catch (error) {
       if (activeSessionIdRef.current !== sessionId) return;
       const apiError = getApiError(error);
-      if (apiError.status === 404) recoverMissingSession(sessionId);
+      if (apiError.code === "chat_session_not_found") recoverMissingSession(sessionId);
+      // The message is gone (404) or no longer a failed one (409: answered, in
+      // flight, or not retryable). The mutation re-reads messages on settle; a
+      // local failure would hide that state behind a retry that cannot succeed.
+      const isStale = apiError.code === "chat_message_not_found" || apiError.status === 409;
       const failedMessage: AssistantTranscriptMessage = {
         kind: "failed-assistant",
         id: `assistant-${requestId}`,
@@ -286,14 +286,7 @@ export default function AssistantPage() {
         role: "assistant",
         messageId,
         serverMessageId: messageId,
-        failure:
-          apiError.status === 409
-            ? "conflict"
-            : apiError.status === 404
-              ? "not-found"
-              : apiError.status === 429
-                ? "rate-limited"
-                : "unavailable",
+        failure: getAssistantFailureKind(apiError),
         retryable: apiError.retryable,
         retryAfterSeconds: apiError.retryAfterSeconds,
         localEmergency,
@@ -310,10 +303,10 @@ export default function AssistantPage() {
                   )
               )
             : []),
-          failedMessage,
+          ...(isStale ? [] : [failedMessage]),
         ],
       }));
-      AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
+      if (!isStale) AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
     }
   };
 
@@ -361,7 +354,11 @@ export default function AssistantPage() {
   }, [consentChecked, isPetsLoading, router, selectedPet]);
 
   useEffect(() => {
-    if (activeSessionId && messagesQuery.error && getApiError(messagesQuery.error).status === 404)
+    if (
+      activeSessionId &&
+      messagesQuery.error &&
+      getApiError(messagesQuery.error).code === "chat_session_not_found"
+    )
       recoverMissingSession(activeSessionId);
   }, [activeSessionId, messagesQuery.error, recoverMissingSession]);
 

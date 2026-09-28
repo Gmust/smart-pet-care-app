@@ -309,6 +309,43 @@ const password = process.env.API_TEST_PASSWORD;
     );
   });
 
+  it("404 chat_session_not_found when sending to or retrying in an unknown chat", async () => {
+    // The assistant restores the session on exactly this alias and no other 404.
+    const sessionId = crypto.randomUUID();
+    await expectFailure(
+      bare.postApiSessionsSessionIdMessages(
+        sessionId,
+        { clientMessageId: crypto.randomUUID(), text: "Contract test" },
+        signedIn()
+      ),
+      404,
+      "chat_session_not_found"
+    );
+    await expectFailure(
+      bare.postApiSessionsSessionIdMessagesMessageIdRetry(
+        sessionId,
+        crypto.randomUUID(),
+        signedIn()
+      ),
+      404,
+      "chat_session_not_found"
+    );
+  });
+
+  it("409 EMAIL_ALREADY_CONFIRMED on confirm and resend for a confirmed address", async () => {
+    // The confirm screen treats this as success and moves on to sign-in.
+    await expectFailure(
+      bare.postApiAuthConfirmEmail({ email: email ?? "", code: "000000" }),
+      409,
+      "EMAIL_ALREADY_CONFIRMED"
+    );
+    await expectFailure(
+      bare.postApiAuthResendConfirmation({ email: email ?? "" }),
+      409,
+      "EMAIL_ALREADY_CONFIRMED"
+    );
+  });
+
   it("refreshes a rejected access token once and replays the request", async () => {
     const { api, refresh, onUnauthorized } = createSignedInClient(refreshToken, keep);
     // Same header and claims, broken signature: fails validation like an expired token.

@@ -7,6 +7,7 @@ import { useForm } from "@tanstack/react-form";
 import { useRouter } from "expo-router";
 
 import type { AuthResponse } from "@/api/generated";
+import { getApiError } from "@/errors/utils/getApiError";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
@@ -70,6 +71,12 @@ export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: Email
         await new Promise((resolve) => setTimeout(resolve, 350));
         onAuthenticated(response);
       } catch (error) {
+        // Signed up but never confirmed: the next step is the code, not a retry.
+        if (getApiError(error).code === "EMAIL_NOT_CONFIRMED") {
+          Toast.show({ type: "info", text1: getApiErrorMessage(error) });
+          router.push({ pathname: "/(auth)/confirm-email", params: { email: value.email } });
+          return;
+        }
         Toast.show({ type: "error", text1: getApiErrorMessage(error) });
       }
     },

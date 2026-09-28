@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
+import { getApiError } from "@/errors/utils/getApiError";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { Button } from "@/shadecn/ui/button";
 import { FieldError } from "@/shadecn/ui/field-error";
@@ -28,6 +29,12 @@ export default function ConfirmEmailPage() {
 
   const schema = useMemo(() => confirmEmailSchema(t), [t]);
 
+  // Confirmed just now or earlier (another device, a second tap): sign in next.
+  const goToSignIn = (text1: string, text2?: string) => {
+    Toast.show({ type: "success", text1, text2 });
+    router.replace({ pathname: "/(auth)/sign-in", params: { mode: "login" } });
+  };
+
   const form = useForm({
     defaultValues: { code: "" },
     validators: { onChange: schema, onSubmit: schema },
@@ -39,13 +46,18 @@ export default function ConfirmEmailPage() {
 
       try {
         await confirmEmail({ email, code: value.code });
-        Toast.show({
-          type: "success",
-          text1: t("auth:success.emailConfirmedTitle"),
-          text2: t("auth:success.emailConfirmedBody"),
-        });
-        router.replace({ pathname: "/(auth)/sign-in", params: { mode: "login" } });
+        goToSignIn(t("auth:success.emailConfirmedTitle"), t("auth:success.emailConfirmedBody"));
       } catch (error) {
+        const { code } = getApiError(error);
+        if (code === "EMAIL_ALREADY_CONFIRMED") {
+          goToSignIn(getApiErrorMessage(error));
+          return;
+        }
+        // Retyping cannot revive an expired or locked-out code: clear it so the
+        // next step is Resend.
+        if (code === "CONFIRMATION_CODE_EXPIRED" || code === "CONFIRMATION_TOO_MANY_ATTEMPTS") {
+          form.reset();
+        }
         Toast.show({ type: "error", text1: getApiErrorMessage(error) });
       }
     },
@@ -61,6 +73,10 @@ export default function ConfirmEmailPage() {
       await resendConfirmation({ email });
       Toast.show({ type: "success", text1: t("auth:success.codeResentTitle") });
     } catch (error) {
+      if (getApiError(error).code === "EMAIL_ALREADY_CONFIRMED") {
+        goToSignIn(getApiErrorMessage(error));
+        return;
+      }
       Toast.show({ type: "error", text1: getApiErrorMessage(error) });
     }
   };
