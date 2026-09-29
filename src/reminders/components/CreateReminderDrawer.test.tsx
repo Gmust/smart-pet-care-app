@@ -42,11 +42,18 @@ jest.mock("@/shadecn/ui/drawer", () => {
 // The select primitive needs a portal host; the pet picker is not under test.
 jest.mock("@/shadecn/ui/select", () => {
   const React = require("react");
-  const { View } = require("react-native");
+  const { Text, View } = require("react-native");
   const passthrough = ({ children }: { children?: React.ReactNode }) =>
     React.createElement(View, null, children);
   return {
-    Select: passthrough,
+    // Shows the selected option, so a test can see what the form preselected.
+    Select: ({ children, value }: { children?: React.ReactNode; value?: { label: string } }) =>
+      React.createElement(
+        View,
+        null,
+        value ? React.createElement(Text, null, `selected:${value.label}`) : null,
+        children
+      ),
     SelectContent: passthrough,
     SelectItem: () => null,
     SelectTrigger: passthrough,
@@ -102,6 +109,19 @@ describe("CreateReminderDrawer", () => {
 
     expect(getByDisplayValue(initialValues.title)).toBeTruthy();
     expect(getByDisplayValue(initialValues.description)).toBeTruthy();
+  });
+
+  it("preselects the pet it was opened for", () => {
+    // From a pet's profile the reminder is for that pet; making the user pick
+    // it again was an extra step, and a flow that skipped it could not save.
+    const pet = { id: "0b7f2d8e-4c1a-4d2e-9f3a-1b2c3d4e5f60", name: "Rex" };
+    mockPets.mockReturnValue({ data: [pet], isLoading: false });
+
+    const { getByText } = render(
+      <CreateReminderDrawer petId={pet.id} isOpen setIsOpen={jest.fn()} />
+    );
+
+    expect(getByText("selected:Rex")).toBeTruthy();
   });
 
   describe("edit mode", () => {

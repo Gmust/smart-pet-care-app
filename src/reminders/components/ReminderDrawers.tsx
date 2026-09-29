@@ -4,6 +4,8 @@ import { ReminderRunsDrawer } from "./ReminderRunsDrawer";
 import { ReminderStatusDrawer } from "./ReminderStatusDrawer";
 
 type ReminderDrawersProps = {
+  /** Preselects this pet in the create drawer (the screen belongs to one pet). */
+  petId?: string;
   isCreateOpen: boolean;
   setIsCreateOpen: (open: boolean) => void;
   editReminderId: string | null;
@@ -17,6 +19,7 @@ type ReminderDrawersProps = {
 };
 
 export function ReminderDrawers({
+  petId,
   isCreateOpen,
   setIsCreateOpen,
   editReminderId,
@@ -30,7 +33,7 @@ export function ReminderDrawers({
 }: ReminderDrawersProps) {
   return (
     <>
-      <CreateReminderDrawer isOpen={isCreateOpen} setIsOpen={setIsCreateOpen} />
+      <CreateReminderDrawer petId={petId} isOpen={isCreateOpen} setIsOpen={setIsCreateOpen} />
 
       {!!editReminderId && (
         <CreateReminderDrawer

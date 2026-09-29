@@ -45,6 +45,9 @@ type Props = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   reminderId?: string;
+  /** Create mode only: preselects this pet each time the drawer opens (e.g. from
+   * the pet's profile). The picker stays, so the user can still change it. */
+  petId?: string;
   /** Create mode only: fields to seed the form with when the drawer opens
    * (e.g. a wellness reminder suggestion). Ignored in edit mode. */
   initialValues?: Partial<CreateReminderForm>;
@@ -107,7 +110,13 @@ const toSchedule = (value: CreateReminderForm) => {
   };
 };
 
-export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId, initialValues }: Props) => {
+export const CreateReminderDrawer = ({
+  isOpen,
+  setIsOpen,
+  reminderId,
+  petId,
+  initialValues,
+}: Props) => {
   const { t } = useTranslation(["reminders", "common"]);
   const { data: pets, isLoading: isPetsLoading } = usePetsQuery();
 
@@ -182,10 +191,14 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId, initialVal
     );
   }, [isEditMode, reminder, form]);
 
+  // Runs on every open: the reset after a save clears the seeded values.
   useEffect(() => {
-    if (isEditMode || !isOpen || !initialValues) return;
-    form.reset({ ...defaultValues, ...initialValues }, { keepDefaultValues: true });
-  }, [isEditMode, isOpen, initialValues, form]);
+    if (isEditMode || !isOpen || (!petId && !initialValues)) return;
+    form.reset(
+      { ...defaultValues, ...(petId ? { petId } : {}), ...initialValues },
+      { keepDefaultValues: true }
+    );
+  }, [isEditMode, isOpen, petId, initialValues, form]);
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
