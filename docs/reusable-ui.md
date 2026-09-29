@@ -81,9 +81,14 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 ### `Input` — `@/shadecn/ui/input`
 
 - Sizes: `sm`, `md`, `lg`
-- Props: `label`, `helperText`, `error`, `editable`, `multiline`, `containerStyle`, `inputStyle`,
-  plus standard `TextInput` props
+- Props: `label`, `helperText`, `error`, `editable`, `multiline`, `displayOnly`, `containerStyle`,
+  `inputStyle`, plus standard `TextInput` props
 - Use with TanStack Form field handlers only — never local state for field values
+- `displayOnly` renders the value as single-line `Text` (ellipsised at the tail) rather than a
+  `TextInput`: for a field that is a tap target, not a text field, since Android's `TextInput`
+  scrolls an overflowing value so the _start_ of it disappears. `DateTimeField` renders through it.
+  It drops `TextInput`-only props (ref, focus, multiline), so keep it static; `editable={false}`
+  alone stays a real `TextInput`.
 
 ### `Chip` — `@/shadecn/ui/chip`
 

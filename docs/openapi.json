@@ -13,6 +13,242 @@
     }
   ],
   "paths": {
+    "/api/pets/{petId}/wellness/evaluation": {
+      "get": {
+        "tags": ["Wellness"],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellnessResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellnessResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellnessResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad Gateway",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pets/{petId}/wellness/history": {
+      "get": {
+        "tags": ["Wellness"],
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": ["integer", "string"],
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": ["integer", "string"],
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellnessHistoryResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellnessHistoryResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WellnessHistoryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/profile/me": {
       "get": {
         "tags": ["Profile"],
@@ -1436,6 +1672,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized",
             "content": {
@@ -2455,17 +2711,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -2495,17 +2751,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -2515,17 +2771,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/NutritionAnalysisErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NutritionAnalysisErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NutritionAnalysisErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -2535,17 +2791,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/NutritionAnalysisErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NutritionAnalysisErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NutritionAnalysisErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -2555,17 +2811,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/NutritionAnalysisErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NutritionAnalysisErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NutritionAnalysisErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -2631,17 +2887,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -4923,17 +5179,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -4963,17 +5219,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5041,17 +5297,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5116,17 +5372,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5156,17 +5412,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5232,17 +5488,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5272,17 +5528,37 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5292,17 +5568,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5312,17 +5588,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5332,17 +5608,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5419,17 +5695,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5439,17 +5715,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5459,17 +5735,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5479,17 +5755,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -5499,17 +5775,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClassifierServiceErrorResponseDto"
+                  "$ref": "#/components/schemas/ApiErrorResponse"
                 }
               }
             }
@@ -7429,8 +7705,17 @@
       "ApiErrorResponse": {
         "type": "object",
         "properties": {
+          "code": {
+            "type": ["null", "string"]
+          },
           "message": {
             "type": "string"
+          },
+          "params": {
+            "type": ["null", "object"]
+          },
+          "traceId": {
+            "type": ["null", "string"]
           },
           "errors": {
             "type": ["null", "object"],
@@ -7440,6 +7725,18 @@
                 "type": "string"
               }
             }
+          },
+          "retryable": {
+            "type": ["null", "boolean"]
+          },
+          "retryAfterSeconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["null", "integer", "string"],
+            "format": "int32"
+          },
+          "messageId": {
+            "type": ["null", "string"],
+            "format": "uuid"
           }
         }
       },
@@ -7557,32 +7854,58 @@
           }
         }
       },
-      "ClassifierServiceErrorResponseDto": {
-        "required": ["code", "message", "retryable"],
-        "type": "object",
-        "properties": {
-          "messageId": {
-            "type": ["null", "string"],
-            "format": "uuid"
-          },
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "retryable": {
-            "type": "boolean"
-          },
-          "retryAfterSeconds": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
-            "format": "int32"
-          }
-        }
-      },
       "ClassifierUrgency": {
         "enum": ["MONITOR", "CONSULT_SOON", "URGENT", "EMERGENCY", null]
+      },
+      "ClassifierWellnessBand": {
+        "enum": ["EXCELLENT", "GOOD", "FAIR", "CONCERNING", "CRITICAL", null]
+      },
+      "ClassifierWellnessReasonCode": {
+        "enum": [
+          "ACTIVITY_DATA_MISSING",
+          "ACTIVITY_TARGET_MET",
+          "ACTIVITY_BELOW_TARGET",
+          "ACTIVITY_NOT_APPLICABLE",
+          "SLEEP_DATA_MISSING",
+          "SLEEP_WITHIN_RANGE",
+          "SLEEP_OUTSIDE_RANGE",
+          "SLEEP_NOT_APPLICABLE",
+          "DIET_DATA_MISSING",
+          "DIET_TRACKING_STRONG",
+          "DIET_TRACKING_NEEDS_ATTENTION",
+          "SYMPTOMS_NOT_REPORTED",
+          "SYMPTOM_CLASSIFIER_UNAVAILABLE",
+          "SYMPTOM_CLASSIFIER_FAILED",
+          "SYMPTOM_RESULT_AVAILABLE",
+          "PREVENTIVE_CARE_DATA_MISSING",
+          "PREVENTIVE_CARE_CURRENT",
+          "PREVENTIVE_CARE_NEEDS_ATTENTION",
+          "BASELINE_DATA_MISSING",
+          "BASELINE_STABLE",
+          "BASELINE_NEEDS_ATTENTION"
+        ]
+      },
+      "ClassifierWellnessReminderType": {
+        "enum": [
+          "Feeding",
+          "Activity",
+          "Medication",
+          "Vaccination",
+          "ParasiteTreatment",
+          "VetVisit",
+          "Grooming",
+          "Weighing",
+          "Deworming",
+          "Bathing",
+          "Brushing",
+          "EarCleaning",
+          "NailTrimming",
+          "PawCare",
+          "TeethCleaning"
+        ]
+      },
+      "ClassifierWellnessScoreStatus": {
+        "enum": ["COMPLETE", "PARTIAL", "INSUFFICIENT_DATA"]
       },
       "CompleteReminderDto": {
         "type": "object",
@@ -8241,26 +8564,6 @@
           },
           "nextCursor": {
             "type": ["null", "string"]
-          }
-        }
-      },
-      "NutritionAnalysisErrorResponseDto": {
-        "required": ["code", "message", "retryable"],
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "retryable": {
-            "type": "boolean"
-          },
-          "retryAfterSeconds": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": ["null", "integer", "string"],
-            "format": "int32"
           }
         }
       },
@@ -9537,6 +9840,126 @@
             "format": "date-time"
           }
         }
+      },
+      "WellnessHistoryResponseDto": {
+        "required": ["items", "page", "pageSize", "totalCount"],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WellnessResponseDto"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          }
+        }
+      },
+      "WellnessReminderSuggestionDto": {
+        "required": ["type", "text"],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/ClassifierWellnessReminderType"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
+      "WellnessResponseDto": {
+        "required": [
+          "scoreStatus",
+          "states",
+          "narrative",
+          "recommendations",
+          "reminderSuggestions",
+          "disclaimer"
+        ],
+        "type": "object",
+        "properties": {
+          "wellnessScore": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["null", "integer", "string"],
+            "format": "int32"
+          },
+          "band": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ClassifierWellnessBand"
+              }
+            ]
+          },
+          "scoreStatus": {
+            "$ref": "#/components/schemas/ClassifierWellnessScoreStatus"
+          },
+          "states": {
+            "$ref": "#/components/schemas/WellnessStatesDto"
+          },
+          "narrative": {
+            "type": "string"
+          },
+          "recommendations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reminderSuggestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WellnessReminderSuggestionDto"
+            }
+          },
+          "disclaimer": {
+            "type": "string"
+          }
+        }
+      },
+      "WellnessStatesDto": {
+        "required": ["activity", "sleep", "diet", "symptoms", "preventiveCare", "baseline"],
+        "type": "object",
+        "properties": {
+          "activity": {
+            "$ref": "#/components/schemas/ClassifierWellnessReasonCode"
+          },
+          "sleep": {
+            "$ref": "#/components/schemas/ClassifierWellnessReasonCode"
+          },
+          "diet": {
+            "$ref": "#/components/schemas/ClassifierWellnessReasonCode"
+          },
+          "symptoms": {
+            "$ref": "#/components/schemas/ClassifierWellnessReasonCode"
+          },
+          "preventiveCare": {
+            "$ref": "#/components/schemas/ClassifierWellnessReasonCode"
+          },
+          "baseline": {
+            "$ref": "#/components/schemas/ClassifierWellnessReasonCode"
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -9549,6 +9972,9 @@
     }
   },
   "tags": [
+    {
+      "name": "Wellness"
+    },
     {
       "name": "Profile"
     },

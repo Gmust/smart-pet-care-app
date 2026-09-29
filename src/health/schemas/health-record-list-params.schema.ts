@@ -1,22 +1,15 @@
 import { z } from "zod";
 
-import { HealthRecordType } from "@/api/generated";
+import { HEALTH_FORM_CATEGORIES } from "../constants";
 
-import type { HealthHistoryCategory } from "../types";
-
-// Kept in sync manually with HEALTH_HISTORY_CATEGORIES in ../constants.ts —
-// zod needs a literal tuple for z.enum, so it can't just read the array.
-// Exported for reuse elsewhere in health/ schemas — avoids a third copy of this list.
-export const HISTORY_CATEGORIES = [
-  HealthRecordType.VetVisit,
-  HealthRecordType.Vaccination,
-  HealthRecordType.Deworming,
-  HealthRecordType.AntiParasiteTreatment,
-] as const satisfies readonly HealthHistoryCategory[];
+/** Shared by the record form schema and the edit drawer, which uses it to
+ * narrow a backend `HealthRecordType` (Medication, Surgery, ...) to the subset
+ * this form can actually edit — without an `as` cast. */
+export const formCategorySchema = z.enum(HEALTH_FORM_CATEGORIES);
 
 export const healthRecordListParamsSchema = z.object({
   petId: z.uuid(),
-  type: z.enum(HISTORY_CATEGORIES),
+  type: formCategorySchema,
 });
 
 export type HealthRecordListParams = z.infer<typeof healthRecordListParamsSchema>;

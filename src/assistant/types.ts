@@ -40,7 +40,7 @@ export interface LiveAssistantMessage {
   serverMessageId: string | null;
 }
 
-export type AssistantFailureKind = "conflict" | "not-found" | "rate-limited" | "unavailable";
+export type AssistantFailureKind = "not-found" | "rate-limited" | "unavailable";
 
 export interface FailedAssistantMessage {
   kind: "failed-assistant";

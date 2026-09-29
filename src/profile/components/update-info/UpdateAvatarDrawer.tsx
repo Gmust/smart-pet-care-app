@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
 import { ImagePicker, type ImagePickerValue } from "@/common/components/ImagePicker";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { useUpdateAvatar } from "@/profile/queries/useUpdateAvatar";
 import { setNewAvatarSchema } from "@/profile/schemas/set-new-avatar.schema";
 import { Button } from "@/shadecn/ui/button";
@@ -37,7 +38,7 @@ export const UpdateAvatarDrawer = ({ isOpen, setIsOpen }: Props) => {
         setIsOpen(false);
       } catch (e) {
         console.error(e);
-        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+        Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },
   });

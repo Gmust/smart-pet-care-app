@@ -3,6 +3,7 @@ import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { TrashIcon } from "@/icons/trash";
 import { Button } from "@/shadecn/ui/button";
 import type { DialogHandler } from "@/shadecn/ui/dialog";
@@ -40,7 +41,7 @@ export function DeleteConfirmDialog({
       setIsOpen(false);
     } catch (e) {
       console.error(e);
-      Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+      Toast.show({ type: "error", text1: getApiErrorMessage(e) });
     }
   };
 

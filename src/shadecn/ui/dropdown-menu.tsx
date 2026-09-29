@@ -33,18 +33,25 @@ function DropdownMenuContent({
 
   return (
     <DropdownMenuPortal hostName={portalHost}>
-      <DropdownMenuPrimitive.Overlay style={StyleSheet.absoluteFill}>
-        <Animated.View entering={overlayEntering} exiting={overlayExiting}>
-          <DropdownMenuPrimitive.Content
-            align={align}
-            sideOffset={sideOffset}
-            style={contentStyle}
-            {...props}
-          >
-            {children}
-          </DropdownMenuPrimitive.Content>
-        </Animated.View>
-      </DropdownMenuPrimitive.Overlay>
+      {/* A sibling of the menu, not its parent (as in select.tsx): the overlay is
+          an accessible Pressable, and Android folds its children into it, so a
+          nested menu never reached TalkBack or UI automation. */}
+      <DropdownMenuPrimitive.Overlay style={StyleSheet.absoluteFill} />
+      <Animated.View
+        style={StyleSheet.absoluteFill}
+        pointerEvents="box-none"
+        entering={overlayEntering}
+        exiting={overlayExiting}
+      >
+        <DropdownMenuPrimitive.Content
+          align={align}
+          sideOffset={sideOffset}
+          style={contentStyle}
+          {...props}
+        >
+          {children}
+        </DropdownMenuPrimitive.Content>
+      </Animated.View>
     </DropdownMenuPortal>
   );
 }

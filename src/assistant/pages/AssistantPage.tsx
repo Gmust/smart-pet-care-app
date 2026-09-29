@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { AccessibilityInfo, ActivityIndicator, FlatList, View } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, useKeyboardState } from "react-native-keyboard-controller";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { ChatMessageStatus, ClassifierUrgency } from "@/api/generated";
+import { getApiError } from "@/errors/utils/getApiError";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
@@ -33,7 +34,7 @@ import {
   setAiUsingConsent,
 } from "../utils/aiUsingConsentStorage";
 import { hasEmergencyIndicator } from "../utils/assistantEmergency";
-import { getAssistantApiError, isAssistantNotFoundError } from "../utils/assistantErrors";
+import { getAssistantFailureKind, isStaleMessageError } from "../utils/assistantFailure";
 import { ASSISTANT_PERSISTENCE_STATUS } from "../utils/assistantPersistence";
 
 const SCROLL_TO_END_THRESHOLD = 160;
@@ -53,6 +54,9 @@ export default function AssistantPage() {
   const [consent, setConsent] = useState<boolean | null>(null);
   const [consentChecked, setConsentChecked] = useState(false);
   const [consentDialogOpen, setConsentDialogOpen] = useState(false);
+
+  const insets = useSafeAreaInsets();
+  const isKeyboardVisible = useKeyboardState((state) => state.isVisible);
 
   const listRef = useRef<FlatList<AssistantTranscriptMessage>>(null);
   const chatInputRef = useRef<ChatInputHandle>(null);
@@ -181,39 +185,43 @@ export default function AssistantPage() {
       );
     } catch (error) {
       if (activeSessionIdRef.current !== sessionId) return;
-      const apiError = getAssistantApiError(error);
-      if (apiError.status === 404) recoverMissingSession(sessionId);
-      if (apiError.retryable && !apiError.messageId) void messagesQuery.refetch();
+      const apiError = getApiError(error);
+      if (apiError.code === "chat_session_not_found") recoverMissingSession(sessionId);
+      // The server already holds this turn (in flight, answered): re-read it.
+      // Both local bubbles go: a failure bubble's messageId would hide the
+      // server's answer, and the optimistic user message would repeat the
+      // server's copy of it (the transcript never matches the two up).
+      const isStale = isStaleMessageError(apiError);
+      if ((apiError.retryable && !apiError.messageId) || isStale) void messagesQuery.refetch();
       setLocalTranscript((current) => ({
         sessionId,
         messages:
           current.sessionId === sessionId
-            ? current.messages.map((message) =>
-                message.kind === "pending-assistant" && message.requestId === requestId
-                  ? {
-                      kind: "failed-assistant",
-                      id: message.id,
-                      requestId,
-                      role: "assistant",
-                      messageId: apiError.messageId,
-                      serverMessageId: apiError.messageId,
-                      failure:
-                        apiError.status === 409
-                          ? "conflict"
-                          : apiError.status === 404
-                            ? "not-found"
-                            : apiError.status === 429
-                              ? "rate-limited"
-                              : "unavailable",
-                      retryable: apiError.retryable,
-                      retryAfterSeconds: apiError.retryAfterSeconds,
-                      localEmergency,
-                    }
-                  : message
+            ? current.messages.flatMap((message): AssistantTranscriptMessage[] =>
+                isStale && message.kind === "optimistic-user" && message.requestId === requestId
+                  ? []
+                  : message.kind === "pending-assistant" && message.requestId === requestId
+                    ? isStale
+                      ? []
+                      : [
+                          {
+                            kind: "failed-assistant",
+                            id: message.id,
+                            requestId,
+                            role: "assistant",
+                            messageId: apiError.messageId,
+                            serverMessageId: apiError.messageId,
+                            failure: getAssistantFailureKind(apiError),
+                            retryable: apiError.retryable,
+                            retryAfterSeconds: apiError.retryAfterSeconds,
+                            localEmergency,
+                          },
+                        ]
+                    : [message]
               )
             : [],
       }));
-      AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
+      if (!isStale) AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
     } finally {
       isSendingRef.current = false;
     }
@@ -274,8 +282,11 @@ export default function AssistantPage() {
       );
     } catch (error) {
       if (activeSessionIdRef.current !== sessionId) return;
-      const apiError = getAssistantApiError(error);
-      if (apiError.status === 404) recoverMissingSession(sessionId);
+      const apiError = getApiError(error);
+      if (apiError.code === "chat_session_not_found") recoverMissingSession(sessionId);
+      // Stale: the mutation re-reads messages on settle, and a local failure
+      // would hide that state behind a retry that cannot succeed.
+      const isStale = isStaleMessageError(apiError);
       const failedMessage: AssistantTranscriptMessage = {
         kind: "failed-assistant",
         id: `assistant-${requestId}`,
@@ -283,14 +294,7 @@ export default function AssistantPage() {
         role: "assistant",
         messageId,
         serverMessageId: messageId,
-        failure:
-          apiError.status === 409
-            ? "conflict"
-            : apiError.status === 404
-              ? "not-found"
-              : apiError.status === 429
-                ? "rate-limited"
-                : "unavailable",
+        failure: getAssistantFailureKind(apiError),
         retryable: apiError.retryable,
         retryAfterSeconds: apiError.retryAfterSeconds,
         localEmergency,
@@ -307,10 +311,10 @@ export default function AssistantPage() {
                   )
               )
             : []),
-          failedMessage,
+          ...(isStale ? [] : [failedMessage]),
         ],
       }));
-      AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
+      if (!isStale) AccessibilityInfo.announceForAccessibility(t("accessibility.requestFailed"));
     }
   };
 
@@ -358,7 +362,11 @@ export default function AssistantPage() {
   }, [consentChecked, isPetsLoading, router, selectedPet]);
 
   useEffect(() => {
-    if (activeSessionId && messagesQuery.error && isAssistantNotFoundError(messagesQuery.error))
+    if (
+      activeSessionId &&
+      messagesQuery.error &&
+      getApiError(messagesQuery.error).code === "chat_session_not_found"
+    )
       recoverMissingSession(activeSessionId);
   }, [activeSessionId, messagesQuery.error, recoverMissingSession]);
 
@@ -467,7 +475,17 @@ export default function AssistantPage() {
                 />
               )}
             </View>
-            <View style={styles.composer}>
+            {/* The screen's SafeAreaView is top-edge only, so the bottom inset
+                is applied here — otherwise the disclaimer below the input sits
+                under the Android gesture bar whenever the keyboard is closed.
+                With the keyboard up it covers the gesture bar, and the inset
+                would only leave a gap above it. */}
+            <View
+              style={[
+                styles.composer,
+                { paddingBottom: (isKeyboardVisible ? 0 : insets.bottom) + 8 },
+              ]}
+            >
               <View style={styles.trayCorner}>
                 <PetSelectorChip selectedPet={selectedPet} />
               </View>
@@ -535,7 +553,10 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(4),
     paddingHorizontal: theme.spacing(4),
     paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(5),
+    // Clears the PetSelectorChip, which floats spacing(14) above the composer
+    // (see trayCorner) — without the room reserved here it sat on top of the
+    // last message and hid a line of the reply mid-sentence.
+    paddingBottom: theme.spacing(17),
   },
   trayCorner: {
     position: "absolute",

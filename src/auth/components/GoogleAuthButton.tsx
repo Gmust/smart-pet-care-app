@@ -8,7 +8,7 @@ import {
 } from "@react-native-google-signin/google-signin";
 
 import type { AuthResponse } from "@/api/generated";
-import { getProblemMessage } from "@/common/utils/getProblemMessage";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { Button } from "@/shadecn/ui/button";
 
 import { useGoogleMobileAuthMutation } from "../queries/useGoogleMobileAuthMutation";
@@ -68,7 +68,10 @@ export function GoogleAuthButton({ onAuthenticated }: GoogleAuthButtonProps) {
           return;
         }
       }
-      Toast.show({ type: "error", text1: getProblemMessage(error, t("auth:errors.googleFailed")) });
+      Toast.show({
+        type: "error",
+        text1: getApiErrorMessage(error, t("auth:errors.googleFailed")),
+      });
     }
   };
 

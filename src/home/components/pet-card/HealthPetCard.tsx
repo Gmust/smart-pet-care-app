@@ -11,6 +11,11 @@ import { SquareActivityIcon } from "@/icons/activity";
 import { HeartPulseIcon } from "@/icons/heart";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
+import { isWellnessStateOk, WELLNESS_CARD_STATE_KEYS } from "@/wellness/constants";
+import { useWellnessQuery } from "@/wellness/queries/useWellnessQuery";
+import { parseWellnessScore } from "@/wellness/utils/parseWellnessScore";
+
+import { SignalStat } from "./SignalStat";
 
 type Props = {
   pet: PetResponseDto;
@@ -18,16 +23,33 @@ type Props = {
 };
 
 export function HealthPetCard({ pet, backgroundColor }: Props) {
-  const { t } = useTranslation(["home"]);
+  const { t } = useTranslation(["home", "wellness"]);
 
   const router = useRouter();
 
   const { name: petName, id: petId, photoUrl } = pet;
 
+  const { data: wellness } = useWellnessQuery(petId);
+
+  const score = parseWellnessScore(wellness?.wellnessScore);
+  const scoreText = score ?? t("wellness:score.unavailable");
+  const bandText = wellness?.band
+    ? t(`wellness:band.${wellness.band}`)
+    : t("wellness:band.unknown");
+
+  const openWellness = () => router.push({ pathname: "/(tabs)/pets/wellness", params: { petId } });
+
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={t("healthPetCard.title", { petName })}
+      // The card is one accessible element, so iOS VoiceOver cannot focus the
+      // nested score button. Expose its score and its action on the card itself.
+      accessibilityValue={{ text: `${t("wellness:score.label")}: ${scoreText}, ${bandText}` }}
+      accessibilityActions={[{ name: "openWellness", label: t("wellness:score.label") }]}
+      onAccessibilityAction={(event) => {
+        if (event.nativeEvent.actionName === "openWellness") openWellness();
+      }}
       style={[styles.card, backgroundColor ? { backgroundColor } : null]}
       onPress={() => router.push({ pathname: "/(tabs)/pets/pet-profile", params: { petId } })}
     >
@@ -49,34 +71,51 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
             <HeartPulseIcon width={16} height={16} color={palette.brand.textOnDark} />
           </BlurView>
           <BlurView intensity={40} tint="dark" style={styles.namePill}>
-            <Text style={styles.eyebrow}>{t("healthPetCard.title", { petName })}</Text>
+            <Text variant="label" style={styles.eyebrow}>
+              {t("healthPetCard.title", { petName })}
+            </Text>
           </BlurView>
           <View style={styles.trendChip}>
             <SquareActivityIcon width={13} height={13} color={palette.brand.primarySoft} />
           </View>
         </View>
-        {/*
-        //TODO return on backend ready
-        <View style={styles.scoreBlock}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("wellness:score.label")}
+          style={styles.scoreBlock}
+          onPress={openWellness}
+        >
           <View style={styles.scoreValueRow}>
-            <Text style={styles.score}>{score}</Text>
-            <Text style={styles.scoreMax}>/100</Text>
+            <Text variant="display" style={styles.score}>
+              {scoreText}
+            </Text>
+            {score !== null && (
+              <Text variant="titleL" style={styles.scoreMax}>
+                {t("wellness:score.outOf")}
+              </Text>
+            )}
           </View>
-          <Text style={styles.status}>{status}</Text>
-        </View> */}
+          <Text variant="bodyS" style={styles.status}>
+            {bandText}
+          </Text>
+        </Pressable>
       </View>
 
-      {/* 
-      //TODO return on backend ready
-      <View style={styles.signalRow}>
-        {signalItems.map((signal, index) => (
-          <SignalStat
-            key={signal.key}
-            signal={{ label: signal.label, value: signal.value, status: signal.status }}
-            first={index === 0}
-          />
-        ))}
-      </View> */}
+      {!!wellness && (
+        <View style={styles.signalRow}>
+          {WELLNESS_CARD_STATE_KEYS.map((key, index) => (
+            <SignalStat
+              key={key}
+              signal={{
+                label: t(`wellness:states.labels.${key}`),
+                value: t(`wellness:states.codes.${wellness.states[key]}`),
+                status: isWellnessStateOk(wellness.states[key]) ? "ok" : "warn",
+              }}
+              first={index === 0}
+            />
+          ))}
+        </View>
+      )}
     </Pressable>
   );
 }
@@ -131,8 +170,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(1),
   },
   eyebrow: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.palette.brand.textOnDark,
@@ -152,6 +189,9 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.palette.brand.textOnDark,
   },
   scoreBlock: {
+    justifyContent: "center",
+    // Nested tappable inside the card Pressable — keep it a real 44pt target.
+    minHeight: 44,
     paddingHorizontal: theme.spacing(2.5),
   },
   scoreValueRow: {
@@ -160,22 +200,16 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(0.5),
   },
   score: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["3xl"],
     letterSpacing: -0.8,
     color: theme.palette.brand.textOnDark,
   },
   scoreMax: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
     marginBottom: theme.spacing(1),
     letterSpacing: -0.5,
     color: theme.palette.brand.textSecondary,
   },
   status: {
     marginTop: theme.spacing(1),
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textFaint,
   },
   signalRow: {

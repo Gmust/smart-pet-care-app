@@ -6,10 +6,13 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 import dayjs from "dayjs";
 
+import type { ReminderResponseDto } from "@/api/generated";
 import { DaysOfWeek, RecalcStrategy, ReminderType, RepeatType } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
 import { formatTimeOfDay, parseTimeOfDay } from "@/common/utils/timeOfDay";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
@@ -42,6 +45,12 @@ type Props = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   reminderId?: string;
+  /** Create mode only: preselects this pet each time the drawer opens (e.g. from
+   * the pet's profile). The picker stays, so the user can still change it. */
+  petId?: string;
+  /** Create mode only: fields to seed the form with when the drawer opens
+   * (e.g. a wellness reminder suggestion). Ignored in edit mode. */
+  initialValues?: Partial<CreateReminderForm>;
 };
 
 const DAY_ORDER: DaysOfWeek[] = [
@@ -72,7 +81,42 @@ const defaultValues: CreateReminderForm = {
   endAt: null,
 };
 
-export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) => {
+const toFormValues = (reminder: ReminderResponseDto): CreateReminderForm => ({
+  petId: reminder.petId ?? "",
+  title: reminder.title ?? "",
+  description: reminder.description ?? null,
+  type: reminder.type ?? ReminderType.Feeding,
+  repeatType: reminder.repeatType ?? RepeatType.Weekly,
+  intervalN: String(reminder.intervalN ?? 1),
+  recalcStrategy: reminder.recalcStrategy ?? RecalcStrategy.Calendar,
+  days: reminder.days ?? [],
+  date: reminder.date ?? null,
+  time: getLocalTimeOfDay(reminder) ?? "",
+  endAt: reminder.endAt ?? null,
+});
+
+const toSchedule = (value: CreateReminderForm) => {
+  const rules = REPEAT_TYPE_RULES[value.repeatType];
+  return {
+    title: value.title,
+    description: value.description ?? null,
+    repeatType: value.repeatType,
+    intervalN: Number(value.intervalN),
+    recalcStrategy: value.recalcStrategy,
+    days: rules.usesDays ? (value.days ?? []) : [],
+    date: rules.usesDate ? (value.date ?? null) : null,
+    time: value.time,
+    endAt: value.endAt ?? null,
+  };
+};
+
+export const CreateReminderDrawer = ({
+  isOpen,
+  setIsOpen,
+  reminderId,
+  petId,
+  initialValues,
+}: Props) => {
   const { t } = useTranslation(["reminders", "common"]);
   const { data: pets, isLoading: isPetsLoading } = usePetsQuery();
 
@@ -85,7 +129,9 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
   const { mutateAsync: updateReminder, isPending: isReminderUpdating } =
     useUpdateRemindersMutation();
 
-  const hasHydratedForm = useRef(false);
+  // What the edit form was filled from, kept as a snapshot: diffing against the
+  // live query instead would count another device's later edit as ours.
+  const hydratedValues = useRef<CreateReminderForm | null>(null);
 
   const isReminderSaving = isReminderCreating || isReminderUpdating;
 
@@ -93,22 +139,29 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
     defaultValues,
     validators: { onChange: createReminderSchema(t), onSubmit: createReminderSchema(t) },
     onSubmit: async ({ value }) => {
-      const rules = REPEAT_TYPE_RULES[value.repeatType];
-      const schedule = {
-        title: value.title,
-        description: value.description ?? null,
-        repeatType: value.repeatType,
-        intervalN: Number(value.intervalN),
-        recalcStrategy: value.recalcStrategy,
-        days: rules.usesDays ? (value.days ?? []) : [],
-        date: rules.usesDate ? (value.date ?? null) : null,
-        time: value.time,
-        endAt: value.endAt ?? null,
-      };
+      const schedule = toSchedule(value);
 
       try {
         if (isEditMode && reminderId) {
-          await updateReminder({ id: reminderId, payload: schedule });
+          // PATCH leaves an omitted key unchanged, so send only what the user
+          // changed: a stale form must not overwrite someone else's newer edit.
+          const before = hydratedValues.current ? toSchedule(hydratedValues.current) : null;
+          const changed = (key: keyof typeof schedule) =>
+            !before || JSON.stringify(schedule[key]) !== JSON.stringify(before[key]);
+          const payload = {
+            ...(changed("title") ? { title: schedule.title } : {}),
+            ...(changed("description") ? { description: schedule.description } : {}),
+            ...(changed("repeatType") ? { repeatType: schedule.repeatType } : {}),
+            ...(changed("intervalN") ? { intervalN: schedule.intervalN } : {}),
+            ...(changed("recalcStrategy") ? { recalcStrategy: schedule.recalcStrategy } : {}),
+            ...(changed("days") ? { days: schedule.days } : {}),
+            ...(changed("date") ? { date: schedule.date } : {}),
+            ...(changed("time") ? { time: schedule.time } : {}),
+            ...(changed("endAt") ? { endAt: schedule.endAt } : {}),
+          };
+          if (Object.keys(payload).length > 0) {
+            await updateReminder({ id: reminderId, payload });
+          }
         } else {
           await createReminder({ ...schedule, petId: value.petId, type: value.type });
         }
@@ -120,29 +173,32 @@ export const CreateReminderDrawer = ({ isOpen, setIsOpen, reminderId }: Props) =
         setIsOpen(false);
       } catch (e) {
         console.error(e);
-        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+        setApiFieldErrors(form, e);
+        Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },
   });
 
   useEffect(() => {
-    if (!isEditMode || !reminder || hasHydratedForm.current) return;
-    hasHydratedForm.current = true;
+    if (!isEditMode || !reminder || hydratedValues.current) return;
+    hydratedValues.current = toFormValues(reminder);
 
-    form.reset({
-      petId: reminder.petId ?? "",
-      title: reminder.title ?? "",
-      description: reminder.description ?? null,
-      type: reminder.type ?? ReminderType.Feeding,
-      repeatType: reminder.repeatType ?? RepeatType.Weekly,
-      intervalN: String(reminder.intervalN ?? 1),
-      recalcStrategy: reminder.recalcStrategy ?? RecalcStrategy.Calendar,
-      days: reminder.days ?? [],
-      date: reminder.date ?? null,
-      time: getLocalTimeOfDay(reminder) ?? "",
-      endAt: reminder.endAt ?? null,
-    });
+    form.reset(
+      hydratedValues.current,
+      // Without this, reset() adopts these values as the form's defaults and the
+      // next render's useForm update (blank defaults, form untouched) wipes them.
+      { keepDefaultValues: true }
+    );
   }, [isEditMode, reminder, form]);
+
+  // Runs on every open: the reset after a save clears the seeded values.
+  useEffect(() => {
+    if (isEditMode || !isOpen || (!petId && !initialValues)) return;
+    form.reset(
+      { ...defaultValues, ...(petId ? { petId } : {}), ...initialValues },
+      { keepDefaultValues: true }
+    );
+  }, [isEditMode, isOpen, petId, initialValues, form]);
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>

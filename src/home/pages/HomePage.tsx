@@ -4,6 +4,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { wellnessQueryKeys } from "@/wellness/queries/wellnessQueryKeys";
+
 import { HeaderSection } from "../components/HeaderSection";
 import { PetOverviewSection } from "../components/PetOverviewSection";
 import { RemindersSection } from "../components/RemindersSection";
@@ -19,6 +21,9 @@ const HomePage = () => {
       await Promise.all([
         queryClient.refetchQueries({ queryKey: ["profile", "me"] }),
         queryClient.refetchQueries({ queryKey: ["pets"] }),
+        // Wellness does not retry on mount, so this pull is how a pet card
+        // recovers from a failed score.
+        queryClient.refetchQueries({ queryKey: wellnessQueryKeys.all() }),
       ]);
     } catch (error) {
       console.error("Failed to refresh queries", error);

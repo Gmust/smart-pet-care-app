@@ -5,11 +5,13 @@ import enActivity from "@/activity/locales/en.json";
 import enAssistant from "@/assistant/locales/en.json";
 import enAuth from "@/auth/locales/en.json";
 import enCommon from "@/common/locales/en.json";
+import enErrors from "@/errors/locales/en.json";
 import enHealth from "@/health/locales/en.json";
 import enHome from "@/home/locales/en.json";
 import enPets from "@/pets/locales/en.json";
 import enProfile from "@/profile/locales/en.json";
 import enReminders from "@/reminders/locales/en.json";
+import enWellness from "@/wellness/locales/en.json";
 
 export enum Languages {
   en = "en",
@@ -28,6 +30,8 @@ const modules = [
   "health",
   "assistant",
   "activity",
+  "wellness",
+  "errors",
 ] as const;
 
 export type I18nModule = (typeof modules)[number];
@@ -44,6 +48,8 @@ const enResources = {
   health: enHealth,
   assistant: enAssistant,
   activity: enActivity,
+  wellness: enWellness,
+  errors: enErrors,
 } as const satisfies Record<I18nModule, TranslationJson>;
 
 const resources: Record<Lang, Record<I18nModule, TranslationJson>> = {

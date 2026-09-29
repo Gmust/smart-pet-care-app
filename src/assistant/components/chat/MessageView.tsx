@@ -80,13 +80,11 @@ function FailedMessage({
       <View style={styles.failure}>
         <Text style={styles.failureTitle}>{t("errors.requestTitle")}</Text>
         <Text style={styles.failureText}>
-          {failure === "conflict"
-            ? t("errors.retryConflict")
-            : failure === "not-found"
-              ? t("errors.sessionMissing")
-              : failure === "rate-limited"
-                ? t("errors.rateLimited")
-                : t("errors.request")}
+          {failure === "not-found"
+            ? t("errors.sessionMissing")
+            : failure === "rate-limited"
+              ? t("errors.rateLimited")
+              : t("errors.request")}
         </Text>
         {remaining > 0 && (
           <Text style={styles.failureText}>{t("errors.retryAfter", { seconds: remaining })}</Text>

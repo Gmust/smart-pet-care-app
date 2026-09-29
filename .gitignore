@@ -70,3 +70,4 @@ app-example
 # GitHub App credentials
 gha-creds-*.json
 .compass/
+perf-out

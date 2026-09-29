@@ -87,9 +87,13 @@ const tabsVariants = StyleSheet.create((theme) => {
       variants: {
         variant: {
           segmented: {
+            // Weight and colour carry the selected state, not size. Growing the
+            // active label pushed the longest one past its equal-width flex: 1
+            // track ("Reminders" truncated to "Reminde…" only while selected)
+            // and shifted every label's layout on each tab change.
             fontFamily: active ? theme.fonts.semiBold : theme.fonts.regular,
-            fontSize: active ? theme.fontSize.sm : theme.fontSize.xs,
-            lineHeight: (active ? theme.fontSize.sm : theme.fontSize.xs) * 1.4,
+            fontSize: theme.fontSize.xs,
+            lineHeight: theme.fontSize.xs * 1.4,
             color: active ? brand.primaryDefault : brand.textSecondary,
           },
           pill: {

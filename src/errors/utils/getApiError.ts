@@ -1,0 +1,65 @@
+import axios from "axios";
+
+/** A failed request in the backend's error contract (`ApiErrorResponse`). */
+export interface ParsedApiError {
+  /** HTTP status; `null` when no response arrived (offline, timeout) or the
+   * failure was not a request at all. */
+  status: number | null;
+  /** The backend's stable alias (e.g. "pet_not_found") — branch and translate
+   * on this, never on `message`. */
+  code: string | null;
+  /** Values for interpolating the translated `code` message. */
+  params: Record<string, unknown> | null;
+  /** Server-side English. Show only for a `code` this build cannot translate. */
+  message: string | null;
+  /** Chat only: the message the failure belongs to. */
+  messageId: string | null;
+  /** Per-field aliases from request validation, keyed by DTO property name
+   * as the server sends it (PascalCase: "Email"). */
+  fieldErrors: Record<string, string[]>;
+  retryable: boolean;
+  retryAfterSeconds: number | null;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const optionalString = (value: unknown): string | null =>
+  typeof value === "string" && value.length > 0 ? value : null;
+
+export const getApiError = (error: unknown): ParsedApiError => {
+  const status = axios.isAxiosError(error) ? (error.response?.status ?? null) : null;
+  const data: unknown = axios.isAxiosError(error) ? error.response?.data : null;
+  const body = isRecord(data) ? data : {};
+  const retryAfter =
+    typeof body.retryAfterSeconds === "number" || typeof body.retryAfterSeconds === "string"
+      ? Number(body.retryAfterSeconds)
+      : NaN;
+
+  return {
+    status,
+    code: optionalString(body.code),
+    params: isRecord(body.params) ? body.params : null,
+    message: optionalString(body.message),
+    messageId: optionalString(body.messageId),
+    fieldErrors: isRecord(body.errors)
+      ? Object.fromEntries(
+          Object.entries(body.errors).map(([field, aliases]) => [
+            field,
+            Array.isArray(aliases)
+              ? aliases.filter((alias): alias is string => typeof alias === "string")
+              : [],
+          ])
+        )
+      : {},
+    // The server only sends `retryable` on dependency failures. Without it, a
+    // missing response, a rate limit and a gateway failure (502+, often a
+    // proxy page with no contract body) are worth repeating; a 500 is a bug
+    // and fails identically, and a 4xx needs a different request.
+    retryable:
+      typeof body.retryable === "boolean"
+        ? body.retryable
+        : status === null || status === 429 || status >= 502,
+    retryAfterSeconds: Number.isFinite(retryAfter) && retryAfter >= 0 ? retryAfter : null,
+  };
+};

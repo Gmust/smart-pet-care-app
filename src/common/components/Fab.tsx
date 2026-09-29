@@ -14,6 +14,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import * as Haptics from "expo-haptics";
 
+import { CreateActivityDrawer } from "@/activity/components/drawers/CreateActivityDrawer";
+import { PetPickerDrawer } from "@/activity/components/drawers/PetPickerDrawer";
+import { HealthRecordType } from "@/api/generated";
 import { AddHealthRecordDrawer } from "@/health/components/drawers/AddHealthRecordDrawer";
 import { ActivityIcon } from "@/icons/activity";
 import { BellPlusIcon } from "@/icons/bell";
@@ -21,7 +24,6 @@ import { CalendarHeartIcon } from "@/icons/calendar";
 import { HeartPulseIcon } from "@/icons/heart";
 import type { Icon } from "@/icons/icons";
 import { PlusIcon } from "@/icons/plus";
-import { UtensilsCrossedIcon } from "@/icons/utensils";
 import { CreatePetDrawer } from "@/pets/components/actions/CreatePetDrawer";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { CreateReminderDrawer } from "@/reminders/components/CreateReminderDrawer";
@@ -32,7 +34,7 @@ import { hexToRGBA } from "../utils/colors";
 import type { FabActionTone } from "./FabMenuItem";
 import { FabMenuItem } from "./FabMenuItem";
 
-type FabActionId = "reminder" | "feeding" | "symptom" | "health" | "activity";
+type FabActionId = "reminder" | "symptom" | "health" | "activity";
 
 type FabAction = {
   id: FabActionId;
@@ -40,26 +42,30 @@ type FabAction = {
   tone: FabActionTone;
 };
 
+// "Log feeding" used to sit second in this list. It opened nothing — no feeding
+// drawer or query exists anywhere in the app, and the endpoints aren't even
+// exported from @/api — so it was removed rather than left as a dead row. Put
+// it back here once a feeding log is actually built.
 const ACTIONS: FabAction[] = [
   { id: "reminder", icon: BellPlusIcon, tone: "primary" },
-  { id: "feeding", icon: UtensilsCrossedIcon, tone: "primary" },
   { id: "symptom", icon: HeartPulseIcon, tone: "peach" },
   { id: "health", icon: CalendarHeartIcon, tone: "peach" },
   { id: "activity", icon: ActivityIcon, tone: "neutral" },
 ];
 
-type FabProps = {
-  onAction?: (id: string) => void;
-};
-
-export function Fab({ onAction }: FabProps) {
+export function Fab() {
   const { t } = useTranslation(["common"]);
   const insets = useSafeAreaInsets();
   const { data: pets } = usePetsQuery();
   const [open, setOpen] = useState(false);
   const [isReminderOpen, setIsReminderOpen] = useState(false);
   const [isHealthRecordOpen, setIsHealthRecordOpen] = useState(false);
+  const [isSymptomOpen, setIsSymptomOpen] = useState(false);
   const [isCreatePetOpen, setIsCreatePetOpen] = useState(false);
+  const [isActivityPetPickerOpen, setIsActivityPetPickerOpen] = useState(false);
+  // CreateActivityDrawer takes a required petId and has no picker step of its
+  // own, so the FAB resolves the pet first — silently, when there is only one.
+  const [activityPetId, setActivityPetId] = useState<string | null>(null);
   const rotation = useSharedValue(0);
 
   const hasPets = (pets?.length ?? 0) > 0;
@@ -94,7 +100,17 @@ export function Fab({ onAction }: FabProps) {
     if (id === "health") {
       setIsHealthRecordOpen(true);
     }
-    onAction?.(id);
+    if (id === "symptom") {
+      setIsSymptomOpen(true);
+    }
+    if (id === "activity") {
+      const onlyPetId = pets?.length === 1 ? pets[0].id : undefined;
+      if (onlyPetId) {
+        setActivityPetId(onlyPetId);
+        return;
+      }
+      setIsActivityPetPickerOpen(true);
+    }
   };
 
   const bottomOffset = insets.bottom + BAR_CLEARANCE;
@@ -148,7 +164,28 @@ export function Fab({ onAction }: FabProps) {
 
       <CreateReminderDrawer isOpen={isReminderOpen} setIsOpen={setIsReminderOpen} />
       <AddHealthRecordDrawer isOpen={isHealthRecordOpen} setIsOpen={setIsHealthRecordOpen} />
+      <AddHealthRecordDrawer
+        isOpen={isSymptomOpen}
+        setIsOpen={setIsSymptomOpen}
+        type={HealthRecordType.Symptom}
+      />
       <CreatePetDrawer isOpen={isCreatePetOpen} setIsOpen={setIsCreatePetOpen} />
+      <PetPickerDrawer
+        isOpen={isActivityPetPickerOpen}
+        setIsOpen={setIsActivityPetPickerOpen}
+        pets={pets ?? []}
+        selectedPetId={activityPetId ?? undefined}
+        onSelect={setActivityPetId}
+      />
+      {!!activityPetId && (
+        <CreateActivityDrawer
+          isOpen
+          setIsOpen={(open) => {
+            if (!open) setActivityPetId(null);
+          }}
+          petId={activityPetId}
+        />
+      )}
     </View>
   );
 }
