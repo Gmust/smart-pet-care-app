@@ -686,13 +686,22 @@ describe("AssistantPage – server-backed conversation", () => {
     // The 409 names the message it belongs to. A failure bubble carrying that
     // messageId used to hide the very answer the re-read brought back.
     getMessagesMock.mockResolvedValueOnce(transcriptOf()).mockResolvedValue(
-      transcriptOf({
-        messageId: "answered-message",
-        role: ChatMessageRole.assistant,
-        status: ChatMessageStatus.Completed,
-        content: "Answered meanwhile",
-        createdAt: "2026-07-15T10:02:00Z",
-      })
+      transcriptOf(
+        {
+          messageId: "user-message",
+          role: ChatMessageRole.user,
+          status: ChatMessageStatus.Completed,
+          content: "routine checkup",
+          createdAt: "2026-07-15T10:01:00Z",
+        },
+        {
+          messageId: "answered-message",
+          role: ChatMessageRole.assistant,
+          status: ChatMessageStatus.Completed,
+          content: "Answered meanwhile",
+          createdAt: "2026-07-15T10:02:00Z",
+        }
+      )
     );
     sendMessageMock.mockImplementation(() =>
       Promise.reject(
@@ -708,6 +717,27 @@ describe("AssistantPage – server-backed conversation", () => {
 
     await waitFor(() => expect(utils.getByText("Answered meanwhile")).toBeTruthy());
     expect(utils.queryByText("errors.requestTitle")).toBeNull();
+    // The server's copy replaces the optimistic one instead of repeating it.
+    expect(utils.getAllByText("routine checkup")).toHaveLength(1);
+  });
+
+  it("keeps a failure when the stored response cannot be read back", async () => {
+    // A 409, but a real failure: re-reading changes nothing, so dropping the
+    // bubble would leave a retry that silently fails every time.
+    getMessagesMock.mockResolvedValue(transcriptOf(restoredFailure("broken-message")));
+    retryMessageMock.mockImplementation(() =>
+      Promise.reject(
+        apiError(409, { code: "chat_stored_response_invalid", message: "Unreadable." })
+      )
+    );
+    const utils = await renderConversation();
+    fireEvent.press(utils.getByLabelText("errors.retry"));
+
+    // The local failure (dismissable, no retry that cannot work) stands in for
+    // the server's copy, which would offer the same failing retry again.
+    await waitFor(() => expect(utils.getByLabelText("errors.dismiss")).toBeTruthy());
+    expect(utils.queryByLabelText("errors.retry")).toBeNull();
+    expect(retryMessageMock).toHaveBeenCalledWith(session.sessionId, "broken-message");
   });
 });
 

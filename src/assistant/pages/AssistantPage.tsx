@@ -34,7 +34,7 @@ import {
   setAiUsingConsent,
 } from "../utils/aiUsingConsentStorage";
 import { hasEmergencyIndicator } from "../utils/assistantEmergency";
-import { getAssistantFailureKind } from "../utils/assistantFailure";
+import { getAssistantFailureKind, isStaleMessageError } from "../utils/assistantFailure";
 import { ASSISTANT_PERSISTENCE_STATUS } from "../utils/assistantPersistence";
 
 const SCROLL_TO_END_THRESHOLD = 160;
@@ -187,34 +187,37 @@ export default function AssistantPage() {
       if (activeSessionIdRef.current !== sessionId) return;
       const apiError = getApiError(error);
       if (apiError.code === "chat_session_not_found") recoverMissingSession(sessionId);
-      // 409: the server already holds another state for this turn (in flight,
-      // answered). Re-read it instead of a failure bubble, whose messageId
-      // would hide that state from the transcript.
-      const isStale = apiError.status === 409;
+      // The server already holds this turn (in flight, answered): re-read it.
+      // Both local bubbles go: a failure bubble's messageId would hide the
+      // server's answer, and the optimistic user message would repeat the
+      // server's copy of it (the transcript never matches the two up).
+      const isStale = isStaleMessageError(apiError);
       if ((apiError.retryable && !apiError.messageId) || isStale) void messagesQuery.refetch();
       setLocalTranscript((current) => ({
         sessionId,
         messages:
           current.sessionId === sessionId
             ? current.messages.flatMap((message): AssistantTranscriptMessage[] =>
-                message.kind === "pending-assistant" && message.requestId === requestId
-                  ? isStale
-                    ? []
-                    : [
-                        {
-                          kind: "failed-assistant",
-                          id: message.id,
-                          requestId,
-                          role: "assistant",
-                          messageId: apiError.messageId,
-                          serverMessageId: apiError.messageId,
-                          failure: getAssistantFailureKind(apiError),
-                          retryable: apiError.retryable,
-                          retryAfterSeconds: apiError.retryAfterSeconds,
-                          localEmergency,
-                        },
-                      ]
-                  : [message]
+                isStale && message.kind === "optimistic-user" && message.requestId === requestId
+                  ? []
+                  : message.kind === "pending-assistant" && message.requestId === requestId
+                    ? isStale
+                      ? []
+                      : [
+                          {
+                            kind: "failed-assistant",
+                            id: message.id,
+                            requestId,
+                            role: "assistant",
+                            messageId: apiError.messageId,
+                            serverMessageId: apiError.messageId,
+                            failure: getAssistantFailureKind(apiError),
+                            retryable: apiError.retryable,
+                            retryAfterSeconds: apiError.retryAfterSeconds,
+                            localEmergency,
+                          },
+                        ]
+                    : [message]
               )
             : [],
       }));
@@ -281,10 +284,9 @@ export default function AssistantPage() {
       if (activeSessionIdRef.current !== sessionId) return;
       const apiError = getApiError(error);
       if (apiError.code === "chat_session_not_found") recoverMissingSession(sessionId);
-      // The message is gone (404) or no longer a failed one (409: answered, in
-      // flight, or not retryable). The mutation re-reads messages on settle; a
-      // local failure would hide that state behind a retry that cannot succeed.
-      const isStale = apiError.code === "chat_message_not_found" || apiError.status === 409;
+      // Stale: the mutation re-reads messages on settle, and a local failure
+      // would hide that state behind a retry that cannot succeed.
+      const isStale = isStaleMessageError(apiError);
       const failedMessage: AssistantTranscriptMessage = {
         kind: "failed-assistant",
         id: `assistant-${requestId}`,

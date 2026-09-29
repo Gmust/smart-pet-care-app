@@ -38,6 +38,20 @@ jest.mock("@/shadecn/ui/drawer", () => {
   };
 });
 
+// The real picker opens a native dialog; tapping this stand-in picks a date.
+jest.mock("@/common/components/DateTimeField", () => {
+  const React = require("react");
+  const { Pressable, Text } = require("react-native");
+  return {
+    DateTimeField: ({ label, onChange }: { label: string; onChange: (date: Date) => void }) =>
+      React.createElement(
+        Pressable,
+        { onPress: () => onChange(new Date("2026-09-01T10:00:00.000Z")) },
+        React.createElement(Text, null, label)
+      ),
+  };
+});
+
 // One stable array, like React Query's structural sharing: a fresh array per
 // render would re-run the pet auto-select effect on every render and hide bugs.
 const mockPets = [{ id: "pet-1", name: "Rex" }];
@@ -126,5 +140,50 @@ describe("AddHealthRecordDrawer", () => {
 
     await waitFor(() => expect(setIsOpen).toHaveBeenCalledWith(false));
     expect(mockUpdate).not.toHaveBeenCalled();
+  });
+
+  describe("switching type before saving a new record", () => {
+    const renderCreate = () =>
+      render(<AddHealthRecordDrawer petId="pet-1" isOpen setIsOpen={jest.fn()} />);
+
+    it("does not carry symptoms picked under Symptom into a Vaccination", async () => {
+      const { getByText, getByPlaceholderText } = renderCreate();
+      fireEvent.press(getByText("health:categoryLabels.Symptom"));
+      fireEvent.press(getByText("Fever"));
+      fireEvent.press(getByText("health:categoryLabels.Vaccination"));
+      fireEvent.changeText(
+        getByPlaceholderText("forms.healthRecord.placeholders.titleVaccination"),
+        "Rabies"
+      );
+      fireEvent.press(getByText("health:forms.healthRecord.fields.performedAt"));
+      fireEvent.press(getByText("health:forms.healthRecord.submit"));
+
+      await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1));
+      // The Vaccination form has no symptoms field, so nothing could remove them later.
+      expect(mockCreate.mock.calls[0][0].dto).toMatchObject({
+        type: HealthRecordType.Vaccination,
+        symptoms: null,
+        description: null,
+      });
+    });
+
+    it("does not carry a next-due date picked under Vaccination into a Symptom", async () => {
+      const { getByText, getByPlaceholderText } = renderCreate();
+      fireEvent.press(getByText("health:categoryLabels.Vaccination"));
+      fireEvent.press(getByText("health:forms.healthRecord.fields.nextDueAt"));
+      fireEvent.press(getByText("health:categoryLabels.Symptom"));
+      fireEvent.changeText(
+        getByPlaceholderText("forms.healthRecord.placeholders.titleSymptom"),
+        "Coughing"
+      );
+      fireEvent.press(getByText("health:forms.healthRecord.fields.performedAt"));
+      fireEvent.press(getByText("health:forms.healthRecord.submit"));
+
+      await waitFor(() => expect(mockCreate).toHaveBeenCalledTimes(1));
+      expect(mockCreate.mock.calls[0][0].dto).toMatchObject({
+        type: HealthRecordType.Symptom,
+        nextDueAt: null,
+      });
+    });
   });
 });

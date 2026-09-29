@@ -55,6 +55,12 @@ type Props = {
 
 const SELECT_PORTAL_HOST = "select";
 
+// Which optional fields a record type collects. The form renders and the create
+// DTO sends by the same rules, so a value typed before switching type (a symptom,
+// a provider, a next-due date) cannot leak into a record of another type.
+const collectsProvider = (type: HealthRecordFormCategory) => type === "VetVisit";
+const collectsNotes = (type: HealthRecordFormCategory) => type === "VetVisit" || type === "Symptom";
+
 // Single call site, kept as a named function anyway (deliberate exception to
 // the no-single-use-helper rule): the explicit `: HealthRecordFormValues`
 // return type catches a missing/mistyped field right here, at the priority
@@ -132,11 +138,11 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
               type: value.type,
               title: value.title,
               performedAt: value.performedAt,
-              description: value.description || null,
+              description: collectsNotes(value.type) ? value.description || null : null,
               dosage: value.dosage || null,
-              provider: value.provider || null,
-              symptoms: value.symptoms.length ? value.symptoms : null,
-              nextDueAt: value.nextDueAt || null,
+              provider: collectsProvider(value.type) ? value.provider || null : null,
+              symptoms: collectsNotes(value.type) && value.symptoms.length ? value.symptoms : null,
+              nextDueAt: collectsNotes(value.type) ? null : value.nextDueAt || null,
             },
           });
         }
@@ -305,7 +311,7 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
                       )}
                     </form.Field>
 
-                    {selectedType === "VetVisit" && (
+                    {collectsProvider(selectedType) && (
                       <form.Field name="provider">
                         {(field) => (
                           <View style={styles.field}>
@@ -323,7 +329,7 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
                       </form.Field>
                     )}
 
-                    {selectedType === "VetVisit" || selectedType === "Symptom" ? (
+                    {collectsNotes(selectedType) ? (
                       <>
                         <form.Field name="description">
                           {(field) => (
