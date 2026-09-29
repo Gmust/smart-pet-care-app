@@ -23,6 +23,7 @@ env:
     text: "Done|Crop|Save"
     optional: true
 - tapOn: "Save photo"
-- assertVisible:
-    text: "Pet photo updated successfully!"
+- extendedWaitUntil:
+    visible:
+      text: "Pet photo updated successfully!"
     timeout: 20000
