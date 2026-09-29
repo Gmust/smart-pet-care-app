@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
 
 import { getApiPetsPetIdWellnessEvaluation } from "@/api";
+import { getApiError } from "@/errors/utils/getApiError";
 
 import { wellnessQueryKeys } from "./wellnessQueryKeys";
 
@@ -17,11 +17,10 @@ export function useWellnessQuery(petId: string | undefined) {
         const response = await getApiPetsPetIdWellnessEvaluation(petId ?? "");
         return response.data;
       } catch (error) {
-        // No score yet is an empty state, not a failure: 404 when none was ever
-        // stored, 422 when the measurement conditions are not met. Surfacing
-        // either as an error would put an error screen in front of every new pet.
-        const status = isAxiosError(error) ? error.response?.status : undefined;
-        if (status === 404 || status === 422) return null;
+        // No score yet is an empty state, not a failure: a pet without enough
+        // logged data answers 422 wellness_insufficient_data (a brand-new pet
+        // included). Anything else, pet_not_found among it, is a real error.
+        if (getApiError(error).code === "wellness_insufficient_data") return null;
         throw error;
       }
     },

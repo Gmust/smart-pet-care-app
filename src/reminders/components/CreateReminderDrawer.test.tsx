@@ -1,8 +1,9 @@
 /// <reference types="jest" />
 
-import { render } from "@testing-library/react-native";
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
-import { ReminderType } from "@/api/generated";
+import type { ReminderResponseDto } from "@/api/generated";
+import { RecalcStrategy, ReminderType, RepeatType } from "@/api/generated";
 
 const mockTranslate = (key: string) => key;
 
@@ -58,14 +59,16 @@ jest.mock("@/pets/queries/usePetsQuery", () => ({
   usePetsQuery: () => mockPets(),
 }));
 
+const mockReminder = jest.fn((): ReminderResponseDto | undefined => undefined);
 jest.mock("../queries/useGetReminderById", () => ({
-  useGetReminderById: () => ({ data: undefined }),
+  useGetReminderById: () => ({ data: mockReminder() }),
 }));
 jest.mock("../queries/useCreateRemindersMutation", () => ({
   useCreateRemindersMutation: () => ({ mutateAsync: jest.fn(), isPending: false }),
 }));
+const mockUpdate = jest.fn();
 jest.mock("../queries/useUpdateRemindersMutation", () => ({
-  useUpdateRemindersMutation: () => ({ mutateAsync: jest.fn(), isPending: false }),
+  useUpdateRemindersMutation: () => ({ mutateAsync: mockUpdate, isPending: false }),
 }));
 
 import { CreateReminderDrawer } from "./CreateReminderDrawer";
@@ -80,6 +83,10 @@ const initialValues = {
 };
 
 describe("CreateReminderDrawer", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("keeps pre-filled values when the drawer re-renders", () => {
     mockPets.mockReturnValue({ data: [PET], isLoading: false });
     const setIsOpen = jest.fn();
@@ -95,5 +102,74 @@ describe("CreateReminderDrawer", () => {
 
     expect(getByDisplayValue(initialValues.title)).toBeTruthy();
     expect(getByDisplayValue(initialValues.description)).toBeTruthy();
+  });
+
+  describe("edit mode", () => {
+    // The form validates petId as a UUID, so "pet-1" would never submit.
+    const pet = { id: "0b7f2d8e-4c1a-4d2e-9f3a-1b2c3d4e5f60", name: "Rex" };
+    const reminder: ReminderResponseDto = {
+      id: "rem-1",
+      petId: pet.id,
+      title: "Give pill",
+      description: "With food",
+      type: ReminderType.Medication,
+      repeatType: RepeatType.Daily,
+      intervalN: 1,
+      recalcStrategy: RecalcStrategy.Calendar,
+      days: [],
+      date: null,
+      timeOfDay: "08:00:00",
+      nextTriggerAt: "2026-10-01T08:00:00Z",
+      endAt: null,
+    };
+
+    const renderEdit = () => {
+      mockPets.mockReturnValue({ data: [pet], isLoading: false });
+      mockReminder.mockReturnValue(reminder);
+      mockUpdate.mockResolvedValue(reminder);
+      const setIsOpen = jest.fn();
+      const utils = render(
+        <CreateReminderDrawer isOpen setIsOpen={setIsOpen} reminderId="rem-1" />
+      );
+      return { ...utils, setIsOpen };
+    };
+
+    it("sends only the field the user changed", async () => {
+      const { getByDisplayValue, getByText } = renderEdit();
+      fireEvent.changeText(getByDisplayValue("Give pill"), "Give pill twice");
+      fireEvent.press(getByText("reminders:editReminderDrawer.submit"));
+
+      await waitFor(() =>
+        expect(mockUpdate).toHaveBeenCalledWith({
+          id: "rem-1",
+          payload: { title: "Give pill twice" },
+        })
+      );
+    });
+
+    it("does not send back a field another device changed after the form opened", async () => {
+      // PATCH semantics: anything sent overwrites. The refetched description
+      // is newer than the form's copy and was not touched here.
+      const { getByDisplayValue, getByText, rerender } = renderEdit();
+      mockReminder.mockReturnValue({ ...reminder, description: "Changed elsewhere" });
+      rerender(<CreateReminderDrawer isOpen setIsOpen={jest.fn()} reminderId="rem-1" />);
+
+      fireEvent.changeText(getByDisplayValue("Give pill"), "Give pill twice");
+      fireEvent.press(getByText("reminders:editReminderDrawer.submit"));
+
+      await waitFor(() => expect(mockUpdate).toHaveBeenCalled());
+      expect(mockUpdate).toHaveBeenCalledWith({
+        id: "rem-1",
+        payload: { title: "Give pill twice" },
+      });
+    });
+
+    it("saves nothing when nothing changed", async () => {
+      const { getByText, setIsOpen } = renderEdit();
+      fireEvent.press(getByText("reminders:editReminderDrawer.submit"));
+
+      await waitFor(() => expect(setIsOpen).toHaveBeenCalledWith(false));
+      expect(mockUpdate).not.toHaveBeenCalled();
+    });
   });
 });

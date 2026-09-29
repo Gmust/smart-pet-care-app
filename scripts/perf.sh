@@ -57,7 +57,9 @@ size() {
   remote=$(adb shell pm path "$PKG" | head -1 | sed 's/^package://' | tr -d '\r')
   adb pull "$remote" "$OUT/app.apk" > /dev/null
   local apk bundle
-  apk=$(stat -f %z "$OUT/app.apk" 2>/dev/null || stat -c %s "$OUT/app.apk")
+  # wc, not stat: stat's flags differ between BSD and GNU, and GNU `stat -f`
+  # prints file-system info instead of failing.
+  apk=$(wc -c < "$OUT/app.apk" | tr -d ' ')
   bundle=$(unzip -l "$OUT/app.apk" | awk '/index.android.bundle/ {print $1; exit}')
   csv size "apk_bytes,js_bundle_bytes" "$apk ${bundle:-}"
   echo "apk=$((apk/1024))kB bundle=$((${bundle:-0}/1024))kB"
@@ -161,6 +163,9 @@ energy() {
   uid=$(adb shell cmd package list packages -U "$PKG" | sed -n 's/.*uid:\([0-9]*\).*/\1/p')
   u0="u0a$((uid-10000))"
   adb shell dumpsys battery unplug
+  # Any failure below exits the script under `set -e`; never leave the device
+  # reporting "unplugged" (it stops charging-state updates until reset).
+  trap 'adb shell dumpsys battery reset > /dev/null 2>&1 || true' EXIT
   adb shell dumpsys batterystats --reset > /dev/null
   local lvl0 t0 lvl1 t1
   lvl0=$(adb shell dumpsys battery | awk '/level/ {print $2}'); t0=$(date +%s)
@@ -175,6 +180,7 @@ energy() {
   mah=$(awk -v u="$u0" '/Estimated power use/ {on=1} on && index(tolower($0), "uid "u) {gsub(/[^0-9.]/,"",$3); print $3; exit}' "$OUT/batterystats.txt")
   csv energy "duration_s,battery_drop_pct,estimated_mah" "$((t1-t0)) $((lvl0-lvl1)) ${mah:-}"
   adb shell dumpsys battery reset
+  trap - EXIT
   echo "duration=$((t1-t0))s drop=$((lvl0-lvl1))% est=${mah:-?}mAh (full dump: $OUT/batterystats.txt)"
 }
 

@@ -71,7 +71,9 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
             <HeartPulseIcon width={16} height={16} color={palette.brand.textOnDark} />
           </BlurView>
           <BlurView intensity={40} tint="dark" style={styles.namePill}>
-            <Text style={styles.eyebrow}>{t("healthPetCard.title", { petName })}</Text>
+            <Text variant="label" style={styles.eyebrow}>
+              {t("healthPetCard.title", { petName })}
+            </Text>
           </BlurView>
           <View style={styles.trendChip}>
             <SquareActivityIcon width={13} height={13} color={palette.brand.primarySoft} />
@@ -84,10 +86,18 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
           onPress={openWellness}
         >
           <View style={styles.scoreValueRow}>
-            <Text style={styles.score}>{scoreText}</Text>
-            {score !== null && <Text style={styles.scoreMax}>{t("wellness:score.outOf")}</Text>}
+            <Text variant="display" style={styles.score}>
+              {scoreText}
+            </Text>
+            {score !== null && (
+              <Text variant="titleL" style={styles.scoreMax}>
+                {t("wellness:score.outOf")}
+              </Text>
+            )}
           </View>
-          <Text style={styles.status}>{bandText}</Text>
+          <Text variant="bodyS" style={styles.status}>
+            {bandText}
+          </Text>
         </Pressable>
       </View>
 
@@ -160,8 +170,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(1),
   },
   eyebrow: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
     letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.palette.brand.textOnDark,
@@ -192,22 +200,16 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(0.5),
   },
   score: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["3xl"],
     letterSpacing: -0.8,
     color: theme.palette.brand.textOnDark,
   },
   scoreMax: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
     marginBottom: theme.spacing(1),
     letterSpacing: -0.5,
     color: theme.palette.brand.textSecondary,
   },
   status: {
     marginTop: theme.spacing(1),
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textFaint,
   },
   signalRow: {

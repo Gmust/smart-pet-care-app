@@ -107,4 +107,24 @@ describe("AddHealthRecordDrawer", () => {
     // form would overwrite a concurrent edit, and `type` could re-type the record.
     expect(mockUpdate.mock.calls[0][0].dto).toEqual({ title: "Warm nose" });
   });
+
+  it("saves nothing when an edit changed nothing", async () => {
+    const setIsOpen = jest.fn();
+    const record: HealthRecordResponseDto = {
+      id: "record-1",
+      petId: "pet-1",
+      type: HealthRecordType.Symptom,
+      title: "Hot nose",
+      performedAt: "2026-09-20T09:00:00.000Z",
+      symptoms: [SymptomType.Fever],
+    };
+    const { getByText } = render(
+      <AddHealthRecordDrawer record={record} isOpen setIsOpen={setIsOpen} />
+    );
+
+    fireEvent.press(getByText("health:forms.healthRecord.submit"));
+
+    await waitFor(() => expect(setIsOpen).toHaveBeenCalledWith(false));
+    expect(mockUpdate).not.toHaveBeenCalled();
+  });
 });

@@ -50,10 +50,10 @@ const axiosOk = <T,>(data: T): AxiosResponse<T> => ({
   config: { headers: new AxiosHeaders() },
 });
 
-const axiosFailure = (status: number) => {
+const axiosFailure = (status: number, code?: string) => {
   const error = new AxiosError("request failed", "ERR_BAD_REQUEST");
   error.response = {
-    data: {},
+    data: code ? { code, message: code, traceId: "trace" } : {},
     status,
     statusText: "",
     headers: {},
@@ -103,10 +103,13 @@ describe("useWellnessQuery", () => {
     expect(result.current.data).toEqual(wellness);
   });
 
-  it("treats 404 as no score yet, not an error", async () => {
-    // mockImplementation over mockRejectedValue: the latter builds the rejected
-    // promise eagerly and surfaces as an unhandled rejection in the next test.
-    evaluationMock.mockImplementation(() => Promise.reject(axiosFailure(404)));
+  it("treats wellness_insufficient_data as no score yet, not an error", async () => {
+    // What the real server answers for a brand-new pet. mockImplementation over
+    // mockRejectedValue: the latter builds the rejected promise eagerly and
+    // surfaces as an unhandled rejection in the next test.
+    evaluationMock.mockImplementation(() =>
+      Promise.reject(axiosFailure(422, "wellness_insufficient_data"))
+    );
     const { wrapper } = createWrapper();
 
     const { result } = renderHook(() => useWellnessQuery(PET_ID), { wrapper });
@@ -117,15 +120,18 @@ describe("useWellnessQuery", () => {
     expect(result.current.isError).toBe(false);
   });
 
-  it("treats 422 (measurement conditions not met) as no score yet", async () => {
-    evaluationMock.mockImplementation(() => Promise.reject(axiosFailure(422)));
+  it.each([
+    [404, "pet_not_found"],
+    [404, undefined],
+    [422, "some_future_validation_code"],
+  ])("reports %s %s as an error, not as no score yet", async (status, code) => {
+    // Status alone used to decide: any 404 or 422 read as "no score yet".
+    evaluationMock.mockImplementation(() => Promise.reject(axiosFailure(status, code)));
     const { wrapper } = createWrapper();
 
     const { result } = renderHook(() => useWellnessQuery(PET_ID), { wrapper });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    expect(result.current.data).toBeNull();
+    await waitFor(() => expect(result.current.isError).toBe(true));
   });
 
   it("does not refetch a failed evaluation on every mount", async () => {

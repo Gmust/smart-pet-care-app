@@ -4,13 +4,13 @@ import { RefreshControl, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { isAxiosError } from "axios";
 import { Redirect, useLocalSearchParams } from "expo-router";
 
 import type { WellnessReminderSuggestionDto } from "@/api/generated";
 import { ClassifierWellnessBand } from "@/api/generated";
 import { BackButton } from "@/common/components/BackButton";
 import { SectionHeader } from "@/common/components/SectionHeader";
+import { getApiError } from "@/errors/utils/getApiError";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { CircleAlertIcon } from "@/icons/alert";
 import { usePetQuery } from "@/pets/queries/usePetQuery";
@@ -37,7 +37,7 @@ const BAND_STYLE_KEY = {
 
 export default function WellnessPage() {
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation(["wellness", "reminders"]);
+  const { t } = useTranslation(["wellness", "reminders", "common"]);
 
   const parsedParams = wellnessParamsSchema.safeParse(useLocalSearchParams());
   const petId = parsedParams.success ? parsedParams.data.petId : undefined;
@@ -76,7 +76,7 @@ export default function WellnessPage() {
   // Deep links can carry arbitrary params — never query with an unvalidated petId.
   // A deleted pet or stale link: the evaluation 404s into the empty state, so
   // the pet itself is what tells "gone" apart from "no score yet".
-  if (!parsedParams.success || (isAxiosError(petError) && petError.response?.status === 404)) {
+  if (!parsedParams.success || getApiError(petError).code === "pet_not_found") {
     return <Redirect href="/(tabs)/pets" />;
   }
 
@@ -127,6 +127,11 @@ export default function WellnessPage() {
             <Text variant="bodyS" style={styles.muted}>
               {getApiErrorMessage(error)}
             </Text>
+            {/* The query does not retry on mount, so without this only a hidden
+                pull-to-refresh could recover from one transient failure. */}
+            <Button size="sm" variant="secondary" onPress={() => void refetch()}>
+              {t("common:errors.tryAgain")}
+            </Button>
           </Card>
         ) : !wellness ? (
           <Card>

@@ -107,23 +107,24 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
           // `type` is never sent, so an edit cannot re-type a record.
           const changed = (key: keyof HealthRecordFormValues) =>
             JSON.stringify(value[key]) !== JSON.stringify(defaultValues[key]);
-          await updateRecord({
-            petId: value.petId,
-            recordId: record.id,
-            dto: {
-              ...(changed("title") ? { title: value.title } : {}),
-              ...(changed("performedAt") ? { performedAt: value.performedAt } : {}),
-              ...(changed("description") ? { description: value.description || null } : {}),
-              ...(changed("dosage") ? { dosage: value.dosage || null } : {}),
-              ...(changed("provider") ? { provider: value.provider || null } : {}),
-              ...(changed("symptoms")
-                ? { symptoms: value.symptoms.length ? value.symptoms : null }
-                : {}),
-              // PatchHealthRecordDto's nextDueAt can't be cleared via null
-              // (unlike create), so an emptied date is not sent at all.
-              ...(changed("nextDueAt") && value.nextDueAt ? { nextDueAt: value.nextDueAt } : {}),
-            },
-          });
+          const dto = {
+            ...(changed("title") ? { title: value.title } : {}),
+            ...(changed("performedAt") ? { performedAt: value.performedAt } : {}),
+            ...(changed("description") ? { description: value.description || null } : {}),
+            ...(changed("dosage") ? { dosage: value.dosage || null } : {}),
+            ...(changed("provider") ? { provider: value.provider || null } : {}),
+            ...(changed("symptoms")
+              ? { symptoms: value.symptoms.length ? value.symptoms : null }
+              : {}),
+            // PatchHealthRecordDto's nextDueAt cannot be cleared (the spec has
+            // no null for it), and DateTimeField has no clear action, so a set
+            // date can only be changed. Empty here means the record had none.
+            ...(changed("nextDueAt") && value.nextDueAt ? { nextDueAt: value.nextDueAt } : {}),
+          };
+          // Nothing changed: an empty PATCH is a wasted call the server may reject.
+          if (Object.keys(dto).length > 0) {
+            await updateRecord({ petId: value.petId, recordId: record.id, dto });
+          }
         } else {
           await createRecord({
             petId: value.petId,
