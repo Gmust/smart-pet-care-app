@@ -18,20 +18,29 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Verified evidence
 
-- `pnpm check` — pass (2026-09-29): 30 suites, 256 tests.
+- `pnpm check` — pass (2026-09-29): 30 suites, 257 tests. CI green on PR #21.
 - `pnpm test:api` — pass (2026-09-29): 24/24 against the live backend.
 - Real-server facts the code relies on: `errors` keys are PascalCase DTO names;
-  a new pet's wellness evaluation is 422 `wellness_insufficient_data`.
-- CI did not run on this PR while it conflicted with `main`; first run follows the merge.
+  a new pet's wellness evaluation is 422 `wellness_insufficient_data`; chat pages
+  allow `limit` 1–8.
+- Device pass (2026-09-29, Samsung S20 FE, Android 13, debug build, live backend),
+  checked on screen and, where it matters, against server state:
+  wrong password stays on the form; expired access token (15 min) refreshes
+  silently and a write after expiry lands; sign-out stays signed out; assistant
+  answers; health type switch stores no leftover symptoms/notes; an unchanged edit
+  closes without error; a reminder edit keeps another device's concurrent change;
+  a new pet shows "No score yet"; the reminder drawer preselects the pet from its
+  profile; the actions menu is in the accessibility tree; Maestro 04 and 05 pass.
 
 ## Limitations
 
-- Nothing verified on a device or emulator. Worth checking on Android: expired
-  session → silent refresh; login with an unconfirmed email; expired confirmation
-  code; assistant retry after the answer already arrived; server field errors on
-  register; `HealthPetCard` typography (score +2px, "/100" lighter, band −1px).
-- Maestro flows 04 (now deletes its reminder) and 05 (waits on the pending
-  bubble) are not yet run on a device.
+- Not verified on a device: login with an unconfirmed email and the confirmation
+  code errors (need an inbox); assistant failure/retry paths and the wellness
+  "Try again" card (offline pauses queries instead of failing them); photo over the
+  size limit; `HealthPetCard` "/100" (only shown with a score).
+- Offline with no cache, the wellness page claims "No wellness score yet" and drops
+  the pet name from its hint (pre-existing).
+- Maestro 03 (photo upload) not run: it would upload an image from the device gallery.
 - `src/api/generated/` is gitignored; run `pnpm api:generate` after install or a
   spec change, or imports from `src/api/index.ts` will fail.
 - Known spec gaps: `PatchFieldOf*` enum types and `PatchFieldOfDateTime` have no
@@ -44,7 +53,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 One bounded, independently verifiable task:
 
-- Device pass on Android over the flows listed under Limitations.
+- Device check of the confirmation-code flows with a fresh, unconfirmed account.
 
 ## Completion fields
 
