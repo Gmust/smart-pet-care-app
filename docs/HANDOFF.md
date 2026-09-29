@@ -6,42 +6,56 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Current state
 
-- Branch: `feature/testing-agentic-repo-setup-skill`.
-- Agent workflow set up: `AGENTS.md` is the single source of truth; `CLAUDE.md`
-  imports it. `pnpm check` is the one quality gate (lint + typecheck + test).
-- Product features implemented: `src/activity`, `src/assistant`, `src/auth`,
-  `src/health`, `src/home`, `src/notifications`, `src/pets`, `src/profile`.
-  `src/health` is the reference feature shape.
+- Branch: `feature/welness-score` (PR #21), merged with `main` at `c870b49`.
+- Backend error contract v1 adopted: `src/errors/` holds the alias translations
+  (`errors` namespace) and `getApiError` / `getApiErrorMessage` / `setApiFieldErrors`.
+  Screens branch on `code`; the convention is in `AGENTS.md` → API Layer.
+- Auth interceptor refreshes only on `auth_authentication_required` (or a code-less
+  401); `postApiAuthRefresh` is bound to `noAuthApi`, so a refresh can never hang.
+- `pnpm test:api` runs contract tests against the real backend (`.env`:
+  `EXPO_PUBLIC_API_URL`, and `API_TEST_EMAIL` / `API_TEST_PASSWORD` for a dedicated,
+  confirmed test account — the suite rotates its refresh token).
 
 ## Verified evidence
 
-- `pnpm check` — pass (2026-09-08). `expo lint`, `tsc --noEmit`, and Jest
-  (19 suites, 179 tests) all green.
-- CI (`.github/workflows/ci.yml`) runs the same steps plus `expo export`.
+- `pnpm check` — pass (2026-09-29): 30 suites, 256 tests.
+- `pnpm test:api` — pass (2026-09-29): 24/24 against the live backend.
+- Real-server facts the code relies on: `errors` keys are PascalCase DTO names;
+  a new pet's wellness evaluation is 422 `wellness_insufficient_data`.
+- CI did not run on this PR while it conflicted with `main`; first run follows the merge.
 
 ## Limitations
 
-- Nothing verified on a device or emulator this session. A green suite is not
-  evidence that native modules, permissions, or platform UI work.
+- Nothing verified on a device or emulator. Worth checking on Android: expired
+  session → silent refresh; login with an unconfirmed email; expired confirmation
+  code; assistant retry after the answer already arrived; server field errors on
+  register; `HealthPetCard` typography (score +2px, "/100" lighter, band −1px).
+- Maestro flows 04 (now deletes its reminder) and 05 (waits on the pending
+  bubble) are not yet run on a device.
 - `src/api/generated/` is gitignored; run `pnpm api:generate` after install or a
   spec change, or imports from `src/api/index.ts` will fail.
-- Known spec gap: `PatchFieldOf*` enum types have no `null` member, so enum fields
-  cannot be cleared through PATCH. Not worked around in code; raise with backend.
+- Known spec gaps: `PatchFieldOf*` enum types and `PatchFieldOfDateTime` have no
+  `null`, so those fields cannot be cleared through PATCH. Not worked around.
+- Backend issues to raise: register repeats `auth_email_invalid` twice; empty chat
+  text returns both `chat_message_text_required` and `_too_long`; the spec still
+  declares `ProblemDetails` on most 4xx responses.
 
 ## Next task
 
 One bounded, independently verifiable task:
 
-- _(none queued)_
+- Device pass on Android over the flows listed under Limitations.
 
 ## Completion fields
 
-Fill these in when closing out work:
-
-- Outcome: Added canonical authorship, project-component, contributor and licensing documentation.
-- Files / contracts changed: `README.md`, `PROJECT_AGREEMENT.md`, `PROJECT_COMPONENTS.md`,
-  `CONTRIBUTORS.md`, and `LICENSE`; agent-workflow documentation was also updated.
-- Checks run and results: Documentation links verified locally; no code checks run (docs-only change).
-- Platforms actually tested: None; no platform behavior changed.
-- Remaining limitations: `PROJECT_AGREEMENT.md` remains proposed until contributors explicitly accept it.
-- Next bounded task: _(none queued)_
+- Outcome: Error contract v1 adopted app-wide; review findings fixed (auth refresh
+  hang and loop, 409 handling, field errors, PATCH diffs, health type leak, wellness
+  codes, perf tooling aborts).
+- Files / contracts changed: `src/errors/**`, `src/api/{index,interceptors}.ts`,
+  assistant/auth/forms error handling, `AGENTS.md` (errors rule, `test:api`),
+  `package.json` (`test:api`, formatted `api:fetch`), `scripts/perf.sh`, `.maestro/04,05`.
+- Checks run and results: `pnpm check` and `pnpm test:api` green as above; each fix
+  has a test confirmed to fail without it.
+- Platforms actually tested: None (Jest + live API only).
+- Remaining limitations: see Limitations.
+- Next bounded task: Android device pass.
