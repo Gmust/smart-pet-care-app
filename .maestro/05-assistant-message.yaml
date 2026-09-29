@@ -21,7 +21,9 @@ env:
       - assertVisible:
           id: "assistant-response-card"
           timeout: 90000
+      # The pending bubble's text. From the second message on, the first
+      # answer's card is already on screen, so only this waits for the reply.
       - assertNotVisible:
-          text: "Assistant is responding"
+          text: "Thinking about your pet…"
           timeout: 90000
 - back

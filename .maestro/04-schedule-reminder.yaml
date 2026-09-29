@@ -27,3 +27,11 @@ env:
 - assertVisible:
     text: "Reminder created successfully!"
     timeout: 20000
+# Delete what this run created. Otherwise every run leaves a Daily reminder on
+# the real account: daily pushes, and a longer list that slows flows 02 and 04.
+- tapOn: "Perf reminder ${TS}"
+- tapOn: "Delete reminder"
+- tapOn: "Delete"
+- assertNotVisible:
+    text: "Perf reminder ${TS}"
+    timeout: 20000

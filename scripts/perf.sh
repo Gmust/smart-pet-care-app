@@ -60,7 +60,9 @@ size() {
   # wc, not stat: stat's flags differ between BSD and GNU, and GNU `stat -f`
   # prints file-system info instead of failing.
   apk=$(wc -c < "$OUT/app.apk" | tr -d ' ')
-  bundle=$(unzip -l "$OUT/app.apk" | awk '/index.android.bundle/ {print $1; exit}')
+  # No `exit` in awk: quitting early SIGPIPEs unzip, and pipefail + set -e then
+  # abort the whole run (rc 141). The bundle entry is unique anyway.
+  bundle=$(unzip -l "$OUT/app.apk" | awk '/index.android.bundle/ {print $1}')
   csv size "apk_bytes,js_bundle_bytes" "$apk ${bundle:-}"
   echo "apk=$((apk/1024))kB bundle=$((${bundle:-0}/1024))kB"
 }
@@ -96,18 +98,20 @@ run_flow() { # name iteration -> exit code
   adb logcat -d -v time -s ReactNativeJS ActivityTaskManager > "$OUT/logcat/$name-$i.logcat.txt"
   local gfx pss java native
   gfx=$(adb shell dumpsys gfxinfo "$PKG")
+  # Here-strings, not `echo | awk ... exit`: awk quitting at the first match
+  # SIGPIPEs echo once a dump outgrows the pipe buffer, aborting under pipefail.
   local total janky p50 p90 p95 p99
-  total=$(echo "$gfx" | awk '/Total frames rendered/ {print $4; exit}')
-  janky=$(echo "$gfx" | awk '/^Janky frames:/ {gsub(/[()%]/,"",$4); print $4; exit}')
-  p50=$(echo "$gfx" | awk '/50th percentile/ {gsub(/ms/,"",$3); print $3; exit}')
-  p90=$(echo "$gfx" | awk '/90th percentile/ {gsub(/ms/,"",$3); print $3; exit}')
-  p95=$(echo "$gfx" | awk '/95th percentile/ {gsub(/ms/,"",$3); print $3; exit}')
-  p99=$(echo "$gfx" | awk '/99th percentile/ {gsub(/ms/,"",$3); print $3; exit}')
+  total=$(awk '/Total frames rendered/ {print $4; exit}' <<< "$gfx")
+  janky=$(awk '/^Janky frames:/ {gsub(/[()%]/,"",$4); print $4; exit}' <<< "$gfx")
+  p50=$(awk '/50th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
+  p90=$(awk '/90th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
+  p95=$(awk '/95th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
+  p99=$(awk '/99th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
   local mem
   mem=$(adb shell dumpsys meminfo "$PKG")
-  pss=$(echo "$mem" | awk '/TOTAL PSS:/ {print $3; exit}')
-  java=$(echo "$mem" | awk '/Java Heap:/ {print $3; exit}')
-  native=$(echo "$mem" | awk '/Native Heap:/ {print $3; exit}')
+  pss=$(awk '/TOTAL PSS:/ {print $3; exit}' <<< "$mem")
+  java=$(awk '/Java Heap:/ {print $3; exit}' <<< "$mem")
+  native=$(awk '/Native Heap:/ {print $3; exit}' <<< "$mem")
   csv scenarios "scenario,iteration,passed,frames,janky_pct,p50_ms,p90_ms,p95_ms,p99_ms,pss_kb,java_heap_kb,native_heap_kb" \
     "$name $i $([[ $rc -eq 0 ]] && echo 1 || echo 0) ${total:-} ${janky:-} ${p50:-} ${p90:-} ${p95:-} ${p99:-} ${pss:-} ${java:-} ${native:-}"
   echo "$name #$i: rc=$rc janky=${janky:-?}% p90=${p90:-?}ms pss=${pss:-?}kB"
@@ -214,6 +218,9 @@ def stats(label, vals):
 def load(path):
     if not (out/path).exists(): return []
     data = list(csv.DictReader(open(out/path)))
+    # A flow that failed early looks fast and lean, and reliability() repeats
+    # ("r"-prefixed iterations) land in scenarios.csv too: keep neither.
+    data = [r for r in data if r.get("passed", "1") == "1" and not r["iteration"].startswith("r")]
     # discard warm-up: first iteration of each group is JIT/cache cold
     groups = {}
     for r in data: groups.setdefault(r.get("kind") or r.get("scenario"), []).append(r)
