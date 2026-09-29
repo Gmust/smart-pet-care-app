@@ -56,7 +56,8 @@ pnpm web            # Run in browser (do not use for default validation)
 pnpm lint           # ESLint
 pnpm typecheck      # TypeScript check
 pnpm test           # Jest
-pnpm check          # Lint + typecheck
+pnpm test:api       # Error-contract tests against the real API (.env URL; API_TEST_EMAIL/PASSWORD for signed-in cases)
+pnpm check          # Lint + typecheck + test (the full gate)
 ```
 
 ## Code Conventions
@@ -125,6 +126,12 @@ const styles = StyleSheet.create((theme) => ({
   ```
 - Mutations invalidate; they do not fire toasts. Toasts belong at the call site (drawer/dialog),
   so one hook can serve several surfaces.
+- Errors: `getApiError(error).code` picks the message and any case-specific branch; the status
+  only picks the reaction class the contract defines (409 re-read, 429/5xx transient, 401
+  refresh-or-sign-out). Never parse `message`. In a form's submit catch, call
+  `setApiFieldErrors(form, error)` and toast `getApiErrorMessage(error)`; alias copy lives in
+  `src/errors/locales/en.json`. Field aliases arrive without `params`, so their copy must not
+  use any.
 - **PATCH endpoints use `PatchFieldOf<T>` semantics: an omitted key is left unchanged, `null`
   clears the value.** Send only the fields that actually changed, or a stale form will silently
   overwrite someone else's concurrent edit.
@@ -189,11 +196,13 @@ Conventions and traps, all of which have bitten before:
 
 Before reporting work complete:
 
-1. `pnpm check` (lint + typecheck) and `pnpm test` pass — the same gates `pre-push` and CI run.
+1. `pnpm check` (lint + typecheck + test) passes — the same gate `pre-push` and CI run.
 2. No `as` type assertion added without a comment explaining why no safer narrowing works.
 3. New user-visible strings are translated; new endpoints are exported from `src/api/index.ts`.
 4. `graphify update .` run if code changed.
-5. **Anything touching native modules, permissions, or platform UI is verified on a device.**
+5. `docs/HANDOFF.md` updated with outcome, checks run, what was and was not verified,
+   and the next bounded task.
+6. **Anything touching native modules, permissions, or platform UI is verified on a device.**
    Say plainly what was verified and what was not — a green suite is not evidence that a native
    feature works.
 
