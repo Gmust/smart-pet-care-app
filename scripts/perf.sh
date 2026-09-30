@@ -3,15 +3,16 @@
 # Usage:
 #   scripts/perf.sh all                # everything below, N=10
 #   scripts/perf.sh size               # APK + JS bundle size
-#   scripts/perf.sh startup            # cold + warm startup (am start -W)
+#   scripts/perf.sh startup            # cold + warm startup (am start -W) + cold time to Home/data
 #   scripts/perf.sh scenarios          # maestro flows + gfxinfo + meminfo + [perf] logcat
 #   scripts/perf.sh reliability        # repeat flows, count pass/fail + crashes/ANRs
-#   scripts/perf.sh energy             # batterystats over a fixed session
+#   scripts/perf.sh energy             # charge counter + batterystats over a fixed session, idle baseline
 #   scripts/perf.sh flashlight         # FPS/CPU/RAM score via @perf-profiler/cli
 #   scripts/perf.sh summary            # median/p90/95% CI over out/*.csv, first run discarded, PSS slope
 # Env: N (iterations, default 10), PET_NAME (default Rex),
 #      OUT (default perf-out/run-<timestamp> for `all`, perf-out otherwise),
-#      ENERGY_LOOPS (flow loops for energy run, default 5).
+#      ENERGY_LOOPS (flow loops for energy run, default 5), IDLE_S (idle baseline seconds, default 300),
+#      ANDROID_SERIAL (pick the device when adb lists more than one entry).
 set -euo pipefail
 
 PKG="com.anonymous.smartpetcareapp"
@@ -27,10 +28,28 @@ if [[ "${1:-all}" == "all" && -z "${OUT:-}" ]]; then
 fi
 OUT="${OUT:-perf-out}"
 ENERGY_LOOPS="${ENERGY_LOOPS:-5}"
+IDLE_S="${IDLE_S:-300}"
 FLOWS=".maestro"
 SCENARIOS=(01-navigate-tabs 02-load-pet-records 03-select-image 04-schedule-reminder 05-assistant-message)
 
 mkdir -p "$OUT/logcat"
+
+# Maestro's taps do not count as user activity, so the screen times out (and
+# locks) mid-run. Hold it on for the run and put the user's setting back after.
+SCREEN_TIMEOUT0=""
+UNPLUGGED=0
+keep_awake() {
+  SCREEN_TIMEOUT0=$(adb shell settings get system screen_off_timeout | tr -d '\r')
+  adb shell settings put system screen_off_timeout 14400000
+}
+cleanup() {
+  if [[ -n "$SCREEN_TIMEOUT0" ]]; then
+    adb shell settings put system screen_off_timeout "$SCREEN_TIMEOUT0" > /dev/null 2>&1 || true
+  fi
+  # Never leave the device reporting "unplugged" (it stops charging-state updates until reset).
+  if [[ "$UNPLUGGED" == 1 ]]; then adb shell dumpsys battery reset > /dev/null 2>&1 || true; fi
+}
+trap cleanup EXIT
 
 device_info() {
   {
@@ -72,11 +91,20 @@ startup() {
   echo ">> startup ($N cold + $N warm)"
   for i in $(seq 1 "$N"); do
     adb shell am force-stop "$PKG"; sleep 3
-    local t
+    adb logcat -c
+    local t ttfd
     t=$(adb shell am start -W -n "$ACTIVITY" | awk -F: '/TotalTime/ {gsub(/ /,"",$2); print $2}')
     csv startup "kind,iteration,total_ms" "cold $i $t"
-    echo "cold #$i: ${t}ms"
-    sleep 3
+    sleep 8
+    # TotalTime is the first frame, which for React Native is the splash screen.
+    # From the launch intent: first route mark (screen shown), last query settled (data loaded).
+    ttfd=$(adb logcat -d -v epoch -s ActivityTaskManager ReactNativeJS | tee "$OUT/logcat/startup-cold-$i.txt" | awk '
+      /ActivityTaskManager: START u0/ && /smartpetcareapp/ && !s { s=$1 }
+      /\[perf\] route \// && !/\[perf\] route \/ t=/ && !r { r=$1 }
+      /\[perf\] query:(success|error)/ { q=$1 }
+      END { printf "%s %s", (s && r ? sprintf("%.0f", (r-s)*1000) : ""), (s && q ? sprintf("%.0f", (q-s)*1000) : "") }')
+    csv ttfd "iteration,first_screen_ms,data_settled_ms" "$i $ttfd"
+    echo "cold #$i: ${t}ms (screen, data: $ttfd ms)"
   done
   for i in $(seq 1 "$N"); do
     adb shell input keyevent KEYCODE_HOME; sleep 2
@@ -89,7 +117,38 @@ startup() {
 }
 
 # ---------- scenarios: frames + memory + [perf] marks ----------
+# Wireless ADB drops and Maestro driver restarts are not app failures.
+INFRA_RE="DeviceServerDied|devices connected|Not enough devices|device offline|waiting for device|device not found|host:transport"
+
+reconnect() {
+  # An offline mDNS duplicate of a wireless device makes Maestro see 0 devices.
+  adb devices | awk '/offline/ {print $1}' | while read -r d; do adb disconnect "$d" > /dev/null 2>&1 || true; done
+  if [[ "${ANDROID_SERIAL:-}" == *:* ]]; then adb connect "$ANDROID_SERIAL" > /dev/null 2>&1 || true; fi
+  for _ in $(seq 1 36); do
+    [[ "$(adb get-state 2>/dev/null)" == device ]] && return 0
+    sleep 5
+  done
+}
+
 run_flow() { # name iteration -> exit code
+  local name="$1" i="$2" try rc
+  # Resume: an iteration that already passed in this $OUT is not run again.
+  grep -q "^$name,$i,1," "$OUT/scenarios.csv" 2>/dev/null && return 0
+  for try in 1 2 3; do
+    rc=0; measure_flow "$name" "$i" || rc=$?
+    [[ $rc -eq 0 ]] && return 0
+    grep -qE "$INFRA_RE" "$OUT/logcat/$name-$i.maestro.log" || return $rc
+    # Drop the row, keep the log, reconnect and re-run the same iteration.
+    echo "   infra failure ($name #$i, try $try): reconnecting"
+    sed -i.bak '$d' "$OUT/scenarios.csv" && rm -f "$OUT/scenarios.csv.bak"
+    mkdir -p "$OUT/infra-failed"
+    mv "$OUT/logcat/$name-$i.maestro.log" "$OUT/infra-failed/$name-$i-try$try.maestro.log"
+    reconnect
+  done
+  return 1
+}
+
+measure_flow() { # name iteration -> exit code
   local name="$1" i="$2"
   adb shell dumpsys gfxinfo "$PKG" reset > /dev/null
   adb logcat -c
@@ -100,9 +159,11 @@ run_flow() { # name iteration -> exit code
   gfx=$(adb shell dumpsys gfxinfo "$PKG")
   # Here-strings, not `echo | awk ... exit`: awk quitting at the first match
   # SIGPIPEs echo once a dump outgrows the pipe buffer, aborting under pipefail.
-  local total janky p50 p90 p95 p99
+  local total janky legacy p50 p90 p95 p99
   total=$(awk '/Total frames rendered/ {print $4; exit}' <<< "$gfx")
+  # "Janky frames" misses the display deadline (8.3 ms at 120 Hz); legacy uses a fixed 16 ms threshold.
   janky=$(awk '/^Janky frames:/ {gsub(/[()%]/,"",$4); print $4; exit}' <<< "$gfx")
+  legacy=$(awk '/^Janky frames \(legacy\):/ {gsub(/[()%]/,"",$5); print $5; exit}' <<< "$gfx")
   p50=$(awk '/50th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
   p90=$(awk '/90th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
   p95=$(awk '/95th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
@@ -112,9 +173,9 @@ run_flow() { # name iteration -> exit code
   pss=$(awk '/TOTAL PSS:/ {print $3; exit}' <<< "$mem")
   java=$(awk '/Java Heap:/ {print $3; exit}' <<< "$mem")
   native=$(awk '/Native Heap:/ {print $3; exit}' <<< "$mem")
-  csv scenarios "scenario,iteration,passed,frames,janky_pct,p50_ms,p90_ms,p95_ms,p99_ms,pss_kb,java_heap_kb,native_heap_kb" \
-    "$name $i $([[ $rc -eq 0 ]] && echo 1 || echo 0) ${total:-} ${janky:-} ${p50:-} ${p90:-} ${p95:-} ${p99:-} ${pss:-} ${java:-} ${native:-}"
-  echo "$name #$i: rc=$rc janky=${janky:-?}% p90=${p90:-?}ms pss=${pss:-?}kB"
+  csv scenarios "scenario,iteration,passed,frames,janky_pct,p50_ms,p90_ms,p95_ms,p99_ms,pss_kb,java_heap_kb,native_heap_kb,janky_legacy_pct" \
+    "$name $i $([[ $rc -eq 0 ]] && echo 1 || echo 0) ${total:-} ${janky:-} ${p50:-} ${p90:-} ${p95:-} ${p99:-} ${pss:-} ${java:-} ${native:-} ${legacy:-}"
+  echo "$name #$i: rc=$rc janky=${janky:-?}% (legacy ${legacy:-?}%) p90=${p90:-?}ms pss=${pss:-?}kB"
   return $rc
 }
 
@@ -161,31 +222,53 @@ reliability() {
 }
 
 # ---------- energy ----------
+# Read the fuel gauge from sysfs: `dumpsys battery unplug` freezes what dumpsys reports
+# (level and charge counter stop updating until reset), sysfs keeps updating.
+battery() { # capacity|charge_counter|status -> value, empty if unreadable
+  adb shell cat "/sys/class/power_supply/battery/$1" 2>/dev/null | tr -d '\r' | grep -E '^[A-Za-z0-9]+$' || true
+}
+energy_row() { # phase seconds level0 level1 charge0_uah charge1_uah [app_mah]
+  local lvl="" drop="" ma=""
+  [[ -n "$3" && -n "$4" ]] && lvl=$(( $3 - $4 ))
+  # Charge counter is uAh for the whole device: valid only while not charging.
+  if [[ -n "$5" && -n "$6" ]]; then
+    drop=$(( $5 - $6 ))
+    ma=$(awk -v d="$drop" -v s="$2" 'BEGIN { printf "%.0f", d * 3.6 / s }')
+  fi
+  csv energy "phase,duration_s,battery_drop_pct,charge_drop_uah,avg_ma,app_estimated_mah" \
+    "$1 $2 $lvl $drop $ma ${7:-}"
+  echo "$1: ${2}s drop=${lvl:-?}% charge=${drop:-?}uAh avg=${ma:-?}mA app_est=${7:-n/a}mAh"
+}
+
 energy() {
-  echo ">> energy ($ENERGY_LOOPS loops of all flows, unplug USB power: adb shell dumpsys battery unplug)"
+  echo ">> energy ($ENERGY_LOOPS loops of all flows, then ${IDLE_S}s idle baseline; do not charge the device)"
   local uid u0
   uid=$(adb shell cmd package list packages -U "$PKG" | sed -n 's/.*uid:\([0-9]*\).*/\1/p')
   u0="u0a$((uid-10000))"
-  adb shell dumpsys battery unplug
-  # Any failure below exits the script under `set -e`; never leave the device
-  # reporting "unplugged" (it stops charging-state updates until reset).
-  trap 'adb shell dumpsys battery reset > /dev/null 2>&1 || true' EXIT
+  [[ "$(battery status)" == Discharging ]] || echo "WARNING: device is charging: charge_drop_uah / avg_ma are not valid"
+  adb shell dumpsys battery unplug; UNPLUGGED=1
   adb shell dumpsys batterystats --reset > /dev/null
-  local lvl0 t0 lvl1 t1
-  lvl0=$(adb shell dumpsys battery | awk '/level/ {print $2}'); t0=$(date +%s)
+  local lvl0 cc0 t0 lvl1 cc1 t1
+  lvl0=$(battery capacity); cc0=$(battery charge_counter); t0=$(date +%s)
   for _ in $(seq 1 "$ENERGY_LOOPS"); do
     for s in "${SCENARIOS[@]}"; do
       maestro test -e "PET_NAME=$PET_NAME" -e "TS=$(date +%s)" "$FLOWS/$s.yaml" > /dev/null 2>&1 || true
     done
   done
-  lvl1=$(adb shell dumpsys battery | awk '/level/ {print $2}'); t1=$(date +%s)
+  lvl1=$(battery capacity); cc1=$(battery charge_counter); t1=$(date +%s)
   adb shell dumpsys batterystats --charged > "$OUT/batterystats.txt"
   local mah
   mah=$(awk -v u="$u0" '/Estimated power use/ {on=1} on && index(tolower($0), "uid "u) {gsub(/[^0-9.]/,"",$3); print $3; exit}' "$OUT/batterystats.txt")
-  csv energy "duration_s,battery_drop_pct,estimated_mah" "$((t1-t0)) $((lvl0-lvl1)) ${mah:-}"
-  adb shell dumpsys battery reset
-  trap - EXIT
-  echo "duration=$((t1-t0))s drop=$((lvl0-lvl1))% est=${mah:-?}mAh (full dump: $OUT/batterystats.txt)"
+  energy_row active "$((t1-t0))" "$lvl0" "$lvl1" "$cc0" "$cc1" "${mah:-}"
+  # Idle baseline: same screen, radio and ADB state, app on Home, no input.
+  # active - idle is what the scripted use itself costs.
+  adb shell am start -n "$ACTIVITY" > /dev/null; sleep 5
+  lvl0=$(battery capacity); cc0=$(battery charge_counter); t0=$(date +%s)
+  sleep "$IDLE_S"
+  lvl1=$(battery capacity); cc1=$(battery charge_counter); t1=$(date +%s)
+  energy_row idle "$((t1-t0))" "$lvl0" "$lvl1" "$cc0" "$cc1"
+  adb shell dumpsys battery reset; UNPLUGGED=0
+  echo "full batterystats dump: $OUT/batterystats.txt"
 }
 
 # ---------- flashlight ----------
@@ -231,10 +314,13 @@ def load(path):
 def group(data, key, metrics):
     for k in sorted({r[key] for r in data}):
         for m in metrics:
-            stats(f"{k} {m}", [r[m] for r in data if r[key]==k])
+            stats(f"{k} {m}", [r.get(m, "") for r in data if r[key]==k])
 group(load("startup.csv"), "kind", ["total_ms"])
+ttfd = load("ttfd.csv")
+for m in ("first_screen_ms", "data_settled_ms"):
+    stats(f"cold {m}", [r[m] for r in ttfd])
 scen = load("scenarios.csv")
-group(scen, "scenario", ["janky_pct","p90_ms","p99_ms","pss_kb","java_heap_kb"])
+group(scen, "scenario", ["janky_pct","janky_legacy_pct","p90_ms","p99_ms","pss_kb","java_heap_kb"])
 # memory leak check: least-squares slope of PSS over iteration order per scenario
 slopes = []
 for k in sorted({r["scenario"] for r in scen}):
@@ -243,6 +329,10 @@ for k in sorted({r["scenario"] for r in scen}):
     xs = range(len(ys)); mx = statistics.mean(xs); my = statistics.mean(ys)
     slope = sum((x-mx)*(y-my) for x, y in zip(xs, ys)) / sum((x-mx)**2 for x in xs)
     slopes.append((k, len(ys), slope))
+if (out/"energy.csv").exists():
+    for r in csv.DictReader(open(out/"energy.csv")):
+        if r.get("avg_ma"):
+            stats(f"energy {r['phase']} avg_ma", [r["avg_ma"]])
 if (out/"marks.csv").exists():
     data = list(csv.DictReader(open(out/"marks.csv")))
     for k in sorted({(r["from"],r["to"]) for r in data}):
@@ -257,7 +347,8 @@ PY
 }
 
 case "${1:-all}" in
-  all) device_info; size; startup; scenarios; reliability; energy; summary ;;
-  size|startup|scenarios|reliability|energy|flashlight|summary) device_info; "$1" ;;
+  all) device_info; keep_awake; size; startup; scenarios; reliability; energy; summary ;;
+  startup|scenarios|reliability|energy|flashlight) device_info; keep_awake; "$1" ;;
+  size|summary) device_info; "$1" ;;
   *) echo "unknown command: $1"; exit 1 ;;
 esac

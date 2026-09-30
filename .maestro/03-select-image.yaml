@@ -13,15 +13,18 @@ env:
 - tapOn: "Open pet actions"
 - tapOn: "Set pet photo"
 - tapOn: "Add Photo"
-# system: photo picker — first thumbnail
+# system: photo picker (com.google.android.photopicker, Compose — no resource
+# ids). Newest photo first, so push the test image right before a run.
 - tapOn:
-    id: "com.google.android.providers.media.module:id/icon_thumbnail"
+    text: "Photo taken on .*"
     index: 0
-    optional: true
-# system: crop editor confirm (label varies: "Done" / "Crop" / "Save")
+# The picker opens in selection mode on Android 13 (Samsung S20 FE): confirm.
 - tapOn:
-    text: "Done|Crop|Save"
+    text: "Done"
     optional: true
+# expo-image-picker crop editor (allowsEditing): confirm.
+- tapOn:
+    id: ".*crop_image_menu_crop"
 - tapOn: "Save photo"
 - extendedWaitUntil:
     visible:
