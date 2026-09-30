@@ -159,9 +159,11 @@ measure_flow() { # name iteration -> exit code
   gfx=$(adb shell dumpsys gfxinfo "$PKG")
   # Here-strings, not `echo | awk ... exit`: awk quitting at the first match
   # SIGPIPEs echo once a dump outgrows the pipe buffer, aborting under pipefail.
-  local total janky p50 p90 p95 p99
+  local total janky legacy p50 p90 p95 p99
   total=$(awk '/Total frames rendered/ {print $4; exit}' <<< "$gfx")
+  # "Janky frames" misses the display deadline (8.3 ms at 120 Hz); legacy uses a fixed 16 ms threshold.
   janky=$(awk '/^Janky frames:/ {gsub(/[()%]/,"",$4); print $4; exit}' <<< "$gfx")
+  legacy=$(awk '/^Janky frames \(legacy\):/ {gsub(/[()%]/,"",$5); print $5; exit}' <<< "$gfx")
   p50=$(awk '/50th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
   p90=$(awk '/90th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
   p95=$(awk '/95th percentile/ {gsub(/ms/,"",$3); print $3; exit}' <<< "$gfx")
@@ -171,9 +173,9 @@ measure_flow() { # name iteration -> exit code
   pss=$(awk '/TOTAL PSS:/ {print $3; exit}' <<< "$mem")
   java=$(awk '/Java Heap:/ {print $3; exit}' <<< "$mem")
   native=$(awk '/Native Heap:/ {print $3; exit}' <<< "$mem")
-  csv scenarios "scenario,iteration,passed,frames,janky_pct,p50_ms,p90_ms,p95_ms,p99_ms,pss_kb,java_heap_kb,native_heap_kb" \
-    "$name $i $([[ $rc -eq 0 ]] && echo 1 || echo 0) ${total:-} ${janky:-} ${p50:-} ${p90:-} ${p95:-} ${p99:-} ${pss:-} ${java:-} ${native:-}"
-  echo "$name #$i: rc=$rc janky=${janky:-?}% p90=${p90:-?}ms pss=${pss:-?}kB"
+  csv scenarios "scenario,iteration,passed,frames,janky_pct,p50_ms,p90_ms,p95_ms,p99_ms,pss_kb,java_heap_kb,native_heap_kb,janky_legacy_pct" \
+    "$name $i $([[ $rc -eq 0 ]] && echo 1 || echo 0) ${total:-} ${janky:-} ${p50:-} ${p90:-} ${p95:-} ${p99:-} ${pss:-} ${java:-} ${native:-} ${legacy:-}"
+  echo "$name #$i: rc=$rc janky=${janky:-?}% (legacy ${legacy:-?}%) p90=${p90:-?}ms pss=${pss:-?}kB"
   return $rc
 }
 
@@ -220,15 +222,22 @@ reliability() {
 }
 
 # ---------- energy ----------
-battery() { adb shell dumpsys battery | awk -v k="$1" '$0 ~ k {print $NF; exit}' | tr -d '\r'; }
+# Read the fuel gauge from sysfs: `dumpsys battery unplug` freezes what dumpsys reports
+# (level and charge counter stop updating until reset), sysfs keeps updating.
+battery() { # capacity|charge_counter|status -> value, empty if unreadable
+  adb shell cat "/sys/class/power_supply/battery/$1" 2>/dev/null | tr -d '\r' | grep -E '^[A-Za-z0-9]+$' || true
+}
 energy_row() { # phase seconds level0 level1 charge0_uah charge1_uah [app_mah]
-  local drop ma
-  # Charge counter is the fuel gauge (uAh, whole device): valid only while not charging.
-  drop=$(( ${5:-0} - ${6:-0} ))
-  ma=$(awk -v d="$drop" -v s="$2" 'BEGIN { printf "%.0f", d * 3.6 / s }')
+  local lvl="" drop="" ma=""
+  [[ -n "$3" && -n "$4" ]] && lvl=$(( $3 - $4 ))
+  # Charge counter is uAh for the whole device: valid only while not charging.
+  if [[ -n "$5" && -n "$6" ]]; then
+    drop=$(( $5 - $6 ))
+    ma=$(awk -v d="$drop" -v s="$2" 'BEGIN { printf "%.0f", d * 3.6 / s }')
+  fi
   csv energy "phase,duration_s,battery_drop_pct,charge_drop_uah,avg_ma,app_estimated_mah" \
-    "$1 $2 $(( ${3:-0} - ${4:-0} )) $drop $ma ${7:-}"
-  echo "$1: ${2}s drop=$(( ${3:-0} - ${4:-0} ))% charge=${drop}uAh avg=${ma}mA app_est=${7:-n/a}mAh"
+    "$1 $2 $lvl $drop $ma ${7:-}"
+  echo "$1: ${2}s drop=${lvl:-?}% charge=${drop:-?}uAh avg=${ma:-?}mA app_est=${7:-n/a}mAh"
 }
 
 energy() {
@@ -236,16 +245,17 @@ energy() {
   local uid u0
   uid=$(adb shell cmd package list packages -U "$PKG" | sed -n 's/.*uid:\([0-9]*\).*/\1/p')
   u0="u0a$((uid-10000))"
+  [[ "$(battery status)" == Discharging ]] || echo "WARNING: device is charging: charge_drop_uah / avg_ma are not valid"
   adb shell dumpsys battery unplug; UNPLUGGED=1
   adb shell dumpsys batterystats --reset > /dev/null
   local lvl0 cc0 t0 lvl1 cc1 t1
-  lvl0=$(battery level); cc0=$(battery "Charge counter"); t0=$(date +%s)
+  lvl0=$(battery capacity); cc0=$(battery charge_counter); t0=$(date +%s)
   for _ in $(seq 1 "$ENERGY_LOOPS"); do
     for s in "${SCENARIOS[@]}"; do
       maestro test -e "PET_NAME=$PET_NAME" -e "TS=$(date +%s)" "$FLOWS/$s.yaml" > /dev/null 2>&1 || true
     done
   done
-  lvl1=$(battery level); cc1=$(battery "Charge counter"); t1=$(date +%s)
+  lvl1=$(battery capacity); cc1=$(battery charge_counter); t1=$(date +%s)
   adb shell dumpsys batterystats --charged > "$OUT/batterystats.txt"
   local mah
   mah=$(awk -v u="$u0" '/Estimated power use/ {on=1} on && index(tolower($0), "uid "u) {gsub(/[^0-9.]/,"",$3); print $3; exit}' "$OUT/batterystats.txt")
@@ -253,9 +263,9 @@ energy() {
   # Idle baseline: same screen, radio and ADB state, app on Home, no input.
   # active - idle is what the scripted use itself costs.
   adb shell am start -n "$ACTIVITY" > /dev/null; sleep 5
-  lvl0=$(battery level); cc0=$(battery "Charge counter"); t0=$(date +%s)
+  lvl0=$(battery capacity); cc0=$(battery charge_counter); t0=$(date +%s)
   sleep "$IDLE_S"
-  lvl1=$(battery level); cc1=$(battery "Charge counter"); t1=$(date +%s)
+  lvl1=$(battery capacity); cc1=$(battery charge_counter); t1=$(date +%s)
   energy_row idle "$((t1-t0))" "$lvl0" "$lvl1" "$cc0" "$cc1"
   adb shell dumpsys battery reset; UNPLUGGED=0
   echo "full batterystats dump: $OUT/batterystats.txt"
@@ -304,13 +314,13 @@ def load(path):
 def group(data, key, metrics):
     for k in sorted({r[key] for r in data}):
         for m in metrics:
-            stats(f"{k} {m}", [r[m] for r in data if r[key]==k])
+            stats(f"{k} {m}", [r.get(m, "") for r in data if r[key]==k])
 group(load("startup.csv"), "kind", ["total_ms"])
 ttfd = load("ttfd.csv")
 for m in ("first_screen_ms", "data_settled_ms"):
     stats(f"cold {m}", [r[m] for r in ttfd])
 scen = load("scenarios.csv")
-group(scen, "scenario", ["janky_pct","p90_ms","p99_ms","pss_kb","java_heap_kb"])
+group(scen, "scenario", ["janky_pct","janky_legacy_pct","p90_ms","p99_ms","pss_kb","java_heap_kb"])
 # memory leak check: least-squares slope of PSS over iteration order per scenario
 slopes = []
 for k in sorted({r["scenario"] for r in scen}):

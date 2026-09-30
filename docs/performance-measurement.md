@@ -59,15 +59,15 @@ anchor those taps (`leftOf`, `above`) and check tabs with `selected: true`.
 
 ## What is measured
 
-| File              | Columns                                                                                                   | Source                                                                                                  |
-| ----------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `startup.csv`     | `kind` (cold/warm), `total_ms`                                                                            | `adb shell am start -W` `TotalTime`                                                                     |
-| `ttfd.csv`        | `first_screen_ms`, `data_settled_ms` (cold only)                                                          | logcat: launch intent → first `[perf] route` mark → last `query:success/error` mark                     |
-| `scenarios.csv`   | `passed`, `frames`, `janky_pct`, `p50/p90/p95/p99_ms`, `pss_kb`, `java_heap_kb`, `native_heap_kb`         | `dumpsys gfxinfo` (reset before each flow), `dumpsys meminfo` after                                     |
-| `marks.csv`       | `from`, `to`, `delta_ms`                                                                                  | `[perf]` logcat lines from `PerfLogger`: route changes, query fetch→success, mutation pending→success   |
-| `reliability.csv` | `runs`, `passed`, `success_pct`                                                                           | Maestro exit codes                                                                                      |
-| `energy.csv`      | `phase` (active/idle), `duration_s`, `battery_drop_pct`, `charge_drop_uah`, `avg_ma`, `app_estimated_mah` | `dumpsys battery` `Charge counter` (whole device); `dumpsys batterystats` for the app UID (active only) |
-| `summary.csv`     | `metric`, `n`, `median`, `p90`, `min`, `max`                                                              | computed from the above                                                                                 |
+| File              | Columns                                                                                                               | Source                                                                                                                           |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `startup.csv`     | `kind` (cold/warm), `total_ms`                                                                                        | `adb shell am start -W` `TotalTime`                                                                                              |
+| `ttfd.csv`        | `first_screen_ms`, `data_settled_ms` (cold only)                                                                      | logcat: launch intent → first `[perf] route` mark → last `query:success/error` mark                                              |
+| `scenarios.csv`   | `passed`, `frames`, `janky_pct`, `p50/p90/p95/p99_ms`, `pss_kb`, `java_heap_kb`, `native_heap_kb`, `janky_legacy_pct` | `dumpsys gfxinfo` (reset before each flow), `dumpsys meminfo` after                                                              |
+| `marks.csv`       | `from`, `to`, `delta_ms`                                                                                              | `[perf]` logcat lines from `PerfLogger`: route changes, query fetch→success, mutation pending→success                            |
+| `reliability.csv` | `runs`, `passed`, `success_pct`                                                                                       | Maestro exit codes                                                                                                               |
+| `energy.csv`      | `phase` (active/idle), `duration_s`, `battery_drop_pct`, `charge_drop_uah`, `avg_ma`, `app_estimated_mah`             | `/sys/class/power_supply/battery/{capacity,charge_counter}` (whole device); `dumpsys batterystats` for the app UID (active only) |
+| `summary.csv`     | `metric`, `n`, `median`, `p90`, `min`, `max`                                                                          | computed from the above                                                                                                          |
 
 Notification delivery: reminders are pushed by the backend at their due time. After
 `04-schedule-reminder` runs, wait for the due time and count:
@@ -93,5 +93,6 @@ Repeat with the device in Doze (`adb shell dumpsys deviceidle force-idle`) for t
 
 - `total_ms` is the first frame, which in a React Native app is the splash screen. Use `ttfd.csv` for when the user sees Home and its data.
 - Every flow starts with `launchApp`, which restarts the process. Frame stats therefore include cold-start frames, and `pss_slope_kb_per_iter` shows drift between runs, not a leak inside one session.
-- Maestro reads the accessibility tree between steps, and that work runs on the app's UI thread. Janky % is an upper bound, and flows with many assertions (`01-navigate-tabs`) are affected most.
+- `janky_pct` counts frames that miss the display deadline, which is 8.3 ms on a 120 Hz screen, so it runs high on such phones. `janky_legacy_pct` uses a fixed 16 ms frame-duration threshold and also catches long cold-start frames, so in a flow it can exceed `janky_pct`. Report both, with the refresh rate (`adb shell dumpsys display | grep fps=`).
 - `avg_ma` covers the whole device (screen, radio, ADB). Compare the `active` row with the `idle` row rather than reading it on its own.
+- Battery values come from sysfs because `dumpsys battery unplug` (needed for `batterystats` over USB) freezes what `dumpsys battery` reports. Runs before this change always recorded `battery_drop_pct` as 0.
