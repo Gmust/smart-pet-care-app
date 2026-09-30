@@ -33,24 +33,34 @@ Keep it short and factual: what is true now, what was actually verified, what is
   - Cold TTID 746 ms; Home rendered at 844 ms; Home data loaded at 1.77 s.
   - Memory (PSS) after a scenario: 423–506 MB. AI reply: median 1.5 s.
   - Active use drew 645 mA against 441 mA idle.
-- New `perf.sh` logic, checked only in parts:
+- Extended `perf.sh` on the device (2026-09-30, `perf-out/verify-0942/`):
+  `startup` (N=2) writes `ttfd.csv` and restores `screen_off_timeout`;
+  `scenarios` (N=1) passes all 5 flows, and a second run into the same `$OUT` resumes
+  in 1 s; `energy` reads the fuel gauge from sysfs, warns when the phone is charging,
+  and leaves fields empty when they cannot be read.
+- `dumpsys battery unplug` freezes the values `dumpsys battery` reports, so every
+  earlier `energy` run recorded `battery_drop_pct` = 0. The diploma run is not affected:
+  its charge-counter reads happened outside the unplugged window.
+- New `perf.sh` logic, checked earlier on recorded data:
   - the TTFD awk reproduces the run's `ttfd.csv` from its logcat;
   - `summary` works on a copy of the run;
   - the `battery()` parser works on the device.
 
 ## Limitations
 
-- The extended `scripts/perf.sh` has not run end to end on a device. Untested paths:
-  `keep_awake`, `reconnect`, retry and resume of flows, and the idle baseline in
-  `energy`.
+- Not exercised on a device: the infra retry/`reconnect` path of `perf.sh` (it needs an
+  ADB drop), and a full `energy` run on battery; the verify run was on the charger.
 - pnpm 11 ignores `node-linker=hoisted` in `.npmrc`, so `node_modules` is `isolated`,
   although `AGENTS.md` says the layout is hoisted. Decide: move it to
   `pnpm-workspace.yaml` (`nodeLinker: hoisted`) or correct `AGENTS.md`.
 - Wireless ADB drops during long runs, and the phone's IP/port changes after sleep.
   22 flow attempts were lost to this in the measurement run and were re-run.
-- Frame jank measured through Maestro is overstated because its accessibility queries
-  run on the UI thread. A clean tab-switching measurement with `adb input` has not
-  been taken.
+- Frame jank is high on this 120 Hz phone. A control run of tab switching with
+  `adb input`, without Maestro (2026-09-30), gave 67–73 % janky against the 8.3 ms
+  deadline but 15 % against the legacy 16 ms threshold; p50 is 10 ms and p99 is 20 ms.
+  The cause is render-thread draw commands, not the JS/UI thread. Maestro does not
+  inflate the jank figure. `perf.sh` now also records `janky_legacy_pct`. In flows it can exceed `janky_pct`,
+  because it also counts long cold-start frames.
 - Not measured: delivery of a scheduled push at its due time, and memory growth
   within one session.
 - Not verified on a device: the confirmation-code flows (need an inbox), assistant
@@ -64,16 +74,18 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 One bounded, independently verifiable task:
 
-- Run `ANDROID_SERIAL=<device> N=2 IDLE_S=60 ENERGY_LOOPS=1 pnpm perf all` once on the
-  phone to exercise the new `perf.sh` paths end to end.
+- Decide the pnpm node linker: `nodeLinker: hoisted` in `pnpm-workspace.yaml` (as
+  `AGENTS.md` intends), or correct `AGENTS.md` to say `isolated`. Then run `pnpm check`
+  and a release build.
 
 ## Completion fields
 
-- Outcome: performance measured for the diploma; release build unblocked; perf tooling
-  hardened against flaky wireless ADB.
+- Outcome: performance measured for the diploma, including a control run of tab navigation
+  without Maestro; release build unblocked; perf tooling hardened against flaky wireless ADB;
+  frozen battery readings in `energy` fixed.
 - Files / contracts changed: `package.json`, `pnpm-lock.yaml`, `.maestro/00–03`,
   `scripts/perf.sh`, `docs/performance-measurement.md`, `docs/HANDOFF.md`.
 - Checks run and results: `pnpm check` green; release bundle builds; device run as above.
 - Platforms actually tested: Android (Samsung S20 FE, Android 13, release build).
 - Remaining limitations: see Limitations.
-- Next bounded task: end-to-end run of the extended `perf.sh`.
+- Next bounded task: decide the pnpm node linker.
