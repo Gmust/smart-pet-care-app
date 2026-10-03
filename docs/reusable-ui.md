@@ -65,7 +65,7 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 ### `Button` — `@/shadecn/ui/button`
 
 - Variants: `primary`, `secondary`, `ghost`, `danger`, `text`, `link`, `icon`
-- Sizes: `sm`, `md`, `lg`, `icon`
+- Sizes: `sm`, `md`, `lg`, `icon`, `hug`
 - Props: `icon`, `iconPosition`, `isLoading`, `disabled`, `dotted`, `textStyle`, plus standard `Pressable` props
 - String children render through the shared `Text` with themed button typography
 - `isLoading` disables the button and swaps the content for an activity indicator

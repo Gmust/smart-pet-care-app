@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 
 import { SectionHeader } from "@/common/components/SectionHeader";
+import { Button } from "@/shadecn/ui/button";
 import { ListCard } from "@/shadecn/ui/card";
-import { Text } from "@/shadecn/ui/text";
 
 import { useNotesQuery } from "../../queries/notes/useNotesQuery";
 import type { usePetQuery } from "../../queries/usePetQuery";
@@ -62,13 +62,15 @@ export const OverviewTabContent = ({ pet }: Props) => {
         <View style={styles.notesLabelRow}>
           <SectionHeader label={t("petProfilePage.notes.title")} compact />
         </View>
-        <Pressable
-          accessibilityRole="button"
+        <Button
+          variant="text"
+          size="hug"
           accessibilityLabel={t("petProfilePage.notes.addNoteA11y")}
+          textStyle={styles.addText}
           onPress={() => openNote()}
         >
-          <Text style={styles.addText}>{t("petProfilePage.notes.addNote")}</Text>
-        </Pressable>
+          {t("petProfilePage.notes.addNote")}
+        </Button>
       </View>
 
       <NotesCard notes={notes} onOpenNote={openNote} />

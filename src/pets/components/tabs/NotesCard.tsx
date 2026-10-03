@@ -2,14 +2,14 @@ import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import type { NoteResponseDto } from "@/api/generated";
 import { Card } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 
-import type { PetNote } from "../../types";
 import { NoteRow } from "../pet-profile/NoteRow";
 
 type Props = {
-  notes: PetNote[];
+  notes: NoteResponseDto[];
   onOpenNote: (noteId?: string) => void;
 };
 

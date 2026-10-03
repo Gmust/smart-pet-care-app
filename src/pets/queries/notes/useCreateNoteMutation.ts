@@ -1,22 +1,25 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { localNotesStore } from "./localNotesStore";
+import { postApiPetsPetIdNotes } from "@/api";
+import type { CreateNoteDto } from "@/api/generated";
 
-type CreateNoteVariables = {
+import { notesQueryKeys } from "./notesQueryKeys";
+
+type Variables = {
   petId: string;
-  title: string;
-  content: string;
+  dto: CreateNoteDto;
 };
 
 export const useCreateNoteMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["create-note"],
-    mutationFn: async ({ petId, title, content }: CreateNoteVariables) =>
-      localNotesStore.create(petId, { title, content }),
-    onSuccess: (_note, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["pets", variables.petId, "notes"] });
+    mutationFn: async ({ petId, dto }: Variables) => {
+      const response = await postApiPetsPetIdNotes(petId, dto);
+      return response.data;
+    },
+    onSuccess: (_data, { petId }) => {
+      queryClient.invalidateQueries({ queryKey: notesQueryKeys.notes(petId) });
     },
   });
 };

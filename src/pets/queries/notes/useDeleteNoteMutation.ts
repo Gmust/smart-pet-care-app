@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { localNotesStore } from "./localNotesStore";
+import { deleteApiPetsPetIdNotesNoteId } from "@/api";
 
-type DeleteNoteVariables = {
+import { notesQueryKeys } from "./notesQueryKeys";
+
+type Variables = {
   petId: string;
   noteId: string;
 };
@@ -11,12 +13,11 @@ export const useDeleteNoteMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ["delete-note"],
-    mutationFn: async ({ petId, noteId }: DeleteNoteVariables) => {
-      localNotesStore.remove(petId, noteId);
+    mutationFn: async ({ petId, noteId }: Variables) => {
+      await deleteApiPetsPetIdNotesNoteId(petId, noteId);
     },
-    onSuccess: (_result, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["pets", variables.petId, "notes"] });
+    onSuccess: (_data, { petId }) => {
+      queryClient.invalidateQueries({ queryKey: notesQueryKeys.notes(petId) });
     },
   });
 };

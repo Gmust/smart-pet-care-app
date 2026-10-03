@@ -8,9 +8,11 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
 import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { ChevronIcon } from "@/icons/chevron";
 import { TrashIcon } from "@/icons/trash";
 import { useUndoRedoText } from "@/pets/hooks/useUndoRedoText";
+import { encodeNoteField } from "@/pets/queries/notes/noteFieldSentinel";
 import { useCreateNoteMutation } from "@/pets/queries/notes/useCreateNoteMutation";
 import { useDeleteNoteMutation } from "@/pets/queries/notes/useDeleteNoteMutation";
 import { useUpdateNoteMutation } from "@/pets/queries/notes/useUpdateNoteMutation";
@@ -73,9 +75,20 @@ export const SingleNoteEditor = ({
     const trimmedContent = contentRef.current.trim();
     const isEmpty = !trimmedTitle && !trimmedContent;
 
+    const onError = (error: unknown) => {
+      console.error(error);
+      Toast.show({ type: "error", text1: getApiErrorMessage(error) });
+    };
+
     if (noteId && isEmpty) {
-      deleteNote({ petId, noteId });
-      Toast.show({ type: "success", text1: t("pets:singleNotePage.deleteDialog.success") });
+      deleteNote(
+        { petId, noteId },
+        {
+          onSuccess: () =>
+            Toast.show({ type: "success", text1: t("pets:singleNotePage.deleteDialog.success") }),
+          onError,
+        }
+      );
       return;
     }
     if (isEmpty) return;
@@ -84,10 +97,16 @@ export const SingleNoteEditor = ({
       trimmedTitle !== initialTitle.trim() || trimmedContent !== initialContent.trim();
     if (!isDirty) return;
 
+    // See noteFieldSentinel.ts for why a blank field is encoded before sending.
+    const dto = {
+      title: encodeNoteField(trimmedTitle),
+      content: encodeNoteField(trimmedContent),
+    };
+
     if (noteId) {
-      updateNote({ petId, noteId, title: trimmedTitle, content: trimmedContent });
+      updateNote({ petId, noteId, dto }, { onError });
     } else {
-      createNote({ petId, title: trimmedTitle, content: trimmedContent });
+      createNote({ petId, dto }, { onError });
     }
   }, [noteId, petId, initialTitle, initialContent, updateNote, createNote, deleteNote, t]);
 
@@ -174,7 +193,7 @@ export const SingleNoteEditor = ({
             accessibilityLabel={t("pets:singleNotePage.undoA11y")}
             disabled={!canUndo}
             onPress={undo}
-            hitSlop={8}
+            hitSlop={13}
           >
             <ChevronIcon
               direction="left"
@@ -188,7 +207,7 @@ export const SingleNoteEditor = ({
             accessibilityLabel={t("pets:singleNotePage.redoA11y")}
             disabled={!canRedo}
             onPress={redo}
-            hitSlop={8}
+            hitSlop={13}
           >
             <ChevronIcon
               direction="right"

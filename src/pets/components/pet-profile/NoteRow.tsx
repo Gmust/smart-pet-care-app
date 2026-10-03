@@ -2,15 +2,14 @@ import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import type { NoteResponseDto } from "@/api/generated";
 import { ChevronIcon } from "@/icons/chevron";
 import { PencilLineIcon } from "@/icons/pencil-line";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-import type { PetNote } from "../../types";
-
 type NoteRowProps = {
-  note: PetNote;
+  note: NoteResponseDto;
   onPress: () => void;
 };
 
@@ -20,8 +19,9 @@ const CHEVRON_ICON_SIZE = 18;
 export const NoteRow = ({ note, onPress }: NoteRowProps) => {
   const { t } = useTranslation(["pets"]);
 
-  const title = note.title.trim() || t("pets:singleNotePage.untitled");
-  const preview = note.content.trim();
+  const trimmedTitle = note.title?.trim() ?? "";
+  const title = trimmedTitle || t("pets:singleNotePage.untitled");
+  const preview = note.content?.trim() ?? "";
 
   return (
     <Pressable
@@ -38,10 +38,7 @@ export const NoteRow = ({ note, onPress }: NoteRowProps) => {
         />
       </View>
       <View style={styles.noteTexts}>
-        <Text
-          variant="bodyS"
-          style={note.title.trim() ? styles.noteTitle : styles.noteTitlePlaceholder}
-        >
+        <Text variant="bodyS" style={trimmedTitle ? styles.noteTitle : styles.noteTitlePlaceholder}>
           {title}
         </Text>
         <Text variant="caption" style={styles.notePreview} numberOfLines={1}>

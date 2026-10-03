@@ -7,7 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { Text, TextClassContext } from "./text";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "text" | "link" | "icon";
-export type ButtonSize = "sm" | "md" | "lg" | "icon";
+export type ButtonSize = "sm" | "md" | "lg" | "icon" | "hug";
 
 const buttonVariants = StyleSheet.create((theme) => {
   const { brand } = theme.palette;
@@ -79,6 +79,7 @@ const buttonVariants = StyleSheet.create((theme) => {
             paddingHorizontal: 0,
             borderRadius: theme.borderRadius.full,
           },
+          hug: { paddingHorizontal: 0 },
         },
       },
     }),
@@ -119,6 +120,7 @@ const buttonVariants = StyleSheet.create((theme) => {
           md: { fontSize: theme.fontSize.base },
           lg: { fontSize: theme.fontSize.lg },
           icon: { fontSize: theme.fontSize.base },
+          hug: {},
         },
       },
     }),
@@ -213,7 +215,7 @@ function Button({
         disabled={isDisabled}
         ref={ref}
         role="button"
-        hitSlop={hitSlop ?? (size === "icon" ? 6 : undefined)}
+        hitSlop={hitSlop ?? (size === "icon" ? 6 : size === "hug" ? 12 : undefined)}
         style={(state) => [
           buttonVariants.button(isDisabled, state.pressed, dotted),
           typeof style === "function" ? style(state) : style,
