@@ -10,6 +10,11 @@ export type HealthHistoryCategory = Extract<
   "VetVisit" | "Vaccination" | "Deworming" | "AntiParasiteTreatment"
 >;
 
+/** What the add/edit record form can create and the `health-record-list` route
+ * can show. Wider than the History grid: a symptom is logged through the same
+ * form but opened from the Symptoms overview row, not a tile. */
+export type HealthRecordFormCategory = HealthHistoryCategory | Extract<HealthRecordType, "Symptom">;
+
 /** Recursively extracts every leaf dot-path key from the "health" translation JSON. */
 type DotPaths<T> = {
   [K in keyof T & string]: T[K] extends string

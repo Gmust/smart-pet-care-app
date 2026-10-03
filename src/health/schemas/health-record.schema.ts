@@ -3,13 +3,13 @@ import { z } from "zod";
 
 import { SymptomType } from "@/api/generated";
 
-import type { HealthHistoryCategory } from "../types";
+import type { HealthRecordFormCategory } from "../types";
 
-import { HISTORY_CATEGORIES } from "./health-record-list-params.schema";
+import { formCategorySchema } from "./health-record-list-params.schema";
 
 export type HealthRecordFormValues = {
   petId: string;
-  type: HealthHistoryCategory | "";
+  type: HealthRecordFormCategory | "";
   title: string;
   performedAt: string;
   description: string;
@@ -25,10 +25,10 @@ export const healthRecordSchema = (t: TFunction<["health", "common"]>) =>
   z.object({
     petId: z.string().min(1, t("health:forms.healthRecord.errors.petRequired")),
     // "" stands for "not chosen yet" (the pet/type picker steps) — literal-union
-    // with HISTORY_CATEGORIES so the field's Input type matches
+    // with the form categories so the field's Input type matches
     // HealthRecordFormValues.type exactly, which TanStack Form's Standard
     // Schema typing requires.
-    type: z.union([z.literal(""), z.enum(HISTORY_CATEGORIES)]).refine((value) => value !== "", {
+    type: z.union([z.literal(""), formCategorySchema]).refine((value) => value !== "", {
       message: t("health:forms.healthRecord.errors.typeRequired"),
     }),
     title: z.string().min(1, t("health:forms.healthRecord.errors.titleRequired")),

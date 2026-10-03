@@ -1,0 +1,31 @@
+appId: com.anonymous.smartpetcareapp
+name: Exchange messages with AI assistant
+env:
+  PET_NAME: Rex
+  MESSAGES: "3"
+---
+- launchApp
+- tapOn: "Pets"
+- tapOn: "View ${PET_NAME}"
+- tapOn: "ai-assistant"
+# consent dialog on first open
+- tapOn:
+    text: "I understand and continue"
+    optional: true
+- repeat:
+    times: ${MESSAGES}
+    commands:
+      - tapOn: "Ask about ${PET_NAME}…"
+      - inputText: "How much water should ${PET_NAME} drink per day?"
+      - tapOn: "Send message"
+      - extendedWaitUntil:
+          visible:
+            id: "assistant-response-card"
+          timeout: 90000
+      # The pending bubble's text. From the second message on, the first
+      # answer's card is already on screen, so only this waits for the reply.
+      - extendedWaitUntil:
+          notVisible:
+            text: "Thinking about your pet…"
+          timeout: 90000
+- back

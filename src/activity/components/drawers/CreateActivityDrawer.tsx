@@ -9,6 +9,8 @@ import dayjs from "dayjs";
 import type { ActivityLogResponseDto, PatchActivityLogDto } from "@/api/generated";
 import { ActivitySource } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
 import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
 import {
@@ -159,7 +161,8 @@ export const CreateActivityDrawer = ({ isOpen, setIsOpen, petId, activity }: Pro
         setIsOpen(false);
       } catch (e) {
         console.error(e);
-        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+        setApiFieldErrors(form, e);
+        Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },
   });

@@ -89,7 +89,7 @@ export function RemindersTabContent({ petId }: Props) {
         </Button>
       </View>
 
-      <ReminderDrawers {...drawerProps} />
+      <ReminderDrawers petId={petId} {...drawerProps} />
 
       <DeleteConfirmDialog {...deleteDialogProps} />
     </>

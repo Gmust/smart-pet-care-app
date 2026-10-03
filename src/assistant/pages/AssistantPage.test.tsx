@@ -8,6 +8,7 @@ import type { AxiosResponse } from "axios";
 import { AxiosError, AxiosHeaders } from "axios";
 
 import {
+  type ChatMessageResponseDto,
   ChatMessageRole,
   ChatMessageStatus,
   ClassifierUrgency,
@@ -481,28 +482,59 @@ describe("AssistantPage – server-backed conversation", () => {
     await waitFor(() => expect(utils.getByText(assistantResponse.answer)).toBeTruthy());
   });
 
-  it("preserves a retryable failure when the dedicated retry conflicts", async () => {
-    getMessagesMock.mockResolvedValue(
-      apiResponse({
-        sessionId: session.sessionId,
-        items: [
-          {
-            messageId: "conflict-message",
-            role: ChatMessageRole.assistant,
-            status: ChatMessageStatus.FailedRetryable,
-            content: "",
-            createdAt: "2026-07-15T10:02:00Z",
-          },
-        ],
-        pagination: { limit: 8, hasMore: false, nextCursor: null },
-      })
+  const transcriptOf = (...items: ChatMessageResponseDto[]) =>
+    apiResponse({
+      sessionId: session.sessionId,
+      items,
+      pagination: { limit: 8, hasMore: false, nextCursor: null },
+    });
+  const restoredFailure = (messageId: string): ChatMessageResponseDto => ({
+    messageId,
+    role: ChatMessageRole.assistant,
+    status: ChatMessageStatus.FailedRetryable,
+    content: "",
+    createdAt: "2026-07-15T10:02:00Z",
+  });
+
+  it("re-reads the transcript instead of keeping a stale failure when retry conflicts", async () => {
+    // 409: the message was answered meanwhile. The server's state has to win
+    // over the local failure, which would otherwise hide the answer.
+    getMessagesMock
+      .mockResolvedValueOnce(transcriptOf(restoredFailure("conflict-message")))
+      .mockResolvedValue(
+        transcriptOf({
+          ...restoredFailure("conflict-message"),
+          status: ChatMessageStatus.Completed,
+          content: "Answered meanwhile",
+        })
+      );
+    retryMessageMock.mockImplementation(() =>
+      Promise.reject(apiError(409, { code: "chat_message_not_retryable", message: "No." }))
     );
-    retryMessageMock.mockRejectedValue(apiError(409, { title: "Conflict" }));
     const utils = await renderConversation();
     fireEvent.press(utils.getByLabelText("errors.retry"));
 
-    await waitFor(() => expect(utils.getByText("errors.retryConflict")).toBeTruthy());
+    await waitFor(() => expect(utils.getByText("Answered meanwhile")).toBeTruthy());
     expect(retryMessageMock).toHaveBeenCalledWith(session.sessionId, "conflict-message");
+    expect(utils.queryByLabelText("errors.retry")).toBeNull();
+    expect(utils.queryByText("errors.requestTitle")).toBeNull();
+  });
+
+  it("drops a failure whose message no longer exists", async () => {
+    getMessagesMock
+      .mockResolvedValueOnce(transcriptOf(restoredFailure("gone-message")))
+      .mockResolvedValue(transcriptOf());
+    retryMessageMock.mockImplementation(() =>
+      Promise.reject(apiError(404, { code: "chat_message_not_found", message: "Gone." }))
+    );
+    const utils = await renderConversation();
+    fireEvent.press(utils.getByLabelText("errors.retry"));
+
+    await waitFor(() => expect(utils.queryByLabelText("errors.retry")).toBeNull());
+    // Before the alias check this 404 restored the session and left a
+    // "chat missing" failure in place of the message.
+    expect(utils.queryByText("errors.requestTitle")).toBeNull();
+    expect(utils.queryByText("errors.sessionMissing")).toBeNull();
   });
 
   it("loads the next cursor page once the user reaches the transcript start", async () => {
@@ -627,11 +659,85 @@ describe("AssistantPage – server-backed conversation", () => {
     getSessionsMock
       .mockResolvedValueOnce(apiResponse([session]))
       .mockResolvedValue(apiResponse([]));
-    sendMessageMock.mockRejectedValue(apiError(404, { title: "Not found" }));
+    sendMessageMock.mockRejectedValue(
+      apiError(404, { code: "chat_session_not_found", message: "Not found." })
+    );
     const utils = await renderConversation();
     await sendText(utils, "routine checkup");
 
     await waitFor(() => expect(createSessionMock).toHaveBeenCalledWith({ petId: "pet-milo" }));
+  });
+
+  it("keeps the session on a 404 that is not about the session", async () => {
+    // Before the alias check every 404 re-bootstrapped the chat.
+    sendMessageMock.mockImplementation(() =>
+      Promise.reject(apiError(404, { code: "pet_not_found", message: "Not found." }))
+    );
+    const utils = await renderConversation();
+    await sendText(utils, "routine checkup");
+
+    await waitFor(() => expect(utils.getByText("errors.request")).toBeTruthy());
+    expect(utils.queryByText("errors.sessionMissing")).toBeNull();
+    expect(getSessionsMock).toHaveBeenCalledTimes(1);
+    expect(createSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("shows the re-read answer when a send conflicts, not a failure over it", async () => {
+    // The 409 names the message it belongs to. A failure bubble carrying that
+    // messageId used to hide the very answer the re-read brought back.
+    getMessagesMock.mockResolvedValueOnce(transcriptOf()).mockResolvedValue(
+      transcriptOf(
+        {
+          messageId: "user-message",
+          role: ChatMessageRole.user,
+          status: ChatMessageStatus.Completed,
+          content: "routine checkup",
+          createdAt: "2026-07-15T10:01:00Z",
+        },
+        {
+          messageId: "answered-message",
+          role: ChatMessageRole.assistant,
+          status: ChatMessageStatus.Completed,
+          content: "Answered meanwhile",
+          createdAt: "2026-07-15T10:02:00Z",
+        }
+      )
+    );
+    sendMessageMock.mockImplementation(() =>
+      Promise.reject(
+        apiError(409, {
+          code: "chat_message_processing_or_retry_required",
+          message: "Busy.",
+          messageId: "answered-message",
+        })
+      )
+    );
+    const utils = await renderConversation();
+    await sendText(utils, "routine checkup");
+
+    await waitFor(() => expect(utils.getByText("Answered meanwhile")).toBeTruthy());
+    expect(utils.queryByText("errors.requestTitle")).toBeNull();
+    // The server's copy replaces the optimistic one instead of repeating it.
+    expect(utils.getAllByText("routine checkup")).toHaveLength(1);
+  });
+
+  it("keeps a failure when the stored response cannot be read back", async () => {
+    // A 409, but a real failure: re-reading changes nothing, so dropping the
+    // bubble would leave a retry that silently fails every time.
+    getMessagesMock.mockResolvedValue(transcriptOf(restoredFailure("broken-message")));
+    retryMessageMock.mockImplementation(() =>
+      Promise.reject(
+        apiError(409, { code: "chat_stored_response_invalid", message: "Unreadable." })
+      )
+    );
+    const utils = await renderConversation();
+    fireEvent.press(utils.getByLabelText("errors.retry"));
+
+    // The local failure (dismissable, no retry that cannot work) stands in for
+    // the server's copy, which would offer the same failing retry again.
+    await waitFor(() => expect(utils.getByLabelText("errors.dismiss")).toBeTruthy());
+    expect(utils.queryByLabelText("errors.retry")).toBeNull();
+    expect(retryMessageMock).toHaveBeenCalledWith(session.sessionId, "broken-message");
   });
 });
 

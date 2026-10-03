@@ -7,6 +7,7 @@ export default function PetsLayout() {
       <Stack.Screen name="pet-profile" />
       <Stack.Screen name="health-record-list" />
       <Stack.Screen name="note" />
+      <Stack.Screen name="wellness" />
     </Stack>
   );
 }

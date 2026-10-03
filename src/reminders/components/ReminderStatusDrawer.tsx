@@ -6,7 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { ReminderStatus } from "@/api/generated";
 import { getLocalTimeOfDay } from "@/common/utils/getLocalTimeOfDay";
-import { getProblemMessage } from "@/common/utils/getProblemMessage";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { Button, type ButtonVariant } from "@/shadecn/ui/button";
 import {
   Drawer,
@@ -76,7 +76,7 @@ export const ReminderStatusDrawer = ({
       resolvedRef.current = false;
       Toast.show({
         type: "error",
-        text1: getProblemMessage(e, t("common:errors.somethingWentWrong")),
+        text1: getApiErrorMessage(e),
       });
     }
   };

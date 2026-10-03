@@ -1,0 +1,9 @@
+appId: com.anonymous.smartpetcareapp
+name: Open app (cold)
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+    timeout: 20000

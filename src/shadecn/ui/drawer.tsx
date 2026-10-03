@@ -302,6 +302,16 @@ function DrawerContent({
   }, [open, modalRef, markUserRequestedClose]);
 
   const beginNativeActivity = React.useCallback(() => {
+    // gorhom's backdrop recognises its tap with a Gesture.Tap() over an
+    // absoluteFill underlay, and that gesture still fires for taps that land
+    // on an RN Pressable inside the sheet — so opening a date field marks a
+    // "user requested close" that nothing consumes (its onPress runs before
+    // the pressBehavior branch, so backdropPressBehavior="none" doesn't help).
+    // The stale flag then makes the picker's own focus-steal dismiss look
+    // deliberate, and the sheet closes for good instead of being restored.
+    // A native dialog is opening now, so any pending mark cannot be about the
+    // dismiss that is coming.
+    userRequestedCloseRef.current = false;
     nativeActivityCountRef.current += 1;
     isRecoveringNativeActivityRef.current = true;
     let ended = false;
@@ -325,7 +335,11 @@ function DrawerContent({
         pressBehavior={backdropPressBehavior}
         // gorhom's own close() runs on backdrop tap, bypassing useDrawerClose() —
         // mark it here too, or a tap right after a native picker re-presents the sheet.
-        onPress={markUserRequestedClose}
+        // Not with "none": nothing closes, and the backdrop gesture also fires for
+        // taps inside the sheet, so its runOnJS mark can land after
+        // beginNativeActivity cleared the flag and turn the picker's focus-steal
+        // dismiss into a "deliberate" close.
+        {...(backdropPressBehavior === "none" ? {} : { onPress: markUserRequestedClose })}
       />
     ),
     [backdropPressBehavior, markUserRequestedClose]

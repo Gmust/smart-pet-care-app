@@ -1,0 +1,16 @@
+appId: com.anonymous.smartpetcareapp
+name: Navigate between principal screens
+---
+- launchApp
+- assertVisible: "Home"
+- repeat:
+    times: 5
+    commands:
+      - tapOn: "Pets"
+      - assertVisible: "Pets"
+      - tapOn: "Activity"
+      - assertVisible: "Activity"
+      - tapOn: "Profile"
+      - assertVisible: "Profile"
+      - tapOn: "Home"
+      - assertVisible: "Home"

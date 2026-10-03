@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import type { HealthRecordResponseDto } from "@/api/generated";
 import { DashedDividerIcon } from "@/icons/dashed-divider";
 import { EyeClosedIcon, EyeIcon } from "@/icons/eye";
+import { HeartPulseIcon } from "@/icons/heart";
 import { cardVariants } from "@/shadecn/ui/card";
 import {
   DropdownMenu,
@@ -18,7 +19,7 @@ import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
 import { HEALTH_CATEGORY_ICON } from "../constants";
-import type { HealthHistoryCategory } from "../types";
+import { formCategorySchema } from "../schemas/health-record-list-params.schema";
 
 type Props = {
   record: HealthRecordResponseDto;
@@ -44,10 +45,10 @@ export function HealthRecordCard({ record, symptomLabelByName, onEdit, onRequest
     symptomLabels
   );
 
-  // record.type is always one of HealthHistoryCategory here — this card only
-  // ever renders records the page already queried for a single validated
-  // category (see health-record-list-params.schema).
-  const Icon = HEALTH_CATEGORY_ICON[record.type as HealthHistoryCategory];
+  // The page only queries validated form categories, so the fallback is for a
+  // backend type this app does not know yet rather than an expected case.
+  const category = formCategorySchema.safeParse(record.type).data;
+  const Icon = category ? HEALTH_CATEGORY_ICON[category] : HeartPulseIcon;
 
   return (
     <DropdownMenu>

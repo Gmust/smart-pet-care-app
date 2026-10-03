@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 
 import { ImagePicker, type ImagePickerValue } from "@/common/components/ImagePicker";
+import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { useUploadPetPhoto } from "@/pets/queries/useUploadPetPhoto";
 import { uploadPetPhotoSchema } from "@/pets/schemas/upload-pet-photo.schema";
 import { Button } from "@/shadecn/ui/button";
@@ -39,7 +40,7 @@ export const UploadPetPhotoDrawer = ({ isOpen, setIsOpen, petId }: Props) => {
         setIsOpen(false);
       } catch (e) {
         console.error(e);
-        Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
+        Toast.show({ type: "error", text1: getApiErrorMessage(e) });
       }
     },
   });

@@ -1,0 +1,41 @@
+appId: com.anonymous.smartpetcareapp
+name: Schedule a reminder (push notification)
+env:
+  PET_NAME: Rex
+# Time is set via the native Android clock dialog; the tap sequence below
+# assumes the default Material time picker ("OK" confirms). Tune once with
+# `maestro studio` if the device uses a different picker.
+---
+- launchApp
+- tapOn: "Pets"
+- tapOn: "View ${PET_NAME}"
+- tapOn: "Reminders"
+# Opened from the pet's profile, the drawer preselects that pet.
+- tapOn: "Add reminder"
+- tapOn: "e.g. Morning feeding"
+- inputText: "Perf reminder ${TS}"
+- hideKeyboard
+# Type already defaults to Feeding. Repeat defaults to Weekly: switch to Daily,
+# not Once — a Once reminder confirmed at the picker defaults (today, the current
+# minute) is rejected as being in the past. Daily has no date and no past check.
+- tapOn: "Weekly"
+- tapOn: "Daily"
+- scrollUntilVisible:
+    element: "Time"
+    direction: DOWN
+- tapOn: "Time"
+- tapOn: "OK"
+- tapOn: "Create reminder"
+- extendedWaitUntil:
+    visible:
+      text: "Reminder created successfully!"
+    timeout: 20000
+# Delete what this run created. Otherwise every run leaves a Daily reminder on
+# the real account: daily pushes, and a longer list that slows flows 02 and 04.
+- tapOn: "Perf reminder ${TS}"
+- tapOn: "Delete reminder"
+- tapOn: "Delete"
+- extendedWaitUntil:
+    notVisible:
+      text: "Perf reminder ${TS}"
+    timeout: 20000
