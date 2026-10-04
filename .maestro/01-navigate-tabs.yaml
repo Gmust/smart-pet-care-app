@@ -1,16 +1,31 @@
 appId: com.anonymous.smartpetcareapp
 name: Navigate between principal screens
+# Tab labels are always on screen, so asserts check the tab's `selected` state.
+# A bare "Home" also matches the system navigation bar's Home button (3-button
+# navigation), which backgrounds the app: pin the tap to the tab bar.
 ---
 - launchApp
-- assertVisible: "Home"
+- assertVisible:
+    text: "Home"
+    selected: true
 - repeat:
     times: 5
     commands:
       - tapOn: "Pets"
-      - assertVisible: "Pets"
+      - assertVisible:
+          text: "Pets"
+          selected: true
       - tapOn: "Activity"
-      - assertVisible: "Activity"
+      - assertVisible:
+          text: "Activity"
+          selected: true
       - tapOn: "Profile"
-      - assertVisible: "Profile"
-      - tapOn: "Home"
-      - assertVisible: "Home"
+      - assertVisible:
+          text: "Profile"
+          selected: true
+      - tapOn:
+          text: "Home"
+          leftOf: "Pets"
+      - assertVisible:
+          text: "Home"
+          selected: true
