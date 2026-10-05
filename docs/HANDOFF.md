@@ -6,65 +6,62 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Current state
 
-- Branch: `feature/welness-score` (PR #21), merged with `main` at `c870b49`.
-- Backend error contract v1 adopted: `src/errors/` holds the alias translations
-  (`errors` namespace) and `getApiError` / `getApiErrorMessage` / `setApiFieldErrors`.
-  Screens branch on `code`; the convention is in `AGENTS.md` → API Layer.
-- Auth interceptor refreshes only on `auth_authentication_required` (or a code-less
-  401); `postApiAuthRefresh` is bound to `noAuthApi`, so a refresh can never hang.
-- `pnpm test:api` runs contract tests against the real backend (`.env`:
-  `EXPO_PUBLIC_API_URL`, and `API_TEST_EMAIL` / `API_TEST_PASSWORD` for a dedicated,
-  confirmed test account — the suite rotates its refresh token).
+- Branch: `feature/pet-notes`, merged with `main` at `227c64b`.
+- Notes are first-class entities behind `/api/pets/{petId}/notes`, replacing the free-text
+  `behavioralNotes` array on Pet. Route `/(tabs)/pets/note` takes `petId` and an optional
+  `noteId`; without a `noteId` it is create mode. Hooks live in `src/pets/queries/notes/`.
+- `SingleNoteEditor` has no save button: it saves on unmount. Blank title and blank content
+  together delete an existing note, an unchanged one sends nothing, and PATCH carries only
+  the fields that changed.
+- `useUndoRedoText` checkpoints on a 500 ms typing pause, and commits a pending checkpoint
+  before stepping so the edit in flight is not dropped.
+- **The backend rejects a note whose title or content is empty, which the UI allows.**
+  Worked around with a U+200B sentinel (`noteFieldSentinel.ts`): encode on send, decode on
+  read. A ticket is open to accept blank fields and reject only when both are empty; remove
+  the sentinel once it lands.
+- A failed or offline-paused notes fetch renders `QueryErrorState` rather than the
+  "note not found" redirect; a 404 still redirects, since no retry could fix it.
+- Touched outside `src/pets/`: `src/common/components/` (`QueryErrorState`,
+  `RouteErrorFallback`), `src/shadecn/ui/{input,button}.tsx`, `src/styles/theme.ts`,
+  `docs/reusable-ui.md`.
 
 ## Verified evidence
 
-- `pnpm check` — pass (2026-09-29): 30 suites, 257 tests. CI green on PR #21.
-- `pnpm test:api` — pass (2026-09-29): 24/24 against the live backend.
-- Real-server facts the code relies on: `errors` keys are PascalCase DTO names;
-  a new pet's wellness evaluation is 422 `wellness_insufficient_data`; chat pages
-  allow `limit` 1–8.
-- Device pass (2026-09-29, Samsung S20 FE, Android 13, debug build, live backend),
-  checked on screen and, where it matters, against server state:
-  wrong password stays on the form; expired access token (15 min) refreshes
-  silently and a write after expiry lands; sign-out stays signed out; assistant
-  answers; health type switch stores no leftover symptoms/notes; an unchanged edit
-  closes without error; a reminder edit keeps another device's concurrent change;
-  a new pet shows "No score yet"; the reminder drawer preselects the pet from its
-  profile; the actions menu is in the accessibility tree; Maestro 04 and 05 pass.
+- `pnpm check` — pass: 35 suites, 292 tests. `pnpm test:api` not run.
+- The full round trip on an Android device against the live backend: create, read, edit and
+  delete, with delete exercised both ways — by clearing both fields, and through the trash
+  button and its confirm dialog. Autosave on leaving the screen writes.
+- Offline behaviour on the device: a cold cache shows the offline screen instead of
+  redirecting away, the note loads by itself once the network returns, and a failed fetch
+  shows the error state whose Try again issues a real request.
+- Covered by tests only, never seen on a device: the 404 → pet-list redirect, and the back
+  button when there is history to pop.
+- The sentinel was validated against the live backend, not the spec: a blank field is
+  rejected, U+200B is accepted, and `null` on PATCH does **not** clear `title`.
+- Android only. iOS and web untested.
 
 ## Limitations
 
-- Not verified on a device: login with an unconfirmed email and the confirmation
-  code errors (need an inbox); assistant failure/retry paths and the wellness
-  "Try again" card (offline pauses queries instead of failing them); photo over the
-  size limit; `HealthPetCard` "/100" (only shown with a score).
-- Offline with no cache, the wellness page claims "No wellness score yet" and drops
-  the pet name from its hint (pre-existing).
-- Maestro 03 (photo upload) not run: it would upload an image from the device gallery.
-- `src/api/generated/` is gitignored; run `pnpm api:generate` after install or a
-  spec change, or imports from `src/api/index.ts` will fail.
-- Known spec gaps: `PatchFieldOf*` enum types and `PatchFieldOfDateTime` have no
-  `null`, so those fields cannot be cleared through PATCH. Not worked around.
-- Backend issues to raise: register repeats `auth_email_invalid` twice; empty chat
-  text returns both `chat_message_text_required` and `_too_long`; the spec still
-  declares `ProblemDetails` on most 4xx responses.
+- **Creating a note offline is silently broken.** No toast, nothing in the list, and every
+  retry queues another POST. Measured: three attempts offline issued zero requests and then
+  three POSTs on reconnect, one note each. A paused mutation never settles, so its `gcTime`
+  never starts and the queue has no expiry; nothing persists it, so an app kill drops it
+  instead. Stopping the duplicates for good needs idempotency from the backend. Flushing on
+  `AppState` → background, still unimplemented, would duplicate notes for the same reason.
+- `behavioralNotes` still exists on `PetResponseDto` / `UpdatePetDto` / `CreatePetDto`, but
+  nothing reads, writes or clears it, and nothing migrates it into notes. Existing values are
+  invisible and undeletable from the UI. With the backend; if the answer is "drop them", the
+  field should also come off `CreatePetDto`.
+- `installOnlineManager.ts` treats `isInternetReachable !== false` as online, so it reports
+  online while the probe is still `null`. A request can fire into a connection that is not
+  usable yet, and the global `retry: false` makes that failure terminal — which is what the
+  note screen's Try again runs into. Left alone: the policy is global.
 
 ## Next task
 
 One bounded, independently verifiable task:
 
-- Device check of the confirmation-code flows with a fresh, unconfirmed account.
-
-## Completion fields
-
-- Outcome: Error contract v1 adopted app-wide; review findings fixed (auth refresh
-  hang and loop, 409 handling, field errors, PATCH diffs, health type leak, wellness
-  codes, perf tooling aborts).
-- Files / contracts changed: `src/errors/**`, `src/api/{index,interceptors}.ts`,
-  assistant/auth/forms error handling, `AGENTS.md` (errors rule, `test:api`),
-  `package.json` (`test:api`, formatted `api:fetch`), `scripts/perf.sh`, `.maestro/04,05`.
-- Checks run and results: `pnpm check` and `pnpm test:api` green as above; each fix
-  has a test confirmed to fail without it.
-- Platforms actually tested: None (Jest + live API only).
-- Remaining limitations: see Limitations.
-- Next bounded task: Android device pass.
+- Add a `pnpm test:api` contract test for what the sentinel rests on: a note with an empty
+  field is rejected, U+200B is accepted, and whether `null` on PATCH clears a field. It pins
+  the behaviour the workaround depends on, so the sentinel can be removed safely once the
+  backend ticket lands.

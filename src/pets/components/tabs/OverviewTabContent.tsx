@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 
@@ -22,6 +22,7 @@ type Props = {
 
 export const OverviewTabContent = ({ pet }: Props) => {
   const { t } = useTranslation(["pets", "common"]);
+  const { theme } = useUnistyles();
   const router = useRouter();
 
   const { data: notes = [] } = useNotesQuery(pet.id);
@@ -67,6 +68,7 @@ export const OverviewTabContent = ({ pet }: Props) => {
           size="hug"
           accessibilityLabel={t("petProfilePage.notes.addNoteA11y")}
           textStyle={styles.addText}
+          hitSlop={(theme.minTouchTarget - theme.textStyles.bodySemiBold.lineHeight) / 2}
           onPress={() => openNote()}
         >
           {t("petProfilePage.notes.addNote")}

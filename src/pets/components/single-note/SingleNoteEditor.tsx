@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Keyboard, Pressable, TextInput, View } from "react-native";
+import { Keyboard, Pressable, View } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
+import { BackButton } from "@/common/components/BackButton";
 import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { ChevronIcon } from "@/icons/chevron";
@@ -17,6 +18,7 @@ import { useCreateNoteMutation } from "@/pets/queries/notes/useCreateNoteMutatio
 import { useDeleteNoteMutation } from "@/pets/queries/notes/useDeleteNoteMutation";
 import { useUpdateNoteMutation } from "@/pets/queries/notes/useUpdateNoteMutation";
 import { Button } from "@/shadecn/ui/button";
+import { Input } from "@/shadecn/ui/input";
 import { Text } from "@/shadecn/ui/text";
 
 type Props = {
@@ -39,8 +41,14 @@ export const SingleNoteEditor = ({
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
+  // Not a TanStack Form: this screen autosaves on exit, there's nothing to
+  // submit or validate — don't copy this exception for an actual form.
   const [title, setTitle] = useState(initialTitle);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  // Frozen at mount: initialTitle/initialContent drift after a save (cache
+  // write, refetch) while this screen stays open, and comparing against the
+  // live prop would PATCH the stale pre-edit text back over that save.
+  const [seed] = useState({ title: initialTitle, content: initialContent });
 
   const isDeletedRef = useRef(false);
 
@@ -53,13 +61,9 @@ export const SingleNoteEditor = ({
     canRedo,
   } = useUndoRedoText(initialContent);
 
-  const { mutate: createNote } = useCreateNoteMutation();
-  const { mutate: updateNote } = useUpdateNoteMutation();
-  const {
-    mutate: deleteNote,
-    mutateAsync: deleteNoteAsync,
-    isPending: isDeleting,
-  } = useDeleteNoteMutation();
+  const { mutateAsync: createNote } = useCreateNoteMutation();
+  const { mutateAsync: updateNote } = useUpdateNoteMutation();
+  const { mutateAsync: deleteNote, isPending: isDeleting } = useDeleteNoteMutation();
 
   const titleRef = useRef(title);
   const contentRef = useRef(content);
@@ -81,34 +85,40 @@ export const SingleNoteEditor = ({
     };
 
     if (noteId && isEmpty) {
-      deleteNote(
-        { petId, noteId },
-        {
-          onSuccess: () =>
-            Toast.show({ type: "success", text1: t("pets:singleNotePage.deleteDialog.success") }),
-          onError,
-        }
-      );
+      // mutateAsync settles regardless of subscribers; mutate(vars, { onError })
+      // would not — MutationObserver#notify gates it on hasListeners(), already
+      // false by the time this unmount-triggered request resolves.
+      deleteNote({ petId, noteId })
+        .then(() =>
+          Toast.show({ type: "success", text1: t("pets:singleNotePage.deleteDialog.success") })
+        )
+        .catch(onError);
       return;
     }
     if (isEmpty) return;
 
-    const isDirty =
-      trimmedTitle !== initialTitle.trim() || trimmedContent !== initialContent.trim();
+    const isDirty = trimmedTitle !== seed.title.trim() || trimmedContent !== seed.content.trim();
     if (!isDirty) return;
 
     // See noteFieldSentinel.ts for why a blank field is encoded before sending.
-    const dto = {
-      title: encodeNoteField(trimmedTitle),
-      content: encodeNoteField(trimmedContent),
-    };
-
     if (noteId) {
-      updateNote({ petId, noteId, dto }, { onError });
+      // An omitted key is left unchanged: sending both would overwrite a
+      // title or content edited elsewhere since this screen opened.
+      const dto = {
+        ...(trimmedTitle !== seed.title.trim() ? { title: encodeNoteField(trimmedTitle) } : {}),
+        ...(trimmedContent !== seed.content.trim()
+          ? { content: encodeNoteField(trimmedContent) }
+          : {}),
+      };
+      updateNote({ petId, noteId, dto }).catch(onError);
     } else {
-      createNote({ petId, dto }, { onError });
+      const dto = {
+        title: encodeNoteField(trimmedTitle),
+        content: encodeNoteField(trimmedContent),
+      };
+      createNote({ petId, dto }).catch(onError);
     }
-  }, [noteId, petId, initialTitle, initialContent, updateNote, createNote, deleteNote, t]);
+  }, [noteId, petId, seed, updateNote, createNote, deleteNote, t]);
 
   const saveIfDirtyRef = useRef(saveIfDirty);
   useEffect(() => {
@@ -121,7 +131,7 @@ export const SingleNoteEditor = ({
 
   const handleDelete = async () => {
     if (!noteId) return;
-    await deleteNoteAsync({ petId, noteId });
+    await deleteNote({ petId, noteId });
     isDeletedRef.current = true;
     Toast.show({ type: "success", text1: t("pets:singleNotePage.deleteDialog.success") });
     router.back();
@@ -129,28 +139,17 @@ export const SingleNoteEditor = ({
 
   return (
     <Pressable style={[styles.screen, { paddingBottom: insets.bottom }]} onPress={Keyboard.dismiss}>
-      <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
-        <Button
-          size="icon"
-          variant="icon"
-          accessibilityLabel={t("common:actions.back")}
-          onPress={() => router.back()}
-        >
-          <ChevronIcon
-            direction="left"
-            width={theme.iconSize.lg}
-            height={theme.iconSize.lg}
-            color={theme.palette.brand.primaryDark}
-          />
-        </Button>
+      <View style={[styles.topBar, styles.topBarInset(insets.top)]}>
+        <BackButton />
 
-        <TextInput
-          style={[styles.titleInput, theme.textStyles.titleL]}
+        <Input
+          variant="plain"
+          wrapperStyle={styles.titleInputWrapper}
+          inputStyle={[styles.titleInput, theme.textStyles.titleL]}
           value={title}
           onChangeText={setTitle}
           placeholder={t("pets:singleNotePage.untitled")}
           placeholderTextColor={theme.palette.brand.textSecondary}
-          selectionColor={theme.palette.brand.primaryDefault}
         />
 
         {noteId ? (
@@ -176,24 +175,25 @@ export const SingleNoteEditor = ({
       </Text>
 
       <KeyboardAvoidingView style={styles.content} behavior="padding">
-        <TextInput
-          style={[styles.bodyInput, theme.textStyles.body]}
+        <Input
+          multiline
+          variant="static"
+          wrapperStyle={styles.bodyInputWrapper}
+          containerStyle={styles.bodyInputContainer}
+          inputStyle={styles.bodyInput}
           value={content}
           onChangeText={setContent}
           placeholder={t("pets:singleNotePage.contentPlaceholder")}
-          placeholderTextColor={theme.palette.brand.textFaint}
-          selectionColor={theme.palette.brand.primaryDefault}
-          multiline
-          textAlignVertical="top"
         />
 
         <View style={styles.controlBar}>
-          <Pressable
-            accessibilityRole="button"
+          <Button
+            variant="text"
+            size="hug"
             accessibilityLabel={t("pets:singleNotePage.undoA11y")}
             disabled={!canUndo}
             onPress={undo}
-            hitSlop={13}
+            hitSlop={(theme.minTouchTarget - theme.iconSize.lg) / 2}
           >
             <ChevronIcon
               direction="left"
@@ -201,13 +201,14 @@ export const SingleNoteEditor = ({
               height={theme.iconSize.lg}
               color={canUndo ? theme.palette.brand.textBody : theme.palette.brand.textFaint}
             />
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
+          </Button>
+          <Button
+            variant="text"
+            size="hug"
             accessibilityLabel={t("pets:singleNotePage.redoA11y")}
             disabled={!canRedo}
             onPress={redo}
-            hitSlop={13}
+            hitSlop={(theme.minTouchTarget - theme.iconSize.lg) / 2}
           >
             <ChevronIcon
               direction="right"
@@ -215,7 +216,7 @@ export const SingleNoteEditor = ({
               height={theme.iconSize.lg}
               color={canRedo ? theme.palette.brand.textBody : theme.palette.brand.textFaint}
             />
-          </Pressable>
+          </Button>
         </View>
       </KeyboardAvoidingView>
 
@@ -242,12 +243,15 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2.5),
     paddingHorizontal: theme.spacing(4),
   },
+  topBarInset: (topInset: number) => ({ paddingTop: topInset + theme.spacing(2) }),
   topBarSpacer: {
     width: theme.spacing(9),
   },
-  titleInput: {
+  titleInputWrapper: {
     flex: 1,
     minWidth: 0,
+  },
+  titleInput: {
     textAlign: "center",
     color: theme.palette.brand.textBody,
   },
@@ -261,13 +265,16 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(4),
     paddingTop: theme.spacing(2),
   },
+  bodyInputWrapper: {
+    flex: 1,
+  },
+  bodyInputContainer: {
+    flex: 1,
+    alignItems: "stretch",
+  },
   bodyInput: {
     flex: 1,
-    borderWidth: theme.spacing(0.375),
-    borderColor: theme.palette.brand.surfaceBorder,
-    borderRadius: theme.borderRadius.lg,
-    backgroundColor: theme.palette.white,
-    padding: theme.spacing(3.5),
+    paddingVertical: theme.spacing(3.5),
     color: theme.palette.brand.textPrimary,
   },
   controlBar: {

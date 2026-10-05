@@ -215,7 +215,7 @@ function Button({
         disabled={isDisabled}
         ref={ref}
         role="button"
-        hitSlop={hitSlop ?? (size === "icon" ? 6 : size === "hug" ? 12 : undefined)}
+        hitSlop={hitSlop ?? (size === "icon" ? 6 : undefined)}
         style={(state) => [
           buttonVariants.button(isDisabled, state.pressed, dotted),
           typeof style === "function" ? style(state) : style,

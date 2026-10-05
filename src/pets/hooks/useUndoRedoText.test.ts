@@ -1,8 +1,6 @@
 import { act, renderHook } from "@testing-library/react-native";
 
-import { useUndoRedoText } from "./useUndoRedoText";
-
-const HISTORY_DEBOUNCE_MS = 500;
+import { HISTORY_DEBOUNCE_MS, useUndoRedoText } from "./useUndoRedoText";
 
 beforeEach(() => {
   jest.useFakeTimers();
@@ -71,5 +69,36 @@ describe("useUndoRedoText", () => {
     act(() => result.current.redo());
     expect(result.current.value).toBe("a");
     expect(result.current.canRedo).toBe(false);
+  });
+
+  it("undo while a checkpoint is pending returns to the last checkpoint", () => {
+    const { result } = renderHook(() => useUndoRedoText(""));
+
+    act(() => result.current.setValue("abc"));
+    act(() => jest.advanceTimersByTime(HISTORY_DEBOUNCE_MS));
+    act(() => result.current.setValue("abcdef")); // debounce still pending
+    act(() => result.current.undo());
+
+    expect(result.current.value).toBe("abc");
+  });
+
+  // Covers the slice(0, index + 1) in checkpoint: typing after an undo has to
+  // drop the abandoned branch, or the next undo walks back into it.
+  it("typing after an undo discards the redo branch", () => {
+    const { result } = renderHook(() => useUndoRedoText(""));
+
+    act(() => result.current.setValue("a"));
+    act(() => jest.advanceTimersByTime(HISTORY_DEBOUNCE_MS));
+    act(() => result.current.setValue("ab"));
+    act(() => jest.advanceTimersByTime(HISTORY_DEBOUNCE_MS));
+    act(() => result.current.undo()); // back to "a"
+    act(() => result.current.setValue("aX"));
+    act(() => jest.advanceTimersByTime(HISTORY_DEBOUNCE_MS));
+
+    expect(result.current.canRedo).toBe(false);
+    act(() => result.current.undo());
+    expect(result.current.value).toBe("a");
+    act(() => result.current.redo());
+    expect(result.current.value).toBe("aX");
   });
 });

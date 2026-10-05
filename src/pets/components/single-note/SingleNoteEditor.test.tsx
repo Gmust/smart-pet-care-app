@@ -1,6 +1,8 @@
 /// <reference types="jest" />
 
 import type { ComponentProps, ReactNode } from "react";
+import Toast from "react-native-toast-message";
+import { PortalHost } from "@rn-primitives/portal";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render } from "@testing-library/react-native";
 import type { AxiosResponse } from "axios";
@@ -23,8 +25,9 @@ jest.mock("react-native-toast-message", () => ({
   default: { show: jest.fn(), hide: jest.fn() },
 }));
 
+const mockBack = jest.fn();
 jest.mock("expo-router", () => ({
-  useRouter: () => ({ back: jest.fn() }),
+  useRouter: () => ({ back: mockBack }),
 }));
 
 jest.mock("react-native-safe-area-context", () => ({
@@ -43,12 +46,14 @@ import {
   postApiPetsPetIdNotes,
 } from "@/api";
 import { EMPTY_NOTE_FIELD } from "@/pets/queries/notes/noteFieldSentinel";
+import { notesQueryKeys } from "@/pets/queries/notes/notesQueryKeys";
 
 import { SingleNoteEditor } from "./SingleNoteEditor";
 
 const createMock = jest.mocked(postApiPetsPetIdNotes);
 const updateMock = jest.mocked(patchApiPetsPetIdNotesNoteId);
 const deleteMock = jest.mocked(deleteApiPetsPetIdNotesNoteId);
+const toastMock = jest.mocked(Toast.show);
 
 const PET_ID = "pet-1";
 const NOTE_ID = "note-1";
@@ -73,20 +78,34 @@ const renderEditor = (props: Partial<EditorProps> = {}) => {
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
-  return render(
-    <SingleNoteEditor petId={PET_ID} petName="Miso" initialTitle="" initialContent="" {...props} />,
-    { wrapper }
-  );
+  return {
+    ...render(
+      <>
+        <SingleNoteEditor
+          petId={PET_ID}
+          petName="Miso"
+          initialTitle=""
+          initialContent=""
+          {...props}
+        />
+        <PortalHost name="dialog" />
+      </>,
+      { wrapper }
+    ),
+    queryClient,
+  };
 };
 
 beforeEach(() => {
   jest.resetAllMocks();
+  jest.spyOn(console, "error").mockImplementation(() => undefined);
 });
 
 afterEach(() => {
   for (const client of clients.splice(0)) {
     client.clear();
   }
+  jest.restoreAllMocks();
 });
 
 describe("SingleNoteEditor save-on-exit", () => {
@@ -157,8 +176,148 @@ describe("SingleNoteEditor save-on-exit", () => {
     await act(async () => unmount());
 
     expect(updateMock).toHaveBeenCalledWith(PET_ID, NOTE_ID, {
-      title: "Vet visit",
       content: "Bring vaccine record and leash",
     });
+  });
+
+  it("only sends the title when just the title is edited", async () => {
+    updateMock.mockResolvedValue(apiResponse({ id: NOTE_ID }));
+    const { getByPlaceholderText, unmount } = renderEditor({
+      noteId: NOTE_ID,
+      initialTitle: "Vet visit",
+      initialContent: "Bring vaccine record",
+    });
+
+    fireEvent.changeText(getByPlaceholderText("pets:singleNotePage.untitled"), "Vet checkup");
+
+    await act(async () => unmount());
+
+    expect(updateMock).toHaveBeenCalledWith(PET_ID, NOTE_ID, {
+      title: "Vet checkup",
+    });
+  });
+
+  it("does not PATCH when a refetch changes the note under an untouched editor", async () => {
+    updateMock.mockResolvedValue(apiResponse({ id: NOTE_ID }));
+    const existing = { noteId: NOTE_ID, initialTitle: "Vet visit", initialContent: "old" };
+    const { rerender, unmount } = renderEditor(existing);
+
+    // The notes refetch lands: same note, newer server content.
+    rerender(
+      <SingleNoteEditor
+        petId={PET_ID}
+        petName="Miso"
+        {...existing}
+        initialContent="saved a moment ago"
+      />
+    );
+    await act(async () => unmount());
+
+    expect(updateMock).not.toHaveBeenCalled();
+  });
+
+  it("shows an error toast when the autosave PATCH fails", async () => {
+    updateMock.mockImplementation(() => Promise.reject(new Error("network down")));
+    const { getByPlaceholderText, unmount } = renderEditor({
+      noteId: NOTE_ID,
+      initialTitle: "Vet visit",
+      initialContent: "old",
+    });
+
+    fireEvent.changeText(getByPlaceholderText("pets:singleNotePage.contentPlaceholder"), "new");
+    await act(async () => unmount());
+    await act(async () => new Promise<void>((resolve) => setTimeout(resolve, 20)));
+
+    expect(updateMock).toHaveBeenCalledTimes(1);
+    expect(toastMock).toHaveBeenCalledWith(expect.objectContaining({ type: "error" }));
+  });
+
+  it("shows an error toast when the autosave POST fails", async () => {
+    createMock.mockImplementation(() => Promise.reject(new Error("network down")));
+    const { getByPlaceholderText, unmount } = renderEditor();
+
+    fireEvent.changeText(getByPlaceholderText("pets:singleNotePage.untitled"), "Vet visit");
+    await act(async () => unmount());
+    await act(async () => new Promise<void>((resolve) => setTimeout(resolve, 20)));
+
+    expect(createMock).toHaveBeenCalledTimes(1);
+    expect(toastMock).toHaveBeenCalledWith(expect.objectContaining({ type: "error" }));
+  });
+
+  it("shows an error toast when the auto-delete fails", async () => {
+    deleteMock.mockImplementation(() => Promise.reject(new Error("network down")));
+    const { getByPlaceholderText, unmount } = renderEditor({
+      noteId: NOTE_ID,
+      initialTitle: "Vet visit",
+      initialContent: "Bring vaccine record",
+    });
+
+    fireEvent.changeText(getByPlaceholderText("pets:singleNotePage.untitled"), "");
+    fireEvent.changeText(getByPlaceholderText("pets:singleNotePage.contentPlaceholder"), "");
+    await act(async () => unmount());
+    await act(async () => new Promise<void>((resolve) => setTimeout(resolve, 20)));
+
+    expect(deleteMock).toHaveBeenCalledTimes(1);
+    expect(toastMock).toHaveBeenCalledWith(expect.objectContaining({ type: "error" }));
+  });
+
+  it("shows an error toast and keeps the dialog open when the explicit delete fails", async () => {
+    deleteMock.mockImplementation(() => Promise.reject(new Error("network down")));
+    const { getByLabelText, getByText } = renderEditor({
+      noteId: NOTE_ID,
+      initialTitle: "Vet visit",
+      initialContent: "Bring vaccine record",
+    });
+
+    fireEvent.press(getByLabelText("pets:singleNotePage.deleteA11y"));
+    await act(async () => {
+      fireEvent.press(getByText("common:deleteDialog.confirm"));
+    });
+
+    expect(deleteMock).toHaveBeenCalledTimes(1);
+    expect(toastMock).toHaveBeenCalledWith(expect.objectContaining({ type: "error" }));
+    expect(mockBack).not.toHaveBeenCalled();
+    // Dialog stayed open for a retry: the confirm button is still on screen.
+    expect(getByText("common:deleteDialog.confirm")).toBeTruthy();
+  });
+
+  // The invalidation sits in the hook's onSuccess, which runs off the Mutation
+  // rather than this screen's observer, so it survives the unmount that triggered
+  // the save. Per-call it would stop firing, hiding the note for staleTime's hour.
+  it("invalidates the notes list when a save resolves after unmount", async () => {
+    createMock.mockResolvedValue(apiResponse({ id: "new-note" }));
+    const { getByPlaceholderText, unmount, queryClient } = renderEditor();
+    queryClient.setQueryData(notesQueryKeys.notes(PET_ID), []);
+
+    fireEvent.changeText(getByPlaceholderText("pets:singleNotePage.untitled"), "Vet visit");
+    await act(async () => unmount());
+    await act(async () => new Promise<void>((resolve) => setTimeout(resolve, 20)));
+
+    expect(queryClient.getQueryState(notesQueryKeys.notes(PET_ID))?.isInvalidated).toBe(true);
+  });
+
+  it("does not create a note when the only input is whitespace", async () => {
+    const { getByPlaceholderText, unmount } = renderEditor();
+
+    fireEvent.changeText(getByPlaceholderText("pets:singleNotePage.untitled"), "   ");
+    await act(async () => unmount());
+
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
+  it("does not treat added trailing whitespace as an edit", async () => {
+    const { getByPlaceholderText, unmount } = renderEditor({
+      noteId: NOTE_ID,
+      initialTitle: "Vet visit",
+      initialContent: "Bring vaccine record",
+    });
+
+    fireEvent.changeText(
+      getByPlaceholderText("pets:singleNotePage.contentPlaceholder"),
+      "Bring vaccine record   "
+    );
+    await act(async () => unmount());
+
+    expect(updateMock).not.toHaveBeenCalled();
   });
 });

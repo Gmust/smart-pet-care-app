@@ -43,6 +43,28 @@ const inputVariants = StyleSheet.create((theme) => ({
         : theme.palette.brand.surfaceBorder,
     opacity: disabled ? 0.5 : 1,
     variants: {
+      // "plain" zeroes the minHeight/paddingHorizontal the size group sets, and
+      // unistyles defines no precedence — InputProps makes the pair a type error.
+      variant: {
+        boxed: {},
+        // A box that ignores focus, for a field that is the whole screen (the
+        // note body). Keeps the error and disabled states.
+        static: {
+          backgroundColor: error
+            ? theme.palette.brand.dangerBg
+            : disabled
+              ? theme.palette.brand.surfaceSunken
+              : theme.palette.white,
+          borderColor: error ? theme.palette.brand.danger : theme.palette.brand.surfaceBorder,
+        },
+        plain: {
+          borderWidth: 0,
+          borderColor: theme.palette.transparent,
+          backgroundColor: theme.palette.transparent,
+          paddingHorizontal: 0,
+          minHeight: 0,
+        },
+      },
       size: {
         sm: { minHeight: theme.spacing(10), paddingHorizontal: theme.spacing(3) },
         md: { minHeight: theme.spacing(13), paddingHorizontal: theme.spacing(3.5) },
@@ -70,7 +92,8 @@ const inputVariants = StyleSheet.create((theme) => ({
 }));
 
 type InputProps = Omit<TextInputProps, "size"> &
-  UnistylesVariants<typeof inputVariants> & {
+  UnistylesVariants<typeof inputVariants> &
+  ({ variant?: "boxed" | "static" } | { variant: "plain"; size?: never }) & {
     ref?: RefObject<TextInput | null>;
     showStatusIcon?: boolean;
     showClearButton?: boolean;
@@ -80,6 +103,10 @@ type InputProps = Omit<TextInputProps, "size"> &
     label?: ReactNode;
     helperText?: ReactNode;
     error?: boolean;
+    /** Sizes/positions Input within its parent's layout (e.g. `flex: 1` in a
+     * row) — `containerStyle` only reaches the inner box, not the node a
+     * flex parent actually lays out. */
+    wrapperStyle?: StyleProp<ViewStyle>;
     containerStyle?: StyleProp<ViewStyle>;
     inputStyle?: StyleProp<TextStyle>;
     leftSlot?: ReactNode;
@@ -94,6 +121,7 @@ type InputProps = Omit<TextInputProps, "size"> &
 function Input({
   ref,
   size,
+  variant = "boxed",
   label,
   helperText,
   error = false,
@@ -102,6 +130,7 @@ function Input({
   value,
   onFocus,
   onBlur,
+  wrapperStyle,
   containerStyle,
   inputStyle,
   leftSlot,
@@ -110,7 +139,7 @@ function Input({
   displayOnly = false,
   ...props
 }: InputProps) {
-  inputVariants.useVariants({ size });
+  inputVariants.useVariants({ size, variant });
   const { theme } = useUnistyles();
 
   const [focused, setFocused] = useState(false);
@@ -119,7 +148,7 @@ function Input({
   const hasValue = value != null && value.length > 0;
 
   return (
-    <View style={inputVariants.wrapper}>
+    <View style={[inputVariants.wrapper, wrapperStyle]}>
       {label != null ? <Text style={inputVariants.label(error)}>{label}</Text> : null}
 
       <View style={[inputVariants.root(focused, error, disabled, hasValue), containerStyle]}>
