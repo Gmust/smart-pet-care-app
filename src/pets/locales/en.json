@@ -67,6 +67,7 @@
     }
   },
   "singleNotePage": {
+    "offlineQueued": "No connection. Your changes will be saved once you are back online.",
     "untitled": "Untitled",
     "contentPlaceholder": "Start typing…",
     "deleteA11y": "Delete note",

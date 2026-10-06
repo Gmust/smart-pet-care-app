@@ -1,10 +1,12 @@
 import { ActivityIndicator, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { useIsMutating } from "@tanstack/react-query";
 import { Redirect, useLocalSearchParams } from "expo-router";
 
 import { QueryErrorState } from "@/common/components/QueryErrorState";
 import { getApiError } from "@/errors/utils/getApiError";
 import { SingleNoteEditor } from "@/pets/components/single-note/SingleNoteEditor";
+import { notesMutationKeys } from "@/pets/queries/notes/notesQueryKeys";
 import { useNotesQuery } from "@/pets/queries/notes/useNotesQuery";
 import { usePetQuery } from "@/pets/queries/usePetQuery";
 import { noteParamsSchema } from "@/pets/schemas/note-params.schema";
@@ -24,6 +26,20 @@ export default function SingleNotePage() {
     refetch: refetchNotes,
   } = useNotesQuery(petId);
 
+  // A save still in flight means the cache holds the pre-edit text. Seeding the
+  // editor from it would lose the save: the editor freezes its baseline at mount
+  // and the next exit would PATCH the stale text back. Paused ones are excluded,
+  // or the screen would spin for the whole offline episode.
+  const isSavePending = useIsMutating({
+    mutationKey: notesMutationKeys.updateNote,
+    predicate: ({ state }) =>
+      !state.isPaused &&
+      typeof state.variables === "object" &&
+      state.variables !== null &&
+      "noteId" in state.variables &&
+      state.variables.noteId === noteId,
+  });
+
   // Deep links can carry arbitrary params — never render with an unvalidated
   // petId, matching the guard in PetProfilePage / HealthRecordListPage.
   if (!parsedParams.success || !petId) {
@@ -36,10 +52,10 @@ export default function SingleNotePage() {
     return <Redirect href="/(tabs)/pets" />;
   }
 
-  // Failed and offline-paused both leave notes undefined, which the catch-all
-  // below would read as "not found" and silently redirect away. A warm cache
-  // falls through on purpose and keeps showing the stale note.
-  const isNotesUnavailable = isNotesError || (isNotesPaused && !notes);
+  // Only the absence of data may replace the editor. A failed refetch keeps the
+  // cached note and still sets status "error", and swapping the screen then tears
+  // the editor down mid-edit, firing its save into the same bad network.
+  const isNotesUnavailable = !notes && (isNotesError || isNotesPaused);
   if (noteId && isNotesUnavailable) {
     return <QueryErrorState onRetry={() => refetchNotes()} fallbackHref="/(tabs)/pets" />;
   }
@@ -52,7 +68,7 @@ export default function SingleNotePage() {
     return <Redirect href={{ pathname: "/(tabs)/pets/pet-profile", params: { petId } }} />;
   }
 
-  if (noteId && !existingNote) {
+  if (noteId && (!existingNote || isSavePending)) {
     return (
       <View style={styles.loadingScreen}>
         <ActivityIndicator />

@@ -2,24 +2,20 @@
 
 import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, renderHook, waitFor } from "@testing-library/react-native";
+import { act, renderHook } from "@testing-library/react-native";
 import type { AxiosResponse } from "axios";
 import { AxiosHeaders } from "axios";
 
-import { getApiPetsPetIdNotes, patchApiPetsPetIdNotesNoteId } from "@/api";
+import { patchApiPetsPetIdNotesNoteId } from "@/api";
 import type { NoteResponseDto } from "@/api/generated";
 
-import { EMPTY_NOTE_FIELD } from "./noteFieldSentinel";
 import { notesQueryKeys } from "./notesQueryKeys";
-import { useNotesQuery } from "./useNotesQuery";
 import { useUpdateNoteMutation } from "./useUpdateNoteMutation";
 
 jest.mock("@/api", () => ({
-  getApiPetsPetIdNotes: jest.fn(),
   patchApiPetsPetIdNotesNoteId: jest.fn(),
 }));
 
-const listMock = jest.mocked(getApiPetsPetIdNotes);
 const updateMock = jest.mocked(patchApiPetsPetIdNotesNoteId);
 
 const PET_ID = "pet-1";
@@ -70,19 +66,6 @@ afterEach(() => {
   }
 });
 
-describe("useNotesQuery", () => {
-  it("decodes the sentinel back to an empty string for both fields", async () => {
-    const sentinelNote = { ...note, title: EMPTY_NOTE_FIELD, content: EMPTY_NOTE_FIELD };
-    listMock.mockResolvedValue(axiosOk([sentinelNote]));
-    const { wrapper } = createWrapper();
-
-    const { result } = renderHook(() => useNotesQuery(PET_ID), { wrapper });
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual([{ ...sentinelNote, title: "", content: "" }]);
-  });
-});
-
 describe("useUpdateNoteMutation", () => {
   it("writes the saved note into the list cache, so a reopen sees it before the refetch", async () => {
     const saved = { ...note, content: "Bring vaccine record and leash" };
@@ -100,24 +83,5 @@ describe("useUpdateNoteMutation", () => {
     });
 
     expect(queryClient.getQueryData(notesQueryKeys.notes(PET_ID))).toEqual([saved]);
-  });
-
-  it("decodes the sentinel before caching, so a cleared field is not an invisible character", async () => {
-    updateMock.mockResolvedValue(axiosOk({ ...note, content: EMPTY_NOTE_FIELD }));
-    const { queryClient, wrapper } = createWrapper();
-    queryClient.setQueryData(notesQueryKeys.notes(PET_ID), [note]);
-
-    const { result } = renderHook(() => useUpdateNoteMutation(), { wrapper });
-    await act(async () => {
-      await result.current.mutateAsync({
-        petId: PET_ID,
-        noteId: NOTE_ID,
-        dto: { content: EMPTY_NOTE_FIELD },
-      });
-    });
-
-    expect(queryClient.getQueryData<NoteResponseDto[]>(notesQueryKeys.notes(PET_ID))).toEqual([
-      { ...note, content: "" },
-    ]);
   });
 });

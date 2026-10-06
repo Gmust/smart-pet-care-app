@@ -5,6 +5,7 @@ import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { onlineManager } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 
 import { BackButton } from "@/common/components/BackButton";
@@ -13,7 +14,6 @@ import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { ChevronIcon } from "@/icons/chevron";
 import { TrashIcon } from "@/icons/trash";
 import { useUndoRedoText } from "@/pets/hooks/useUndoRedoText";
-import { encodeNoteField } from "@/pets/queries/notes/noteFieldSentinel";
 import { useCreateNoteMutation } from "@/pets/queries/notes/useCreateNoteMutation";
 import { useDeleteNoteMutation } from "@/pets/queries/notes/useDeleteNoteMutation";
 import { useUpdateNoteMutation } from "@/pets/queries/notes/useUpdateNoteMutation";
@@ -84,7 +84,16 @@ export const SingleNoteEditor = ({
       Toast.show({ type: "error", text1: getApiErrorMessage(error) });
     };
 
+    // React Query pauses a mutation while offline rather than failing it, so
+    // neither callback runs and the screen closes with no sign the save is
+    // still pending. Say so, or the user retypes the note and duplicates it.
+    const warnIfOffline = () => {
+      if (onlineManager.isOnline()) return;
+      Toast.show({ type: "info", text1: t("pets:singleNotePage.offlineQueued") });
+    };
+
     if (noteId && isEmpty) {
+      warnIfOffline();
       // mutateAsync settles regardless of subscribers; mutate(vars, { onError })
       // would not — MutationObserver#notify gates it on hasListeners(), already
       // false by the time this unmount-triggered request resolves.
@@ -100,21 +109,20 @@ export const SingleNoteEditor = ({
     const isDirty = trimmedTitle !== seed.title.trim() || trimmedContent !== seed.content.trim();
     if (!isDirty) return;
 
-    // See noteFieldSentinel.ts for why a blank field is encoded before sending.
+    warnIfOffline();
+
     if (noteId) {
       // An omitted key is left unchanged: sending both would overwrite a
       // title or content edited elsewhere since this screen opened.
       const dto = {
-        ...(trimmedTitle !== seed.title.trim() ? { title: encodeNoteField(trimmedTitle) } : {}),
-        ...(trimmedContent !== seed.content.trim()
-          ? { content: encodeNoteField(trimmedContent) }
-          : {}),
+        ...(trimmedTitle !== seed.title.trim() ? { title: trimmedTitle } : {}),
+        ...(trimmedContent !== seed.content.trim() ? { content: trimmedContent } : {}),
       };
       updateNote({ petId, noteId, dto }).catch(onError);
     } else {
       const dto = {
-        title: encodeNoteField(trimmedTitle),
-        content: encodeNoteField(trimmedContent),
+        title: trimmedTitle,
+        content: trimmedContent,
       };
       createNote({ petId, dto }).catch(onError);
     }
@@ -180,7 +188,7 @@ export const SingleNoteEditor = ({
           variant="static"
           wrapperStyle={styles.bodyInputWrapper}
           containerStyle={styles.bodyInputContainer}
-          inputStyle={styles.bodyInput}
+          inputStyle={[styles.bodyInput, theme.textStyles.body]}
           value={content}
           onChangeText={setContent}
           placeholder={t("pets:singleNotePage.contentPlaceholder")}

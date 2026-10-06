@@ -3,7 +3,7 @@
 import type { ComponentProps, ReactNode } from "react";
 import Toast from "react-native-toast-message";
 import { PortalHost } from "@rn-primitives/portal";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { onlineManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render } from "@testing-library/react-native";
 import type { AxiosResponse } from "axios";
 import { AxiosHeaders } from "axios";
@@ -45,7 +45,6 @@ import {
   patchApiPetsPetIdNotesNoteId,
   postApiPetsPetIdNotes,
 } from "@/api";
-import { EMPTY_NOTE_FIELD } from "@/pets/queries/notes/noteFieldSentinel";
 import { notesQueryKeys } from "@/pets/queries/notes/notesQueryKeys";
 
 import { SingleNoteEditor } from "./SingleNoteEditor";
@@ -102,6 +101,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  onlineManager.setOnline(true);
   for (const client of clients.splice(0)) {
     client.clear();
   }
@@ -117,10 +117,7 @@ describe("SingleNoteEditor save-on-exit", () => {
 
     await act(async () => unmount());
 
-    expect(createMock).toHaveBeenCalledWith(PET_ID, {
-      title: "Vet visit",
-      content: EMPTY_NOTE_FIELD,
-    });
+    expect(createMock).toHaveBeenCalledWith(PET_ID, { title: "Vet visit", content: "" });
   });
 
   it("does nothing for a new, untouched note", async () => {
@@ -303,6 +300,34 @@ describe("SingleNoteEditor save-on-exit", () => {
     await act(async () => unmount());
 
     expect(createMock).not.toHaveBeenCalled();
+  });
+
+  // Offline, React Query pauses the mutation instead of failing it, so nothing
+  // else tells the user the note has not reached the server yet. Without this
+  // they retype it, and every attempt lands as its own note on reconnect.
+  it("says the save is queued when offline, and still queues it", async () => {
+    onlineManager.setOnline(false);
+    const { getByPlaceholderText, unmount } = renderEditor();
+
+    fireEvent.changeText(getByPlaceholderText("pets:singleNotePage.untitled"), "Vet visit");
+    await act(async () => unmount());
+
+    expect(toastMock).toHaveBeenCalledWith(
+      expect.objectContaining({ text1: "pets:singleNotePage.offlineQueued" })
+    );
+    expect(createMock).not.toHaveBeenCalled();
+  });
+
+  it("stays quiet about the connection when online", async () => {
+    createMock.mockResolvedValue(apiResponse({ id: "new-note" }));
+    const { getByPlaceholderText, unmount } = renderEditor();
+
+    fireEvent.changeText(getByPlaceholderText("pets:singleNotePage.untitled"), "Vet visit");
+    await act(async () => unmount());
+
+    expect(toastMock).not.toHaveBeenCalledWith(
+      expect.objectContaining({ text1: "pets:singleNotePage.offlineQueued" })
+    );
   });
 
   it("does not treat added trailing whitespace as an edit", async () => {
