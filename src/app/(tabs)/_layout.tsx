@@ -22,6 +22,7 @@ export default function TabLayout() {
     pathname.endsWith("/assistant") ||
     pathname.endsWith("/assistant-pet-selection") ||
     pathname.endsWith("/assistant-new-pet");
+  const hideTabBar = isAssistantFlow || pathname.endsWith("/pets/note");
 
   if (status === "loading") {
     return null;
@@ -34,7 +35,7 @@ export default function TabLayout() {
   return (
     <View style={styles.root}>
       <Tabs
-        tabBar={(props) => (isAssistantFlow ? null : <TabBar {...props} />)}
+        tabBar={(props) => (hideTabBar ? null : <TabBar {...props} />)}
         screenOptions={{
           headerShown: false,
           animation: "fade",

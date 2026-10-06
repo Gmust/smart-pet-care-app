@@ -39,8 +39,12 @@ export function OfflineScreen({ onReconnected }: OfflineScreenProps) {
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.title}>{t("offline.title")}</Text>
-      <Text style={styles.description}>{t("offline.description")}</Text>
+      <Text variant="titleL" style={styles.title}>
+        {t("offline.title")}
+      </Text>
+      <Text variant="body" style={styles.description}>
+        {t("offline.description")}
+      </Text>
       <View style={styles.actions}>
         <Button
           variant="primary"
@@ -73,15 +77,10 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.surfacePage,
   },
   title: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
     color: theme.palette.brand.textBody,
     textAlign: "center",
   },
   description: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.4,
     color: theme.palette.brand.textSecondary,
     textAlign: "center",
   },

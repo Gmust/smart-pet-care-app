@@ -41,7 +41,6 @@ export const createPetSchema = (t: TFunction<"pets">) =>
     sex: z.enum(Sex).default(Sex.Unknown),
     allergies: optionalTextList,
     chronicConditions: optionalTextList,
-    behavioralNotes: optionalTextList,
   });
 
 type CreatePetSchema = ReturnType<typeof createPetSchema>;

@@ -185,6 +185,10 @@ export const theme = {
     "2xl": 24,
   },
 
+  // Smallest tappable area the app ships, per the platform guidelines. A floor,
+  // not a size: pad a smaller visual up to it with hitSlop.
+  minTouchTarget: 44,
+
   // ---------------------------------------------------------------------
   // borderRadius — own pixel scale, intentionally independent from text
   // sizing. It previously rode on getTextSize (a text-scale helper), which
