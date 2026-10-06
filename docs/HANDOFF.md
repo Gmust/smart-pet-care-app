@@ -6,7 +6,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Current state
 
-- Branch: `feature/pet-notes`, merged with `main` at `227c64b`.
+- Branch: `feature/pet-notes`, merged with `main` at `e503d1d`.
 - Notes are first-class entities behind `/api/pets/{petId}/notes`, replacing the free-text
   `behavioralNotes` array on Pet. Route `/(tabs)/pets/note` takes `petId` and an optional
   `noteId`; without a `noteId` it is create mode. Hooks live in `src/pets/queries/notes/`.
@@ -24,6 +24,8 @@ Keep it short and factual: what is true now, what was actually verified, what is
 - Touched outside `src/pets/`: `src/common/components/` (`QueryErrorState`,
   `RouteErrorFallback`), `src/shadecn/ui/{input,button}.tsx`, `src/styles/theme.ts`,
   `docs/reusable-ui.md`.
+- `pnpm test:api` rotates the test account's refresh token, so a device signed in with the
+  same account gets signed out.
 
 ## Verified evidence
 
@@ -39,6 +41,8 @@ Keep it short and factual: what is true now, what was actually verified, what is
 - The sentinel was validated against the live backend, not the spec: a blank field is
   rejected, U+200B is accepted, and `null` on PATCH does **not** clear `title`.
 - Android only. iOS and web untested.
+- Diploma performance measurement and the release-build fix are in `e503d1d`; results live
+  in `perf-out/` (gitignored) and `docs/performance-measurement.md`.
 
 ## Limitations
 
@@ -56,6 +60,13 @@ Keep it short and factual: what is true now, what was actually verified, what is
   online while the probe is still `null`. A request can fire into a connection that is not
   usable yet, and the global `retry: false` makes that failure terminal — which is what the
   note screen's Try again runs into. Left alone: the policy is global.
+- `PatchFieldOf*` enum types, `PatchFieldOfDateTime` and `PatchFieldOfdecimal` have no
+  `null` in the spec, so those fields cannot be cleared through PATCH at all.
+- Unfinished from the perf work, and it outlives that branch: pnpm ignores
+  `node-linker=hoisted`, so `node_modules` is `isolated` although `AGENTS.md` says hoisted.
+  Decide between `nodeLinker: hoisted` in `pnpm-workspace.yaml` and correcting `AGENTS.md`.
+  Everything else from that handoff is in `docs/performance-measurement.md` and
+  `git log docs/HANDOFF.md`.
 
 ## Next task
 

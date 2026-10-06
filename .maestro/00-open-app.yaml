@@ -3,7 +3,9 @@ name: Open app (cold)
 ---
 - stopApp
 - launchApp
+# `selected`: a bare "Home" also matches the system navigation bar button.
 - extendedWaitUntil:
     visible:
       text: "Home"
+      selected: true
     timeout: 20000

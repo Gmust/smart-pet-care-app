@@ -20,4 +20,7 @@ env:
     visible:
       text: "Reminders"
     timeout: 15000
-- tapOn: "Go back"
+# "Back" alone also matches the system navigation bar button.
+- tapOn:
+    text: "Back"
+    above: "Overview"
