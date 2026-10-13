@@ -2,6 +2,7 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { Image } from "expo-image";
 
+import { PhotoViewer } from "@/common/components/PhotoViewer";
 import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
 import { UserIcon } from "@/icons/user";
 import { useGetAvatarById } from "@/profile/queries/useGetAvatarById";
@@ -30,7 +31,11 @@ export function ProfileAvatar() {
   const initials = getInitials(profile?.displayName, profile?.email);
 
   if (avatarUrl) {
-    return <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />;
+    return (
+      <PhotoViewer uri={avatarUrl}>
+        <Image source={{ uri: avatarUrl }} style={styles.avatar} contentFit="cover" />
+      </PhotoViewer>
+    );
   }
 
   return (
