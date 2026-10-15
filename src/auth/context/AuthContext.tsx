@@ -42,6 +42,18 @@ const toSession = (
   };
 };
 
+// Consent is stored per device, so each account must give its own. Only `true` counts as
+// consent, so when the delete fails, overwriting with `false` still fails closed.
+const revokeAiConsent = async (context: string) => {
+  const cleared = await clearAiUsingConsent();
+  if (cleared.ok) return;
+  console.error(`Failed to clear the AI consent during ${context}.`);
+  const overwritten = await setAiUsingConsent(false);
+  if (!overwritten.ok) {
+    console.error(`Failed to overwrite the AI consent during ${context}.`);
+  }
+};
+
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -75,6 +87,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           console.error("Failed to clear the Google session during sign-out.", error);
         });
       }
+      await revokeAiConsent("sign-out");
       try {
         await clearStoredSession();
       } catch (error: unknown) {
@@ -98,19 +111,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!next) {
         throw new Error("Auth response did not include an access token.");
       }
+      // The only entry point for a new account. Revoked before the tokens are stored, so an
+      // app killed in between cannot start the new account with the previous one's consent.
+      await revokeAiConsent("sign-in");
       await setStoredSession({
         accessToken: next.accessToken,
         refreshToken: next.refreshToken,
         expiresAtUtc: next.expiresAtUtc,
       });
-      // The only entry point for a new account. Consent is stored per device, so the account
-      // must give its own.
-      const consentCleared = await clearAiUsingConsent();
-      if (!consentCleared.ok) {
-        console.error("Failed to clear the previous account's AI consent during sign-in.");
-        // Only `true` counts as consent, so overwriting it fails closed.
-        await setAiUsingConsent(false);
-      }
       // Drops data a mutation that settled after sign-out wrote back. This narrows the window,
       // it does not close it: one still in flight can write into the new account's cache.
       queryClient.clear();
