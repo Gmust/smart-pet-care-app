@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { GoogleMaps } from "expo-maps";
+import { AppleMaps, type Coordinates, GoogleMaps } from "expo-maps";
 
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
@@ -55,23 +55,24 @@ export const ActivityMap = ({
 
   const latitude = center?.latitude ?? markers[0]?.coordinates.latitude;
   const longitude = center?.longitude ?? markers[0]?.coordinates.longitude;
+  // expo-maps renders Google Maps on Android and Apple Maps on iOS (no API key).
+  // Either view is absent when the native binary predates the dependency, so
+  // check for the component itself rather than assuming it.
+  const isGoogle = Platform.OS === "android" && GoogleMaps?.View != null;
+  const isApple = Platform.OS === "ios" && AppleMaps?.View != null;
 
   useEffect(() => {
     if (latitude == null || longitude == null) return;
     setLastCamera({ latitude, longitude });
   }, [latitude, longitude]);
 
+  // Apple Maps has no load event and no key to misconfigure, so only Google
+  // Maps can time out.
   useEffect(() => {
-    if (isLoaded) return;
+    if (isLoaded || !isGoogle) return;
     const timer = setTimeout(() => setHasTimedOut(true), LOAD_TIMEOUT_MS);
     return () => clearTimeout(timer);
-  }, [isLoaded, attempt]);
-
-  // expo-maps ships GoogleMaps.View on Android only; the development target is
-  // Android, and other platforms get the same explicit fallback as a failed load.
-  // GoogleMaps.View is also absent when the native binary predates the
-  // dependency, so check for the component itself rather than assuming it.
-  const isSupported = Platform.OS === "android" && GoogleMaps?.View != null;
+  }, [isLoaded, isGoogle, attempt]);
 
   const fallback = (
     <View style={[styles.fallback, style]}>
@@ -81,7 +82,7 @@ export const ActivityMap = ({
     </View>
   );
 
-  if (!isSupported) {
+  if (!isGoogle && !isApple) {
     return fallback;
   }
 
@@ -127,38 +128,51 @@ export const ActivityMap = ({
       }
     : {};
 
+  const mapMarkers = markers.map((marker) => ({
+    id: marker.id,
+    title: marker.title,
+    coordinates: {
+      latitude: marker.coordinates.latitude,
+      longitude: marker.coordinates.longitude,
+    },
+  }));
+
+  const handleMapClick = (event: { coordinates: Coordinates }) => {
+    const { latitude, longitude } = event.coordinates;
+    if (latitude == null || longitude == null) return;
+    onMapClick?.({ latitude, longitude });
+  };
+
+  const handleMarkerClick = (marker: { id?: string }) => {
+    if (marker.id) onMarkerClick?.(marker.id);
+  };
+
   return (
     <MapErrorBoundary fallback={fallback}>
       <View style={[styles.container, style]}>
-        <GoogleMaps.View
-          key={attempt}
-          style={styles.map}
-          {...cameraProps}
-          markers={markers.map((marker) => ({
-            id: marker.id,
-            title: marker.title,
-            coordinates: {
-              latitude: marker.coordinates.latitude,
-              longitude: marker.coordinates.longitude,
-            },
-          }))}
-          onMapLoaded={() => setIsLoaded(true)}
-          onMapClick={(event) => {
-            const { latitude, longitude } = event.coordinates;
-            if (latitude == null || longitude == null) return;
-            onMapClick?.({ latitude, longitude });
-          }}
-          // A tap landing on a POI label never reaches onMapClick, which makes
-          // picking a park or a vet look broken. Treat it as a map tap.
-          onPOIClick={(event) => {
-            const { latitude, longitude } = event.coordinates;
-            if (latitude == null || longitude == null) return;
-            onMapClick?.({ latitude, longitude });
-          }}
-          onMarkerClick={(marker) => {
-            if (marker.id) onMarkerClick?.(marker.id);
-          }}
-        />
+        {isApple ? (
+          <AppleMaps.View
+            key={attempt}
+            style={styles.map}
+            {...cameraProps}
+            markers={mapMarkers}
+            onMapClick={handleMapClick}
+            onMarkerClick={handleMarkerClick}
+          />
+        ) : (
+          <GoogleMaps.View
+            key={attempt}
+            style={styles.map}
+            {...cameraProps}
+            markers={mapMarkers}
+            onMapLoaded={() => setIsLoaded(true)}
+            onMapClick={handleMapClick}
+            // A tap landing on a POI label never reaches onMapClick, which makes
+            // picking a park or a vet look broken. Treat it as a map tap.
+            onPOIClick={handleMapClick}
+            onMarkerClick={handleMarkerClick}
+          />
+        )}
       </View>
     </MapErrorBoundary>
   );

@@ -11,7 +11,7 @@ import { Text } from "@/shadecn/ui/text";
 
 import type { ActivityCoordinates } from "../types";
 
-import { ActivityMap } from "./ActivityMap";
+import { ExpandableActivityMap } from "./ExpandableActivityMap";
 
 type Props = {
   label: string;
@@ -90,7 +90,7 @@ export const ActivityLocationField = ({
         onChangeText={onChangeLabel}
       />
 
-      <ActivityMap
+      <ExpandableActivityMap
         style={styles.map}
         markers={
           coordinates

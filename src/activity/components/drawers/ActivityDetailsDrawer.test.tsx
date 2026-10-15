@@ -36,6 +36,7 @@ jest.mock("@/shadecn/ui/drawer", () => {
     DrawerTitle: passthrough("drawer-title"),
     DrawerScrollView: passthrough("drawer-scroll"),
     DrawerCloseButton: () => null,
+    useDrawerNativeActivity: () => undefined,
   };
 });
 

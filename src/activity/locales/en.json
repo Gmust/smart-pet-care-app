@@ -65,7 +65,11 @@
     "empty": "None of the matching activities has a saved location.",
     "unavailable": "The map could not be loaded. Check that the Google Maps API key is configured.",
     "markerLabel": "{{type}} at {{time}}",
-    "retry": "Try again"
+    "retry": "Try again",
+    "expand": "Open the map full screen",
+    "fullscreenTitle": "Location",
+    "pickHint": "Tap the map to place the pin",
+    "done": "Done"
   },
   "forms": {
     "activity": {
