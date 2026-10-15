@@ -79,8 +79,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
   places the pin, with a Done button. Checked on an Android emulator: the Modal does not
   collapse the drawer, so it no longer registers a drawer native activity — doing so left
   `isRecoveringNativeActivityRef` stuck and the details drawer bounced back on swipe-down.
-  The fullscreen camera is frozen at open so placing a pin keeps the zoom, and closing
-  remounts the preview (its "Try again" sits under the tap overlay). The unit tests mock the
+  The fullscreen camera anchor is frozen at open so placing a pin keeps the zoom; with nothing
+  to centre on it is `null`, which `ActivityMap` treats as "set no camera" (only an omitted
+  `center` falls back to the first marker). The preview is unmounted while fullscreen is open,
+  so one native map is alive, and its remount on close retries a timed-out map. The unit tests mock the
   drawer, so they cannot catch a drawer interaction like that; it needs a device. On an
   unsupported map the fullscreen view still shows the pick hint and Done.
 - Apple Maps is gated on iOS 17 (expo-maps renders nothing below it, and the app targets
@@ -135,6 +137,13 @@ Keep it short and factual: what is true now, what was actually verified, what is
   **Not checked on a device** — no Android device was attached.
 
 ## Limitations
+
+- No paid Apple Developer account, so iOS push is out of scope: APNs keys need the paid
+  program, and the backend sends through FCM, which cannot use the APNs token iOS returns.
+  Notifications stay Android-only (`NotificationProvider` returns early on iOS). The same
+  account limit rules out TestFlight; the expo-notifications plugin also adds the
+  `aps-environment` entitlement, which a free Apple ID cannot sign for a physical iPhone.
+  Backend follow-up is tracked in Jira KAN-91.
 
 - Accepted for now: if SecureStore fails to delete the tokens at sign-out, the app shows
   signed out but the tokens survive, and the next app start restores that account. No retry
