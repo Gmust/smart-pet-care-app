@@ -71,6 +71,34 @@ describe("ExpandableActivityMap", () => {
     expect(fullscreen?.markers).toEqual(markersAt(pinB));
   });
 
+  it("keeps the camera unset when fullscreen opened with nothing to centre on", () => {
+    const { getByLabelText, rerender } = render(
+      <ExpandableActivityMap markers={[]} center={null} onMapClick={jest.fn()} />
+    );
+    fireEvent.press(getByLabelText("activity:map.expand"));
+
+    mockMapProps.length = 0;
+    rerender(
+      <ExpandableActivityMap markers={markersAt(pinB)} center={pinB} onMapClick={jest.fn()} />
+    );
+
+    const fullscreen = mockMapProps.find((props) => props.onMapClick !== undefined);
+    expect(fullscreen?.center).toBeNull();
+  });
+
+  it("renders only the fullscreen map while it is open", () => {
+    const { getByLabelText, rerender } = render(
+      <ExpandableActivityMap markers={markersAt(pinA)} onMapClick={jest.fn()} />
+    );
+    fireEvent.press(getByLabelText("activity:map.expand"));
+
+    mockMapProps.length = 0;
+    rerender(<ExpandableActivityMap markers={markersAt(pinA)} onMapClick={jest.fn()} />);
+
+    expect(mockMapProps.length).toBeGreaterThan(0);
+    expect(mockMapProps.every((props) => props.onMapClick !== undefined)).toBe(true);
+  });
+
   it("remounts the preview when fullscreen closes, retrying a map that timed out", () => {
     const { getByLabelText } = render(<ExpandableActivityMap markers={markersAt(pinA)} />);
     fireEvent.press(getByLabelText("activity:map.expand"));

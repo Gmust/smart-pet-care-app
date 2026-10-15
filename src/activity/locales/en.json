@@ -63,7 +63,7 @@
   "map": {
     "title": "Activity locations",
     "empty": "None of the matching activities has a saved location.",
-    "unavailable": "The map could not be loaded. Check that the Google Maps API key is configured.",
+    "unavailable": "The map could not be loaded.",
     "markerLabel": "{{type}} at {{time}}",
     "retry": "Try again",
     "expand": "Open the map full screen",

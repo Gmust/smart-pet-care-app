@@ -9,6 +9,8 @@ import { MaximizeIcon } from "@/icons/maximize";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 
+import type { ActivityCoordinates } from "../types";
+
 import { ActivityMap } from "./ActivityMap";
 
 type Props = ComponentProps<typeof ActivityMap>;
@@ -23,27 +25,28 @@ export const ExpandableActivityMap = ({ style, onMapClick, onMarkerClick, ...map
   const { theme } = useUnistyles();
 
   const [isOpen, setIsOpen] = useState(false);
-  // Frozen while fullscreen is open: placing a pin changes the caller's center,
-  // and a moving camera would reset the user's zoom on every tap.
-  const [fullscreenCenter, setFullscreenCenter] = useState(mapProps.center);
-  // The overlay covers the preview's own "Try again", so closing fullscreen
-  // remounts the preview instead, which retries a map that timed out.
-  const [previewKey, setPreviewKey] = useState(0);
+  // The camera anchor, frozen when fullscreen opens: placing a pin changes the
+  // caller's center and markers, and a moving camera would reset the user's zoom
+  // on every tap. null (nothing to centre on yet) sets no camera at all, so the
+  // map stays wherever the user pans.
+  const [fullscreenCenter, setFullscreenCenter] = useState<ActivityCoordinates | null>(null);
 
   const open = () => {
-    setFullscreenCenter(mapProps.center ?? mapProps.markers[0]?.coordinates ?? null);
+    setFullscreenCenter(
+      mapProps.center === undefined ? (mapProps.markers[0]?.coordinates ?? null) : mapProps.center
+    );
     setIsOpen(true);
   };
 
-  const close = () => {
-    setIsOpen(false);
-    setPreviewKey((current) => current + 1);
-  };
+  const close = () => setIsOpen(false);
 
   return (
     <>
       <View style={[styles.preview, style]}>
-        <ActivityMap key={previewKey} {...mapProps} style={styles.fill} />
+        {/* Unmounted while fullscreen is open, so only one native map is alive. Its
+            remount on close also retries a map that timed out: the overlay covers
+            the preview's own "Try again". */}
+        {!isOpen && <ActivityMap {...mapProps} style={styles.fill} />}
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t("activity:map.expand")}

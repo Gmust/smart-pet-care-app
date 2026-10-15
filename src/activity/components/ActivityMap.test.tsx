@@ -33,7 +33,9 @@ jest.mock("expo-maps", () => ({
 
 import { ActivityMap } from "./ActivityMap";
 
-// Platform.Version is a getter in the jest preset; redefine it per test.
+// Platform.Version is a getter in the jest preset; redefine it per test and put
+// the original back afterwards so no test inherits another's version.
+const originalVersion = Object.getOwnPropertyDescriptor(Platform, "Version");
 const setIosVersion = (version: string) => {
   Object.defineProperty(Platform, "Version", { value: version, configurable: true });
 };
@@ -50,6 +52,7 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.useRealTimers();
+  if (originalVersion) Object.defineProperty(Platform, "Version", originalVersion);
 });
 
 describe("ActivityMap", () => {
@@ -106,12 +109,22 @@ describe("ActivityMap", () => {
     });
   });
 
-  it("centres on the first marker when no explicit centre is given", () => {
+  it("centres on the first marker when no centre is given", () => {
+    mockMaps.GoogleMaps = { View: recordingView };
+
+    render(<ActivityMap markers={markers} />);
+
+    expect(viewProps[0].cameraPosition).toBeDefined();
+  });
+
+  it("sets no camera for a null centre, even with markers", () => {
+    // The fullscreen picker passes null when it opened with nothing to centre on;
+    // following the newest marker would reset the user's zoom on every tap.
     mockMaps.GoogleMaps = { View: recordingView };
 
     render(<ActivityMap markers={markers} center={null} />);
 
-    expect(viewProps[0].cameraPosition).toBeDefined();
+    expect("cameraPosition" in viewProps[0]).toBe(false);
   });
 
   it("falls back on platforms the map does not support", () => {

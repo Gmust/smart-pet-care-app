@@ -19,7 +19,10 @@ export type ActivityMapMarker = {
 
 type Props = {
   markers: ActivityMapMarker[];
-  /** Where the camera starts; falls back to the first marker when omitted. */
+  /**
+   * Where the camera starts. Omitted (undefined) falls back to the first marker;
+   * null means no camera is set and the map keeps whatever the user did.
+   */
   center?: ActivityCoordinates | null;
   zoom?: number;
   onMapClick?: (coordinates: ActivityCoordinates) => void;
@@ -53,8 +56,9 @@ export const ActivityMap = ({
   const [attempt, setAttempt] = useState(0);
   const [lastCamera, setLastCamera] = useState<ActivityCoordinates | null>(null);
 
-  const latitude = center?.latitude ?? markers[0]?.coordinates.latitude;
-  const longitude = center?.longitude ?? markers[0]?.coordinates.longitude;
+  const anchor = center === undefined ? markers[0]?.coordinates : center;
+  const latitude = anchor?.latitude;
+  const longitude = anchor?.longitude;
   // expo-maps renders Google Maps on Android and Apple Maps on iOS (no API key).
   // Apple Maps needs iOS 17: below it the native view renders nothing and raises
   // no error, so gate on the version. A binary without the native view throws on
