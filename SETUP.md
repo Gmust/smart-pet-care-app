@@ -145,7 +145,7 @@ FCM credentials in `google-services.json`:
 
 1. In the Google Cloud project, enable **Maps SDK for Android**.
 2. Create an API key and restrict it to the app's package name
-   (`com.anonymous.smartpetcareapp`) and signing certificate fingerprint.
+   (`com.misopets.app`) and signing certificate fingerprint.
 3. Set `GOOGLE_MAPS_API_KEY` locally in `.env`, and as an EAS secret for builds:
 
 ```bash
