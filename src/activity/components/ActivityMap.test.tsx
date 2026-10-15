@@ -33,6 +33,11 @@ jest.mock("expo-maps", () => ({
 
 import { ActivityMap } from "./ActivityMap";
 
+// Platform.Version is a getter in the jest preset; redefine it per test.
+const setIosVersion = (version: string) => {
+  Object.defineProperty(Platform, "Version", { value: version, configurable: true });
+};
+
 const coordinates = { latitude: 50.4501, longitude: 30.5234 };
 const markers = [{ id: "a", title: "Walk", coordinates }];
 
@@ -119,6 +124,7 @@ describe("ActivityMap", () => {
 
   it("renders Apple Maps on iOS with the camera and markers", () => {
     Platform.OS = "ios";
+    setIosVersion("17.0");
     mockMaps.AppleMaps = { View: recordingView };
 
     render(<ActivityMap markers={markers} />);
@@ -130,6 +136,7 @@ describe("ActivityMap", () => {
   it("never times out to the fallback on iOS, which has no load event", () => {
     jest.useFakeTimers();
     Platform.OS = "ios";
+    setIosVersion("17.0");
 
     const { queryByText } = render(<ActivityMap markers={markers} />);
     act(() => {
@@ -137,6 +144,28 @@ describe("ActivityMap", () => {
     });
 
     expect(queryByText("activity:map.unavailable")).toBeNull();
+  });
+
+  it("falls back on iOS 16, where Apple Maps renders nothing", () => {
+    Platform.OS = "ios";
+    setIosVersion("16.4");
+
+    const { getByText } = render(<ActivityMap markers={markers} />);
+
+    expect(getByText("activity:map.unavailable")).toBeTruthy();
+  });
+
+  it("hides Apple Maps POIs only when the map picks a location", () => {
+    Platform.OS = "ios";
+    setIosVersion("17.0");
+    mockMaps.AppleMaps = { View: recordingView };
+
+    render(<ActivityMap markers={markers} onMapClick={jest.fn()} />);
+    expect(viewProps[0].properties).toEqual({ pointsOfInterest: { including: [] } });
+
+    viewProps.length = 0;
+    render(<ActivityMap markers={markers} />);
+    expect("properties" in viewProps[0]).toBe(false);
   });
 
   it("falls back to the retry state when Google Maps never reports loaded", () => {

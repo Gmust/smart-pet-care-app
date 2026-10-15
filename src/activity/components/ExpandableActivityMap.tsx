@@ -1,13 +1,12 @@
-import { type ComponentProps, useEffect, useRef, useState } from "react";
+import { type ComponentProps, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Modal, Platform, Pressable, View } from "react-native";
+import { Modal, Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { CrossIcon } from "@/icons/cross";
 import { MaximizeIcon } from "@/icons/maximize";
 import { Button } from "@/shadecn/ui/button";
-import { useDrawerNativeActivity } from "@/shadecn/ui/drawer";
 import { Text } from "@/shadecn/ui/text";
 
 import { ActivityMap } from "./ActivityMap";
@@ -16,37 +15,35 @@ type Props = ComponentProps<typeof ActivityMap>;
 
 // Inside a bottom sheet, panning a map fights the sheet's own drag, so the small
 // map is a static preview. A tap opens it full screen, where it pans, zooms and,
-// when onMapClick is set, places the pin.
+// when onMapClick is set, places the pin. The Modal does not collapse an
+// enclosing drawer on Android (checked on an emulator), so unlike the date
+// picker it needs no drawer native activity.
 export const ExpandableActivityMap = ({ style, onMapClick, onMarkerClick, ...mapProps }: Props) => {
   const { t } = useTranslation(["activity", "common"]);
   const { theme } = useUnistyles();
 
   const [isOpen, setIsOpen] = useState(false);
-
-  const endNativeActivityRef = useRef<(() => void) | undefined>(undefined);
-
-  const beginNativeActivity = useDrawerNativeActivity();
+  // Frozen while fullscreen is open: placing a pin changes the caller's center,
+  // and a moving camera would reset the user's zoom on every tap.
+  const [fullscreenCenter, setFullscreenCenter] = useState(mapProps.center);
+  // The overlay covers the preview's own "Try again", so closing fullscreen
+  // remounts the preview instead, which retries a map that timed out.
+  const [previewKey, setPreviewKey] = useState(0);
 
   const open = () => {
-    // On Android the modal's window steals focus and collapses an enclosing
-    // drawer; marking it as a native activity makes the drawer re-present.
-    if (Platform.OS === "android") endNativeActivityRef.current = beginNativeActivity?.();
+    setFullscreenCenter(mapProps.center ?? mapProps.markers[0]?.coordinates ?? null);
     setIsOpen(true);
   };
 
   const close = () => {
     setIsOpen(false);
-    endNativeActivityRef.current?.();
-    endNativeActivityRef.current = undefined;
+    setPreviewKey((current) => current + 1);
   };
-
-  // Unmounting while open must not leave the drawer waiting on the activity forever.
-  useEffect(() => () => endNativeActivityRef.current?.(), []);
 
   return (
     <>
       <View style={[styles.preview, style]}>
-        <ActivityMap {...mapProps} style={styles.fill} />
+        <ActivityMap key={previewKey} {...mapProps} style={styles.fill} />
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t("activity:map.expand")}
@@ -91,6 +88,7 @@ export const ExpandableActivityMap = ({ style, onMapClick, onMarkerClick, ...map
 
           <ActivityMap
             {...mapProps}
+            center={fullscreenCenter}
             style={styles.fullMap}
             onMapClick={onMapClick}
             onMarkerClick={onMarkerClick}

@@ -56,10 +56,14 @@ export const ActivityMap = ({
   const latitude = center?.latitude ?? markers[0]?.coordinates.latitude;
   const longitude = center?.longitude ?? markers[0]?.coordinates.longitude;
   // expo-maps renders Google Maps on Android and Apple Maps on iOS (no API key).
-  // Either view is absent when the native binary predates the dependency, so
-  // check for the component itself rather than assuming it.
+  // Apple Maps needs iOS 17: below it the native view renders nothing and raises
+  // no error, so gate on the version. A binary without the native view throws on
+  // render instead, which MapErrorBoundary turns into the fallback.
   const isGoogle = Platform.OS === "android" && GoogleMaps?.View != null;
-  const isApple = Platform.OS === "ios" && AppleMaps?.View != null;
+  const isApple =
+    Platform.OS === "ios" &&
+    AppleMaps?.View != null &&
+    Number.parseInt(String(Platform.Version), 10) >= 17;
 
   useEffect(() => {
     if (latitude == null || longitude == null) return;
@@ -156,6 +160,10 @@ export const ActivityMap = ({
             style={styles.map}
             {...cameraProps}
             markers={mapMarkers}
+            // Apple Maps does not report taps on POI labels, so a picker hides
+            // them and every tap reaches onMapClick. Spread, not `undefined`:
+            // the native view converts whatever it receives.
+            {...(onMapClick ? { properties: { pointsOfInterest: { including: [] } } } : {})}
             onMapClick={handleMapClick}
             onMarkerClick={handleMarkerClick}
           />
