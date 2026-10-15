@@ -16,10 +16,16 @@ Keep it short and factual: what is true now, what was actually verified, what is
   clears the cache and ends the session even when deleting the stored tokens fails (logged,
   not rethrown), and `signIn` clears the cache again to drop data a mutation that settled
   after sign-out wrote back. One still in flight at sign-in can still write into it.
-- `signIn` also clears the AI-assistant consent. It is stored per device, so each new sign-in
-  must give its own; a restart or token refresh keeps it. If the delete fails, `signIn`
-  overwrites the consent with `false` (only `true` counts). `signIn` is the only entry point
-  for a new account (`AuthPage`), which also covers a session that expired at startup.
+- `signIn` also clears the AI-assistant consent, before it stores the new session, so a kill
+  in between cannot restore the new account alongside the old consent. Consent is stored per
+  device, so each new sign-in must give its own; a restart or token refresh keeps it. If the
+  delete fails, `signIn` overwrites the consent with `false` (only `true` counts); if that
+  fails too, `signIn` throws and nothing is stored. `signIn` is the only entry point for a
+  new account (`AuthPage`), which also covers a session that expired at startup. The
+  `ai-veterinary-assistant` spec now says the same (it used to say cleared at sign-out);
+  `openspec/` is gitignored, so that edit is local only.
+- `clearStoredSession` attempts all three deletes (`Promise.allSettled`) and throws only when
+  the access-token delete fails.
 - `useDeleteAccountMutation` no longer clears the cache itself; its only caller signs out
   right after.
 - Home wellness card: the three signal values (`SignalStat`) use the `label` text style,
@@ -42,6 +48,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
 - Photo viewer: `pnpm check` — pass: 34 suites, 291 tests. **Not checked on a device** — no
   Android device was attached. `.expo/types/router.d.ts` was stale (missing `/pets/note`)
   and failed typecheck until `expo start` regenerated it.
+- Codex/dual-review fixes (consent before session, abort on double failure, `allSettled`
+  token clear, spec): `pnpm check` — pass: 34 suites, 296 tests. The new abort test fails
+  without the `throw`, and moving `setStoredSession` back above the consent clear fails
+  three order tests. `clearStoredSession` has no test. Not checked on a device.
 - Account-switch fix: `pnpm check` — pass: 34 suites, 295 tests. `AuthContext.test.tsx`
   covers the sign-out clear, the order of the sign-in consent and cache clears, a failing
   consent delete, and a failing `clearStoredSession`; each test fails when its fix is
@@ -58,10 +68,17 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Limitations
 
-- Accepted for now: if SecureStore fails to delete the tokens at sign-out, the app shows
-  signed out but the tokens survive, and the next app start restores that account. No retry
-  flag, since it would live in the same storage that just failed. `clearStoredSession` also
-  stops at the first failed delete; `Promise.allSettled` would clear as much as it can.
+- Accepted for now: if SecureStore fails to delete the access token at sign-out, the app
+  shows signed out but the token survives, and the next app start restores that account
+  until its first 401 (the refresh token is most likely gone). No retry flag, since it would
+  live in the same storage that just failed.
+- `onAuthenticated` is not awaited (`EmailAuthForm.tsx:73`, `GoogleAuthButton.tsx:60`), so a
+  throw from `signIn` (no access token, consent not revocable, `setStoredSession` failing)
+  is an unhandled rejection: the user stays on the auth screen after a success toast.
+- `restoreSession`'s `clearStoredSession` (`AuthContext.tsx`) has no catch; a throw leaves
+  the app on "loading".
+- A mutation still in flight across an account switch can write the old account's data into
+  the new cache; `signIn`'s `queryClient.clear()` narrows the window, it does not close it.
 - A note saved offline is queued, not written. The queue is in memory, so an app kill drops
   it, and create is not idempotent, so retyping while offline lands one note per attempt.
 - `behavioralNotes` is still on the pet DTOs, but the app no longer reads, writes or clears

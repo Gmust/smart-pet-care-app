@@ -52,15 +52,17 @@ jest.mock("@/api/tokenStorage", () => ({
     events.push("clear-auth");
   }),
   getStoredSession: jest.fn(async () => null),
-  setStoredSession: jest.fn(),
+  setStoredSession: jest.fn(async () => {
+    events.push("store-session");
+  }),
 }));
 
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 import { setAuthToken } from "@/api/interceptors";
 import { queryClient } from "@/api/queryClient";
-import { clearStoredSession } from "@/api/tokenStorage";
-import { clearAiUsingConsent } from "@/assistant/utils/aiUsingConsentStorage";
+import { clearStoredSession, setStoredSession } from "@/api/tokenStorage";
+import { clearAiUsingConsent, setAiUsingConsent } from "@/assistant/utils/aiUsingConsentStorage";
 import { unregisterStoredDeviceToken } from "@/notifications/services/notificationRegistration";
 
 const mockedClearStoredSession = jest.mocked(clearStoredSession);
@@ -68,6 +70,8 @@ const mockedUnregisterStoredDeviceToken = jest.mocked(unregisterStoredDeviceToke
 const mockedGoogleSignOut = jest.mocked(GoogleSignin.signOut);
 const mockedSetAuthToken = jest.mocked(setAuthToken);
 const mockedClearAiUsingConsent = jest.mocked(clearAiUsingConsent);
+const mockedSetAiUsingConsent = jest.mocked(setAiUsingConsent);
+const mockedSetStoredSession = jest.mocked(setStoredSession);
 
 // Records whether the previous account's cached data was gone when the session was applied.
 const recordSessionApply = () => {
@@ -146,7 +150,7 @@ describe("AuthProvider", () => {
       await auth.signIn({ accessToken: "next-token" });
     });
 
-    expect(events).toEqual(["clear-consent", "apply-session:next-token:clean"]);
+    expect(events).toEqual(["clear-consent", "store-session", "apply-session:next-token:clean"]);
   });
 
   it("revokes the previous consent when clearing it fails", async () => {
@@ -166,9 +170,31 @@ describe("AuthProvider", () => {
     expect(events).toEqual([
       "clear-consent-failed",
       "set-consent:false",
+      "store-session",
       "apply-session:next-token:clean",
     ]);
     expect(consoleError).toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
+  it("aborts sign-in when the previous consent cannot be revoked", async () => {
+    const consoleError = jest.spyOn(console, "error").mockImplementation();
+    mockedClearAiUsingConsent.mockImplementationOnce(async () => ({
+      ok: false,
+      reason: "unavailable",
+    }));
+    mockedSetAiUsingConsent.mockImplementationOnce(async () => ({
+      ok: false,
+      reason: "unavailable",
+    }));
+    const auth = await renderAuthProvider();
+
+    await act(async () => {
+      await expect(auth.signIn({ accessToken: "next-token" })).rejects.toThrow();
+    });
+
+    expect(mockedSetStoredSession).not.toHaveBeenCalled();
+    expect(mockedSetAuthToken).not.toHaveBeenCalledWith("next-token");
     consoleError.mockRestore();
   });
 

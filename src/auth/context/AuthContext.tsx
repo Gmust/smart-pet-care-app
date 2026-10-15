@@ -78,7 +78,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         await clearStoredSession();
       } catch (error: unknown) {
-        // Sign out anyway. The tokens survive, so the next app start restores this account.
+        // Sign out anyway. If the access token survived, the refresh token is most likely gone,
+        // so a restored session ends at its first 401.
         console.error("Failed to clear the stored session during sign-out.", error);
       }
       // Query keys are not user-scoped: drop this account's data from memory. Safe here:
@@ -98,19 +99,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!next) {
         throw new Error("Auth response did not include an access token.");
       }
+      // The only entry point for a new account. Consent is stored per device, so the account
+      // must give its own. Cleared before the session is stored: a restart in between must not
+      // restore the new account alongside the previous account's consent.
+      const consentCleared = await clearAiUsingConsent();
+      if (!consentCleared.ok) {
+        console.error("Failed to clear the previous account's AI consent during sign-in.");
+        // Only `true` counts as consent, so overwriting it with `false` revokes it too.
+        const consentRevoked = await setAiUsingConsent(false);
+        if (!consentRevoked.ok) {
+          // Abort: signing in now would hand this account the previous account's consent.
+          throw new Error("Could not revoke the previous account's AI consent.");
+        }
+      }
       await setStoredSession({
         accessToken: next.accessToken,
         refreshToken: next.refreshToken,
         expiresAtUtc: next.expiresAtUtc,
       });
-      // The only entry point for a new account. Consent is stored per device, so the account
-      // must give its own.
-      const consentCleared = await clearAiUsingConsent();
-      if (!consentCleared.ok) {
-        console.error("Failed to clear the previous account's AI consent during sign-in.");
-        // Only `true` counts as consent, so overwriting it fails closed.
-        await setAiUsingConsent(false);
-      }
       // Drops data a mutation that settled after sign-out wrote back. This narrows the window,
       // it does not close it: one still in flight can write into the new account's cache.
       queryClient.clear();
