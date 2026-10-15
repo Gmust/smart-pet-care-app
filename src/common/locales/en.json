@@ -19,7 +19,8 @@
   "errors": {
     "somethingWentWrong": "Something went wrong",
     "screenErrorDescription": "An unexpected error occurred on this screen. Please try again.",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "openLinkFailed": "Couldn't open the page. Please try again."
   },
   "deleteDialog": {
     "confirm": "Delete",
