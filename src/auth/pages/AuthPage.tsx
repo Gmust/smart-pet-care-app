@@ -90,10 +90,7 @@ export default function AuthPage() {
           {/* Google sign-up records acceptance with no checkbox, and a Google sign-in from login
               mode can still create an account: the notice shows in both modes. */}
           <Text variant="caption" style={styles.legalNotice}>
-            {t("auth:agreements.googleNotice", {
-              terms: t("auth:agreements.terms"),
-              privacy: t("auth:agreements.privacy"),
-            })}
+            {t("auth:agreements.googleNotice")}
           </Text>
           <LegalLinks />
         </View>
