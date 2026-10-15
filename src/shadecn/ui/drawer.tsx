@@ -1,6 +1,6 @@
 import React from "react";
 import type { PressableProps, StyleProp, ViewProps, ViewStyle } from "react-native";
-import { AppState, BackHandler, Keyboard, Pressable, View } from "react-native";
+import { AppState, BackHandler, Keyboard, Platform, Pressable, View } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Easing } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -396,10 +396,12 @@ function DrawerContent({
     const changeSubscription = AppState.addEventListener("change", (state) => {
       if (state === "active") restore();
     });
-    const focusSubscription = AppState.addEventListener("focus", restore);
+    // "focus" is Android-only: iOS RCTAppState rejects the event type.
+    const focusSubscription =
+      Platform.OS === "android" ? AppState.addEventListener("focus", restore) : null;
     return () => {
       changeSubscription.remove();
-      focusSubscription.remove();
+      focusSubscription?.remove();
     };
   }, [index, modalRef, open]);
 

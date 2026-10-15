@@ -1,6 +1,6 @@
 {
   "name": "smart-pet-care-app",
-  "main": "expo-router/entry",
+  "main": "src/index.ts",
   "version": "1.0.0",
   "packageManager": "pnpm@11.5.1",
   "engines": {
