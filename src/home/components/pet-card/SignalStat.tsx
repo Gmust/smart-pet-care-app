@@ -18,7 +18,9 @@ export function SignalStat({ signal, first = false }: SignalStatProps) {
         <View style={[styles.dot, signal.status === "ok" ? styles.dotOk : styles.dotWarn]} />
         <Text style={styles.label}>{signal.label}</Text>
       </View>
-      <Text style={styles.value}>{signal.value}</Text>
+      <Text variant="label" style={styles.value}>
+        {signal.value}
+      </Text>
     </View>
   );
 }
@@ -55,8 +57,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   value: {
     marginTop: theme.spacing(1),
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textOnDark,
   },
 }));

@@ -144,7 +144,8 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 
 Beyond the primitives, `src/common/components/` holds composites worth reusing:
 `AddButton`, `BackButton`, `DeleteConfirmDialog`, `DateTimeField`, `SectionHeader`,
-`SkeletonBox`, `ImagePicker`, `OfflineBanner`, `RouteErrorFallback`, `QueryErrorState`.
+`SkeletonBox`, `ImagePicker`, `OfflineBanner`, `RouteErrorFallback`, `QueryErrorState`,
+`PhotoViewer` (tap a thumbnail to see the photo full screen).
 
 Check here before building a new one.
 
