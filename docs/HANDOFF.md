@@ -76,9 +76,15 @@ Keep it short and factual: what is true now, what was actually verified, what is
 - `ExpandableActivityMap` wraps `ActivityMap` in the create/edit location field and the
   activity details drawer. The small map is a static preview (panning it fought the bottom
   sheet's drag); a tap opens a fullscreen `Modal` where the map pans, zooms and, in the form,
-  places the pin, with a Done button. On Android it registers the modal as a drawer native
-  activity so the sheet re-presents. Tests cover the preview not placing pins and the
-  begin/end pairing on close and on unmount. Not checked on a device yet.
+  places the pin, with a Done button. Checked on an Android emulator: the Modal does not
+  collapse the drawer, so it no longer registers a drawer native activity — doing so left
+  `isRecoveringNativeActivityRef` stuck and the details drawer bounced back on swipe-down.
+  The fullscreen camera is frozen at open so placing a pin keeps the zoom, and closing
+  remounts the preview (its "Try again" sits under the tap overlay). The unit tests mock the
+  drawer, so they cannot catch a drawer interaction like that; it needs a device. On an
+  unsupported map the fullscreen view still shows the pick hint and Done.
+- Apple Maps is gated on iOS 17 (expo-maps renders nothing below it, and the app targets
+  16.4), and hides POI labels when picking, since Apple Maps does not report taps on them.
 - iOS on this Mac: macOS 15.7 cannot run Xcode 26.4+, which SDK 56 needs. A trial downgrade to
   SDK 55 lives in the worktree `../smart-pet-care-app-sdk55` (branch `chore/expo-sdk-55`,
   uncommitted) and builds with Xcode 26.0.1. Simulators now live on the internal disk; the old
@@ -115,6 +121,12 @@ Keep it short and factual: what is true now, what was actually verified, what is
 - Android only. iOS and web untested.
 
 - Legal links + register gate + consent revoke: `pnpm check` — pass: 35 suites, 299 tests.
+- Android emulator (`Medium_Phone_API_35`, SDK 56 build from the old `android/` folder):
+  app starts through the new `src/index.ts` entry; welcome agreements dialog and the auth
+  legal notice render; sign-in; creating a walk with a pin from the fullscreen map; details
+  drawer preview and fullscreen render the pin; details drawer closes on swipe-down after
+  the fullscreen map (it bounced back before the fix). A Play services auto-update on the
+  emulator killed the app once mid-test; unrelated to the code.
   `AuthContext.test.tsx` fails if the sign-in revoke moves after `setStoredSession`, if
   `signOut` drops the revoke, or if the fallback stops logging (each checked by breaking it).
   `AuthPage.test.tsx` covers the gate from confirm-email, a bare deep link, and the welcome
