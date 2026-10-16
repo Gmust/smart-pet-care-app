@@ -106,6 +106,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
 - The auth screen's "Already have an account? / Create an account" link now sits under the
   email form's submit button, not after Terms/Privacy. On a 1080×2400 phone it was below the
   fold, and with the scroll indicator hidden nothing showed it was there.
+- The activity location picker opens on Poznań (52.4064, 16.9252) when no position is
+  known, not on (0, 0). A walk saved from a tap on that ocean is how a "map that does not
+  load" showed up: the map was fine, and the pin sat in the Gulf of Guinea, solid navy in
+  dark mode. With location granted, the last known position still wins.
 
 - App identity is now `com.misopets.app` on both platforms (was `com.anonymous.*`) and the
   display name is "Miso". The Firebase owner registered `com.misopets.app` on Android and iOS
@@ -185,6 +189,13 @@ successful`. No `com.anonymous.*` app was on the emulator. **Not checked**: obta
   fold on that phone. `pnpm check` passed: 36 suites, 311 tests. **Not checked** on either
   platform: sign-in, push, photos, maps, account switch. The link move has no test: it is
   layout.
+- Same phone, SDK 55: pets list and profile, the profile photo viewer (opens, Back closes),
+  Terms opening the HTML page, notification permission granted with no FCM warning in the
+  Metro log. Activity map: "Use my current location" asks for permission and pins the
+  position, tiles load, a fullscreen tap (including on a POI) moves the pin. With location
+  revoked, preview and fullscreen open on Poznań. The Maps key is fine: no application
+  restriction, Maps SDK for Android allowed, billing on (Geocoding answers `OK`). The camera
+  default has no test: the drawer test stubs the native map, so it was checked on the phone.
 
 ## Limitations
 
