@@ -73,7 +73,7 @@ Notification delivery: reminders are pushed by the backend at their due time. Af
 `04-schedule-reminder` runs, wait for the due time and count:
 
 ```bash
-adb shell dumpsys notification --noredact | grep -c "pkg=com.anonymous.smartpetcareapp"
+adb shell dumpsys notification --noredact | grep -c "pkg=com.misopets.app"
 ```
 
 Repeat with the device in Doze (`adb shell dumpsys deviceidle force-idle`) for the low-power case.

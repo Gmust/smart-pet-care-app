@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 
 import { Platform } from "react-native";
-import { render } from "@testing-library/react-native";
+import { act, render } from "@testing-library/react-native";
 
 const mockTranslate = (key: string) => key;
 
@@ -10,7 +10,10 @@ jest.mock("react-i18next", () => ({
 }));
 
 // Mutable so each test can model a different native-module state.
-const mockMaps: { GoogleMaps: { View: unknown } } = { GoogleMaps: { View: () => null } };
+const mockMaps: { GoogleMaps: { View: unknown }; AppleMaps: { View: unknown } } = {
+  GoogleMaps: { View: () => null },
+  AppleMaps: { View: () => null },
+};
 
 // Captures the props the native view actually receives.
 const viewProps: Record<string, unknown>[] = [];
@@ -23,9 +26,19 @@ jest.mock("expo-maps", () => ({
   get GoogleMaps() {
     return mockMaps.GoogleMaps;
   },
+  get AppleMaps() {
+    return mockMaps.AppleMaps;
+  },
 }));
 
 import { ActivityMap } from "./ActivityMap";
+
+// Platform.Version is a getter in the jest preset; redefine it per test and put
+// the original back afterwards so no test inherits another's version.
+const originalVersion = Object.getOwnPropertyDescriptor(Platform, "Version");
+const setIosVersion = (version: string) => {
+  Object.defineProperty(Platform, "Version", { value: version, configurable: true });
+};
 
 const coordinates = { latitude: 50.4501, longitude: 30.5234 };
 const markers = [{ id: "a", title: "Walk", coordinates }];
@@ -33,7 +46,13 @@ const markers = [{ id: "a", title: "Walk", coordinates }];
 beforeEach(() => {
   Platform.OS = "android";
   mockMaps.GoogleMaps = { View: () => null };
+  mockMaps.AppleMaps = { View: () => null };
   viewProps.length = 0;
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+  if (originalVersion) Object.defineProperty(Platform, "Version", originalVersion);
 });
 
 describe("ActivityMap", () => {
@@ -90,19 +109,86 @@ describe("ActivityMap", () => {
     });
   });
 
-  it("centres on the first marker when no explicit centre is given", () => {
+  it("centres on the first marker when no centre is given", () => {
     mockMaps.GoogleMaps = { View: recordingView };
 
-    render(<ActivityMap markers={markers} center={null} />);
+    render(<ActivityMap markers={markers} />);
 
     expect(viewProps[0].cameraPosition).toBeDefined();
   });
 
+  it("sets no camera for a null centre, even with markers", () => {
+    // The fullscreen picker passes null when it opened with nothing to centre on;
+    // following the newest marker would reset the user's zoom on every tap.
+    mockMaps.GoogleMaps = { View: recordingView };
+
+    render(<ActivityMap markers={markers} center={null} />);
+
+    expect("cameraPosition" in viewProps[0]).toBe(false);
+  });
+
   it("falls back on platforms the map does not support", () => {
-    Platform.OS = "ios";
+    Platform.OS = "web";
 
     const { getByText } = render(<ActivityMap markers={markers} />);
 
     expect(getByText("activity:map.unavailable")).toBeTruthy();
+  });
+
+  it("renders Apple Maps on iOS with the camera and markers", () => {
+    Platform.OS = "ios";
+    setIosVersion("17.0");
+    mockMaps.AppleMaps = { View: recordingView };
+
+    render(<ActivityMap markers={markers} />);
+
+    expect(viewProps[0].cameraPosition).toEqual({ coordinates, zoom: 14 });
+    expect(viewProps[0].markers).toEqual([{ id: "a", title: "Walk", coordinates }]);
+  });
+
+  it("never times out to the fallback on iOS, which has no load event", () => {
+    jest.useFakeTimers();
+    Platform.OS = "ios";
+    setIosVersion("17.0");
+
+    const { queryByText } = render(<ActivityMap markers={markers} />);
+    act(() => {
+      jest.advanceTimersByTime(10_000);
+    });
+
+    expect(queryByText("activity:map.unavailable")).toBeNull();
+  });
+
+  it("falls back on iOS 16, where Apple Maps renders nothing", () => {
+    Platform.OS = "ios";
+    setIosVersion("16.4");
+
+    const { getByText } = render(<ActivityMap markers={markers} />);
+
+    expect(getByText("activity:map.unavailable")).toBeTruthy();
+  });
+
+  it("hides Apple Maps POIs only when the map picks a location", () => {
+    Platform.OS = "ios";
+    setIosVersion("17.0");
+    mockMaps.AppleMaps = { View: recordingView };
+
+    render(<ActivityMap markers={markers} onMapClick={jest.fn()} />);
+    expect(viewProps[0].properties).toEqual({ pointsOfInterest: { including: [] } });
+
+    viewProps.length = 0;
+    render(<ActivityMap markers={markers} />);
+    expect("properties" in viewProps[0]).toBe(false);
+  });
+
+  it("falls back to the retry state when Google Maps never reports loaded", () => {
+    jest.useFakeTimers();
+
+    const { queryByText } = render(<ActivityMap markers={markers} />);
+    act(() => {
+      jest.advanceTimersByTime(10_000);
+    });
+
+    expect(queryByText("activity:map.retry")).toBeTruthy();
   });
 });

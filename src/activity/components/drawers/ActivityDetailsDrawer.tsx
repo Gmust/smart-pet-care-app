@@ -14,7 +14,7 @@ import {
 } from "@/shadecn/ui/drawer";
 import { Text } from "@/shadecn/ui/text";
 
-import { ActivityMap } from "../../components/ActivityMap";
+import { ExpandableActivityMap } from "../../components/ExpandableActivityMap";
 import { decodeActivityLocation } from "../../utils/activityLocation";
 
 type Props = {
@@ -104,7 +104,7 @@ export const ActivityDetailsDrawer = ({ activity, onClose }: Props) => {
           )}
 
           {!!location?.coordinates && (
-            <ActivityMap
+            <ExpandableActivityMap
               style={styles.map}
               markers={[
                 {

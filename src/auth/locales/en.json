@@ -9,7 +9,7 @@
     "description": "To create your account, please review and accept our Terms of Service and Privacy Policy.",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "body": "By continuing, you agree to our {{terms}} and acknowledge our {{privacy}}.",
+    "googleNotice": "By continuing with Google, you agree to the documents below.",
     "agree": "Agree & continue",
     "cancel": "Not now"
   },

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "smart-pet-care-app",
+    "name": "Miso",
     "slug": "miso",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.smart-pet-care-app",
+      "bundleIdentifier": "com.misopets.app",
       "deploymentTarget": "16.4"
     },
     "android": {
@@ -26,7 +26,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.smartpetcareapp",
+      "package": "com.misopets.app",
       "permissions": [
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE",
@@ -53,8 +53,17 @@
       ],
       "expo-font",
       "expo-image",
-      "expo-status-bar",
-      "expo-build-properties",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "extraPods": [
+              { "name": "GoogleUtilities", "modular_headers": true },
+              { "name": "RecaptchaInterop", "modular_headers": true }
+            ]
+          }
+        }
+      ],
       [
         "react-native-edge-to-edge",
         {

@@ -9,8 +9,10 @@ import type { AuthResponse } from "@/api/generated";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 
+import { AgreementsDialog } from "../components/AgreementsDialog";
 import { EmailAuthForm } from "../components/EmailAuthForm";
 import { GoogleAuthButton } from "../components/GoogleAuthButton";
+import { LegalLinks } from "../components/LegalLinks";
 import { useAuth } from "../hooks/useAuth";
 import type { AuthMode } from "../types";
 
@@ -20,9 +22,14 @@ export default function AuthPage() {
   const { agreed, mode: modeParam } = useLocalSearchParams<{ agreed?: string; mode?: string }>();
   const { signIn } = useAuth();
 
-  const [mode, setMode] = useState<AuthMode>(modeParam === "login" ? "login" : "register");
+  // Registering needs the terms accepted first: any entry without `agreed` (confirm-email,
+  // a deep link) starts in login and asks before switching to register.
+  const [termsPreAccepted, setTermsPreAccepted] = useState(agreed === "1");
+  const [mode, setMode] = useState<AuthMode>(
+    modeParam !== "login" && termsPreAccepted ? "register" : "login"
+  );
+  const [agreementsOpen, setAgreementsOpen] = useState(false);
   const isRegister = mode === "register";
-  const termsPreAccepted = agreed === "1";
 
   const handleAuthenticated = useCallback(
     async (response: AuthResponse) => {
@@ -31,6 +38,24 @@ export default function AuthPage() {
     },
     [signIn, router]
   );
+
+  const handleSwitchMode = () => {
+    if (isRegister) {
+      setMode("login");
+      return;
+    }
+    if (termsPreAccepted) {
+      setMode("register");
+      return;
+    }
+    setAgreementsOpen(true);
+  };
+
+  const handleAgree = () => {
+    setAgreementsOpen(false);
+    setTermsPreAccepted(true);
+    setMode("register");
+  };
 
   return (
     <SafeAreaView style={styles.screen} edges={["top", "bottom"]}>
@@ -54,18 +79,32 @@ export default function AuthPage() {
           onAuthenticated={handleAuthenticated}
         />
 
+        <Button variant="link" size="md" onPress={handleSwitchMode}>
+          {isRegister ? t("auth:actions.switchToLogin") : t("auth:actions.switchToRegister")}
+        </Button>
+
         <View style={styles.divider}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerText}>{t("auth:screen.orDivider")}</Text>
           <View style={styles.dividerLine} />
         </View>
 
-        <GoogleAuthButton onAuthenticated={handleAuthenticated} />
-
-        <Button variant="link" size="md" onPress={() => setMode(isRegister ? "login" : "register")}>
-          {isRegister ? t("auth:actions.switchToLogin") : t("auth:actions.switchToRegister")}
-        </Button>
+        <View style={styles.google}>
+          <GoogleAuthButton onAuthenticated={handleAuthenticated} />
+          {/* Google sign-up records acceptance with no checkbox, and a Google sign-in from login
+              mode can still create an account: the notice shows in both modes. */}
+          <Text variant="caption" style={styles.legalNotice}>
+            {t("auth:agreements.googleNotice")}
+          </Text>
+          <LegalLinks />
+        </View>
       </ScrollView>
+
+      <AgreementsDialog
+        open={agreementsOpen}
+        onOpenChange={setAgreementsOpen}
+        onAgree={handleAgree}
+      />
     </SafeAreaView>
   );
 }
@@ -105,6 +144,13 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     height: theme.spacing(0.25),
     backgroundColor: theme.palette.brand.surfaceBorder,
+  },
+  google: {
+    gap: theme.spacing(2),
+  },
+  legalNotice: {
+    textAlign: "center",
+    color: theme.palette.brand.textSecondary,
   },
   dividerText: {
     fontFamily: theme.fonts.medium,

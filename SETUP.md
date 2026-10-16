@@ -52,7 +52,7 @@ These require interactive login / secrets and can't be done from this session.
    pnpm install
    ```
 
-   `npx expo install` pins `expo-updates` to the exact version compatible with SDK 56.
+   `npx expo install` pins `expo-updates` to the exact version compatible with SDK 55.
    Commit the updated `pnpm-lock.yaml`.
 
 2. **Log in to EAS** (locally):
@@ -145,7 +145,7 @@ FCM credentials in `google-services.json`:
 
 1. In the Google Cloud project, enable **Maps SDK for Android**.
 2. Create an API key and restrict it to the app's package name
-   (`com.anonymous.smartpetcareapp`) and signing certificate fingerprint.
+   (`com.misopets.app`) and signing certificate fingerprint.
 3. Set `GOOGLE_MAPS_API_KEY` locally in `.env`, and as an EAS secret for builds:
 
 ```bash
@@ -157,6 +157,6 @@ Without the key the app still builds and runs; the map area renders an explicit
 
 ## Notes
 
-- SDK 56 / React Native 0.85 with the New Architecture — all compatible with EAS Update.
+- SDK 55 / React Native 0.83 with the New Architecture — all compatible with EAS Update.
 - `production` uses a separate `production` channel so preview updates never reach real users.
 - The existing `ci.yml` (lint/typecheck/test) still runs on PRs and is independent of this pipeline.

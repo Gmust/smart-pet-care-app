@@ -8,10 +8,13 @@ import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/auth/hooks/useAuth";
+import { openLegalUrl, PRIVACY_URL, TERMS_URL } from "@/common/utils/legalUrls";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
 import { TriangleAlertIcon } from "@/icons/alert";
+import { FileTextIcon } from "@/icons/file-text";
 import { PencilLineIcon } from "@/icons/pencil-line";
+import { ShieldIcon } from "@/icons/shield";
 import { UserIcon } from "@/icons/user";
 import { Button } from "@/shadecn/ui/button";
 import {
@@ -137,6 +140,22 @@ export default function ProfilePage() {
             tone="danger"
             disabled={!profile}
             onPress={() => setIsDeleteOpen(true)}
+          />
+        </View>
+
+        <SectionHeader label={t("profile:profilePage.sections.legal")} />
+        <View style={styles.card}>
+          <ProfileMenuRow
+            icon={<FileTextIcon width={18} height={18} color={palette.brand.primaryDefault} />}
+            label={t("profile:profilePage.menu.terms")}
+            description={t("profile:profilePage.menu.termsDescription")}
+            onPress={() => openLegalUrl(TERMS_URL)}
+          />
+          <ProfileMenuRow
+            icon={<ShieldIcon width={18} height={18} color={palette.brand.primaryDefault} />}
+            label={t("profile:profilePage.menu.privacy")}
+            description={t("profile:profilePage.menu.privacyDescription")}
+            onPress={() => openLegalUrl(PRIVACY_URL)}
           />
         </View>
       </ScrollView>

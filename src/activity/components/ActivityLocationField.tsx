@@ -11,7 +11,9 @@ import { Text } from "@/shadecn/ui/text";
 
 import type { ActivityCoordinates } from "../types";
 
-import { ActivityMap } from "./ActivityMap";
+import { ExpandableActivityMap } from "./ExpandableActivityMap";
+
+const DEFAULT_CAMERA: ActivityCoordinates = { latitude: 52.4064, longitude: 16.9252 };
 
 type Props = {
   label: string;
@@ -30,9 +32,10 @@ export const ActivityLocationField = ({
 
   const [isLocating, setIsLocating] = useState(false);
   const [isPermissionDenied, setIsPermissionDenied] = useState(false);
-  // Only seeds the camera. Without it a fresh entry opens on (0, 0) and the
-  // user has to pan across the ocean to drop a pin.
-  const [cameraSeed, setCameraSeed] = useState<ActivityCoordinates | null>(null);
+  // Only seeds the camera: the last known position when location is granted,
+  // Poznań otherwise. With no seed a fresh entry opens on (0, 0), and a tap
+  // there saves a pin in the Gulf of Guinea.
+  const [cameraSeed, setCameraSeed] = useState<ActivityCoordinates>(DEFAULT_CAMERA);
 
   useEffect(() => {
     if (coordinates) return;
@@ -90,7 +93,7 @@ export const ActivityLocationField = ({
         onChangeText={onChangeLabel}
       />
 
-      <ActivityMap
+      <ExpandableActivityMap
         style={styles.map}
         markers={
           coordinates

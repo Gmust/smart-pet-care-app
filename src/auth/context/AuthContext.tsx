@@ -42,6 +42,20 @@ const toSession = (
   };
 };
 
+// Consent is stored per device, so each account must give its own. Only `true` counts as
+// consent, so when the delete fails, overwriting with `false` revokes it too. Returns false
+// only when both fail and the consent may still be granted.
+const revokeAiConsent = async (context: string): Promise<boolean> => {
+  const cleared = await clearAiUsingConsent();
+  if (cleared.ok) return true;
+  console.error(`Failed to clear the AI consent during ${context}.`);
+  const overwritten = await setAiUsingConsent(false);
+  if (!overwritten.ok) {
+    console.error(`Failed to overwrite the AI consent during ${context}.`);
+  }
+  return overwritten.ok;
+};
+
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -75,6 +89,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           console.error("Failed to clear the Google session during sign-out.", error);
         });
       }
+      // A failure is logged and sign-out goes on: blocking it would keep this account signed in.
+      await revokeAiConsent("sign-out");
       try {
         await clearStoredSession();
       } catch (error: unknown) {
@@ -99,18 +115,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!next) {
         throw new Error("Auth response did not include an access token.");
       }
-      // The only entry point for a new account. Consent is stored per device, so the account
-      // must give its own. Cleared before the session is stored: a restart in between must not
-      // restore the new account alongside the previous account's consent.
-      const consentCleared = await clearAiUsingConsent();
-      if (!consentCleared.ok) {
-        console.error("Failed to clear the previous account's AI consent during sign-in.");
-        // Only `true` counts as consent, so overwriting it with `false` revokes it too.
-        const consentRevoked = await setAiUsingConsent(false);
-        if (!consentRevoked.ok) {
-          // Abort: signing in now would hand this account the previous account's consent.
-          throw new Error("Could not revoke the previous account's AI consent.");
-        }
+      // The only entry point for a new account. Revoked before the tokens are stored, so an
+      // app killed in between cannot start the new account with the previous one's consent.
+      if (!(await revokeAiConsent("sign-in"))) {
+        // Abort: signing in now would hand this account the previous account's consent.
+        throw new Error("Could not revoke the previous account's AI consent.");
       }
       await setStoredSession({
         accessToken: next.accessToken,

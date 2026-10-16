@@ -82,6 +82,9 @@ const recordSessionApply = () => {
 };
 
 describe("AuthProvider", () => {
+  // Restored in afterEach so a failing assertion cannot leave console.error mocked.
+  let consoleError: jest.SpyInstance;
+
   beforeEach(() => {
     events.length = 0;
     jest.clearAllMocks();
@@ -93,20 +96,27 @@ describe("AuthProvider", () => {
       events.push("google-sign-out");
       return null;
     });
+    consoleError = jest.spyOn(console, "error").mockImplementation();
   });
 
   afterEach(() => {
     queryClient.clear();
+    consoleError.mockRestore();
   });
 
-  it("attempts device-token deletion before clearing authentication", async () => {
+  it("attempts device-token deletion and revokes AI consent before clearing authentication", async () => {
     const auth = await renderAuthProvider();
 
     await act(async () => {
       await auth.signOut();
     });
 
-    expect(events).toEqual(["delete-device-token", "google-sign-out", "clear-auth"]);
+    expect(events).toEqual([
+      "delete-device-token",
+      "google-sign-out",
+      "clear-consent",
+      "clear-auth",
+    ]);
   });
 
   it("drops cached server data on sign-out", async () => {
@@ -121,7 +131,6 @@ describe("AuthProvider", () => {
   });
 
   it("still ends the session when clearing the stored tokens fails", async () => {
-    const consoleError = jest.spyOn(console, "error").mockImplementation();
     mockedClearStoredSession.mockImplementationOnce(() => Promise.reject(new Error("keystore")));
     const auth = await renderAuthProvider();
     await act(async () => {
@@ -136,10 +145,9 @@ describe("AuthProvider", () => {
     expect(mockedSetAuthToken).toHaveBeenLastCalledWith(null);
     expect(queryClient.getQueryData(["profile", "me"])).toBeUndefined();
     expect(consoleError).toHaveBeenCalled();
-    consoleError.mockRestore();
   });
 
-  it("clears the previous consent and cache before applying a new session", async () => {
+  it("clears the previous consent before storing the tokens and the cache before applying", async () => {
     const auth = await renderAuthProvider();
     events.length = 0;
     recordSessionApply();
@@ -154,7 +162,6 @@ describe("AuthProvider", () => {
   });
 
   it("revokes the previous consent when clearing it fails", async () => {
-    const consoleError = jest.spyOn(console, "error").mockImplementation();
     mockedClearAiUsingConsent.mockImplementationOnce(async () => {
       events.push("clear-consent-failed");
       return { ok: false, reason: "unavailable" };
@@ -174,11 +181,9 @@ describe("AuthProvider", () => {
       "apply-session:next-token:clean",
     ]);
     expect(consoleError).toHaveBeenCalled();
-    consoleError.mockRestore();
   });
 
   it("aborts sign-in when the previous consent cannot be revoked", async () => {
-    const consoleError = jest.spyOn(console, "error").mockImplementation();
     mockedClearAiUsingConsent.mockImplementationOnce(async () => ({
       ok: false,
       reason: "unavailable",
@@ -193,13 +198,31 @@ describe("AuthProvider", () => {
       await expect(auth.signIn({ accessToken: "next-token" })).rejects.toThrow();
     });
 
+    expect(consoleError).toHaveBeenCalledWith("Failed to overwrite the AI consent during sign-in.");
     expect(mockedSetStoredSession).not.toHaveBeenCalled();
     expect(mockedSetAuthToken).not.toHaveBeenCalledWith("next-token");
-    consoleError.mockRestore();
+  });
+
+  it("still signs out when the consent cannot be revoked", async () => {
+    mockedClearAiUsingConsent.mockImplementationOnce(async () => ({
+      ok: false,
+      reason: "unavailable",
+    }));
+    mockedSetAiUsingConsent.mockImplementationOnce(async () => ({
+      ok: false,
+      reason: "unavailable",
+    }));
+    const auth = await renderAuthProvider();
+
+    await act(async () => {
+      await auth.signOut();
+    });
+
+    expect(mockedClearStoredSession).toHaveBeenCalledTimes(1);
+    expect(mockedSetAuthToken).toHaveBeenLastCalledWith(null);
   });
 
   it("still clears authentication when notification cleanup fails", async () => {
-    const consoleError = jest.spyOn(console, "error").mockImplementation();
     mockedUnregisterStoredDeviceToken.mockRejectedValue(new Error("delete failed"));
     const auth = await renderAuthProvider();
 
@@ -209,11 +232,9 @@ describe("AuthProvider", () => {
 
     expect(mockedClearStoredSession).toHaveBeenCalledTimes(1);
     expect(consoleError).toHaveBeenCalled();
-    consoleError.mockRestore();
   });
 
   it("still clears authentication when Google cleanup fails", async () => {
-    const consoleError = jest.spyOn(console, "error").mockImplementation();
     mockedGoogleSignOut.mockRejectedValue(new Error("Google sign-out failed"));
     const auth = await renderAuthProvider();
 
@@ -223,7 +244,6 @@ describe("AuthProvider", () => {
 
     expect(mockedClearStoredSession).toHaveBeenCalledTimes(1);
     expect(consoleError).toHaveBeenCalled();
-    consoleError.mockRestore();
   });
 });
 
