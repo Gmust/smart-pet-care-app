@@ -79,6 +79,10 @@ export default function AuthPage() {
           onAuthenticated={handleAuthenticated}
         />
 
+        <Button variant="link" size="md" onPress={handleSwitchMode}>
+          {isRegister ? t("auth:actions.switchToLogin") : t("auth:actions.switchToRegister")}
+        </Button>
+
         <View style={styles.divider}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerText}>{t("auth:screen.orDivider")}</Text>
@@ -94,10 +98,6 @@ export default function AuthPage() {
           </Text>
           <LegalLinks />
         </View>
-
-        <Button variant="link" size="md" onPress={handleSwitchMode}>
-          {isRegister ? t("auth:actions.switchToLogin") : t("auth:actions.switchToRegister")}
-        </Button>
       </ScrollView>
 
       <AgreementsDialog
