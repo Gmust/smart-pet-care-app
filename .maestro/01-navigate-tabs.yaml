@@ -1,4 +1,4 @@
-appId: com.anonymous.smartpetcareapp
+appId: com.misopets.app
 name: Navigate between principal screens
 # Tab labels are always on screen, so asserts check the tab's `selected` state.
 # A bare "Home" also matches the system navigation bar's Home button (3-button
