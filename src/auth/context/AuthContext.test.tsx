@@ -61,7 +61,7 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 
 import { setAuthToken } from "@/api/interceptors";
 import { queryClient } from "@/api/queryClient";
-import { clearStoredSession } from "@/api/tokenStorage";
+import { clearStoredSession, setStoredSession } from "@/api/tokenStorage";
 import { clearAiUsingConsent, setAiUsingConsent } from "@/assistant/utils/aiUsingConsentStorage";
 import { unregisterStoredDeviceToken } from "@/notifications/services/notificationRegistration";
 
@@ -71,6 +71,7 @@ const mockedGoogleSignOut = jest.mocked(GoogleSignin.signOut);
 const mockedSetAuthToken = jest.mocked(setAuthToken);
 const mockedClearAiUsingConsent = jest.mocked(clearAiUsingConsent);
 const mockedSetAiUsingConsent = jest.mocked(setAiUsingConsent);
+const mockedSetStoredSession = jest.mocked(setStoredSession);
 
 // Records whether the previous account's cached data was gone when the session was applied.
 const recordSessionApply = () => {
@@ -182,7 +183,7 @@ describe("AuthProvider", () => {
     expect(consoleError).toHaveBeenCalled();
   });
 
-  it("logs and still signs in when overwriting the consent also fails", async () => {
+  it("aborts sign-in when the previous consent cannot be revoked", async () => {
     mockedClearAiUsingConsent.mockImplementationOnce(async () => ({
       ok: false,
       reason: "unavailable",
@@ -192,14 +193,33 @@ describe("AuthProvider", () => {
       reason: "unavailable",
     }));
     const auth = await renderAuthProvider();
-    recordSessionApply();
 
     await act(async () => {
-      await auth.signIn({ accessToken: "next-token" });
+      await expect(auth.signIn({ accessToken: "next-token" })).rejects.toThrow();
     });
 
     expect(consoleError).toHaveBeenCalledWith("Failed to overwrite the AI consent during sign-in.");
-    expect(mockedSetAuthToken).toHaveBeenLastCalledWith("next-token");
+    expect(mockedSetStoredSession).not.toHaveBeenCalled();
+    expect(mockedSetAuthToken).not.toHaveBeenCalledWith("next-token");
+  });
+
+  it("still signs out when the consent cannot be revoked", async () => {
+    mockedClearAiUsingConsent.mockImplementationOnce(async () => ({
+      ok: false,
+      reason: "unavailable",
+    }));
+    mockedSetAiUsingConsent.mockImplementationOnce(async () => ({
+      ok: false,
+      reason: "unavailable",
+    }));
+    const auth = await renderAuthProvider();
+
+    await act(async () => {
+      await auth.signOut();
+    });
+
+    expect(mockedClearStoredSession).toHaveBeenCalledTimes(1);
+    expect(mockedSetAuthToken).toHaveBeenLastCalledWith(null);
   });
 
   it("still clears authentication when notification cleanup fails", async () => {

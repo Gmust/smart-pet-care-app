@@ -6,7 +6,8 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Current state
 
-- Branch: `feature/photo-viewer`, off `main` at `f7f22db` (pet notes merged as #23).
+- Branch: `feature/legal-ios-map` (PR #25), with `main` merged in at `8921356` (photo viewer
+  merged as #24).
 - `PhotoViewer` (`src/common/components/`) wraps a thumbnail in a `Pressable`; a tap opens
   the photo full screen in a native `Modal` (`contentFit="contain"`, black backdrop). A tap
   anywhere or Android back closes it. Used on the pet profile hero and `ProfileAvatar`, only
@@ -17,12 +18,16 @@ Keep it short and factual: what is true now, what was actually verified, what is
   not rethrown), and `signIn` clears the cache again to drop data a mutation that settled
   after sign-out wrote back. One still in flight at sign-in can still write into it.
 - AI-assistant consent is revoked by `revokeAiConsent` in `AuthContext.tsx`, from `signOut`
-  (before the tokens are cleared, as the archived assistant spec requires) and from `signIn`
-  (before the new tokens are stored, so an app killed in between cannot carry the old
-  consent over). It is stored per device, so each new sign-in must give its own; a restart or
-  token refresh keeps it. If the delete fails, it overwrites the consent with `false` (only
-  `true` counts), and logs if that also fails. `signIn` is the only entry point for a new
-  account (`AuthPage`), which also covers a session that expired at startup.
+  (before the tokens are cleared) and from `signIn` (before the new tokens are stored, so an
+  app killed in between cannot carry the old consent over). It is stored per device, so each
+  new sign-in must give its own; a restart or token refresh keeps it. If the delete fails, it
+  overwrites the consent with `false` (only `true` counts). If that fails too, `signOut` logs
+  and still signs out, while `signIn` throws and stores nothing. `signIn` is the only entry
+  point for a new account (`AuthPage`), which also covers a session that expired at startup.
+  The local `ai-veterinary-assistant` spec (`openspec/` is gitignored) describes the sign-in
+  revoke only, not the one at sign-out.
+- `clearStoredSession` attempts all three deletes (`Promise.allSettled`) and throws only when
+  the access-token delete fails.
 - Legal documents: the app linked `/legal/terms` and `/legal/privacy`, which return 404.
   `src/common/utils/legalUrls.ts` now builds `/terms.html` and `/privacy.html` from
   `EXPO_PUBLIC_API_URL`. The backend contract is the legal-documents API doc (suffixed routes
@@ -106,6 +111,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
 - Photo viewer: `pnpm check` — pass: 34 suites, 291 tests. **Not checked on a device** — no
   Android device was attached. `.expo/types/router.d.ts` was stale (missing `/pets/note`)
   and failed typecheck until `expo start` regenerated it.
+- Codex/dual-review fixes (consent before session, abort on double failure, `allSettled`
+  token clear, spec): `pnpm check` — pass: 34 suites, 296 tests. The new abort test fails
+  without the `throw`, and moving `setStoredSession` back above the consent clear fails
+  three order tests. `clearStoredSession` has no test. Not checked on a device.
 - Account-switch fix: `pnpm check` — pass: 34 suites, 295 tests. `AuthContext.test.tsx`
   covers the sign-out clear, the order of the sign-in consent and cache clears, a failing
   consent delete, and a failing `clearStoredSession`; each test fails when its fix is
@@ -135,6 +144,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
   path. Breaking the switch guard or the initial mode each fails its test. `curl` against production:
   `/terms.html` and `/privacy.html` 200 `text/html`, `/legal/terms` and `/legal/privacy` 404.
   **Not checked on a device** — no Android device was attached.
+- Merge of `main` (#24) into this branch: `pnpm check` — pass: 36 suites, 311 tests. The
+  consent conflict resolved to `main`'s abort on sign-in plus this branch's revoke on
+  sign-out. The abort test fails without the `throw`, and "still signs out when the consent
+  cannot be revoked" fails if `signOut` throws on it. Not checked on a device.
 
 ## Limitations
 
@@ -145,10 +158,17 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `aps-environment` entitlement, which a free Apple ID cannot sign for a physical iPhone.
   Backend follow-up is tracked in Jira KAN-91.
 
-- Accepted for now: if SecureStore fails to delete the tokens at sign-out, the app shows
-  signed out but the tokens survive, and the next app start restores that account. No retry
-  flag, since it would live in the same storage that just failed. `clearStoredSession` also
-  stops at the first failed delete; `Promise.allSettled` would clear as much as it can.
+- Accepted for now: if SecureStore fails to delete the access token at sign-out, the app
+  shows signed out but the token survives, and the next app start restores that account
+  until its first 401 (the refresh token is most likely gone). No retry flag, since it would
+  live in the same storage that just failed.
+- `onAuthenticated` is not awaited (`EmailAuthForm.tsx:73`, `GoogleAuthButton.tsx:60`), so a
+  throw from `signIn` (no access token, consent not revocable, `setStoredSession` failing)
+  is an unhandled rejection: the user stays on the auth screen after a success toast.
+- `restoreSession`'s `clearStoredSession` (`AuthContext.tsx`) has no catch; a throw leaves
+  the app on "loading".
+- A mutation still in flight across an account switch can write the old account's data into
+  the new cache; `signIn`'s `queryClient.clear()` narrows the window, it does not close it.
 - A note saved offline is queued, not written. The queue is in memory, so an app kill drops
   it, and create is not idempotent, so retyping while offline lands one note per attempt.
 - `behavioralNotes` is still on the pet DTOs, but the app no longer reads, writes or clears
