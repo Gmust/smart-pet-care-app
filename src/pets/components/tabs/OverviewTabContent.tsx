@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 
@@ -22,7 +22,6 @@ type Props = {
 
 export const OverviewTabContent = ({ pet }: Props) => {
   const { t } = useTranslation(["pets", "common"]);
-  const { theme } = useUnistyles();
   const router = useRouter();
 
   const { data: notes = [] } = useNotesQuery(pet.id);
@@ -65,10 +64,8 @@ export const OverviewTabContent = ({ pet }: Props) => {
         </View>
         <Button
           variant="text"
-          size="hug"
+          size="inline"
           accessibilityLabel={t("petProfilePage.notes.addNoteA11y")}
-          textStyle={styles.addText}
-          hitSlop={(theme.minTouchTarget - theme.textStyles.bodySemiBold.lineHeight) / 2}
           onPress={() => openNote()}
         >
           {t("petProfilePage.notes.addNote")}
@@ -87,11 +84,7 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.palette.brand.surfaceBorder,
     borderRadius: theme.borderRadius["2xl"],
     backgroundColor: theme.palette.white,
-    shadowColor: theme.palette.brand.primaryDark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    boxShadow: theme.shadows.card,
     marginBottom: theme.spacing(5),
   },
   notesHeader: {
@@ -105,9 +98,5 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing(2),
-  },
-  addText: {
-    ...theme.textStyles.bodySemiBold,
-    color: theme.palette.brand.primaryDefault,
   },
 }));

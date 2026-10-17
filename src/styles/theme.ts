@@ -54,9 +54,9 @@ const fontPx = {
   32: 32,
 };
 
-// Line-height multiplier per size bucket, matching the Figma line-height
-// values (display/title use a tighter 1.2x, body/label/caption/chip use 1.4x).
-const LINE_HEIGHT_TIGHT = 1.2;
+// Figma uses 1.2x for display/title, but Fraunces needs about 1.233x: below that Android trims the
+// line and clips descenders, so keep this above 1.233.
+const LINE_HEIGHT_TIGHT = 1.25;
 const LINE_HEIGHT_NORMAL = 1.4;
 
 export const theme = {
@@ -65,6 +65,9 @@ export const theme = {
   textSizing: getTextSize, // LEGACY — superseded by explicit pixel values in fontSize below
   shadows: {
     dialog: "0px 4px 10px 0 rgba(0,0,0,0.35)",
+    // A CSS-style string, not shadow*/elevation: Android ignores shadowOpacity/shadowRadius and
+    // draws the heavier Material shadow for `elevation`.
+    card: "0px 1px 4px 0 rgba(26,58,46,0.06)",
   },
 
   // ---------------------------------------------------------------------

@@ -66,14 +66,17 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 ### `Button` — `@/shadecn/ui/button`
 
 - Variants: `primary`, `secondary`, `ghost`, `danger`, `text`, `link`, `icon`
-- Sizes: `sm`, `md`, `lg`, `icon`, `hug`
+- Sizes: `sm`, `md`, `lg`, `icon`, `hug`, `inline`
 - Props: `icon`, `iconPosition`, `isLoading`, `disabled`, `dotted`, `textStyle`, plus standard `Pressable` props
 - String children render through the shared `Text` with themed button typography
 - `isLoading` disables the button and swaps the content for an activity indicator
 - **`icon` is rendered as given — `Button` does not tint it.** Pass the color explicitly to match
   the variant (see `AddButton`)
-- `size="hug"` has no height of its own and no default `hitSlop` — pass one sized from what it
-  renders, e.g. `(theme.minTouchTarget - theme.iconSize.lg) / 2`
+- `size="hug"` is for a bare icon action with no frame or fill (`variant="text"` around an icon):
+  no padding, no height of its own and no default `hitSlop` — pass one sized from the icon, e.g.
+  `(theme.minTouchTarget - theme.iconSize.lg) / 2`. For a text action use `inline`
+- `size="inline"` is a text action set into a row or card (`variant="text"`): no padding, Body/SemiBold
+  type, and a `hitSlop` that brings the target up to the minimum touch size
 
 ### `Text` — `@/shadecn/ui/text`
 
@@ -104,10 +107,13 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 
 ### `Chip` — `@/shadecn/ui/chip`
 
-- Variants: `default`, `ghost`; tones: `neutral`, `primary`, `ok`, `peach`, `warn`, `danger`;
-  sizes: `sm`, `md`
+- Variants: `default`, `ghost`, `onDark`; tones: `neutral`, `primary`, `ok`, `peach`, `warn`,
+  `danger`; sizes: `sm`, `md`
+- `onDark` is for a dark strip: no fill, a status-coloured outline and light text. It takes only
+  the `ok`, `warn` and `danger` tones
 - Props: `label`, `icon`, `iconSize`, `onPress`, `disabled`
 - Use for statuses, tags, and multi-select filter toggles
+- Without `onPress` it is a plain `View`, so it does not swallow taps meant for a card or row
 
 ### `Dialog` — `@/shadecn/ui/dialog`
 
@@ -132,12 +138,28 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 - Exports `Select`, `SelectTrigger`, `SelectValue`, `SelectContent`, `SelectItem`
 - `SelectContent` needs a `portalHost`
 
+### `Tabs` — `@/shadecn/ui/tabs`
+
+- `variant`: `segmented` (default, underline), `pill`, `chips` (a `Chip`-sized outline with a
+  fill that slides to the active tab, for filters). `tone`: `primary` | `peach`, `segmented` only
+- Do not give tabs `flex: 1`: a zero flex basis hands every tab an equal share and clips the
+  longest label
+
+### `Card` / `ListCard` — `@/shadecn/ui/card`
+
+- `Card` takes `padding` (`standalone` | `compact` | `none`) and `radius` (`standalone` | `loose`)
+- `onPress` makes the whole card a `Pressable` button; `accessibilityLabel` is then required
+- Do not put `Button`s inside a tappable `Card`: the card is one accessible element, so TalkBack
+  may not reach them. When a card needs both, leave it a plain `Card` and lay a `Pressable` under
+  the content (`pointerEvents="none"` on the content, `"box-none"` where a button sits), as
+  `AnalysisCard` and `PetListCard` do
+- A card with its own look (no border, a photo, a custom shadow) is hand-written:
+  `ActivityCard`, `PetListCard`
+
 ### Others
 
 - `DropdownMenu` — `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`
 - `Switch` — boolean toggle
-- `Tabs` — tabbed sections
-- `Card` / `ListCard` — grouped content surfaces
 - `FieldError` — renders TanStack Form `field.state.meta.errors`
 
 ## Shared app components

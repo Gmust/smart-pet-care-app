@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
 import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
+import { SectionHeader } from "@/common/components/SectionHeader";
 import { CirclePlusIcon } from "@/icons/plus";
 import { ReminderDrawers } from "@/reminders/components/ReminderDrawers";
 import { ReminderRow } from "@/reminders/components/ReminderRow";
@@ -16,8 +17,6 @@ import { toReminderGroups } from "@/reminders/utils/reminderGroups";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
-
-import { SectionLabel } from "./SectionLabel";
 
 export function RemindersSection() {
   const { t } = useTranslation(["home", "reminders", "common"]);
@@ -54,8 +53,8 @@ export function RemindersSection() {
 
   return (
     <>
-      <SectionLabel
-        title={t("sectionLabel.remindersAmount.title")}
+      <SectionHeader
+        label={t("sectionLabel.remindersAmount.title")}
         action={t("sectionLabel.remindersAmount.action")}
         onActionPress={handleSeeAllReminders}
       />

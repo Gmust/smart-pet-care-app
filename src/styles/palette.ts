@@ -14,6 +14,7 @@ export const palette = {
     danger: "#b84a3e",
     dangerBg: "#faeada",
     peachDefault: "#7a3a1a",
+    peachMid: "#c97a4a",
     peachSoft: "#fff8ec",
     peachIconBg: "#fff2d3",
     surfacePage: "#f5f1ea",

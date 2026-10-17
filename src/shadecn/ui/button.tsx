@@ -2,12 +2,12 @@ import React from "react";
 import type { PressableStateCallbackType, StyleProp, TextStyle } from "react-native";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import type { UnistylesVariants } from "react-native-unistyles";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { Text, TextClassContext } from "./text";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "text" | "link" | "icon";
-export type ButtonSize = "sm" | "md" | "lg" | "icon" | "hug";
+export type ButtonSize = "sm" | "md" | "lg" | "icon" | "hug" | "inline";
 
 const buttonVariants = StyleSheet.create((theme) => {
   const { brand } = theme.palette;
@@ -80,6 +80,7 @@ const buttonVariants = StyleSheet.create((theme) => {
             borderRadius: theme.borderRadius.full,
           },
           hug: { paddingHorizontal: 0 },
+          inline: { paddingHorizontal: 0 },
         },
       },
     }),
@@ -121,6 +122,7 @@ const buttonVariants = StyleSheet.create((theme) => {
           lg: { fontSize: theme.fontSize.lg },
           icon: { fontSize: theme.fontSize.base },
           hug: {},
+          inline: { ...theme.textStyles.bodySemiBold },
         },
       },
     }),
@@ -186,6 +188,7 @@ function Button({
   ...props
 }: ButtonProps) {
   buttonVariants.useVariants({ size, variant });
+  const { theme } = useUnistyles();
 
   const isDisabled = !!(disabled || isLoading);
 
@@ -215,7 +218,14 @@ function Button({
         disabled={isDisabled}
         ref={ref}
         role="button"
-        hitSlop={hitSlop ?? (size === "icon" ? 6 : undefined)}
+        hitSlop={
+          hitSlop ??
+          (size === "icon"
+            ? 6
+            : size === "inline"
+              ? (theme.minTouchTarget - theme.textStyles.bodySemiBold.lineHeight) / 2
+              : undefined)
+        }
         style={(state) => [
           buttonVariants.button(isDisabled, state.pressed, dotted),
           typeof style === "function" ? style(state) : style,

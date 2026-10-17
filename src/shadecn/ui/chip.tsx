@@ -1,13 +1,14 @@
 import type { ComponentType } from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import type { SvgProps } from "react-native-svg";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import type { theme } from "@/styles/theme";
 
 export type ChipTone = "neutral" | "primary" | "ok" | "peach" | "warn" | "danger";
-export type ChipVariant = "default" | "ghost";
-type ChipToneKey = ChipTone | `ghost-${ChipTone}`;
+export type ChipOnDarkTone = "ok" | "warn" | "danger";
+export type ChipVariant = "default" | "ghost" | "onDark";
+type ChipToneKey = ChipTone | `ghost-${ChipTone}` | `onDark-${ChipOnDarkTone}`;
 type ChipSize = "md" | "sm";
 
 type AppTheme = typeof theme;
@@ -28,6 +29,9 @@ const getToneColors = (theme: AppTheme) => {
     "ghost-peach": brand.peachDefault,
     "ghost-warn": brand.warn,
     "ghost-danger": brand.danger,
+    "onDark-ok": brand.peachSoft,
+    "onDark-warn": brand.peachSoft,
+    "onDark-danger": brand.peachSoft,
   } satisfies Record<ChipToneKey, string>;
 };
 
@@ -71,6 +75,12 @@ const chipVariants = StyleSheet.create((theme) => {
           },
           "ghost-warn": { backgroundColor: theme.palette.transparent, borderColor: brand.warn },
           "ghost-danger": { backgroundColor: theme.palette.transparent, borderColor: brand.danger },
+          "onDark-ok": { backgroundColor: theme.palette.transparent, borderColor: brand.ok },
+          "onDark-warn": { backgroundColor: theme.palette.transparent, borderColor: brand.warn },
+          "onDark-danger": {
+            backgroundColor: theme.palette.transparent,
+            borderColor: brand.danger,
+          },
         },
         size: {
           md: {
@@ -102,6 +112,9 @@ const chipVariants = StyleSheet.create((theme) => {
           "ghost-peach": { color: toneColors["ghost-peach"] },
           "ghost-warn": { color: toneColors["ghost-warn"] },
           "ghost-danger": { color: toneColors["ghost-danger"] },
+          "onDark-ok": { color: toneColors["onDark-ok"] },
+          "onDark-warn": { color: toneColors["onDark-warn"] },
+          "onDark-danger": { color: toneColors["onDark-danger"] },
         },
         size: {
           md: { ...theme.textStyles.chipMd },
@@ -114,29 +127,49 @@ const chipVariants = StyleSheet.create((theme) => {
 
 type ChipProps = {
   label: string;
-  tone?: ChipTone;
-  variant?: ChipVariant;
   size?: ChipSize;
   icon?: ComponentType<SvgProps>;
   iconSize?: number;
   onPress?: () => void;
   disabled?: boolean;
-};
+} & (
+  | { variant?: Exclude<ChipVariant, "onDark">; tone?: ChipTone }
+  | { variant: "onDark"; tone: ChipOnDarkTone }
+);
 
-export function Chip({
-  label,
-  tone = "neutral",
-  variant = "default",
-  size = "md",
-  icon: Icon,
-  iconSize,
-  onPress,
-  disabled = false,
-}: ChipProps) {
-  const toneKey: ChipToneKey = variant === "ghost" ? `ghost-${tone}` : tone;
+export function Chip(props: ChipProps) {
+  const { label, size = "md", icon: Icon, iconSize, onPress, disabled = false } = props;
+
+  const tone = props.tone ?? "neutral";
+  const toneKey: ChipToneKey =
+    props.variant === "onDark"
+      ? `onDark-${props.tone}`
+      : props.variant === "ghost"
+        ? `ghost-${tone}`
+        : tone;
   chipVariants.useVariants({ size, tone: toneKey });
   const { theme } = useUnistyles();
   const iconColor = getToneColors(theme)[toneKey];
+
+  const content = (
+    <>
+      {!!Icon && (
+        <Icon
+          width={iconSize ?? theme.iconSize[size]}
+          height={iconSize ?? theme.iconSize[size]}
+          color={iconColor}
+        />
+      )}
+      <Text style={chipVariants.label}>{label}</Text>
+    </>
+  );
+
+  // Without an action a chip is a label. A `Pressable` there would still claim the
+  // touch, so tapping a status chip inside a tappable card or row would do nothing
+  // — and it would be announced as a button.
+  if (!onPress) {
+    return <View style={chipVariants.root(false, disabled)}>{content}</View>;
+  }
 
   return (
     <Pressable
@@ -147,14 +180,7 @@ export function Chip({
       accessibilityState={{ disabled }}
       style={({ pressed }) => chipVariants.root(pressed && !disabled, disabled)}
     >
-      {!!Icon && (
-        <Icon
-          width={iconSize ?? theme.iconSize[size]}
-          height={iconSize ?? theme.iconSize[size]}
-          color={iconColor}
-        />
-      )}
-      <Text style={chipVariants.label}>{label}</Text>
+      {content}
     </Pressable>
   );
 }

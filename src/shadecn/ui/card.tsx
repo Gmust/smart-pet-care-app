@@ -1,29 +1,53 @@
 import { Children, type ReactNode } from "react";
-import { View, type ViewStyle } from "react-native";
+import { Pressable, View, type ViewStyle } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 type CardPadding = "standalone" | "compact" | "none";
 type CardRadius = "standalone" | "loose";
 
-type CardProps = {
+type CardBaseProps = {
   padding?: CardPadding;
   radius?: CardRadius;
   style?: ViewStyle | ViewStyle[];
   children: ReactNode;
 };
 
+type CardInteractionProps =
+  | { onPress?: undefined; accessibilityLabel?: undefined }
+  | { onPress: () => void; accessibilityLabel: string };
+
+type CardProps = CardBaseProps & CardInteractionProps;
+
 export const Card = ({
   padding = "standalone",
   radius = "standalone",
   style,
   children,
+  onPress,
+  accessibilityLabel,
 }: CardProps) => {
   cardVariants.useVariants({ padding, radius });
 
-  return <View style={[cardVariants.card, style]}>{children}</View>;
+  if (!onPress) {
+    return <View style={[cardVariants.card, style]}>{children}</View>;
+  }
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      onPress={onPress}
+      style={({ pressed }) => [cardVariants.card, style, pressed && cardVariants.pressed]}
+    >
+      {children}
+    </Pressable>
+  );
 };
 
 export const cardVariants = StyleSheet.create((theme) => ({
+  pressed: {
+    backgroundColor: theme.palette.brand.surfacePage,
+  },
   card: {
     backgroundColor: theme.palette.white,
     borderWidth: 1,
