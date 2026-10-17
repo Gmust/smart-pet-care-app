@@ -11,7 +11,8 @@
     "editProfile": "Edit profile",
     "sections": {
       "details": "Account details",
-      "manage": "Manage account"
+      "manage": "Manage account",
+      "legal": "Legal"
     },
     "fields": {
       "phoneNumber": "Phone number",
@@ -25,7 +26,11 @@
       "signOut": "Sign out",
       "signOutDescription": "Leave this device",
       "deleteAccount": "Delete account",
-      "deleteAccountDescription": "Permanently remove your data"
+      "deleteAccountDescription": "Permanently remove your data",
+      "terms": "Terms of Service",
+      "termsDescription": "Rules for using the app",
+      "privacy": "Privacy Policy",
+      "privacyDescription": "How your data is handled"
     },
     "signOutDrawer": {
       "title": "Leave this device?",

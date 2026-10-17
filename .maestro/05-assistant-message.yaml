@@ -1,4 +1,4 @@
-appId: com.anonymous.smartpetcareapp
+appId: com.misopets.app
 name: Exchange messages with AI assistant
 env:
   PET_NAME: Rex

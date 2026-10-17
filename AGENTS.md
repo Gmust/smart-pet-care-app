@@ -6,7 +6,7 @@ Cross-platform mobile app (iOS, Android, Web) built with Expo and React Native. 
 
 ## Tech Stack
 
-- **Framework**: Expo ~56 / React Native 0.85 (New Architecture enabled)
+- **Framework**: Expo ~55 / React Native 0.83 (New Architecture enabled). Pinned to SDK 55: SDK 56 needs Xcode 26.4+, which macOS 15.7 cannot run.
 - **Navigation**: Expo Router (file-based, typed routes)
 - **State/Data**: TanStack React Query
 - **Forms**: TanStack Form + Zod

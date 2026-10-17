@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { GoogleMaps } from "expo-maps";
+import { AppleMaps, type Coordinates, GoogleMaps } from "expo-maps";
 
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
@@ -19,7 +19,10 @@ export type ActivityMapMarker = {
 
 type Props = {
   markers: ActivityMapMarker[];
-  /** Where the camera starts; falls back to the first marker when omitted. */
+  /**
+   * Where the camera starts. Omitted (undefined) falls back to the first marker;
+   * null means no camera is set and the map keeps whatever the user did.
+   */
   center?: ActivityCoordinates | null;
   zoom?: number;
   onMapClick?: (coordinates: ActivityCoordinates) => void;
@@ -53,25 +56,31 @@ export const ActivityMap = ({
   const [attempt, setAttempt] = useState(0);
   const [lastCamera, setLastCamera] = useState<ActivityCoordinates | null>(null);
 
-  const latitude = center?.latitude ?? markers[0]?.coordinates.latitude;
-  const longitude = center?.longitude ?? markers[0]?.coordinates.longitude;
+  const anchor = center === undefined ? markers[0]?.coordinates : center;
+  const latitude = anchor?.latitude;
+  const longitude = anchor?.longitude;
+  // expo-maps renders Google Maps on Android and Apple Maps on iOS (no API key).
+  // Apple Maps needs iOS 17: below it the native view renders nothing and raises
+  // no error, so gate on the version. A binary without the native view throws on
+  // render instead, which MapErrorBoundary turns into the fallback.
+  const isGoogle = Platform.OS === "android" && GoogleMaps?.View != null;
+  const isApple =
+    Platform.OS === "ios" &&
+    AppleMaps?.View != null &&
+    Number.parseInt(String(Platform.Version), 10) >= 17;
 
   useEffect(() => {
     if (latitude == null || longitude == null) return;
     setLastCamera({ latitude, longitude });
   }, [latitude, longitude]);
 
+  // Apple Maps has no load event and no key to misconfigure, so only Google
+  // Maps can time out.
   useEffect(() => {
-    if (isLoaded) return;
+    if (isLoaded || !isGoogle) return;
     const timer = setTimeout(() => setHasTimedOut(true), LOAD_TIMEOUT_MS);
     return () => clearTimeout(timer);
-  }, [isLoaded, attempt]);
-
-  // expo-maps ships GoogleMaps.View on Android only; the development target is
-  // Android, and other platforms get the same explicit fallback as a failed load.
-  // GoogleMaps.View is also absent when the native binary predates the
-  // dependency, so check for the component itself rather than assuming it.
-  const isSupported = Platform.OS === "android" && GoogleMaps?.View != null;
+  }, [isLoaded, isGoogle, attempt]);
 
   const fallback = (
     <View style={[styles.fallback, style]}>
@@ -81,7 +90,7 @@ export const ActivityMap = ({
     </View>
   );
 
-  if (!isSupported) {
+  if (!isGoogle && !isApple) {
     return fallback;
   }
 
@@ -127,38 +136,55 @@ export const ActivityMap = ({
       }
     : {};
 
+  const mapMarkers = markers.map((marker) => ({
+    id: marker.id,
+    title: marker.title,
+    coordinates: {
+      latitude: marker.coordinates.latitude,
+      longitude: marker.coordinates.longitude,
+    },
+  }));
+
+  const handleMapClick = (event: { coordinates: Coordinates }) => {
+    const { latitude, longitude } = event.coordinates;
+    if (latitude == null || longitude == null) return;
+    onMapClick?.({ latitude, longitude });
+  };
+
+  const handleMarkerClick = (marker: { id?: string }) => {
+    if (marker.id) onMarkerClick?.(marker.id);
+  };
+
   return (
     <MapErrorBoundary fallback={fallback}>
       <View style={[styles.container, style]}>
-        <GoogleMaps.View
-          key={attempt}
-          style={styles.map}
-          {...cameraProps}
-          markers={markers.map((marker) => ({
-            id: marker.id,
-            title: marker.title,
-            coordinates: {
-              latitude: marker.coordinates.latitude,
-              longitude: marker.coordinates.longitude,
-            },
-          }))}
-          onMapLoaded={() => setIsLoaded(true)}
-          onMapClick={(event) => {
-            const { latitude, longitude } = event.coordinates;
-            if (latitude == null || longitude == null) return;
-            onMapClick?.({ latitude, longitude });
-          }}
-          // A tap landing on a POI label never reaches onMapClick, which makes
-          // picking a park or a vet look broken. Treat it as a map tap.
-          onPOIClick={(event) => {
-            const { latitude, longitude } = event.coordinates;
-            if (latitude == null || longitude == null) return;
-            onMapClick?.({ latitude, longitude });
-          }}
-          onMarkerClick={(marker) => {
-            if (marker.id) onMarkerClick?.(marker.id);
-          }}
-        />
+        {isApple ? (
+          <AppleMaps.View
+            key={attempt}
+            style={styles.map}
+            {...cameraProps}
+            markers={mapMarkers}
+            // Apple Maps does not report taps on POI labels, so a picker hides
+            // them and every tap reaches onMapClick. Spread, not `undefined`:
+            // the native view converts whatever it receives.
+            {...(onMapClick ? { properties: { pointsOfInterest: { including: [] } } } : {})}
+            onMapClick={handleMapClick}
+            onMarkerClick={handleMarkerClick}
+          />
+        ) : (
+          <GoogleMaps.View
+            key={attempt}
+            style={styles.map}
+            {...cameraProps}
+            markers={mapMarkers}
+            onMapLoaded={() => setIsLoaded(true)}
+            onMapClick={handleMapClick}
+            // A tap landing on a POI label never reaches onMapClick, which makes
+            // picking a park or a vet look broken. Treat it as a map tap.
+            onPOIClick={handleMapClick}
+            onMarkerClick={handleMarkerClick}
+          />
+        )}
       </View>
     </MapErrorBoundary>
   );

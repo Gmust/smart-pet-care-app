@@ -10,7 +10,9 @@ import {
   setRefreshAuthSessionHandler,
   setUnauthorizedHandler,
 } from "@/api/interceptors";
+import { queryClient } from "@/api/queryClient";
 import { clearStoredSession, getStoredSession, setStoredSession } from "@/api/tokenStorage";
+import { clearAiUsingConsent, setAiUsingConsent } from "@/assistant/utils/aiUsingConsentStorage";
 import { NotificationProvider } from "@/notifications/providers/NotificationProvider";
 import { unregisterStoredDeviceToken } from "@/notifications/services/notificationRegistration";
 
@@ -38,6 +40,20 @@ const toSession = (
     refreshToken: response.refreshToken ?? fallbackRefreshToken,
     expiresAtUtc: response.expiresAtUtc ?? null,
   };
+};
+
+// Consent is stored per device, so each account must give its own. Only `true` counts as
+// consent, so when the delete fails, overwriting with `false` revokes it too. Returns false
+// only when both fail and the consent may still be granted.
+const revokeAiConsent = async (context: string): Promise<boolean> => {
+  const cleared = await clearAiUsingConsent();
+  if (cleared.ok) return true;
+  console.error(`Failed to clear the AI consent during ${context}.`);
+  const overwritten = await setAiUsingConsent(false);
+  if (!overwritten.ok) {
+    console.error(`Failed to overwrite the AI consent during ${context}.`);
+  }
+  return overwritten.ok;
 };
 
 interface AuthProviderProps {
@@ -73,7 +89,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
           console.error("Failed to clear the Google session during sign-out.", error);
         });
       }
-      await clearStoredSession();
+      // A failure is logged and sign-out goes on: blocking it would keep this account signed in.
+      await revokeAiConsent("sign-out");
+      try {
+        await clearStoredSession();
+      } catch (error: unknown) {
+        // Sign out anyway. If the access token survived, the refresh token is most likely gone,
+        // so a restored session ends at its first 401.
+        console.error("Failed to clear the stored session during sign-out.", error);
+      }
+      // Query keys are not user-scoped: drop this account's data from memory. Safe here:
+      // the (tabs) layout redirects on "unauthenticated", unmounting every observer.
+      queryClient.clear();
       applySession(null);
     })().finally(() => {
       signOutPromiseRef.current = null;
@@ -88,11 +115,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (!next) {
         throw new Error("Auth response did not include an access token.");
       }
+      // The only entry point for a new account. Revoked before the tokens are stored, so an
+      // app killed in between cannot start the new account with the previous one's consent.
+      if (!(await revokeAiConsent("sign-in"))) {
+        // Abort: signing in now would hand this account the previous account's consent.
+        throw new Error("Could not revoke the previous account's AI consent.");
+      }
       await setStoredSession({
         accessToken: next.accessToken,
         refreshToken: next.refreshToken,
         expiresAtUtc: next.expiresAtUtc,
       });
+      // Drops data a mutation that settled after sign-out wrote back. This narrows the window,
+      // it does not close it: one still in flight can write into the new account's cache.
+      queryClient.clear();
       applySession(next);
     },
     [applySession]

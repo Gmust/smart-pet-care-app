@@ -1,4 +1,4 @@
-appId: com.anonymous.smartpetcareapp
+appId: com.misopets.app
 name: Select pet photo from gallery
 env:
   PET_NAME: Rex

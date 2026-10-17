@@ -39,8 +39,13 @@ export const setStoredSession = async (session: StoredSession): Promise<void> =>
   await SecureStore.deleteItemAsync(EXPIRES_AT_KEY);
 };
 
+// Every delete is attempted, so one failure does not leave the others behind. Only a surviving
+// access token restores the session; without it the rest is unreadable.
 export const clearStoredSession = async (): Promise<void> => {
-  await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
-  await SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY);
-  await SecureStore.deleteItemAsync(EXPIRES_AT_KEY);
+  const [access] = await Promise.allSettled([
+    SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
+    SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
+    SecureStore.deleteItemAsync(EXPIRES_AT_KEY),
+  ]);
+  if (access.status === "rejected") throw access.reason;
 };

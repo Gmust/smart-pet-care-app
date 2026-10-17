@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { Linking, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { Button } from "@/shadecn/ui/button";
@@ -12,11 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shadecn/ui/dialog";
-import { Text } from "@/shadecn/ui/text";
 
-// TODO(content): replace with the production legal pages once they exist.
-const TERMS_URL = "https://smart-pet-care.duckdns.org/legal/terms";
-const PRIVACY_URL = "https://smart-pet-care.duckdns.org/legal/privacy";
+import { LegalLinks } from "./LegalLinks";
 
 interface AgreementsDialogProps {
   open: boolean;
@@ -37,14 +33,7 @@ export function AgreementsDialog({ open, onOpenChange, onAgree }: AgreementsDial
           </DialogDescription>
         </DialogHeader>
 
-        <View style={styles.links}>
-          <Button variant="link" onPress={() => Linking.openURL(TERMS_URL)} size="md">
-            <Text>{t("auth:agreements.terms")}</Text>
-          </Button>
-          <Button variant="link" onPress={() => Linking.openURL(PRIVACY_URL)} size="md">
-            <Text>{t("auth:agreements.privacy")}</Text>
-          </Button>
-        </View>
+        <LegalLinks />
 
         <DialogFooter>
           <Button size="md" variant="primary" onPress={onAgree}>
@@ -62,10 +51,6 @@ export function AgreementsDialog({ open, onOpenChange, onAgree }: AgreementsDial
 }
 
 const styles = StyleSheet.create(() => ({
-  links: {
-    flexDirection: "row",
-    justifyContent: "center",
-  },
   description: {
     textAlign: "center",
   },

@@ -1,4 +1,4 @@
-appId: com.anonymous.smartpetcareapp
+appId: com.misopets.app
 name: Schedule a reminder (push notification)
 env:
   PET_NAME: Rex

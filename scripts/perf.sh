@@ -15,7 +15,7 @@
 #      ANDROID_SERIAL (pick the device when adb lists more than one entry).
 set -euo pipefail
 
-PKG="com.anonymous.smartpetcareapp"
+PKG="com.misopets.app"
 ACTIVITY="$PKG/.MainActivity"
 N="${N:-10}"
 PET_NAME="${PET_NAME:-Rex}"
@@ -98,8 +98,8 @@ startup() {
     sleep 8
     # TotalTime is the first frame, which for React Native is the splash screen.
     # From the launch intent: first route mark (screen shown), last query settled (data loaded).
-    ttfd=$(adb logcat -d -v epoch -s ActivityTaskManager ReactNativeJS | tee "$OUT/logcat/startup-cold-$i.txt" | awk '
-      /ActivityTaskManager: START u0/ && /smartpetcareapp/ && !s { s=$1 }
+    ttfd=$(adb logcat -d -v epoch -s ActivityTaskManager ReactNativeJS | tee "$OUT/logcat/startup-cold-$i.txt" | awk -v pkg="$PKG" '
+      /ActivityTaskManager: START u0/ && index($0, pkg) && !s { s=$1 }
       /\[perf\] route \// && !/\[perf\] route \/ t=/ && !r { r=$1 }
       /\[perf\] query:(success|error)/ { q=$1 }
       END { printf "%s %s", (s && r ? sprintf("%.0f", (r-s)*1000) : ""), (s && q ? sprintf("%.0f", (q-s)*1000) : "") }')

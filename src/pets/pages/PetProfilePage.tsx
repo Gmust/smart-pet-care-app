@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { BackButton } from "@/common/components/BackButton";
+import { PhotoViewer } from "@/common/components/PhotoViewer";
 import { useRefreshControl } from "@/common/hooks/useRefreshControl";
 import { HealthTabContent } from "@/health/components/HealthTabContent";
 import { healthQueryKeys } from "@/health/queries/healthQueryKeys";
@@ -143,7 +144,9 @@ export default function PetProfilePage() {
               exiting={FadeOut.duration(150)}
             >
               {pet.photoUrl ? (
-                <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} variant="hero" />
+                <PhotoViewer uri={pet.photoUrl} style={StyleSheet.absoluteFill}>
+                  <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} variant="hero" />
+                </PhotoViewer>
               ) : (
                 <PetSpeciesImage species={pet.species} variant="hero" />
               )}
@@ -266,6 +269,8 @@ const styles = StyleSheet.create((theme) => ({
     left: theme.spacing(3.5),
     right: theme.spacing(3.5),
     bottom: theme.spacing(1.5),
+    // Chips are not interactive: let every tap reach the photo underneath.
+    pointerEvents: "none",
     flexDirection: "row",
     gap: theme.spacing(2),
   },
