@@ -55,8 +55,11 @@ export default function TabLayout() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
+  // Tab screens cross-fade, and the strip behind them has no colour of its own: it
+  // showed the root stack's dark navy for a moment on every switch.
   root: {
     flex: 1,
+    backgroundColor: theme.palette.brand.surfacePage,
   },
-});
+}));

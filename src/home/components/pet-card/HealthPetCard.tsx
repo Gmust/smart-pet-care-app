@@ -37,7 +37,11 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
     ? t(`wellness:band.${wellness.band}`)
     : t("wellness:band.unknown");
 
-  const openWellness = () => router.push({ pathname: "/(tabs)/pets/wellness", params: { petId } });
+  const openWellness = () =>
+    router.push(
+      { pathname: "/(tabs)/pets/assessment", params: { petId, tab: "wellness", from: "home" } },
+      { withAnchor: true }
+    );
 
   return (
     <Pressable
@@ -51,7 +55,12 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
         if (event.nativeEvent.actionName === "openWellness") openWellness();
       }}
       style={[styles.card, backgroundColor ? { backgroundColor } : null]}
-      onPress={() => router.push({ pathname: "/(tabs)/pets/pet-profile", params: { petId } })}
+      onPress={() =>
+        router.push(
+          { pathname: "/(tabs)/pets/pet-profile", params: { petId, from: "home" } },
+          { withAnchor: true }
+        )
+      }
     >
       {!!photoUrl && (
         <>

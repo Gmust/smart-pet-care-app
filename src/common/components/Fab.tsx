@@ -17,6 +17,7 @@ import * as Haptics from "expo-haptics";
 import { CreateActivityDrawer } from "@/activity/components/drawers/CreateActivityDrawer";
 import { PetPickerDrawer } from "@/activity/components/drawers/PetPickerDrawer";
 import { HealthRecordType } from "@/api/generated";
+import { LogMealDrawer } from "@/feeding/components/drawers/LogMealDrawer";
 import { AddHealthRecordDrawer } from "@/health/components/drawers/AddHealthRecordDrawer";
 import { ActivityIcon } from "@/icons/activity";
 import { BellPlusIcon } from "@/icons/bell";
@@ -24,6 +25,7 @@ import { CalendarHeartIcon } from "@/icons/calendar";
 import { HeartPulseIcon } from "@/icons/heart";
 import type { Icon } from "@/icons/icons";
 import { PlusIcon } from "@/icons/plus";
+import { UtensilsIcon } from "@/icons/utensils";
 import { CreatePetDrawer } from "@/pets/components/actions/CreatePetDrawer";
 import { usePetsQuery } from "@/pets/queries/usePetsQuery";
 import { CreateReminderDrawer } from "@/reminders/components/CreateReminderDrawer";
@@ -34,7 +36,7 @@ import { hexToRGBA } from "../utils/colors";
 import type { FabActionTone } from "./FabMenuItem";
 import { FabMenuItem } from "./FabMenuItem";
 
-type FabActionId = "reminder" | "symptom" | "health" | "activity";
+type FabActionId = "reminder" | "feeding" | "symptom" | "health" | "activity";
 
 type FabAction = {
   id: FabActionId;
@@ -42,12 +44,9 @@ type FabAction = {
   tone: FabActionTone;
 };
 
-// "Log feeding" used to sit second in this list. It opened nothing — no feeding
-// drawer or query exists anywhere in the app, and the endpoints aren't even
-// exported from @/api — so it was removed rather than left as a dead row. Put
-// it back here once a feeding log is actually built.
 const ACTIONS: FabAction[] = [
   { id: "reminder", icon: BellPlusIcon, tone: "primary" },
+  { id: "feeding", icon: UtensilsIcon, tone: "warm" },
   { id: "symptom", icon: HeartPulseIcon, tone: "peach" },
   { id: "health", icon: CalendarHeartIcon, tone: "peach" },
   { id: "activity", icon: ActivityIcon, tone: "neutral" },
@@ -66,6 +65,8 @@ export function Fab() {
   // CreateActivityDrawer takes a required petId and has no picker step of its
   // own, so the FAB resolves the pet first — silently, when there is only one.
   const [activityPetId, setActivityPetId] = useState<string | null>(null);
+  const [isFeedingPetPickerOpen, setIsFeedingPetPickerOpen] = useState(false);
+  const [feedingPetId, setFeedingPetId] = useState<string | null>(null);
   const rotation = useSharedValue(0);
 
   const hasPets = (pets?.length ?? 0) > 0;
@@ -102,6 +103,14 @@ export function Fab() {
     }
     if (id === "symptom") {
       setIsSymptomOpen(true);
+    }
+    if (id === "feeding") {
+      const onlyPetId = pets?.length === 1 ? pets[0].id : undefined;
+      if (onlyPetId) {
+        setFeedingPetId(onlyPetId);
+        return;
+      }
+      setIsFeedingPetPickerOpen(true);
     }
     if (id === "activity") {
       const onlyPetId = pets?.length === 1 ? pets[0].id : undefined;
@@ -177,6 +186,22 @@ export function Fab() {
         selectedPetId={activityPetId ?? undefined}
         onSelect={setActivityPetId}
       />
+      <PetPickerDrawer
+        isOpen={isFeedingPetPickerOpen}
+        setIsOpen={setIsFeedingPetPickerOpen}
+        pets={pets ?? []}
+        selectedPetId={feedingPetId ?? undefined}
+        onSelect={setFeedingPetId}
+      />
+      {!!feedingPetId && (
+        <LogMealDrawer
+          isOpen
+          setIsOpen={(open) => {
+            if (!open) setFeedingPetId(null);
+          }}
+          petId={feedingPetId}
+        />
+      )}
       {!!activityPetId && (
         <CreateActivityDrawer
           isOpen

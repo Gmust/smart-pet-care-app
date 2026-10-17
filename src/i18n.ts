@@ -6,6 +6,7 @@ import enAssistant from "@/assistant/locales/en.json";
 import enAuth from "@/auth/locales/en.json";
 import enCommon from "@/common/locales/en.json";
 import enErrors from "@/errors/locales/en.json";
+import enFeeding from "@/feeding/locales/en.json";
 import enHealth from "@/health/locales/en.json";
 import enHome from "@/home/locales/en.json";
 import enPets from "@/pets/locales/en.json";
@@ -32,6 +33,7 @@ const modules = [
   "activity",
   "wellness",
   "errors",
+  "feeding",
 ] as const;
 
 export type I18nModule = (typeof modules)[number];
@@ -50,6 +52,7 @@ const enResources = {
   activity: enActivity,
   wellness: enWellness,
   errors: enErrors,
+  feeding: enFeeding,
 } as const satisfies Record<I18nModule, TranslationJson>;
 
 const resources: Record<Lang, Record<I18nModule, TranslationJson>> = {

@@ -65,7 +65,7 @@ export const ReminderStatusDrawer = ({
     resolvedRef.current = true;
     try {
       if (status === ReminderStatus.Completed) {
-        await completeReminder(reminderId);
+        await completeReminder({ id: reminderId });
       } else {
         await updateReminder({ id: reminderId, payload: { status } });
       }

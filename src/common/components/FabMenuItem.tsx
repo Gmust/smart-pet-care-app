@@ -4,11 +4,12 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { Icon } from "@/icons/icons";
 import { palette } from "@/styles/palette";
 
-export type FabActionTone = "primary" | "peach" | "neutral";
+export type FabActionTone = "primary" | "peach" | "warm" | "neutral";
 
 const toneColors: Record<FabActionTone, { bg: string; fg: string }> = {
   primary: { bg: palette.brand.primaryXsoft, fg: palette.brand.primaryDefault },
   peach: { bg: palette.brand.peachIconBg, fg: palette.brand.peachDefault },
+  warm: { bg: palette.brand.dangerBg, fg: palette.brand.peachDefault },
   neutral: { bg: palette.brand.surfaceSunken, fg: palette.brand.textPrimary },
 };
 
