@@ -177,6 +177,35 @@ describe("NutritionAnalysisPage", () => {
     expect(screen.getByText("Below target")).toBeTruthy();
   });
 
+  it("names the goal on each card only where the run provably used it", async () => {
+    summaryMock.mockResolvedValue(
+      apiResponse({
+        mealCount: 1,
+        totalCalories: 170,
+        goal: { dailyCalorieTarget: 420, createdAt: dayjs().subtract(3, "day").toISOString() },
+      })
+    );
+    analysisMock.mockResolvedValue(
+      apiResponse({
+        latest: verdict(),
+        previous: verdict({ id: "analysis-0", targetCalories: "380.00" }),
+      })
+    );
+    const screen = renderPage();
+
+    expect(await screen.findByText("3 meals logged · target from your daily goal")).toBeTruthy();
+    expect(screen.getByText("of 380 kcal/day target · −4%")).toBeTruthy();
+  });
+
+  it("does not claim the goal for a run when the goal is unknown", async () => {
+    summaryMock.mockResolvedValue(apiResponse({ mealCount: 1, totalCalories: 170 }));
+    analysisMock.mockResolvedValue(apiResponse({ latest: verdict(), previous: null }));
+    const screen = renderPage();
+
+    expect(await screen.findByText("3 meals logged")).toBeTruthy();
+    expect(screen.queryByText(/target from your daily goal/)).toBeNull();
+  });
+
   it("shows the disclaimer the server sent, or ours when it sent none", async () => {
     analysisMock.mockResolvedValue(
       apiResponse({ latest: verdict({ disclaimer: "Check with your own vet." }), previous: null })
@@ -231,7 +260,7 @@ describe("NutritionAnalysisPage", () => {
     expect(runMock).not.toHaveBeenCalled();
   });
 
-  it("shows why a run failed instead of the old verdict", async () => {
+  it("shows why a run failed, with the last verdict still below it", async () => {
     analysisMock.mockResolvedValue(apiResponse({ latest: verdict(), previous: null }));
     logsMock.mockResolvedValue(
       apiResponse([meal({ createdAt: dayjs().add(2, "hour").toISOString() })])
@@ -249,7 +278,25 @@ describe("NutritionAnalysisPage", () => {
 
     expect(await screen.findByText("Analysis failed")).toBeTruthy();
     expect(screen.getByText("Too many requests. Try again in 30 seconds.")).toBeTruthy();
-    expect(screen.queryByText("On target")).toBeNull();
+    expect(screen.getByText("On target")).toBeTruthy();
+  });
+
+  it("dismisses a failure that cannot be retried, so the page is not stuck on it", async () => {
+    logsMock.mockResolvedValue(apiResponse([meal()]));
+    runMock.mockImplementation(() =>
+      Promise.reject(
+        new AxiosError("failed", "ERR_BAD_RESPONSE", undefined, undefined, {
+          ...apiResponse({ code: "something_unknown", retryable: false }, 400),
+        })
+      )
+    );
+    const screen = renderPage();
+
+    fireEvent.press(await screen.findByText("Run analysis"));
+    fireEvent.press(await screen.findByText("Dismiss"));
+
+    await waitFor(() => expect(screen.queryByText("Analysis failed")).toBeNull());
+    expect(await screen.findByText("Run analysis")).toBeTruthy();
   });
 
   it("does not read a failed load as 'no analysis yet'", async () => {

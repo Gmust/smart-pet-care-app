@@ -56,7 +56,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: theme.borderRadius.lg,
-    backgroundColor: theme.palette.brand.dangerBg,
+    backgroundColor: theme.palette.brand.peachTint,
   },
   texts: {
     flex: 1,

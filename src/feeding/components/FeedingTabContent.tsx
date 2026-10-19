@@ -122,9 +122,10 @@ export const FeedingTabContent = ({
   return (
     <View style={styles.root}>
       <View style={styles.block}>
+        {/* The goal comes with the summary: a form opened earlier is blank and would clear it. */}
         <SectionHeader
           label={t("feeding:today.label")}
-          action={t("feeding:today.editGoal")}
+          action={summary ? t("feeding:today.editGoal") : undefined}
           onActionPress={() => setIsGoalOpen(true)}
         />
         {isSummaryLoading && <TodayCardSkeleton />}
@@ -221,7 +222,7 @@ export const FeedingTabContent = ({
       <DeleteConfirmDialog {...dialogProps} />
       <DeleteConfirmDialog {...goalDialogProps} />
       <DailyGoalDrawer
-        isOpen={isGoalOpen}
+        isOpen={isGoalOpen && !!summary}
         setIsOpen={setIsGoalOpen}
         petId={petId}
         goal={summary?.goal}

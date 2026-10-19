@@ -29,12 +29,13 @@ export const NutritionAnalysisBlock = ({
 
   const {
     latest,
-    isEstimate,
+    isLatestGoal,
     canRun,
     blocker,
     isRunning,
     run,
     runFailure,
+    dismissFailure,
     isPending,
     isFailed,
     refetch,
@@ -53,21 +54,22 @@ export const NutritionAnalysisBlock = ({
           retryable={runFailure.retryable}
           isRunning={isRunning}
           onRetry={run}
+          onDismiss={dismissFailure}
         />
       )}
       {isLoading && <AnalysisCardSkeleton />}
       {isRunning && !latest && <AnalysisRunningCard />}
-      {!runFailure && !!latest && (
+      {!!latest && (
         <AnalysisCard
           analysis={latest}
-          isEstimate={isEstimate}
+          isGoal={isLatestGoal}
           canRun={canRun}
           isRunning={isRunning}
           onPress={onOpenAnalysis}
           onRun={run}
         />
       )}
-      {!runFailure && !!latest && !canRun && (
+      {!!latest && !canRun && (
         <Text variant="caption" style={styles.caption}>
           {blocker === "noCalories"
             ? t("feeding:analysis.addCaloriesToRun")

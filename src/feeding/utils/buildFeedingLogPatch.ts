@@ -3,8 +3,7 @@ import type { FeedingLogResponseDto, PatchFeedingLogDto } from "@/api/generated"
 import type { FeedingLogFormValues } from "../schemas/feeding-log.schema";
 
 import { toApiNumber } from "./toApiNumber";
-
-const trimmedOrNull = (value: string): string | null => value.trim() || null;
+import { trimmedOrNull } from "./trimmedOrNull";
 
 // PATCH: an omitted key is left unchanged, `null` clears. Send only what changed, or a stale form
 // overwrites a concurrent edit. Numbers are compared as numbers: the API types them `number |

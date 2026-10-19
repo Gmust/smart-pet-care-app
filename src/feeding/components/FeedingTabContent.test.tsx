@@ -296,6 +296,24 @@ describe("FeedingTabContent", () => {
     });
   });
 
+  describe("editing the goal while the summary is unknown", () => {
+    it("offers no Edit goal while the summary loads, so a blank form cannot clear the goal", async () => {
+      summaryMock.mockImplementation(() => new Promise(() => undefined));
+      const screen = renderTab();
+
+      await screen.findByText("Royal Canin Renal");
+      expect(screen.queryByText("Edit goal")).toBeNull();
+    });
+
+    it("offers no Edit goal after the summary failed to load", async () => {
+      summaryMock.mockImplementation(() => Promise.reject(new Error("network")));
+      const screen = renderTab();
+
+      await screen.findByText("We could not load today’s summary");
+      expect(screen.queryByText("Edit goal")).toBeNull();
+    });
+  });
+
   describe("logging and editing a meal", () => {
     it("opens an empty Log meal form from the empty state", async () => {
       logsMock.mockResolvedValue(apiResponse([]));
@@ -487,7 +505,14 @@ describe("FeedingTabContent", () => {
         )
       );
 
+    const goalSummary = (goal: object) =>
+      apiResponse({
+        ...GOAL_SUMMARY,
+        goal: { createdAt: dayjs().subtract(3, "day").toISOString(), ...goal },
+      });
+
     it("shows the verdict against the goal, with the deviation signed", async () => {
+      summaryMock.mockResolvedValue(goalSummary({ dailyCalorieTarget: 420, mealsPerDay: 3 }));
       respondWith(verdict(dayjs().add(1, "hour").toISOString()));
       const screen = renderTab();
 
@@ -497,12 +522,55 @@ describe("FeedingTabContent", () => {
       expect(screen.getByText(`${dayjs().format("MMM D")} · 3 meals logged`)).toBeTruthy();
     });
 
-    it("calls the target an AI estimate when the pet has no goal", async () => {
-      summaryMock.mockResolvedValue(apiResponse(EMPTY_SUMMARY));
-      respondWith(verdict(dayjs().add(1, "hour").toISOString()));
-      const screen = renderTab();
+    describe("when the target cannot be proven to come from the goal", () => {
+      const expectNeutral = async (screen: ReturnType<typeof renderTab>) => {
+        expect(await screen.findByText("of 420 kcal/day target · −4%")).toBeTruthy();
+        expect(screen.queryByText(/goal · /)).toBeNull();
+      };
 
-      expect(await screen.findByText("of 420 kcal/day AI estimate · −4%")).toBeTruthy();
+      it("says 'target', not 'goal', when the pet has no goal", async () => {
+        summaryMock.mockResolvedValue(apiResponse(EMPTY_SUMMARY));
+        respondWith(verdict(dayjs().add(1, "hour").toISOString()));
+
+        await expectNeutral(renderTab());
+      });
+
+      it("says 'target' when the goal has no calorie target", async () => {
+        summaryMock.mockResolvedValue(goalSummary({ mealsPerDay: 3 }));
+        respondWith(verdict(dayjs().add(1, "hour").toISOString()));
+
+        await expectNeutral(renderTab());
+      });
+
+      it("says 'target' when the goal carries no timestamps to compare with the run", async () => {
+        summaryMock.mockResolvedValue(apiResponse(GOAL_SUMMARY));
+        respondWith(verdict(dayjs().add(1, "hour").toISOString()));
+
+        await expectNeutral(renderTab());
+      });
+
+      it("says 'target' when the goal was changed after the run", async () => {
+        summaryMock.mockResolvedValue(
+          goalSummary({ dailyCalorieTarget: 420, updatedAt: dayjs().add(2, "hour").toISOString() })
+        );
+        respondWith(verdict(dayjs().add(1, "hour").toISOString()));
+
+        await expectNeutral(renderTab());
+      });
+
+      it("says 'target' when the goal's target differs from the one the run used", async () => {
+        summaryMock.mockResolvedValue(goalSummary({ dailyCalorieTarget: 500 }));
+        respondWith(verdict(dayjs().add(1, "hour").toISOString()));
+
+        await expectNeutral(renderTab());
+      });
+
+      it("says 'target' while the summary has not loaded", async () => {
+        summaryMock.mockImplementation(() => new Promise(() => undefined));
+        respondWith(verdict(dayjs().add(1, "hour").toISOString()));
+
+        await expectNeutral(renderTab());
+      });
     });
 
     it("opens the analysis screen from the card", async () => {
@@ -689,7 +757,9 @@ describe("FeedingTabContent", () => {
 
       expect(await screen.findByText("Analysis failed")).toBeTruthy();
       expect(screen.getByText("Too many requests. Try again in 30 seconds.")).toBeTruthy();
-      expect(screen.getByText("Nothing was lost — you can try again in 30 seconds")).toBeTruthy();
+      expect(
+        screen.getByText("Nothing was lost — please wait about 30 seconds before trying again")
+      ).toBeTruthy();
     });
 
     it("offers no retry for a failure that would repeat identically", async () => {
@@ -700,6 +770,32 @@ describe("FeedingTabContent", () => {
 
       expect(await screen.findByText("Analysis failed")).toBeTruthy();
       expect(screen.queryByText("Try again")).toBeNull();
+    });
+
+    it("lets the user dismiss a failure that cannot be retried, bringing back the first-run invitation", async () => {
+      failWith(400, { code: "something_unknown", retryable: false });
+      const screen = renderTab();
+
+      fireEvent.press(await screen.findByText("Run analysis"));
+      fireEvent.press(await screen.findByText("Dismiss"));
+
+      await waitFor(() => expect(screen.queryByText("Analysis failed")).toBeNull());
+      expect(await screen.findByText("Run analysis")).toBeTruthy();
+    });
+
+    it("keeps the last verdict and its Run button under a failure that cannot be retried", async () => {
+      logsMock.mockResolvedValue(
+        apiResponse([{ ...TODAY_LOG, createdAt: dayjs().add(2, "hour").toISOString() }])
+      );
+      respondWith(verdict(dayjs().add(1, "hour").toISOString()));
+      failWith(400, { code: "something_unknown", retryable: false });
+      const screen = renderTab();
+
+      fireEvent.press(await screen.findByText("Run new analysis"));
+
+      expect(await screen.findByText("Analysis failed")).toBeTruthy();
+      expect(screen.getByText("On target")).toBeTruthy();
+      expect(screen.getByText("Run new analysis")).toBeTruthy();
     });
 
     it("shows the progress card while a first analysis is under way", async () => {

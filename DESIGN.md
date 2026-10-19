@@ -10,7 +10,7 @@ colors:
   success: "#285a3f"
   warning: "#c98a3e"
   danger: "#b84a3e"
-  danger-background: "#faeada"
+  danger-background: "#fae6da"
   peach: "#7a3a1a"
   peach-soft: "#fff8ec"
   page: "#f5f1ea"

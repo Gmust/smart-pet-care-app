@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 
+import type { NutritionAnalysisResponseDto } from "@/api/generated";
 import { getApiError } from "@/errors/utils/getApiError";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 
@@ -26,6 +27,7 @@ export const useNutritionAnalysis = (petId: string | undefined) => {
     mutate: runAnalysis,
     isPending: isRunning,
     error: runError,
+    reset: dismissFailure,
   } = useRunNutritionAnalysisMutation();
 
   const latest = history?.latest ?? null;
@@ -47,6 +49,15 @@ export const useNutritionAnalysis = (petId: string | undefined) => {
   const goalChangedAt = summary?.goal?.updatedAt ?? summary?.goal?.createdAt;
   const isGoalChanged =
     !!latest && !!goalChangedAt && dayjs(goalChangedAt).isAfter(latest.createdAt);
+  // The analysis has no target source, so "goal" is claimed only when provable.
+  const goalTarget = toApiNumber(summary?.goal?.dailyCalorieTarget);
+  const isGoalRun = (analysis: NutritionAnalysisResponseDto | null) =>
+    !!analysis &&
+    goalTarget !== null &&
+    !!goalChangedAt &&
+    !dayjs(goalChangedAt).isAfter(analysis.createdAt) &&
+    toApiNumber(analysis.targetCalories) === goalTarget;
+  const previous = history?.previous ?? null;
   const canRun =
     !blocker &&
     (!latest || !isLatestToday || !logs || hasNewLogsSince(logs, latest) || isGoalChanged);
@@ -55,9 +66,9 @@ export const useNutritionAnalysis = (petId: string | undefined) => {
 
   return {
     latest,
-    previous: history?.previous ?? null,
-    // A summary that did not load says nothing about the goal either way.
-    isEstimate: !!summary && !summary.goal,
+    previous,
+    isLatestGoal: isGoalRun(latest),
+    isPreviousGoal: isGoalRun(previous),
     canRun,
     blocker,
     isRunning,
@@ -65,6 +76,7 @@ export const useNutritionAnalysis = (petId: string | undefined) => {
       if (petId) runAnalysis({ petId });
     },
     runFailure: failure && runError ? { ...failure, message: getApiErrorMessage(runError) } : null,
+    dismissFailure,
     isPending,
     isFailed: !history && (isError || fetchStatus === "paused"),
     refetch,

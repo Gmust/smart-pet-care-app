@@ -6,7 +6,7 @@ import { FoodType } from "@/api/generated";
 
 import { PORTION_UNITS } from "../constants";
 
-import { optionalPositiveNumber } from "./number-fields";
+import { optionalPositiveNumber, optionalWholeNumber } from "./number-fields";
 
 const FOOD_TYPE_VALUES = Object.values(FoodType);
 
@@ -19,13 +19,6 @@ export type FeedingLogFormValues = {
   approxCalories: string;
   notes: string;
 };
-
-const optionalWholeNumber = (message: string) =>
-  z.string().refine((value) => {
-    const trimmed = value.trim();
-    if (trimmed === "") return true;
-    return /^\d+$/.test(trimmed);
-  }, message);
 
 type Options = {
   // A stored portion cannot be cleared: neither `PatchFieldOfdecimal` nor `PatchFieldOfPortionUnit`

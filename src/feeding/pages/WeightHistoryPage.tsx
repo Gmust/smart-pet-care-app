@@ -107,10 +107,7 @@ export default function WeightHistoryPage() {
               label: t(`feeding:weight.periods.${key}`),
             }))}
             value={period}
-            onChange={(key) => {
-              const next = WEIGHT_PERIOD_KEYS.find((candidate) => candidate === key);
-              if (next) setPeriod(next);
-            }}
+            onChange={setPeriod}
           />
         </View>
 

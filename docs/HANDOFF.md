@@ -22,16 +22,18 @@ Keep it short and factual: what is true now, what was actually verified, what is
   past its time shows "Missed" (device clock, `isOverdue` is unreliable).
 - Analysis: one call analyses one day. It runs only with a meal today and calories on all of
   today's meals; a repeat needs a meal added or edited, or the goal changed, since the last run
-  (`hasNewLogsSince`, goal `updatedAt`). The first run shows a progress card.
+  (`hasNewLogsSince`, goal `updatedAt`). The first run shows a progress card. The cards say "goal"
+  only when it is provable (a calorie goal unchanged since the run, same target) and "target"
+  otherwise: the analysis DTO has no target source.
 - Weight history: 1 month / 3 months / 1 year chips (server-side range), chart with axes,
   entries with Edit / Delete.
 - The schedule card opens the pet profile on its Reminders tab (`tab` param).
 - Pull-to-refresh on the feeding screens, Wellness and every pet-profile tab (`useRefreshControl`).
 - Shared pieces touched: `Tabs` (generic over its keys, state-driven indicator, `chips` variant),
-  `Card`, `Chip` (`onDark` variant), `Button` (`inline` size), `SectionHeader`, `drawer` (footer
-  fade; titles no longer upper-case, `textPrimary`), `theme` (`shadows.card`, tight line height
-  1.25), `PetProfilePage`, `Fab`, `PetListCard`, `HealthPetCard`, `(tabs)/_layout`,
-  `pets/_layout`, `jest.setup.ts`.
+  `Card`, `Chip` (`onDark` variant), `Button` (`inline` size), `SectionHeader`,
+  `drawer` (footer fade; titles no longer upper-case, `textPrimary`), `theme` (`shadows.card`,
+  tight line height 1.25), `PetProfilePage`, `Fab`, `PetListCard`, `HealthPetCard`,
+  `(tabs)/_layout`, `pets/_layout`, `jest.setup.ts`.
 - `PhotoViewer` (`src/common/components/`) opens a photo full screen in a native `Modal` on a tap
   (pet profile hero and `ProfileAvatar`, only when a photo exists); a tap or Android back closes
   it. No pinch-zoom.
@@ -69,7 +71,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
 ## Verified evidence
 
 - `pnpm check` on this branch with `main` merged in (SDK 55): lint and typecheck clean, 70 suites
-  / 629 tests. `act` warnings come only from suites outside this feature (activity, assistant,
+  / 642 tests. `act` warnings come only from suites outside this feature (activity, assistant,
   pet notes) and vary with timing.
 - The feeding tests were mutation-checked (about 400 mutants); the survivors are equivalent or
   visual-only.
@@ -110,6 +112,8 @@ Keep it short and factual: what is true now, what was actually verified, what is
   shows the date and "Actual". Needs a word from the designer or backend.
 - The API does not turn grams or food type into calories, so a meal without calories blocks the
   analysis.
+- A slot is hidden by a log tied to its reminder on the same day, so moving that log's `fedAt` to
+  another day brings the slot back; what the server returns for such a run was not checked.
 - Completing a reminder cannot be undone: deleting a meal does not reopen a missed slot. A
   reminder edited after its slot came due keeps the old, already created run, shown as "Missed".
 - Tests run with `TZ=UTC` pinned (`jest.config.js`), so the day-grouping and slot tests cannot
@@ -137,4 +141,5 @@ an EAS `preview` Android build, to confirm the EAS variables reach the build.
 
 Feeding: bring back a place in the app for `behavioralNotes` (see Limitations) and decide with the
 designer where the field lives. Waiting on the backend: calories from grams, undoing a
-completion, `isOverdue`, a weekly analysis mode, the PATCH `null` gap.
+completion, `isOverdue`, a weekly analysis mode, the PATCH `null` gap, a target source on the
+analysis DTO.

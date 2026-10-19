@@ -13,6 +13,7 @@ type AnalysisErrorCardProps = {
   retryable: boolean;
   isRunning: boolean;
   onRetry: () => void;
+  onDismiss: () => void;
 };
 
 export const AnalysisErrorCard = ({
@@ -21,6 +22,7 @@ export const AnalysisErrorCard = ({
   retryable,
   isRunning,
   onRetry,
+  onDismiss,
 }: AnalysisErrorCardProps) => {
   const { t } = useTranslation(["feeding", "common"]);
 
@@ -31,19 +33,23 @@ export const AnalysisErrorCard = ({
         {message}
       </Text>
       {retryable && (
-        <>
-          <Text variant="bodyS" style={styles.hint}>
-            {retryAfterSeconds
-              ? t("feeding:analysis.retryIn", { count: retryAfterSeconds })
-              : t("feeding:analysis.retryNow")}
-          </Text>
-          <View style={styles.action}>
-            <Button variant="text" size="inline" isLoading={isRunning} onPress={onRetry}>
-              {t("common:errors.tryAgain")}
-            </Button>
-          </View>
-        </>
+        <Text variant="bodyS" style={styles.hint}>
+          {retryAfterSeconds
+            ? t("feeding:analysis.retryIn", { count: retryAfterSeconds })
+            : t("feeding:analysis.retryNow")}
+        </Text>
       )}
+      <View style={styles.action}>
+        {retryable ? (
+          <Button variant="text" size="inline" isLoading={isRunning} onPress={onRetry}>
+            {t("common:errors.tryAgain")}
+          </Button>
+        ) : (
+          <Button variant="text" size="inline" onPress={onDismiss}>
+            {t("feeding:analysis.dismiss")}
+          </Button>
+        )}
+      </View>
     </Card>
   );
 };

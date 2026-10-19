@@ -14,7 +14,7 @@ import { describeAnalysis } from "../utils/describeAnalysis";
 
 type AnalysisCardProps = {
   analysis: NutritionAnalysisResponseDto;
-  isEstimate: boolean;
+  isGoal: boolean;
   canRun: boolean;
   isRunning: boolean;
   onPress: () => void;
@@ -23,7 +23,7 @@ type AnalysisCardProps = {
 
 export const AnalysisCard = ({
   analysis,
-  isEstimate,
+  isGoal,
   canRun,
   isRunning,
   onPress,
@@ -67,7 +67,7 @@ export const AnalysisCard = ({
             {actual}
           </Text>
           <Text variant="bodyS" style={styles.goalLine}>
-            {t(isEstimate ? "feeding:analysis.ofEstimate" : "feeding:analysis.ofGoal", {
+            {t(isGoal ? "feeding:analysis.ofGoal" : "feeding:analysis.ofTarget", {
               target,
               deviation: deviationLabel,
             })}

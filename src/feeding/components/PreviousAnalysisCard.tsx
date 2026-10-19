@@ -12,10 +12,10 @@ import { describeAnalysis } from "../utils/describeAnalysis";
 
 type PreviousAnalysisCardProps = {
   analysis: NutritionAnalysisResponseDto;
-  isEstimate: boolean;
+  isGoal: boolean;
 };
 
-export const PreviousAnalysisCard = ({ analysis, isEstimate }: PreviousAnalysisCardProps) => {
+export const PreviousAnalysisCard = ({ analysis, isGoal }: PreviousAnalysisCardProps) => {
   const { t } = useTranslation(["feeding"]);
 
   const { actual, target, deviationLabel, mealCount, dateLabel } = describeAnalysis(analysis);
@@ -35,7 +35,7 @@ export const PreviousAnalysisCard = ({ analysis, isEstimate }: PreviousAnalysisC
           {actual}
         </Text>
         <Text variant="bodyS" style={styles.secondary}>
-          {t(isEstimate ? "feeding:analysis.ofEstimate" : "feeding:analysis.ofGoal", {
+          {t(isGoal ? "feeding:analysis.ofGoal" : "feeding:analysis.ofTarget", {
             target,
             deviation: deviationLabel,
           })}

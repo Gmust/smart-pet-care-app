@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, View } from "react-native";
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -43,6 +43,7 @@ export default function AssessmentPage() {
   const wellnessRefresh = useWellnessRefresh(petId);
   const { data: pet, isError: isPetError, refetch: refetchPet } = usePetQuery(petId);
 
+  const tabParam = parsedParams.success ? parsedParams.data.tab : undefined;
   const refresh =
     activeTab === "wellness" ? wellnessRefresh : activeTab === "feeding" ? feedingRefresh : null;
 
@@ -61,6 +62,11 @@ export default function AssessmentPage() {
       .runOnJS(true)
       .onEnd(() => goToTabBy(-1))
   );
+
+  // Re-opening a mounted screen with another tab changes its params, not its state.
+  useEffect(() => {
+    if (tabParam) setActiveTab(tabParam);
+  }, [tabParam]);
 
   if (!parsedParams.success) {
     return <Redirect href="/(tabs)/pets" />;

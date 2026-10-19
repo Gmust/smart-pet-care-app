@@ -3,8 +3,7 @@ import type { CreateFeedingLogDto } from "@/api/generated";
 import type { FeedingLogFormValues } from "../schemas/feeding-log.schema";
 
 import { toApiNumber } from "./toApiNumber";
-
-const trimmedOrNull = (value: string): string | null => value.trim() || null;
+import { trimmedOrNull } from "./trimmedOrNull";
 
 // Blank optional fields become `null`, never `0` or `""`: a stored `0` would skew the daily totals.
 // A unit without an amount is dropped, not sent next to a null amount.

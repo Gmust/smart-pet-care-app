@@ -92,10 +92,7 @@ export default function FeedingLogListPage() {
             label: key === "all" ? t("feeding:logList.filters.all") : t(`feeding:foodTypes.${key}`),
           }))}
           value={filter}
-          onChange={(key) => {
-            const next = LOG_FILTERS.find((candidate) => candidate === key);
-            if (next) setFilter(next);
-          }}
+          onChange={setFilter}
         />
       </ScrollView>
 

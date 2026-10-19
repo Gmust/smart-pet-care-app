@@ -9,7 +9,7 @@ export type FabActionTone = "primary" | "peach" | "warm" | "neutral";
 const toneColors: Record<FabActionTone, { bg: string; fg: string }> = {
   primary: { bg: palette.brand.primaryXsoft, fg: palette.brand.primaryDefault },
   peach: { bg: palette.brand.peachIconBg, fg: palette.brand.peachDefault },
-  warm: { bg: palette.brand.dangerBg, fg: palette.brand.peachDefault },
+  warm: { bg: palette.brand.peachTint, fg: palette.brand.peachDefault },
   neutral: { bg: palette.brand.surfaceSunken, fg: palette.brand.textPrimary },
 };
 

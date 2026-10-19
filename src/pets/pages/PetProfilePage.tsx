@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RefreshControl, View } from "react-native";
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -72,6 +72,12 @@ export default function PetProfilePage() {
     )
   );
   const petName = pet?.name;
+  const tabParam = parsedParams.success ? parsedParams.data.tab : undefined;
+
+  // Re-opening a mounted screen with another tab changes its params, not its state.
+  useEffect(() => {
+    if (tabParam) setActiveTab(tabParam);
+  }, [tabParam]);
 
   // Deep links can carry arbitrary params — never fetch with an unvalidated id.
   if (!parsedParams.success) {

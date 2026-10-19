@@ -286,12 +286,26 @@ describe("daily summaries", () => {
       expect(named.result.current.isSuccess).toBe(true);
     });
     expect(getApiPetsPetIdNutritionSummary).toHaveBeenCalledWith(PET_ID, {
+      date: dayjs().format("YYYY-MM-DD"),
       utcOffsetMinutes: 123,
     });
     expect(getApiPetsPetIdNutritionSummary).toHaveBeenCalledWith(PET_ID, {
       date: "2026-10-07",
       utcOffsetMinutes: 123,
     });
+  });
+
+  it("share one request for today between the Today card and the week chart", async () => {
+    const { wrapper } = createWrapper();
+
+    const today = renderHook(() => useNutritionSummaryQuery({ petId: PET_ID }), { wrapper });
+    const week = renderHook(() => useWeekNutritionQueries(PET_ID), { wrapper });
+
+    await waitFor(() => {
+      expect(today.result.current.isSuccess).toBe(true);
+      expect(week.result.current.isLoading).toBe(false);
+    });
+    expect(getApiPetsPetIdNutritionSummary).toHaveBeenCalledTimes(7);
   });
 
   it("are not requested without a pet", () => {

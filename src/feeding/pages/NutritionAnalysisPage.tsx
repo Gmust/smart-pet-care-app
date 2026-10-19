@@ -36,12 +36,14 @@ export default function NutritionAnalysisPage() {
   const {
     latest,
     previous,
-    isEstimate,
+    isLatestGoal,
+    isPreviousGoal,
     canRun,
     blocker,
     isRunning,
     run,
     runFailure,
+    dismissFailure,
     isPending,
     isFailed,
     refetch,
@@ -73,11 +75,10 @@ export default function NutritionAnalysisPage() {
               retryable={runFailure.retryable}
               isRunning={isRunning}
               onRetry={run}
+              onDismiss={dismissFailure}
             />
           )}
-          {!runFailure && !!latest && (
-            <AnalysisDetailCard analysis={latest} isEstimate={isEstimate} />
-          )}
+          {!!latest && <AnalysisDetailCard analysis={latest} isGoal={isLatestGoal} />}
           {!runFailure && !latest && isPending && <AnalysisCardSkeleton />}
           {!runFailure && !latest && isRunning && <AnalysisRunningCard />}
           {!runFailure && !latest && !isPending && !isRunning && !blocker && (
@@ -102,7 +103,7 @@ export default function NutritionAnalysisPage() {
         {!!previous && (
           <View style={styles.block}>
             <SectionHeader label={t("feeding:analysis.previous")} />
-            <PreviousAnalysisCard analysis={previous} isEstimate={isEstimate} />
+            <PreviousAnalysisCard analysis={previous} isGoal={isPreviousGoal} />
             <Text variant="caption" style={styles.historyNote}>
               {t("feeding:analysis.historyLimit")}
             </Text>

@@ -12,10 +12,10 @@ import { describeAnalysis } from "../utils/describeAnalysis";
 
 type AnalysisDetailCardProps = {
   analysis: NutritionAnalysisResponseDto;
-  isEstimate: boolean;
+  isGoal: boolean;
 };
 
-export const AnalysisDetailCard = ({ analysis, isEstimate }: AnalysisDetailCardProps) => {
+export const AnalysisDetailCard = ({ analysis, isGoal }: AnalysisDetailCardProps) => {
   const { t } = useTranslation(["feeding"]);
 
   const { actual, target, deviationLabel, mealCount, dateLabel } = describeAnalysis(analysis);
@@ -65,7 +65,7 @@ export const AnalysisDetailCard = ({ analysis, isEstimate }: AnalysisDetailCardP
         </View>
 
         <Text variant="bodyS" style={styles.statLabel}>
-          {t(isEstimate ? "feeding:analysis.mealsEstimate" : "feeding:analysis.mealsGoal", {
+          {t(isGoal ? "feeding:analysis.mealsGoal" : "feeding:analysis.mealsTarget", {
             count: mealCount,
           })}
         </Text>
