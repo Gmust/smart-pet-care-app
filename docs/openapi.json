@@ -8605,10 +8605,10 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "string"
+            "type": ["null", "string"]
           },
           "content": {
-            "type": "string"
+            "type": ["null", "string"]
           }
         }
       },
@@ -9073,10 +9073,10 @@
             "format": "uuid"
           },
           "title": {
-            "type": "string"
+            "type": ["null", "string"]
           },
           "content": {
-            "type": "string"
+            "type": ["null", "string"]
           },
           "createdAt": {
             "type": "string",

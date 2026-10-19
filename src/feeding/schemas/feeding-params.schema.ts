@@ -1,5 +1,5 @@
 import { z } from "zod";
 
-export const wellnessParamsSchema = z.object({
+export const feedingParamsSchema = z.object({
   petId: z.uuid(),
 });

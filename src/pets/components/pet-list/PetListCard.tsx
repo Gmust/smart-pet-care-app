@@ -1,13 +1,15 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TouchableOpacity, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Pressable, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useRouter } from "expo-router";
 
 import type { PetResponseDto } from "@/api/generated";
 import { ReminderType } from "@/api/generated";
 import { ChevronIcon } from "@/icons/chevron";
 import { TrendingUpIcon } from "@/icons/trending";
 import { useGetRemindersByPet } from "@/reminders/queries/useGetReminderByPet";
+import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 
@@ -23,6 +25,10 @@ type PetListCardProps = {
 
 export function PetListCard({ pet, onPress }: PetListCardProps) {
   const { t } = useTranslation(["pets"]);
+  const { theme } = useUnistyles();
+  const router = useRouter();
+
+  const [isPressed, setIsPressed] = useState(false);
 
   const { data: reminders, isLoading: isRemindersLoading } = useGetRemindersByPet(pet.id);
 
@@ -58,20 +64,24 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
   }, [reminders, t]);
 
   return (
-    <TouchableOpacity
-      accessibilityRole="button"
-      accessibilityLabel={t("pets:petListCard.accessibilityLabel", { name: pet.name })}
-      onPress={() => onPress(pet.id ?? "")}
-      style={styles.card}
-    >
-      <View style={styles.photoColumn}>
+    <View style={[styles.card, isPressed && styles.cardPressed]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t("pets:petListCard.accessibilityLabel", { name: pet.name })}
+        onPress={() => onPress(pet.id ?? "")}
+        onPressIn={() => setIsPressed(true)}
+        onPressOut={() => setIsPressed(false)}
+        style={styles.overlay}
+      />
+
+      <View pointerEvents="none" style={styles.photoColumn}>
         <View style={styles.photoFrame}>
           <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} />
         </View>
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.info}>
+      <View pointerEvents="box-none" style={styles.content}>
+        <View pointerEvents="none" style={styles.info}>
           <View style={styles.headerRow}>
             <Text
               variant="titleL"
@@ -126,16 +136,36 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
           </View>
         </View>
 
-        <View style={styles.actionBar}>
-          <View style={styles.actionItem}>
-            <Text variant="bodyS" style={styles.actionText} numberOfLines={1}>
+        <View pointerEvents="box-none" style={styles.actionBar}>
+          <View pointerEvents="none" style={styles.viewInfo}>
+            <Text variant="bodySemiBold" style={styles.ctaText}>
               {t("pets:petListCard.viewInfo")}
             </Text>
-            <ChevronIcon direction="right" width={14} height={14} color={styles.actionText.color} />
+            <ChevronIcon
+              direction="right"
+              width={theme.iconSize.md}
+              height={theme.iconSize.md}
+              color={styles.ctaText.color}
+            />
           </View>
+
+          {!!pet.id && (
+            <Button
+              variant="text"
+              size="inline"
+              accessibilityLabel={t("pets:petListCard.assessmentAccessibilityLabel", {
+                name: pet.name,
+              })}
+              onPress={() =>
+                router.push({ pathname: "/(tabs)/pets/assessment", params: { petId: pet.id } })
+              }
+            >
+              {t("pets:petListCard.assessment")}
+            </Button>
+          )}
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -148,6 +178,16 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius["2xl"],
     backgroundColor: theme.palette.white,
     boxShadow: `0 3px 12px ${theme.palette.brand.primaryDark}12`,
+  },
+  cardPressed: {
+    opacity: 0.75,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   photoColumn: {
     width: "38%",
@@ -204,19 +244,17 @@ const styles = StyleSheet.create((theme) => ({
   actionBar: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing(8),
+    justifyContent: "space-between",
+    gap: theme.spacing(2),
     backgroundColor: theme.palette.brand.primaryXsoft,
     paddingHorizontal: theme.spacing(4),
     paddingVertical: theme.spacing(2),
   },
-  actionText: {
-    color: theme.palette.brand.primaryDefault,
-  },
-  actionItem: {
+  viewInfo: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing(1),
-    borderRadius: theme.borderRadius.lg,
-    borderCurve: "continuous",
+  },
+  ctaText: {
+    color: theme.palette.brand.primaryDefault,
   },
 }));

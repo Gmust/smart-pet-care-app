@@ -13,7 +13,7 @@ jest.mock("react-native-keyboard-controller", () =>
 // Lightweight manual mock: the real package initializes native Worklets, which is
 // unavailable under Jest. Only the surface used by animated components is stubbed.
 jest.mock("react-native-reanimated", () => {
-  const { View } = require("react-native");
+  const { FlatList, ScrollView, View } = require("react-native");
   const identity = <T>(value: T): T => value;
   const easingFn = (value: number) => value;
 
@@ -23,7 +23,7 @@ jest.mock("react-native-reanimated", () => {
 
   return {
     __esModule: true,
-    default: { View },
+    default: { View, ScrollView, FlatList },
     View,
     useSharedValue: (value: unknown) => ({ value }),
     useAnimatedStyle: () => ({}),
@@ -31,7 +31,7 @@ jest.mock("react-native-reanimated", () => {
     withRepeat: identity,
     withSpring: identity,
     cancelAnimation: () => undefined,
-    Easing: { inOut: () => easingFn, ease: easingFn },
+    Easing: { inOut: () => easingFn, out: () => easingFn, ease: easingFn, cubic: easingFn },
     FadeIn: chainable,
     FadeOut: chainable,
     LinearTransition: chainable,

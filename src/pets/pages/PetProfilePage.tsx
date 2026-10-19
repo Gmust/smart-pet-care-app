@@ -1,18 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, RefreshControl, View } from "react-native";
+import { RefreshControl, View } from "react-native";
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { useQueryClient } from "@tanstack/react-query";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
 import { BackButton } from "@/common/components/BackButton";
 import { PhotoViewer } from "@/common/components/PhotoViewer";
+import { useRefreshControl } from "@/common/hooks/useRefreshControl";
 import { HealthTabContent } from "@/health/components/HealthTabContent";
+import { healthQueryKeys } from "@/health/queries/healthQueryKeys";
 import { AiIcon } from "@/icons/ai-icon";
 import { Button } from "@/shadecn/ui/button";
-import { tabsContentEntering } from "@/shadecn/ui/tabs";
+import { Tabs, tabsContentEntering } from "@/shadecn/ui/tabs";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
@@ -25,28 +28,56 @@ import { PetSpeciesImage } from "../components/PetSpeciesImage";
 import { EmptyTabPlaceholder } from "../components/tabs/EmptyTabPlaceholder";
 import { OverviewTabContent } from "../components/tabs/OverviewTabContent";
 import { RemindersTabContent } from "../components/tabs/RemindersTabContent";
+import { useBackToOrigin } from "../hooks/useBackToOrigin";
 import { usePetQuery } from "../queries/usePetQuery";
-import { petProfileParamsSchema } from "../schemas/pet-profile-params.schema";
+import {
+  petProfileParamsSchema,
+  PROFILE_TAB_KEYS,
+  type ProfileTabKey,
+} from "../schemas/pet-profile-params.schema";
 import { PetProfilePageSkeleton } from "../skeletons/PetProfilePageSkeleton";
 import type { PetFlag } from "../types";
 
-const PROFILE_TAB_KEYS = ["overview", "health", "care", "reminders"] as const;
-type ProfileTabKey = (typeof PROFILE_TAB_KEYS)[number];
+const PROFILE_TAB_REFRESH_KEYS: Record<ProfileTabKey, readonly (readonly string[])[]> = {
+  overview: [],
+  health: [healthQueryKeys.allRecords()],
+  care: [],
+  reminders: [["reminders"]],
+};
 
 export default function PetProfilePage() {
+  const parsedParams = petProfileParamsSchema.safeParse(useLocalSearchParams());
+
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<ProfileTabKey>("overview");
+  const [activeTab, setActiveTab] = useState<ProfileTabKey>(
+    (parsedParams.success && parsedParams.data.tab) || "overview"
+  );
 
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { t } = useTranslation(["pets", "common"]);
 
-  const parsedParams = petProfileParamsSchema.safeParse(useLocalSearchParams());
   const petId = parsedParams.success ? parsedParams.data.petId : undefined;
-  const { data: pet, isLoading: isPetLoading, refetch, isRefetching } = usePetQuery(petId);
+  const goBackToOrigin = useBackToOrigin(parsedParams.success ? parsedParams.data.from : undefined);
+  const queryClient = useQueryClient();
+  const { data: pet, isLoading: isPetLoading } = usePetQuery(petId);
+  // The pet key also covers its notes, so the Overview tab needs nothing more.
+  const { isRefreshing, onRefresh } = useRefreshControl(() =>
+    Promise.all(
+      [["pets", petId ?? ""] as const, ...PROFILE_TAB_REFRESH_KEYS[activeTab]].map((queryKey) =>
+        queryClient.refetchQueries({ queryKey, type: "active" })
+      )
+    )
+  );
   const petName = pet?.name;
+  const tabParam = parsedParams.success ? parsedParams.data.tab : undefined;
+
+  // Re-opening a mounted screen with another tab changes its params, not its state.
+  useEffect(() => {
+    if (tabParam) setActiveTab(tabParam);
+  }, [tabParam]);
 
   // Deep links can carry arbitrary params — never fetch with an unvalidated id.
   if (!parsedParams.success) {
@@ -99,7 +130,7 @@ export default function PetProfilePage() {
     <>
       <View style={styles.screen}>
         <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
-          <BackButton />
+          <BackButton onBackPress={goBackToOrigin} />
           <Text variant="titleL" style={styles.topBarTitle}>
             {petName}
           </Text>
@@ -158,28 +189,15 @@ export default function PetProfilePage() {
             </Animated.View>
           ))}
 
-        <Animated.View style={styles.segmentedTabs} layout={LinearTransition.duration(200)}>
-          {PROFILE_TAB_KEYS.map((key) => {
-            const isActive = key === activeTab;
-            return (
-              <Pressable
-                key={key}
-                style={styles.segmentTab}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: isActive }}
-                onPress={() => setActiveTab(key)}
-              >
-                <Text
-                  variant={isActive ? "bodySemiBold" : "bodyS"}
-                  style={[styles.segmentText, isActive && styles.segmentTextActive]}
-                  numberOfLines={1}
-                >
-                  {t(`petProfilePage.tabs.${key}`)}
-                </Text>
-                {isActive && <View style={styles.activeIndicator} />}
-              </Pressable>
-            );
-          })}
+        <Animated.View layout={LinearTransition.duration(200)}>
+          <Tabs
+            items={PROFILE_TAB_KEYS.map((key) => ({
+              key,
+              label: t(`petProfilePage.tabs.${key}`),
+            }))}
+            value={activeTab}
+            onChange={setActiveTab}
+          />
         </Animated.View>
 
         <GestureDetector gesture={swipeTabs}>
@@ -189,7 +207,7 @@ export default function PetProfilePage() {
             showsVerticalScrollIndicator={false}
             contentInsetAdjustmentBehavior="automatic"
             contentContainerStyle={styles.content}
-            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+            refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
           >
             {!!pet && activeTab === "overview" && <OverviewTabContent pet={pet} />}
             {!!pet && activeTab === "health" && <HealthTabContent pet={pet} />}
@@ -261,36 +279,6 @@ const styles = StyleSheet.create((theme) => ({
     pointerEvents: "none",
     flexDirection: "row",
     gap: theme.spacing(2),
-  },
-  segmentedTabs: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    borderWidth: 1,
-    borderColor: theme.palette.brand.surfaceBorder,
-    backgroundColor: theme.palette.white,
-    paddingHorizontal: theme.spacing(5),
-  },
-  segmentTab: {
-    flex: 1,
-    minWidth: 0,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: theme.spacing(2.5),
-    paddingHorizontal: theme.spacing(1),
-  },
-  activeIndicator: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 2,
-    backgroundColor: theme.palette.brand.primaryDefault,
-  },
-  segmentText: {
-    color: theme.palette.brand.textSecondary,
-  },
-  segmentTextActive: {
-    color: theme.palette.brand.primaryDefault,
   },
   content: {
     gap: theme.spacing(2),

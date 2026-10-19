@@ -601,10 +601,12 @@ const styles = StyleSheet.create((theme) => ({
     zIndex: 2,
     paddingTop: theme.spacing(6),
   },
+  // The floating footer pads its content by `theme.spacing(6)`; reach past it so the
+  // fade covers the sheet's full width, even where a drawer pads its scroll narrower.
   footerFade: {
     position: "absolute",
-    left: 0,
-    right: 0,
+    left: -theme.spacing(6),
+    right: -theme.spacing(6),
     bottom: 0,
     height: theme.spacing(DRAWER_FOOTER_FADE_SPACING),
   },
@@ -614,8 +616,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing(6),
   },
   title: {
-    textTransform: "uppercase",
-    color: theme.palette.slate[950],
+    color: theme.palette.brand.textPrimary,
     textAlign: "center",
   },
   description: {

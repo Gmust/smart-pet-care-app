@@ -122,10 +122,13 @@ describe("HealthPetCard", () => {
 
     fireEvent.press(getByLabelText("wellness:score.label"));
 
-    expect(mockPush).toHaveBeenCalledWith({
-      pathname: "/(tabs)/pets/wellness",
-      params: { petId: PET_ID },
-    });
+    expect(mockPush).toHaveBeenCalledWith(
+      {
+        pathname: "/(tabs)/pets/assessment",
+        params: { petId: PET_ID, tab: "wellness", from: "home" },
+      },
+      { withAnchor: true }
+    );
   });
 
   it("lets screen readers open the wellness screen from the card itself", () => {
@@ -139,9 +142,24 @@ describe("HealthPetCard", () => {
       nativeEvent: { actionName: "openWellness" },
     });
 
-    expect(mockPush).toHaveBeenCalledWith({
-      pathname: "/(tabs)/pets/wellness",
-      params: { petId: PET_ID },
-    });
+    expect(mockPush).toHaveBeenCalledWith(
+      {
+        pathname: "/(tabs)/pets/assessment",
+        params: { petId: PET_ID, tab: "wellness", from: "home" },
+      },
+      { withAnchor: true }
+    );
+  });
+
+  it("opens the pet profile from the card, on top of the pets list so back returns to Home", () => {
+    const { getByLabelText } = render(<HealthPetCard pet={pet} />);
+
+    fireEvent.press(getByLabelText("healthPetCard.title"));
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    expect(mockPush).toHaveBeenCalledWith(
+      { pathname: "/(tabs)/pets/pet-profile", params: { petId: PET_ID, from: "home" } },
+      { withAnchor: true }
+    );
   });
 });

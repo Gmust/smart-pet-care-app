@@ -251,11 +251,7 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.palette.brand.surfaceBorder,
     borderRadius: theme.borderRadius["2xl"],
     backgroundColor: theme.palette.white,
-    shadowColor: theme.palette.brand.primaryDark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    boxShadow: theme.shadows.card,
   },
   deleteDialogDescription: {
     textAlign: "center",

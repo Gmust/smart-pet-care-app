@@ -124,6 +124,7 @@
     "lastActivityPlaceholder": "Not tracked",
     "viewInfo": "View info",
     "assessment": "Assessment",
+    "assessmentAccessibilityLabel": "Open assessment for {{name}}",
     "kg": "kg"
   },
   "species": {

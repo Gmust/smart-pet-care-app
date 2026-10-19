@@ -60,11 +60,7 @@ export const NotesCard = ({ notes, onOpenNote }: Props) => {
 
 const styles = StyleSheet.create((theme) => ({
   shadow: {
-    shadowColor: theme.palette.brand.primaryDark,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    boxShadow: theme.shadows.card,
   },
   notesScroll: {
     maxHeight: theme.spacing(14.5 * MAX_VISIBLE_NOTE_ROWS),

@@ -1,0 +1,266 @@
+{
+  "tabs": {
+    "wellness": "Wellness",
+    "feeding": "Feeding",
+    "recommendations": "Recommendations",
+    "recommendationsHint": "Recommendations are coming soon"
+  },
+  "today": {
+    "label": "Today",
+    "editGoal": "Edit goal",
+    "ofTarget": "/ {{target}} kcal",
+    "noTarget": "kcal logged",
+    "ofTargetMeals": "/ {{target}} meals",
+    "noTargetMeals": "meals logged",
+    "meals": "Meals",
+    "portion": "Portion",
+    "remaining": "Remaining",
+    "remainingValue": "{{count}} kcal"
+  },
+  "meals": {
+    "label": "Meals",
+    "seeAll": "See all",
+    "scheduled": "Scheduled",
+    "upcoming": "Upcoming",
+    "missed": "Not logged",
+    "logMissed": "Log this meal",
+    "missedChip": "Missed",
+    "calories": "{{count}} kcal",
+    "untitled": "Meal",
+    "menu": {
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "week": {
+    "label": "Last 7 days",
+    "average": "avg {{calories}} kcal",
+    "averageMeals": "avg {{value}} meals",
+    "belowGoal": "{{percent}}% below goal",
+    "aboveGoal": "{{percent}}% above goal",
+    "onGoal": "On goal",
+    "today": "Today",
+    "barLabel": "{{day}}, {{value}} kcal",
+    "barLabelMeals": "{{day}}, {{value}} meals"
+  },
+  "analysis": {
+    "label": "Nutrition analysis",
+    "status": {
+      "ExtremeUnderTarget": "Far below target",
+      "UnderTarget": "Below target",
+      "OnTarget": "On target",
+      "OverTarget": "Above target",
+      "ExtremeOverTarget": "Far above target"
+    },
+    "open": "Open nutrition analysis",
+    "ofGoal": "of {{target}} kcal/day goal · {{deviation}}",
+    "ofTarget": "of {{target}} kcal/day target · {{deviation}}",
+    "meta_one": "{{date}} · {{count}} meal logged",
+    "meta_other": "{{date}} · {{count}} meals logged",
+    "disclaimerShort": "AI estimate based on logged meals. Not a veterinary recommendation.",
+    "run": "Run new analysis",
+    "running": "Analysing today’s intake…",
+    "addCaloriesToRun": "Add calories to all of today’s meals to run again",
+    "upToDate": "Updated {{when}} · add or edit a meal, or change the goal, to run again",
+    "failed": "Analysis failed",
+    "dismiss": "Dismiss",
+    "retryIn_one": "Nothing was lost — please wait about {{count}} second before trying again",
+    "retryIn_other": "Nothing was lost — please wait about {{count}} seconds before trying again",
+    "retryNow": "Nothing was lost — you can try again",
+    "title": "Nutrition analysis",
+    "latest": "Latest",
+    "previous": "Previous",
+    "actual": "Actual",
+    "target": "Target",
+    "deviation": "Deviation",
+    "perDay": "{{count}} kcal/day",
+    "mealsGoal_one": "{{count}} meal logged · target from your daily goal",
+    "mealsGoal_other": "{{count}} meals logged · target from your daily goal",
+    "mealsTarget_one": "{{count}} meal logged",
+    "mealsTarget_other": "{{count}} meals logged",
+    "disclaimerFull": "AI estimate based on logged meals. Not a veterinary recommendation — consult your vet before changing the diet.",
+    "historyLimit": "Only the two most recent analyses are available."
+  },
+  "weight": {
+    "label": "Weight",
+    "title": "Weight history",
+    "history": "History",
+    "value": "{{weight}} kg",
+    "sinceChange": "{{delta}} kg since {{date}}",
+    "entries": "Entries",
+    "periods": {
+      "month": "1 month",
+      "quarter": "3 months",
+      "year": "1 year"
+    },
+    "periodChange": "{{delta}} kg in {{period}}",
+    "logAction": "Log weight"
+  },
+  "schedule": {
+    "label": "Schedule",
+    "title": "Feeding schedule",
+    "mealsPerDay_one": "{{count}} meal a day",
+    "mealsPerDay_other": "{{count}} meals a day"
+  },
+  "logList": {
+    "title": "Feeding log",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "dayCalories": "{{count}} kcal",
+    "dayMeals_one": "{{count}} meal",
+    "dayMeals_other": "{{count}} meals",
+    "emptyFiltered": "No meals of this type",
+    "showAll": "Show all",
+    "filters": {
+      "all": "All"
+    }
+  },
+  "foodTypes": {
+    "DryFood": "Dry food",
+    "WetFood": "Wet food",
+    "Homemade": "Homemade",
+    "Treat": "Treat",
+    "Supplement": "Supplement",
+    "Other": "Other"
+  },
+  "portionUnits": {
+    "Gram": "g",
+    "Milliliter": "ml",
+    "Cup": "cup",
+    "Piece": "pc"
+  },
+  "forms": {
+    "meal": {
+      "createTitle": "Log meal",
+      "editTitle": "Edit meal",
+      "submit": "Save meal",
+      "missingId": "This meal cannot be edited — it has no id.",
+      "createSuccess": "Meal logged",
+      "updateSuccess": "Meal updated",
+      "fields": {
+        "fedAt": "When",
+        "foodType": "Food type",
+        "foodName": "Food",
+        "portionAmount": "Portion",
+        "portionUnit": "Portion unit",
+        "approxCalories": "Calories",
+        "notes": "Notes"
+      },
+      "placeholders": {
+        "fedAtDate": "Date",
+        "fedAtTime": "Time",
+        "foodName": "e.g. Royal Canin Renal",
+        "portionAmount": "85",
+        "approxCalories": "Needed for the nutrition analysis",
+        "notes": "Anything worth remembering"
+      },
+      "errors": {
+        "fedAtRequired": "Pick when this meal was given",
+        "fedAtFuture": "A meal cannot be logged in the future",
+        "foodTypeRequired": "Pick a food type",
+        "portionInvalid": "Enter a positive number",
+        "caloriesInvalid": "Enter a whole number",
+        "portionUnitRequired": "Pick a unit for the portion",
+        "portionRequired": "A saved portion cannot be removed — change it instead"
+      },
+      "slotNotClosed": "Meal saved, but its scheduled slot could not be marked done"
+    },
+    "goal": {
+      "title": "Daily goal",
+      "submit": "Save goal",
+      "delete": "Remove goal",
+      "createSuccess": "Goal saved",
+      "deleteSuccess": "Goal removed",
+      "fields": {
+        "dailyCalorieTarget": "Calories per day",
+        "dailyPortionTarget": "Portion per day",
+        "portionUnit": "Portion unit",
+        "mealsPerDay": "Meals per day"
+      },
+      "hints": {
+        "dailyCalorieTarget": "Used for the goal progress and AI analysis"
+      },
+      "placeholders": {
+        "dailyCalorieTarget": "420",
+        "dailyPortionTarget": "200",
+        "mealsPerDay": "3"
+      },
+      "errors": {
+        "calorieInvalid": "Enter a whole number",
+        "portionInvalid": "Enter a positive number",
+        "mealsInvalid": "Enter a whole number",
+        "portionUnitRequired": "Pick a unit for the portion",
+        "empty": "Set at least one target"
+      }
+    },
+    "weight": {
+      "createTitle": "Log weight",
+      "editTitle": "Edit weight",
+      "submit": "Save weight",
+      "missingId": "This entry cannot be edited — it has no id.",
+      "createSuccess": "Weight logged",
+      "updateSuccess": "Weight updated",
+      "fields": {
+        "weightKg": "Weight",
+        "measuredAt": "When",
+        "notes": "Notes"
+      },
+      "hints": {
+        "weightKg": "Kilograms"
+      },
+      "placeholders": {
+        "weightKg": "4.1",
+        "measuredAtDate": "Date",
+        "measuredAtTime": "Time",
+        "notes": "Anything worth remembering"
+      },
+      "errors": {
+        "weightRequired": "Enter a weight",
+        "weightInvalid": "Enter a positive number",
+        "measuredAtRequired": "Pick when this was measured",
+        "measuredAtFuture": "A measurement cannot be in the future"
+      }
+    }
+  },
+  "deleteDialog": {
+    "goalTitle": "Remove the daily goal?",
+    "goalDescription": "Progress will no longer be shown against a goal. Your logged meals stay.",
+    "mealTitle": "Delete this meal?",
+    "mealDescription": "{{name}} will be removed from the feeding log.",
+    "mealSuccess": "Meal deleted",
+    "weightTitle": "Delete this entry?",
+    "weightDescription": "This weight measurement will be removed.",
+    "weightSuccess": "Weight entry deleted"
+  },
+  "error": {
+    "today": "We could not load today’s summary",
+    "meals": "We could not load the meals",
+    "weight": "We could not load the weight history",
+    "analysis": "We could not load the analysis",
+    "schedule": "We could not load the feeding schedule"
+  },
+  "empty": {
+    "today": {
+      "message": "Set a daily goal to track calories and portions",
+      "action": "Set daily goal"
+    },
+    "meals": {
+      "message": "No meals logged today",
+      "action": "Log meal"
+    },
+    "analysis": {
+      "message": "Run an AI check of today’s intake",
+      "action": "Run analysis",
+      "noMeals": "Log a meal to run an AI check of today’s intake",
+      "noCalories": "Add calories to all of today’s meals to run an AI check"
+    },
+    "weight": {
+      "message": "No weight entries yet",
+      "action": "Log weight"
+    },
+    "schedule": {
+      "message": "No feeding schedule yet",
+      "action": "Set up schedule"
+    }
+  }
+}
