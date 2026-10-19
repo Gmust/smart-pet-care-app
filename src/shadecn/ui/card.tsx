@@ -9,6 +9,7 @@ type CardBaseProps = {
   padding?: CardPadding;
   radius?: CardRadius;
   style?: ViewStyle | ViewStyle[];
+  pressDelay?: number;
   children: ReactNode;
 };
 
@@ -23,6 +24,7 @@ export const Card = ({
   radius = "standalone",
   style,
   children,
+  pressDelay,
   onPress,
   accessibilityLabel,
 }: CardProps) => {
@@ -37,6 +39,7 @@ export const Card = ({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
+      unstable_pressDelay={pressDelay}
       style={({ pressed }) => [cardVariants.card, style, pressed && cardVariants.pressed]}
     >
       {children}

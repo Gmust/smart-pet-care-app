@@ -38,6 +38,10 @@ export const PORTION_UNITS = [
 
 export const QUERY_STALE_TIME_MS = 60_000;
 
+export const PRESS_HIGHLIGHT_DELAY_MS = 80;
+
+export const NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS = 50;
+
 export const WEIGHT_WINDOW_DAYS = 90;
 
 export const WEEK_LENGTH_DAYS = 7;

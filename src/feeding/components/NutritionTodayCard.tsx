@@ -7,6 +7,7 @@ import { Card } from "@/shadecn/ui/card";
 import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 
+import { PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
 import { toApiNumber } from "../utils/toApiNumber";
 
 type NutritionTodayCardProps = {
@@ -39,6 +40,7 @@ export const NutritionTodayCard = ({ summary, onPress }: NutritionTodayCardProps
       radius="loose"
       padding="none"
       style={styles.card}
+      pressDelay={PRESS_HIGHLIGHT_DELAY_MS}
       onPress={onPress}
       accessibilityLabel={t("feeding:today.editGoal")}
     >

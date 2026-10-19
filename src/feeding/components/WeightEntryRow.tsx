@@ -12,6 +12,8 @@ import {
 } from "@/shadecn/ui/dropdown-menu";
 import { Text } from "@/shadecn/ui/text";
 
+import { PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
+
 type WeightEntryRowProps = {
   entry: PetWeightLogResponseDto;
   weightKg: number;
@@ -31,6 +33,7 @@ export const WeightEntryRow = ({ entry, weightKg, onEdit, onDelete }: WeightEntr
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${date}, ${t("feeding:weight.value", { weight: weightKg })}`}
+          unstable_pressDelay={PRESS_HIGHLIGHT_DELAY_MS}
           style={({ pressed }) => [styles.root, pressed && styles.rootPressed]}
         >
           <Text variant="body" style={styles.date}>

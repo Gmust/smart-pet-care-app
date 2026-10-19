@@ -148,7 +148,9 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 ### `Card` / `ListCard` — `@/shadecn/ui/card`
 
 - `Card` takes `padding` (`standalone` | `compact` | `none`) and `radius` (`standalone` | `loose`)
-- `onPress` makes the whole card a `Pressable` button; `accessibilityLabel` is then required
+- `onPress` makes the whole card a `Pressable` button; `accessibilityLabel` is then required;
+  `pressDelay` (ms) holds the pressed highlight back so a scroll or swipe over the card does not
+  flash it; keep it short on cards that navigate away, where a longer wait reads as lag
 - Do not put `Button`s inside a tappable `Card`: the card is one accessible element, so TalkBack
   may not reach them. When a card needs both, leave it a plain `Card` and lay a `Pressable` under
   the content (`pointerEvents="none"` on the content, `"box-none"` where a button sits), as

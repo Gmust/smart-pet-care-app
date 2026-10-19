@@ -14,7 +14,7 @@ import {
 } from "@/shadecn/ui/dropdown-menu";
 import { Text } from "@/shadecn/ui/text";
 
-import { FOOD_TYPE_ICONS } from "../constants";
+import { FOOD_TYPE_ICONS, PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
 import type { FeedingListRow, FeedingSlot } from "../types";
 import { toApiNumber } from "../utils/toApiNumber";
 
@@ -110,6 +110,7 @@ export const MealRow = ({ row, onEdit, onDelete, onLogSlot }: MealRowProps) => {
             title: row.occurrence.title ?? null,
           });
         }}
+        unstable_pressDelay={PRESS_HIGHLIGHT_DELAY_MS}
         style={({ pressed }) => [styles.root, pressed && styles.rootPressed]}
       >
         {content}
@@ -125,6 +126,7 @@ export const MealRow = ({ row, onEdit, onDelete, onLogSlot }: MealRowProps) => {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={title}
+          unstable_pressDelay={PRESS_HIGHLIGHT_DELAY_MS}
           style={({ pressed }) => [styles.root, pressed && styles.rootPressed]}
         >
           {content}

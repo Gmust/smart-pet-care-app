@@ -30,7 +30,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
 - The schedule card opens the pet profile on its Reminders tab (`tab` param).
 - Pull-to-refresh on the feeding screens, Wellness and every pet-profile tab (`useRefreshControl`).
 - Shared pieces touched: `Tabs` (generic over its keys, state-driven indicator, `chips` variant),
-  `Card`, `Chip` (`onDark` variant), `Button` (`inline` size), `SectionHeader`,
+  `Card` (`pressDelay`), `Chip` (`onDark` variant), `Button` (`inline` size), `SectionHeader`,
   `drawer` (footer fade; titles no longer upper-case, `textPrimary`), `theme` (`shadows.card`,
   tight line height 1.25), `PetProfilePage`, `Fab`, `PetListCard`, `HealthPetCard`,
   `(tabs)/_layout`, `pets/_layout`, `jest.setup.ts`.

@@ -9,7 +9,7 @@ import { Card } from "@/shadecn/ui/card";
 import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 
-import { ANALYSIS_STATUS_TONE } from "../constants";
+import { ANALYSIS_STATUS_TONE, NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
 import { describeAnalysis } from "../utils/describeAnalysis";
 
 type AnalysisCardProps = {
@@ -40,6 +40,7 @@ export const AnalysisCard = ({
         accessibilityRole="button"
         accessibilityLabel={t("feeding:analysis.open")}
         onPress={onPress}
+        unstable_pressDelay={NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS}
         style={({ pressed }) => [styles.overlay, pressed && styles.overlayPressed]}
       />
 

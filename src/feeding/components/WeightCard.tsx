@@ -10,6 +10,7 @@ import { Card } from "@/shadecn/ui/card";
 import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 
+import { NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
 import type { WeightPoint } from "../types";
 import { buildWeightChange } from "../utils/buildWeightChange";
 import { buildWeightChart } from "../utils/buildWeightChart";
@@ -52,6 +53,7 @@ export const WeightCard = ({ points, onHistoryPress }: WeightCardProps) => {
       radius="loose"
       padding="none"
       style={styles.card}
+      pressDelay={NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS}
       onPress={onHistoryPress}
       accessibilityLabel={t("feeding:weight.history")}
     >
