@@ -81,7 +81,8 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 ### `Text` — `@/shadecn/ui/text`
 
 - `variant` maps to `theme.textStyles`: `display`, `titleL`, `titleM`, `body`, `bodyS`,
-  `bodySemiBold`, `label`, `caption`
+  `bodySemiBold`, `label`, `caption`, `controlS`, `controlM`, `controlL`, `tabLabelActive`,
+  `tabLabelInactive`
 - Prefer a `variant` over ad-hoc `fontSize` / `fontFamily`
 
 ### `Input` — `@/shadecn/ui/input`

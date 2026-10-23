@@ -116,7 +116,7 @@ const tabsVariants = StyleSheet.create((theme) => {
             color: active ? brand.primaryDark : brand.textSecondary,
           },
           chips: {
-            ...theme.textStyles.chipMd,
+            ...theme.textStyles.controlM,
             color: active ? brand.primaryDark : brand.textSecondary,
           },
         },

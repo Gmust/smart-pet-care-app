@@ -49,6 +49,7 @@ const fontPx = {
   13: 13,
   14: 14,
   15: 15,
+  17: 17,
   19: 19,
   24: 24,
   32: 32,
@@ -58,6 +59,8 @@ const fontPx = {
 // line and clips descenders, so keep this above 1.233.
 const LINE_HEIGHT_TIGHT = 1.25;
 const LINE_HEIGHT_NORMAL = 1.4;
+// Figma Control/L letter spacing, -0.2%, as a fraction of the font size.
+const CONTROL_L_LETTER_SPACING = -0.002;
 
 export const theme = {
   palette,
@@ -113,7 +116,7 @@ export const theme = {
 
   // Semantic text styles — mirror the named "Text styles" list in the Figma
   // Styles panel 1:1 (Display, Body, Label, Caption, Title/L, Title/M,
-  // Body/S, Body/SemiBold, Chip/md, Chip/sm, TabLabel/active, TabLabel/inactive).
+  // Body/S, Body/SemiBold, Control/S, Control/M, Control/L, TabLabel/active, TabLabel/inactive).
   // Composed from fontFamily/fontPx above — prefer these over composing
   // fontFamily + fontPx + lineHeight by hand in every component, that's the
   // duplication we're trying to get rid of.
@@ -158,15 +161,19 @@ export const theme = {
       fontSize: fontPx[11],
       lineHeight: fontPx[11] * LINE_HEIGHT_NORMAL,
     },
-    chipMd: {
-      fontFamily: fontFamily.semiBold,
-      fontSize: fontPx[12],
-      lineHeight: fontPx[12] * LINE_HEIGHT_NORMAL,
-    },
-    chipSm: {
+    // Figma sets "Auto" line height on Control/*: no lineHeight, so the platform uses the font's own.
+    controlS: {
       fontFamily: fontFamily.medium,
       fontSize: fontPx[11],
-      lineHeight: fontPx[11] * LINE_HEIGHT_NORMAL,
+    },
+    controlM: {
+      fontFamily: fontFamily.semiBold,
+      fontSize: fontPx[12],
+    },
+    controlL: {
+      fontFamily: fontFamily.semiBold,
+      fontSize: fontPx[17],
+      letterSpacing: fontPx[17] * CONTROL_L_LETTER_SPACING,
     },
     tabLabelActive: {
       fontFamily: fontFamily.semiBold,

@@ -8,7 +8,7 @@ import type { theme as appTheme } from "@/styles/theme";
 
 const TextClassContext = React.createContext<TextStyle | undefined>(undefined);
 
-export type TextVariant = Exclude<keyof typeof appTheme.textStyles, "chipMd" | "chipSm">;
+export type TextVariant = keyof typeof appTheme.textStyles;
 
 type TextProps = React.ComponentProps<typeof RNText> & {
   ref?: React.RefObject<RNText>;

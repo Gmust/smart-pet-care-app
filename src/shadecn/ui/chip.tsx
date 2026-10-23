@@ -117,8 +117,8 @@ const chipVariants = StyleSheet.create((theme) => {
           "onDark-danger": { color: toneColors["onDark-danger"] },
         },
         size: {
-          md: { ...theme.textStyles.chipMd },
-          sm: { ...theme.textStyles.chipSm },
+          md: { ...theme.textStyles.controlM },
+          sm: { ...theme.textStyles.controlS },
         },
       },
     },
