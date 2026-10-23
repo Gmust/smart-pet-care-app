@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
-import { useForm } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useRouter } from "expo-router";
 
 import type { AuthResponse } from "@/api/generated";
@@ -84,76 +84,88 @@ export function EmailAuthForm({ mode, termsPreAccepted, onAuthenticated }: Email
     },
   });
 
+  // Errors stay hidden until blur or submit, or the first keystroke already looks like a mistake.
+  const submitted = useStore(form.store, (state) => state.submissionAttempts > 0);
+
   return (
     <View style={styles.container}>
       <form.Field name="email">
-        {(field) => (
-          <View style={styles.field}>
-            <Input
-              label={t("auth:fields.email")}
-              placeholder={t("auth:fields.emailPlaceholder")}
-              value={field.state.value}
-              onChangeText={field.handleChange}
-              onBlur={field.handleBlur}
-              error={field.state.meta.errors.length > 0}
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              textContentType="emailAddress"
-            />
-            <FieldError errors={field.state.meta.errors} />
-          </View>
-        )}
+        {(field) => {
+          const errors = field.state.meta.isBlurred || submitted ? field.state.meta.errors : [];
+          return (
+            <View style={styles.field}>
+              <Input
+                label={t("auth:fields.email")}
+                placeholder={t("auth:fields.emailPlaceholder")}
+                value={field.state.value}
+                onChangeText={field.handleChange}
+                onBlur={field.handleBlur}
+                error={errors.length > 0}
+                autoCapitalize="none"
+                autoComplete="email"
+                keyboardType="email-address"
+                textContentType="emailAddress"
+              />
+              <FieldError errors={errors} />
+            </View>
+          );
+        }}
       </form.Field>
 
       <form.Field name="password">
-        {(field) => (
-          <View style={styles.field}>
-            <Input
-              label={t("auth:fields.password")}
-              placeholder={t("auth:fields.passwordPlaceholder")}
-              value={field.state.value}
-              onChangeText={field.handleChange}
-              onBlur={field.handleBlur}
-              error={field.state.meta.errors.length > 0}
-              secureTextEntry
-              autoCapitalize="none"
-              autoComplete={isRegister ? "new-password" : "current-password"}
-              textContentType={isRegister ? "newPassword" : "password"}
-            />
-            <FieldError errors={field.state.meta.errors} />
-          </View>
-        )}
+        {(field) => {
+          const errors = field.state.meta.isBlurred || submitted ? field.state.meta.errors : [];
+          return (
+            <View style={styles.field}>
+              <Input
+                label={t("auth:fields.password")}
+                placeholder={t("auth:fields.passwordPlaceholder")}
+                value={field.state.value}
+                onChangeText={field.handleChange}
+                onBlur={field.handleBlur}
+                error={errors.length > 0}
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete={isRegister ? "new-password" : "current-password"}
+                textContentType={isRegister ? "newPassword" : "password"}
+              />
+              <FieldError errors={errors} />
+            </View>
+          );
+        }}
       </form.Field>
 
       {isRegister ? (
         <form.Field name="passwordConfirm">
-          {(field) => (
-            <View style={styles.field}>
-              <Input
-                label={t("auth:fields.passwordConfirm")}
-                placeholder={t("auth:fields.passwordConfirmPlaceholder")}
-                value={field.state.value}
-                onChangeText={field.handleChange}
-                onBlur={field.handleBlur}
-                error={field.state.meta.errors.length > 0}
-                secureTextEntry
-                autoCapitalize="none"
-                autoComplete="new-password"
-                textContentType="newPassword"
-              />
-              <FieldError errors={field.state.meta.errors} />
-            </View>
-          )}
+          {(field) => {
+            const errors = field.state.meta.isBlurred || submitted ? field.state.meta.errors : [];
+            return (
+              <View style={styles.field}>
+                <Input
+                  label={t("auth:fields.passwordConfirm")}
+                  placeholder={t("auth:fields.passwordConfirmPlaceholder")}
+                  value={field.state.value}
+                  onChangeText={field.handleChange}
+                  onBlur={field.handleBlur}
+                  error={errors.length > 0}
+                  secureTextEntry
+                  autoCapitalize="none"
+                  autoComplete="new-password"
+                  textContentType="newPassword"
+                />
+                <FieldError errors={errors} />
+              </View>
+            );
+          }}
         </form.Field>
       ) : null}
 
-      <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-        {([canSubmit, isSubmitting]) => (
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(isSubmitting) => (
           <Button
             size="lg"
             variant="primary"
-            disabled={!canSubmit}
+            disabled={isSubmitting}
             isLoading={isSubmitting}
             onPress={() => form.handleSubmit()}
           >

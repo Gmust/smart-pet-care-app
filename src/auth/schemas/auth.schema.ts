@@ -1,8 +1,6 @@
 import type { TFunction } from "i18next";
 import { z } from "zod/v4";
 
-const PASSWORD_PATTERN = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[\W_]).+$/;
-
 export const loginSchema = (t: TFunction<["auth"]>) =>
   z.object({
     email: z.email(t("auth:validation.emailInvalid")),
@@ -14,10 +12,19 @@ export const registerSchema = (t: TFunction<["auth"]>) =>
   z
     .object({
       email: z.email(t("auth:validation.emailInvalid")),
-      password: z
-        .string()
-        .min(6, t("auth:validation.passwordMin"))
-        .regex(PASSWORD_PATTERN, t("auth:validation.passwordPattern")),
+      password: z.string().superRefine((value, ctx) => {
+        const rules = value
+          ? [
+              { met: value.length >= 6, message: t("auth:validation.passwordMin") },
+              { met: /[a-zA-Z]/.test(value), message: t("auth:validation.passwordNeedsLetter") },
+              { met: /\d/.test(value), message: t("auth:validation.passwordNeedsDigit") },
+              { met: /[\W_]/.test(value), message: t("auth:validation.passwordNeedsSpecial") },
+            ]
+          : [{ met: false, message: t("auth:validation.passwordRequired") }];
+        for (const { met, message } of rules) {
+          if (!met) ctx.addIssue({ code: "custom", message });
+        }
+      }),
       passwordConfirm: z.string(),
     })
     .refine((values) => values.password === values.passwordConfirm, {

@@ -48,7 +48,9 @@
     "emailInvalid": "Enter a valid email address.",
     "passwordRequired": "Enter your password.",
     "passwordMin": "Password must be at least 6 characters.",
-    "passwordPattern": "Use at least one letter, one number, and one special character.",
+    "passwordNeedsLetter": "Add a letter.",
+    "passwordNeedsDigit": "Add a number.",
+    "passwordNeedsSpecial": "Add a special character.",
     "passwordMismatch": "Passwords do not match.",
     "codeInvalid": "Enter the 6-digit code from your email."
   },

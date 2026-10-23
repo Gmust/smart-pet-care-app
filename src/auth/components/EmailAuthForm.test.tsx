@@ -64,6 +64,40 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
+describe("EmailAuthForm validation timing", () => {
+  const renderLogin = () =>
+    render(<EmailAuthForm mode="login" termsPreAccepted onAuthenticated={jest.fn()} />);
+
+  it("does not flag a field while the user is still typing in it", () => {
+    const utils = renderLogin();
+    fireEvent.changeText(utils.getByPlaceholderText("auth:fields.emailPlaceholder"), "m");
+
+    expect(utils.queryByText("auth:validation.emailInvalid")).toBeNull();
+    expect(utils.queryByText("auth:validation.passwordRequired")).toBeNull();
+  });
+
+  it("flags a field once the user leaves it, and clears the error as they fix it", () => {
+    const utils = renderLogin();
+    const email = utils.getByPlaceholderText("auth:fields.emailPlaceholder");
+    fireEvent.changeText(email, "milo");
+    fireEvent(email, "blur");
+    expect(utils.getByText("auth:validation.emailInvalid")).toBeTruthy();
+
+    fireEvent.changeText(email, "milo@example.com");
+    expect(utils.queryByText("auth:validation.emailInvalid")).toBeNull();
+  });
+
+  it("shows every error on submit and keeps the button usable", async () => {
+    const utils = renderLogin();
+    fireEvent.press(utils.getByText("auth:actions.login"));
+
+    expect(await utils.findByText("auth:validation.emailInvalid")).toBeTruthy();
+    expect(utils.getByText("auth:validation.passwordRequired")).toBeTruthy();
+    expect(mockLogin).not.toHaveBeenCalled();
+    expect(utils.getByRole("button", { name: "auth:actions.login" })).toBeEnabled();
+  });
+});
+
 describe("EmailAuthForm", () => {
   it("sends an unconfirmed account to the code screen with its email", async () => {
     mockLogin.mockImplementation(() => Promise.reject(apiFailure(403, "EMAIL_NOT_CONFIRMED")));

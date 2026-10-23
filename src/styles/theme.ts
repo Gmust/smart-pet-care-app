@@ -59,8 +59,7 @@ const fontPx = {
 // line and clips descenders, so keep this above 1.233.
 const LINE_HEIGHT_TIGHT = 1.25;
 const LINE_HEIGHT_NORMAL = 1.4;
-// Figma Control/L letter spacing, -0.2%, as a fraction of the font size.
-const CONTROL_L_LETTER_SPACING = -0.002;
+const CONTROL_L_LETTER_SPACING_EM = -0.002;
 
 export const theme = {
   palette,
@@ -161,7 +160,7 @@ export const theme = {
       fontSize: fontPx[11],
       lineHeight: fontPx[11] * LINE_HEIGHT_NORMAL,
     },
-    // Figma sets "Auto" line height on Control/*: no lineHeight, so the platform uses the font's own.
+    // No lineHeight on purpose: Figma sets Auto for Control/*.
     controlS: {
       fontFamily: fontFamily.medium,
       fontSize: fontPx[11],
@@ -173,7 +172,7 @@ export const theme = {
     controlL: {
       fontFamily: fontFamily.semiBold,
       fontSize: fontPx[17],
-      letterSpacing: fontPx[17] * CONTROL_L_LETTER_SPACING,
+      letterSpacing: fontPx[17] * CONTROL_L_LETTER_SPACING_EM,
     },
     tabLabelActive: {
       fontFamily: fontFamily.semiBold,
