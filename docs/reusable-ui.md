@@ -13,7 +13,7 @@ depends on — and it drifts from `DESIGN.md` the moment a token changes.
 | You are building                               | Use                                               | Not                           |
 | ---------------------------------------------- | ------------------------------------------------- | ----------------------------- |
 | Anything the user taps that performs an action | `Button`                                          | `Pressable` + `Text`          |
-| A row of actions in a drawer or sheet          | `Button` (`size="lg"`)                            | hand-rolled pressable rows    |
+| A list of actions in a drawer or dialog        | `ActionRow` from `@/common/components/`           | hand-rolled pressable rows    |
 | An icon-only control                           | `Button` `variant="icon"` `size="icon"`           | bare `Pressable` with an icon |
 | Any text at all                                | `Text` from `@/shadecn/ui/text`                   | `Text` from `react-native`    |
 | A text field                                   | `Input`                                           | raw `TextInput`               |
@@ -46,14 +46,8 @@ Prefer `Pressable` over `TouchableOpacity` — the codebase standardises on it.
 ## Anti-patterns seen in review
 
 **Hand-rolled action rows.** The activity actions drawer originally shipped as two `Pressable`
-rows with their own border, radius, background, and pressed-opacity styles — about thirty lines
-reproducing what `Button` already does, minus the disabled and loading states. It became:
-
-```tsx
-<Button size="lg" variant="secondary" icon={<TrashIcon … />} onPress={…}>
-  {t("activity:actions.delete")}
-</Button>
-```
+rows with their own border, radius, background, and pressed-opacity styles. Action lists now use
+`ActionRow`.
 
 **Raw `Text` from `react-native`.** Bypasses the `variant` scale in `theme.textStyles`, so the
 type drifts from `DESIGN.md`. Import `Text` from `@/shadecn/ui/text` and pass `variant`.
@@ -65,8 +59,9 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 
 ### `Button` — `@/shadecn/ui/button`
 
-- Variants: `primary`, `secondary`, `ghost`, `danger`, `neutral`, `text`, `link`, `icon`
-- Sizes: `sm`, `md`, `lg`, `icon`, `hug`, `inline`
+- Variants: `primary`, `tonal`, `secondary`, `ghost`, `danger`, `dangerText`, `text`, `link`, `icon`;
+  `ghost` with `dotted` is the Figma dashed button
+- Sizes: `sm`, `md`, `icon`, `hug`, `inline`
 - Props: `icon`, `iconPosition`, `isLoading`, `disabled`, `dotted`, `textStyle`, plus standard `Pressable` props
 - String children render through the shared `Text` with themed button typography
 - `isLoading` disables the button and swaps the content for an activity indicator
@@ -173,7 +168,7 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 ## Shared app components
 
 Beyond the primitives, `src/common/components/` holds composites worth reusing:
-`AddButton`, `BackButton`, `DeleteConfirmDialog`, `DateTimeField`, `SectionHeader`,
+`ActionRow`, `AddButton`, `BackButton`, `DeleteConfirmDialog`, `DateTimeField`, `SectionHeader`,
 `SkeletonBox`, `ImagePicker`, `OfflineBanner`, `RouteErrorFallback`, `QueryErrorState`,
 `PhotoViewer` (tap a thumbnail to see the photo full screen).
 

@@ -41,7 +41,7 @@ export const GoogleConsentSheet = ({ onAgree }: GoogleConsentSheetProps) => {
         >
           {t("auth:agreements.agree")}
         </Button>
-        <Button variant="text" size="inline" onPress={close} style={styles.cancel}>
+        <Button variant="text" size="sm" onPress={close}>
           {t("auth:agreements.cancel")}
         </Button>
       </DrawerFooter>
@@ -55,8 +55,5 @@ const styles = StyleSheet.create((theme) => ({
   },
   description: {
     color: theme.palette.brand.textSecondary,
-  },
-  cancel: {
-    alignSelf: "center",
   },
 }));

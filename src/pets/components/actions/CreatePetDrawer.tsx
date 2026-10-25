@@ -247,7 +247,7 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
                         error={itemField.state.meta.errors.length > 0}
                         rightSlot={
                           <Button
-                            variant="text"
+                            variant="dangerText"
                             size="sm"
                             accessibilityLabel={t("pets:createPetDrawer.removeAllergy")}
                             onPress={() => field.removeValue(index)}
@@ -284,7 +284,7 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
                         error={itemField.state.meta.errors.length > 0}
                         rightSlot={
                           <Button
-                            variant="text"
+                            variant="dangerText"
                             size="sm"
                             accessibilityLabel={t("pets:createPetDrawer.removeChronicCondition")}
                             onPress={() => field.removeValue(index)}
@@ -309,7 +309,6 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
               <Button
-                size="lg"
                 variant="primary"
                 style={styles.submitButton}
                 disabled={!canSubmit || isPetCreating}

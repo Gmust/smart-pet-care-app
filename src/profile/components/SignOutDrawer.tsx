@@ -43,7 +43,9 @@ export const SignOutDrawer = ({ isOpen, setIsOpen, onConfirm }: Props) => {
             {t("profile:profilePage.signOutDrawer.confirm")}
           </Button>
           <DrawerClose asChild>
-            <Button size="md">{t("profile:profilePage.signOutDrawer.cancel")}</Button>
+            <Button size="md" variant="secondary">
+              {t("profile:profilePage.signOutDrawer.cancel")}
+            </Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

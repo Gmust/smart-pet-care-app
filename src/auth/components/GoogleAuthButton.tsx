@@ -89,7 +89,7 @@ export function GoogleAuthButton({ onAuthenticated }: GoogleAuthButtonProps) {
   return (
     <>
       <Button
-        variant="neutral"
+        variant="secondary"
         icon={<GoogleIcon />}
         disabled={isBusy}
         isLoading={isBusy}

@@ -107,7 +107,6 @@ const styles = StyleSheet.create((theme) => ({
   description: {
     ...theme.textStyles.body,
     textAlign: "center",
-    color: theme.palette.brand.textSecondary,
   },
   footer: {
     gap: theme.spacing(2),

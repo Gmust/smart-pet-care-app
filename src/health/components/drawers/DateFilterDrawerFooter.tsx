@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { StyleSheet } from "react-native-unistyles";
 
 import { Button } from "@/shadecn/ui/button";
 import { useDrawerClose } from "@/shadecn/ui/drawer";
@@ -21,8 +20,17 @@ export function DateFilterDrawerFooter({ pendingFrom, pendingTo, onApply, onClea
   return (
     <>
       <Button
+        variant="primary"
+        onPress={() => {
+          onApply(pendingFrom, pendingTo);
+          close();
+        }}
+      >
+        {t("health:recordList.filters.apply")}
+      </Button>
+      <Button
         variant="text"
-        size="lg"
+        size="sm"
         onPress={() => {
           onClearPending();
           onApply(null, null);
@@ -31,23 +39,6 @@ export function DateFilterDrawerFooter({ pendingFrom, pendingTo, onApply, onClea
       >
         {t("health:recordList.filters.clear")}
       </Button>
-      <Button
-        variant="primary"
-        size="lg"
-        style={styles.applyButton}
-        onPress={() => {
-          onApply(pendingFrom, pendingTo);
-          close();
-        }}
-      >
-        {t("health:recordList.filters.apply")}
-      </Button>
     </>
   );
 }
-
-const styles = StyleSheet.create(() => ({
-  applyButton: {
-    flex: 1,
-  },
-}));

@@ -32,19 +32,19 @@ export const ActivityListEmpty = ({ reason, onClearFilters, onGoToPets, onRetry 
       </Text>
 
       {reason === "error" && (
-        <Button variant="secondary" size="md" onPress={onRetry}>
+        <Button variant="tonal" size="md" onPress={onRetry}>
           {t("activity:list.retry")}
         </Button>
       )}
 
       {reason === "noMatches" && (
-        <Button variant="secondary" size="md" onPress={onClearFilters}>
+        <Button variant="tonal" size="md" onPress={onClearFilters}>
           {t("activity:list.clearFilters")}
         </Button>
       )}
 
       {reason === "noPets" && (
-        <Button variant="secondary" size="md" onPress={onGoToPets}>
+        <Button variant="tonal" size="md" onPress={onGoToPets}>
           {t("activity:list.goToPets")}
         </Button>
       )}

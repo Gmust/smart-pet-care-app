@@ -147,7 +147,6 @@ export const ActivityFilterDrawer = ({ isOpen, setIsOpen, from, to, filters, onA
 
         <DrawerFooter style={styles.footer}>
           <Button
-            size="lg"
             variant="primary"
             onPress={() => {
               onApply(pendingFrom, pendingTo, {
@@ -159,7 +158,7 @@ export const ActivityFilterDrawer = ({ isOpen, setIsOpen, from, to, filters, onA
           >
             {t("activity:filters.apply")}
           </Button>
-          <Button size="md" variant="secondary" onPress={clearAll}>
+          <Button size="sm" variant="text" onPress={clearAll}>
             {t("activity:filters.clearAll")}
           </Button>
         </DrawerFooter>

@@ -252,9 +252,8 @@ const styles = StyleSheet.create((theme) => ({
   topBarTitle: {
     flex: 1,
     minWidth: 0,
-    letterSpacing: -0.12,
     textAlign: "center",
-    color: theme.palette.brand.textBody,
+    color: theme.palette.brand.textSecondary,
   },
   hero: {
     height: theme.spacing(38.5),

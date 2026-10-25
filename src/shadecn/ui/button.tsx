@@ -4,18 +4,23 @@ import { ActivityIndicator, Pressable, View } from "react-native";
 import type { UnistylesVariants } from "react-native-unistyles";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { DashedBorder } from "./dashed-border";
 import { Text, TextClassContext } from "./text";
 
 export type ButtonVariant =
   | "primary"
+  | "tonal"
   | "secondary"
   | "ghost"
   | "danger"
-  | "neutral"
+  | "dangerText"
   | "text"
   | "link"
   | "icon";
-export type ButtonSize = "sm" | "md" | "lg" | "icon" | "hug" | "inline";
+export type ButtonSize = "sm" | "md" | "icon" | "hug" | "inline";
+
+// In `spacing` units; the touch-target padding below reads it too.
+const SM_HEIGHT = 10;
 
 const buttonVariants = StyleSheet.create((theme) => {
   const { brand } = theme.palette;
@@ -25,7 +30,7 @@ const buttonVariants = StyleSheet.create((theme) => {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: theme.spacing(2),
+      gap: theme.spacing(2.5),
       borderRadius: theme.borderRadius.lg,
       variants: {
         variant: {
@@ -37,33 +42,41 @@ const buttonVariants = StyleSheet.create((theme) => {
                 : brand.primaryDefault,
             borderWidth: 0,
           },
-          secondary: {
+          tonal: {
             backgroundColor: disabled
               ? brand.surfaceBorder
               : pressed
-                ? brand.ok
+                ? brand.primaryMid
                 : brand.primarySoft,
             borderWidth: 0,
           },
           ghost: {
-            backgroundColor: pressed && !disabled ? brand.primarySoft : theme.palette.transparent,
-            borderWidth: theme.spacing(0.375),
-            borderStyle: dotted ? "dashed" : "solid",
-            borderColor: disabled
-              ? brand.surfaceBorder
-              : dotted
-                ? brand.textSecondary
-                : brand.primaryDefault,
+            backgroundColor: disabled
+              ? dotted
+                ? theme.palette.transparent
+                : brand.surfaceBorder
+              : pressed
+                ? dotted
+                  ? brand.surfaceSunken
+                  : brand.primaryXsoft
+                : theme.palette.transparent,
+            // The dashed look is drawn by DashedBorder, not by a native border.
+            borderWidth: dotted ? 0 : theme.spacing(0.25),
+            borderColor: disabled ? brand.textFaint : brand.primaryDefault,
           },
           danger: {
             backgroundColor: disabled
               ? brand.surfaceBorder
               : pressed
-                ? brand.danger
+                ? brand.dangerBgMid
                 : brand.dangerBg,
             borderWidth: 0,
           },
-          neutral: {
+          dangerText: {
+            backgroundColor: theme.palette.transparent,
+            borderWidth: 0,
+          },
+          secondary: {
             backgroundColor: disabled
               ? brand.surfaceBorder
               : pressed
@@ -87,9 +100,8 @@ const buttonVariants = StyleSheet.create((theme) => {
           },
         },
         size: {
-          sm: { paddingHorizontal: theme.spacing(4), height: theme.spacing(10) },
+          sm: { paddingHorizontal: theme.spacing(4), height: theme.spacing(SM_HEIGHT) },
           md: { paddingHorizontal: theme.spacing(5), height: theme.spacing(13.5) },
-          lg: { paddingHorizontal: theme.spacing(6), height: theme.spacing(15) },
           icon: {
             width: theme.spacing(9),
             height: theme.spacing(9),
@@ -107,10 +119,10 @@ const buttonVariants = StyleSheet.create((theme) => {
       variants: {
         variant: {
           primary: {
-            color: disabled ? brand.textFaint : pressed ? brand.primarySoft : brand.textOnDark,
+            color: disabled ? brand.textSecondary : brand.textOnDark,
           },
-          secondary: {
-            color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.primaryDark,
+          tonal: {
+            color: disabled ? brand.textSecondary : brand.primaryDark,
           },
           ghost: {
             color: disabled
@@ -121,8 +133,11 @@ const buttonVariants = StyleSheet.create((theme) => {
                   ? brand.primaryDark
                   : brand.primaryDefault,
           },
-          danger: { color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.danger },
-          neutral: { color: disabled ? brand.textFaint : brand.textPrimary },
+          danger: { color: disabled ? brand.textSecondary : brand.danger },
+          dangerText: {
+            color: disabled ? brand.textFaint : pressed ? brand.dangerDark : brand.danger,
+          },
+          secondary: { color: disabled ? brand.textSecondary : brand.textPrimary },
           text: {
             color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
           },
@@ -137,7 +152,6 @@ const buttonVariants = StyleSheet.create((theme) => {
         size: {
           sm: { ...theme.textStyles.bodySemiBold },
           md: { ...theme.textStyles.controlL },
-          lg: { ...theme.textStyles.controlL },
           icon: { ...theme.textStyles.controlL },
           hug: {},
           inline: { ...theme.textStyles.bodySemiBold },
@@ -149,10 +163,10 @@ const buttonVariants = StyleSheet.create((theme) => {
       variants: {
         variant: {
           primary: {
-            color: disabled ? brand.textFaint : pressed ? brand.primarySoft : brand.textOnDark,
+            color: disabled ? brand.textSecondary : brand.textOnDark,
           },
-          secondary: {
-            color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.primaryDark,
+          tonal: {
+            color: disabled ? brand.textSecondary : brand.primaryDark,
           },
           ghost: {
             color: disabled
@@ -163,8 +177,11 @@ const buttonVariants = StyleSheet.create((theme) => {
                   ? brand.primaryDark
                   : brand.primaryDefault,
           },
-          danger: { color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.danger },
-          neutral: { color: disabled ? brand.textFaint : brand.textPrimary },
+          danger: { color: disabled ? brand.textSecondary : brand.danger },
+          dangerText: {
+            color: disabled ? brand.textFaint : pressed ? brand.dangerDark : brand.danger,
+          },
+          secondary: { color: disabled ? brand.textSecondary : brand.textPrimary },
           text: {
             color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
           },
@@ -243,7 +260,9 @@ function Button({
             ? 6
             : size === "inline"
               ? (theme.minTouchTarget - theme.textStyles.bodySemiBold.lineHeight) / 2
-              : undefined)
+              : size === "sm"
+                ? (theme.minTouchTarget - theme.spacing(SM_HEIGHT)) / 2
+                : undefined)
         }
         style={(state) => [
           buttonVariants.button(isDisabled, state.pressed, dotted),
@@ -260,6 +279,14 @@ function Button({
           ).color;
           return (
             <>
+              {variant === "ghost" && dotted ? (
+                <DashedBorder
+                  color={
+                    isDisabled ? theme.palette.brand.textFaint : theme.palette.brand.textSecondary
+                  }
+                  radius={theme.borderRadius.lg}
+                />
+              ) : null}
               {!!icon && iconPosition === "left" && !isLoading && <View>{icon}</View>}
               {isLoading ? (
                 <ActivityIndicator size="small" color={iconColor} />

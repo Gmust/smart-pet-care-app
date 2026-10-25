@@ -421,7 +421,6 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
               <Button
-                size="lg"
                 variant="primary"
                 style={styles.submitButton}
                 disabled={!canSubmit || isSaving}

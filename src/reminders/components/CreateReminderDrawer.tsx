@@ -544,7 +544,6 @@ export const CreateReminderDrawer = ({
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
               <Button
-                size="lg"
                 variant="primary"
                 disabled={!canSubmit || isReminderSaving}
                 isLoading={isSubmitting || isReminderSaving}

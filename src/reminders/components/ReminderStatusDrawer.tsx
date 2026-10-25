@@ -126,7 +126,6 @@ export const ReminderStatusDrawer = ({
           {STATUS_OPTIONS.map(({ status, variant }) => (
             <Button
               key={status}
-              size="lg"
               variant={variant}
               disabled={isPending}
               isLoading={isPending}

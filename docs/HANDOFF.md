@@ -11,8 +11,9 @@ Keep it short and factual: what is true now, what was actually verified, what is
   email is rebuilt in the same style. Terms are a checkbox on sign-up; Google asks in a consent
   sheet on both screens, and the server records no consent for it. Forgot password is not built:
   the backend has no endpoint.
-- It touched shared pieces: new `Checkbox`, `Button` (`neutral`, `md` text is Control/L, `sm` / `lg`
-  / `icon` on permanent tokens), `Input` type, `theme` (`controlS/M/L`), `Chip`, `Tabs`, `Text`.
+- It touched shared pieces: new `Checkbox` and `ActionRow`, `Button` (`tonal`, `secondary`,
+  `dangerText`; no `lg`), `DialogTitle` (now `titleL` in all dialogs), `Input` type, `theme`
+  (`controlS/M/L`), `Chip`, `Tabs`, `Text`.
 - The Wellness screen moved from `/pets/wellness` (route removed) into the first tab of
   `AssessmentPage` (`/(tabs)/pets/assessment?petId=…`), opened by the "Assessment" button on a pet
   card.
@@ -133,9 +134,13 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Next task
 
-Check the auth redesign on an Android device against Figma (Welcome, SignIn, SignUp, the consent
-sheet, Confirm email), the Google flow end to end, and `Button` `sm` / `lg` text, which moved to
-permanent tokens. Then the two ForgotPassword screens once the backend ships password reset.
+Next commit: the shared `Drawer` (the reminder history drawer opens full screen and its content
+does not fit, so it needs a scroll) and the reminders screen: the dropdown opens too low on a
+reminder at the bottom of the list and the system navigation covers its options; editing a
+reminder did not update its type, and its time came from the previous attempt (not reproduced
+since, check again before fixing).
+
+Then the two ForgotPassword screens once the backend ships password reset.
 
 After that: on the SDK 55 build of `com.misopets.app`: sign in with Google and with email, switch accounts
 (A, sign out, B) and confirm B sees their own pets and is asked for assistant consent, and

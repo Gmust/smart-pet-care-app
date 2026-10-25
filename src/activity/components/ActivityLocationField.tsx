@@ -113,7 +113,7 @@ export const ActivityLocationField = ({
       <View style={styles.actions}>
         <Button
           size="md"
-          variant="secondary"
+          variant="tonal"
           isLoading={isLocating}
           disabled={isLocating}
           onPress={useCurrentLocation}

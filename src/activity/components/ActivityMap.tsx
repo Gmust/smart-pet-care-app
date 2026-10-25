@@ -102,7 +102,7 @@ export const ActivityMap = ({
         </Text>
         <Button
           size="sm"
-          variant="secondary"
+          variant="tonal"
           onPress={() => {
             setHasTimedOut(false);
             setAttempt((current) => current + 1);

@@ -194,7 +194,7 @@ export const DailyGoalDrawer = ({ isOpen, setIsOpen, petId, goal, onRemove }: Pr
           </form.Subscribe>
 
           {!!goal && !!onRemove && (
-            <Button variant="text" size="inline" onPress={onRemove}>
+            <Button variant="dangerText" size="sm" onPress={onRemove}>
               {t("feeding:forms.goal.delete")}
             </Button>
           )}
