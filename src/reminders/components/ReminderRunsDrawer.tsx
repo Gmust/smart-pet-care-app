@@ -44,7 +44,7 @@ export const ReminderRunsDrawer = ({ reminderId, onClose }: Props) => {
 
   return (
     <Drawer open onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent enableDynamicSizing>
+      <DrawerContent scrollable snapPoints={["75%"]} enableDynamicSizing={false}>
         <DrawerCloseButton />
 
         <DrawerHeader style={styles.header}>
@@ -119,6 +119,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   list: {
     gap: theme.spacing(2),
+    paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
   run: {

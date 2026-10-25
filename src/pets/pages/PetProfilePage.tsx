@@ -14,6 +14,7 @@ import { useRefreshControl } from "@/common/hooks/useRefreshControl";
 import { HealthTabContent } from "@/health/components/HealthTabContent";
 import { healthQueryKeys } from "@/health/queries/healthQueryKeys";
 import { AiIcon } from "@/icons/ai-icon";
+import { reminderQueryKeys } from "@/reminders/queries/reminderQueryKeys";
 import { Button } from "@/shadecn/ui/button";
 import { Tabs, tabsContentEntering } from "@/shadecn/ui/tabs";
 import { Text } from "@/shadecn/ui/text";
@@ -42,7 +43,7 @@ const PROFILE_TAB_REFRESH_KEYS: Record<ProfileTabKey, readonly (readonly string[
   overview: [],
   health: [healthQueryKeys.allRecords()],
   care: [],
-  reminders: [["reminders"]],
+  reminders: [reminderQueryKeys.all()],
 };
 
 export default function PetProfilePage() {

@@ -1,6 +1,7 @@
 import React from "react";
 import type { StyleProp, ViewStyle } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import * as DropdownMenuPrimitive from "@rn-primitives/dropdown-menu";
 
@@ -21,12 +22,17 @@ function DropdownMenuContent({
   align = "end",
   sideOffset = 8,
   style,
+  insets,
   ...props
 }: DropdownMenuPrimitive.ContentProps & {
   ref?: React.RefObject<DropdownMenuPrimitive.ContentRef>;
   portalHost?: DropdownMenuPrimitive.PortalProps["hostName"];
   style?: StyleProp<ViewStyle>;
 }) {
+  // Collisions are measured against the window, which with edge-to-edge reaches under the
+  // system bars; without these insets the menu opens below the navigation bar.
+  const safeAreaInsets = useSafeAreaInsets();
+
   // The native primitive renders Content as `style={[positionStyle, style]}`,
   // so a function/array style is dropped. Flatten to a plain object instead.
   const contentStyle = StyleSheet.flatten([styles.content, style]);
@@ -46,6 +52,7 @@ function DropdownMenuContent({
         <DropdownMenuPrimitive.Content
           align={align}
           sideOffset={sideOffset}
+          insets={insets ?? safeAreaInsets}
           style={contentStyle}
           {...props}
         >

@@ -4,6 +4,8 @@ import { postApiReminders } from "@/api";
 import type { CreateReminderDto } from "@/api/generated";
 import { getUtcOffsetMinutes } from "@/common/utils/getUtcOffsetMinutes";
 
+import { reminderQueryKeys } from "./reminderQueryKeys";
+
 type CreateReminderInput = Omit<CreateReminderDto, "utcOffsetMinutes">;
 
 export const useCreateRemindersMutation = () => {
@@ -19,7 +21,7 @@ export const useCreateRemindersMutation = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reminders"] });
+      queryClient.invalidateQueries({ queryKey: reminderQueryKeys.all() });
     },
   });
 };

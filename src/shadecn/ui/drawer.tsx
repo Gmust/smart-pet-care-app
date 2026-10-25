@@ -1,6 +1,7 @@
 import React from "react";
 import type { PressableProps, StyleProp, ViewProps, ViewStyle } from "react-native";
 import { AppState, BackHandler, Keyboard, Platform, Pressable, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Easing } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -349,6 +350,10 @@ function DrawerContent({
     [beginNativeActivity, markUserRequestedClose, modalRef, open, scrollable, setOpen]
   );
 
+  // Without a gesture of its own the scrollable sheet is skipped by Android's gesture-handler
+  // walk and taps land on the backdrop. A Manual gesture claims them but never activates.
+  const contentTouchClaim = React.useMemo(() => Gesture.Manual(), []);
+
   // Computed once — React.Children.toArray re-keys on every call, so find/filter must share a result.
   const childrenArray = React.Children.toArray(children);
   const footerChild = scrollable
@@ -468,17 +473,19 @@ function DrawerContent({
     >
       <DrawerContext.Provider value={contextValue}>
         {scrollable ? (
-          <View
-            style={[
-              styles.content,
-              styles.contentFill,
-              styles.contentScrollable,
-              { paddingBottom: insets.bottom + 24 },
-              contentStyle,
-            ]}
-          >
-            {contentChildren}
-          </View>
+          <GestureDetector gesture={contentTouchClaim}>
+            <View
+              style={[
+                styles.content,
+                styles.contentFill,
+                styles.contentScrollable,
+                { paddingBottom: insets.bottom + 24 },
+                contentStyle,
+              ]}
+            >
+              {contentChildren}
+            </View>
+          </GestureDetector>
         ) : (
           <BottomSheetView
             style={[styles.content, { paddingBottom: insets.bottom + 24 }, contentStyle]}
