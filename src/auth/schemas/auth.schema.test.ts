@@ -4,6 +4,7 @@ import type { TFunction } from "i18next";
 
 import { registerSchema } from "./auth.schema";
 
+// A passthrough: the schema only calls `t` with a key, and the full TFunction type has no cheap fake.
 const t = ((key: string) => key) as TFunction<["auth"]>;
 
 const passwordMessages = (password: string) => {

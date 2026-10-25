@@ -65,7 +65,7 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 
 ### `Button` — `@/shadecn/ui/button`
 
-- Variants: `primary`, `secondary`, `ghost`, `danger`, `text`, `link`, `icon`
+- Variants: `primary`, `secondary`, `ghost`, `danger`, `neutral`, `text`, `link`, `icon`
 - Sizes: `sm`, `md`, `lg`, `icon`, `hug`, `inline`
 - Props: `icon`, `iconPosition`, `isLoading`, `disabled`, `dotted`, `textStyle`, plus standard `Pressable` props
 - String children render through the shared `Text` with themed button typography
@@ -81,8 +81,7 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 ### `Text` — `@/shadecn/ui/text`
 
 - `variant` maps to `theme.textStyles`: `display`, `titleL`, `titleM`, `body`, `bodyS`,
-  `bodySemiBold`, `label`, `caption`, `controlS`, `controlM`, `controlL`, `tabLabelActive`,
-  `tabLabelInactive`
+  `bodySemiBold`, `label`, `caption`, `controlS`, `controlM`, `controlL`
 - Prefer a `variant` over ad-hoc `fontSize` / `fontFamily`
 
 ### `Input` — `@/shadecn/ui/input`
@@ -105,6 +104,12 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
   scrolls an overflowing value so the _start_ of it disappears. `DateTimeField` renders through it.
   It drops `TextInput`-only props (ref, focus, multiline), so keep it static; `editable={false}`
   alone stays a real `TextInput`.
+
+### `Checkbox` — `@/shadecn/ui/checkbox`
+
+- Controlled: `checked` / `onCheckedChange`; `shape`: `square` or `circle`
+- Use with TanStack Form: `checked={field.state.value}`, `onCheckedChange={field.handleChange}`
+- Pass `accessibilityLabel`: the label text sits beside it, not inside
 
 ### `Chip` — `@/shadecn/ui/chip`
 

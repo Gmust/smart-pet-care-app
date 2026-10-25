@@ -1,15 +1,16 @@
 /// <reference types="jest" />
 
+import type { ReactNode } from "react";
 import Toast from "react-native-toast-message";
-import { fireEvent, render, waitFor } from "@testing-library/react-native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { AxiosError, AxiosHeaders } from "axios";
 
-import { EmailAuthForm } from "./EmailAuthForm";
+import { SignInForm } from "./SignInForm";
 
 const mockTranslate = (key: string) => key;
 const mockRouter = { replace: jest.fn(), push: jest.fn() };
 const mockLogin = jest.fn();
-const mockRegister = jest.fn();
 
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({ t: mockTranslate, i18n: { language: "en" } }),
@@ -30,12 +31,8 @@ jest.mock("react-native-toast-message", () => ({
   default: { show: jest.fn(), hide: jest.fn() },
 }));
 
-jest.mock("../queries/useLoginMutation", () => ({
-  useLoginMutation: () => ({ mutateAsync: mockLogin }),
-}));
-
-jest.mock("../queries/useRegisterMutation", () => ({
-  useRegisterMutation: () => ({ mutateAsync: mockRegister }),
+jest.mock("@/api", () => ({
+  postApiAuthLogin: (...args: unknown[]) => mockLogin(...args),
 }));
 
 const toastMock = jest.mocked(Toast.show);
@@ -52,8 +49,25 @@ const apiFailure = (status: number, code: string, errors?: Record<string, string
   return error;
 };
 
-const signInWith = (email: string) => {
-  const utils = render(<EmailAuthForm mode="login" termsPreAccepted onAuthenticated={jest.fn()} />);
+const clients: QueryClient[] = [];
+
+const renderForm = (onAuthenticated: () => Promise<void> = () => Promise.resolve()) => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { gcTime: Infinity, retry: false },
+      mutations: { gcTime: Infinity, retry: false },
+    },
+  });
+  clients.push(queryClient);
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+
+  return render(<SignInForm onAuthenticated={onAuthenticated} />, { wrapper });
+};
+
+const signInWith = (email: string, onAuthenticated?: () => Promise<void>) => {
+  const utils = renderForm(onAuthenticated);
   fireEvent.changeText(utils.getByPlaceholderText("auth:fields.emailPlaceholder"), email);
   fireEvent.changeText(utils.getByPlaceholderText("auth:fields.passwordPlaceholder"), "Secret-1!");
   fireEvent.press(utils.getByText("auth:actions.login"));
@@ -64,12 +78,16 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("EmailAuthForm validation timing", () => {
-  const renderLogin = () =>
-    render(<EmailAuthForm mode="login" termsPreAccepted onAuthenticated={jest.fn()} />);
+afterEach(() => {
+  // A retained cache keeps React Query's notify timer alive and jest never exits.
+  for (const client of clients.splice(0)) {
+    client.clear();
+  }
+});
 
+describe("SignInForm validation timing", () => {
   it("does not flag a field while the user is still typing in it", () => {
-    const utils = renderLogin();
+    const utils = renderForm();
     fireEvent.changeText(utils.getByPlaceholderText("auth:fields.emailPlaceholder"), "m");
 
     expect(utils.queryByText("auth:validation.emailInvalid")).toBeNull();
@@ -77,7 +95,7 @@ describe("EmailAuthForm validation timing", () => {
   });
 
   it("flags a field once the user leaves it, and clears the error as they fix it", () => {
-    const utils = renderLogin();
+    const utils = renderForm();
     const email = utils.getByPlaceholderText("auth:fields.emailPlaceholder");
     fireEvent.changeText(email, "milo");
     fireEvent(email, "blur");
@@ -88,7 +106,7 @@ describe("EmailAuthForm validation timing", () => {
   });
 
   it("shows every error on submit and keeps the button usable", async () => {
-    const utils = renderLogin();
+    const utils = renderForm();
     fireEvent.press(utils.getByText("auth:actions.login"));
 
     expect(await utils.findByText("auth:validation.emailInvalid")).toBeTruthy();
@@ -98,7 +116,47 @@ describe("EmailAuthForm validation timing", () => {
   });
 });
 
-describe("EmailAuthForm", () => {
+describe("SignInForm", () => {
+  it("welcomes the user back only once the session is stored", async () => {
+    mockLogin.mockImplementation(() => Promise.resolve({ data: { accessToken: "token" } }));
+    let finishSignIn: () => void = () => undefined;
+    const onAuthenticated = jest.fn(() => new Promise<void>((resolve) => (finishSignIn = resolve)));
+    signInWith("milo@example.com", onAuthenticated);
+
+    await waitFor(() => expect(onAuthenticated).toHaveBeenCalledWith({ accessToken: "token" }));
+    expect(toastMock).not.toHaveBeenCalled();
+
+    await act(async () => finishSignIn());
+
+    expect(toastMock).toHaveBeenCalledWith({
+      type: "success",
+      text1: "auth:success.welcomeBackTitle",
+      text2: "auth:success.welcomeBackBody",
+    });
+  });
+
+  it("says so when the session could not be stored, instead of welcoming the user back", async () => {
+    mockLogin.mockImplementation(() => Promise.resolve({ data: { accessToken: "token" } }));
+    const onAuthenticated = jest.fn(() => Promise.reject(new Error("SecureStore failed")));
+    const utils = signInWith("milo@example.com", onAuthenticated);
+
+    await waitFor(() =>
+      expect(toastMock).toHaveBeenCalledWith({ type: "error", text1: "auth:errors.signInFailed" })
+    );
+    expect(toastMock).not.toHaveBeenCalledWith(expect.objectContaining({ type: "success" }));
+    expect(utils.getByRole("button", { name: "auth:actions.login" })).toBeEnabled();
+  });
+
+  it("masks the password until the user reveals it", () => {
+    const utils = renderForm();
+    const password = utils.getByPlaceholderText("auth:fields.passwordPlaceholder");
+    expect(password.props.secureTextEntry).toBe(true);
+
+    fireEvent.press(utils.getByRole("button", { name: "auth:fields.showPassword" }));
+    expect(password.props.secureTextEntry).toBe(false);
+    expect(utils.getByRole("button", { name: "auth:fields.hidePassword" })).toBeTruthy();
+  });
+
   it("sends an unconfirmed account to the code screen with its email", async () => {
     mockLogin.mockImplementation(() => Promise.reject(apiFailure(403, "EMAIL_NOT_CONFIRMED")));
     signInWith("milo@example.com");
@@ -128,46 +186,8 @@ describe("EmailAuthForm", () => {
     expect(mockRouter.push).not.toHaveBeenCalled();
   });
 
-  it("puts every failed rule under its field on register, ignoring fields the form lacks", async () => {
-    // Real server shape: PascalCase keys, a duplicated alias, and a field
-    // (Terms) that has no input on this form.
-    mockRegister.mockImplementation(() =>
-      Promise.reject(
-        apiFailure(400, "request_validation_failed", {
-          Email: ["auth_email_invalid", "auth_email_invalid"],
-          Password: ["auth_password_too_short", "auth_password_too_weak"],
-          TermsAccepted: ["auth_terms_not_accepted"],
-        })
-      )
-    );
-    const utils = render(
-      <EmailAuthForm mode="register" termsPreAccepted onAuthenticated={jest.fn()} />
-    );
-    fireEvent.changeText(utils.getByPlaceholderText("auth:fields.emailPlaceholder"), "a@b.co");
-    fireEvent.changeText(
-      utils.getByPlaceholderText("auth:fields.passwordPlaceholder"),
-      "Secret-1!"
-    );
-    fireEvent.changeText(
-      utils.getByPlaceholderText("auth:fields.passwordConfirmPlaceholder"),
-      "Secret-1!"
-    );
-    fireEvent.press(utils.getByText("auth:actions.register"));
-
-    expect(await utils.findByText("errors:codes.auth_email_invalid")).toBeTruthy();
-    expect(utils.getAllByText("errors:codes.auth_email_invalid")).toHaveLength(1);
-    expect(utils.getByText(/errors:codes\.auth_password_too_short/)).toBeTruthy();
-    expect(utils.getByText(/errors:codes\.auth_password_too_weak/)).toBeTruthy();
-    expect(utils.queryByText(/auth_terms_not_accepted/)).toBeNull();
-    // The toast names the first failed rule, not the generic form-level alias.
-    expect(toastMock).toHaveBeenCalledWith({
-      type: "error",
-      text1: "errors:codes.auth_email_invalid",
-    });
-  });
-
   it("ignores a server error for a field that is not on screen, so it cannot block submit", async () => {
-    // Login renders no password-confirm input, but the form still holds its value.
+    // The sign-in form has no password-confirm input, so the alias has nowhere to show.
     mockLogin.mockImplementation(() =>
       Promise.reject(
         apiFailure(400, "request_validation_failed", {

@@ -6,7 +6,15 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { Text, TextClassContext } from "./text";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "text" | "link" | "icon";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "danger"
+  | "neutral"
+  | "text"
+  | "link"
+  | "icon";
 export type ButtonSize = "sm" | "md" | "lg" | "icon" | "hug" | "inline";
 
 const buttonVariants = StyleSheet.create((theme) => {
@@ -55,6 +63,15 @@ const buttonVariants = StyleSheet.create((theme) => {
                 : brand.dangerBg,
             borderWidth: 0,
           },
+          neutral: {
+            backgroundColor: disabled
+              ? brand.surfaceBorder
+              : pressed
+                ? brand.surfaceSunken
+                : theme.palette.white,
+            borderWidth: theme.spacing(0.25),
+            borderColor: brand.surfaceBorder,
+          },
           text: {
             backgroundColor: theme.palette.transparent,
             borderWidth: 0,
@@ -86,7 +103,7 @@ const buttonVariants = StyleSheet.create((theme) => {
     }),
 
     text: (disabled: boolean = false, pressed: boolean = false, dotted: boolean = false) => ({
-      fontFamily: theme.fonts.semiBold,
+      fontFamily: theme.fontFamily.semiBold,
       variants: {
         variant: {
           primary: {
@@ -105,6 +122,7 @@ const buttonVariants = StyleSheet.create((theme) => {
                   : brand.primaryDefault,
           },
           danger: { color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.danger },
+          neutral: { color: disabled ? brand.textFaint : brand.textPrimary },
           text: {
             color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
           },
@@ -117,10 +135,10 @@ const buttonVariants = StyleSheet.create((theme) => {
           },
         },
         size: {
-          sm: { fontSize: theme.fontSize.sm },
-          md: { fontSize: theme.fontSize.base },
-          lg: { fontSize: theme.fontSize.lg },
-          icon: { fontSize: theme.fontSize.base },
+          sm: { ...theme.textStyles.bodySemiBold },
+          md: { ...theme.textStyles.controlL },
+          lg: { ...theme.textStyles.controlL },
+          icon: { ...theme.textStyles.controlL },
           hug: {},
           inline: { ...theme.textStyles.bodySemiBold },
         },
@@ -146,6 +164,7 @@ const buttonVariants = StyleSheet.create((theme) => {
                   : brand.primaryDefault,
           },
           danger: { color: disabled ? brand.textFaint : pressed ? brand.textOnDark : brand.danger },
+          neutral: { color: disabled ? brand.textFaint : brand.textPrimary },
           text: {
             color: disabled ? brand.textFaint : pressed ? brand.primaryDark : brand.primaryDefault,
           },

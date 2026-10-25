@@ -111,8 +111,8 @@ const tabsVariants = StyleSheet.create((theme) => {
             color: active ? accent(tone) : brand.textSecondary,
           },
           pill: {
-            fontFamily: active ? theme.fonts.semiBold : theme.fonts.medium,
-            fontSize: theme.fontSize.xs,
+            fontFamily: active ? theme.fontFamily.semiBold : theme.fontFamily.medium,
+            fontSize: theme.fontPx[12],
             color: active ? brand.primaryDark : brand.textSecondary,
           },
           chips: {

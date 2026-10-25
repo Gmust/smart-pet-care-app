@@ -60,6 +60,8 @@ const fontPx = {
 const LINE_HEIGHT_TIGHT = 1.25;
 const LINE_HEIGHT_NORMAL = 1.4;
 const CONTROL_L_LETTER_SPACING_EM = -0.002;
+const DISPLAY_LETTER_SPACING_EM = -0.008;
+const TITLE_L_LETTER_SPACING_EM = -0.005;
 
 export const theme = {
   palette,
@@ -124,11 +126,13 @@ export const theme = {
       fontFamily: fontFamily.display,
       fontSize: fontPx[32],
       lineHeight: fontPx[32] * LINE_HEIGHT_TIGHT,
+      letterSpacing: fontPx[32] * DISPLAY_LETTER_SPACING_EM,
     },
     titleL: {
       fontFamily: fontFamily.displayRegular,
       fontSize: fontPx[24],
       lineHeight: fontPx[24] * LINE_HEIGHT_TIGHT,
+      letterSpacing: fontPx[24] * TITLE_L_LETTER_SPACING_EM,
     },
     titleM: {
       fontFamily: fontFamily.displayRegular,
@@ -192,6 +196,7 @@ export const theme = {
     lg: 18,
     xl: 20,
     "2xl": 24,
+    "3xl": 32,
   },
 
   // Smallest tappable area the app ships, per the platform guidelines. A floor,

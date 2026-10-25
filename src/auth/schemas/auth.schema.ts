@@ -5,7 +5,6 @@ export const loginSchema = (t: TFunction<["auth"]>) =>
   z.object({
     email: z.email(t("auth:validation.emailInvalid")),
     password: z.string().min(1, t("auth:validation.passwordRequired")),
-    passwordConfirm: z.string(),
   });
 
 export const registerSchema = (t: TFunction<["auth"]>) =>
@@ -26,6 +25,7 @@ export const registerSchema = (t: TFunction<["auth"]>) =>
         }
       }),
       passwordConfirm: z.string(),
+      termsAccepted: z.boolean().refine((accepted) => accepted, t("auth:validation.termsRequired")),
     })
     .refine((values) => values.password === values.passwordConfirm, {
       path: ["passwordConfirm"],

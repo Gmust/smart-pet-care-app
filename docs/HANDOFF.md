@@ -6,7 +6,13 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Current state
 
-- Branch: `feature/feeding-nutrition`, with `main` merged in at `bab6138`.
+- Branch: `feature/auth-flow-redesign`, off `main` at `45374d7` (feeding and nutrition merged).
+- Auth redesign (Figma "Full Design"): Welcome, SignIn and SignUp are separate routes and Confirm
+  email is rebuilt in the same style. Terms are a checkbox on sign-up; Google asks in a consent
+  sheet on both screens, and the server records no consent for it. Forgot password is not built:
+  the backend has no endpoint.
+- It touched shared pieces: new `Checkbox`, `Button` (`neutral`, `md` text is Control/L, `sm` / `lg`
+  / `icon` on permanent tokens), `Input` type, `theme` (`controlS/M/L`), `Chip`, `Tabs`, `Text`.
 - The Wellness screen moved from `/pets/wellness` (route removed) into the first tab of
   `AssessmentPage` (`/(tabs)/pets/assessment?petId=…`), opened by the "Assessment" button on a pet
   card.
@@ -43,10 +49,8 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `revokeAiConsent` (`AuthContext.tsx`) at `signOut` and before `signIn` stores new tokens; it is
   stored per device. If the revoke cannot be done, `signIn` throws and stores nothing.
 - Legal links: `src/common/utils/legalUrls.ts` builds `/terms.html` and `/privacy.html` from
-  `EXPO_PUBLIC_API_URL`. They show in the Welcome agreements dialog, under the Google button on
-  `AuthPage` and in a Legal section on Profile, and open in the system browser (an error toast if
-  that fails). `AuthPage` gates register on acceptance: without `agreed=1` it starts in login, and
-  "Create an account" opens the agreements dialog first.
+  `EXPO_PUBLIC_API_URL`. They show in the sign-up consent row, in the Google consent sheet and in a
+  Legal section on Profile, and open in the system browser (an error toast if that fails).
 - Maps: Apple Maps on iOS (iOS 17+; `expo-maps` renders nothing below), Google Maps on Android;
   the 6 s load timeout and POI-as-tap are Android-only. `ExpandableActivityMap` is a static
   preview, and a tap opens a fullscreen `Modal`; that Modal must not register a drawer native
@@ -70,9 +74,9 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Verified evidence
 
-- `pnpm check` on this branch with `main` merged in (SDK 55): lint and typecheck clean, 70 suites
-  / 642 tests. `act` warnings come only from suites outside this feature (activity, assistant,
-  pet notes) and vary with timing.
+- `pnpm check` on this branch (SDK 55): lint and typecheck clean, 73 suites / 665 tests. `act`
+  warnings come only from suites outside this feature (activity, assistant, pet notes) and vary
+  with timing.
 - The feeding tests were mutation-checked (about 400 mutants); the survivors are equivalent or
   visual-only.
 - Checked on an Android device: the whole Feeding flow (tab, log screen, weight history, goal
@@ -100,8 +104,6 @@ Keep it short and factual: what is true now, what was actually verified, what is
   physical iPhone are ruled out. Backend follow-up is in Jira KAN-91.
 - Accepted: if SecureStore fails to delete the access token at sign-out, the app shows signed out
   but the next start restores that account until its first 401.
-- `onAuthenticated` is not awaited (`EmailAuthForm.tsx`, `GoogleAuthButton.tsx`), so a throw from
-  `signIn` is an unhandled rejection: the user stays on the auth screen after a success toast.
 - `restoreSession`'s `clearStoredSession` (`AuthContext.tsx`) has no catch; a throw leaves the
   app on "loading".
 - A note saved offline is queued in memory, so an app kill drops it, and create is not
@@ -131,7 +133,11 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Next task
 
-On the SDK 55 build of `com.misopets.app`: sign in with Google and with email, switch accounts
+Check the auth redesign on an Android device against Figma (Welcome, SignIn, SignUp, the consent
+sheet, Confirm email), the Google flow end to end, and `Button` `sm` / `lg` text, which moved to
+permanent tokens. Then the two ForgotPassword screens once the backend ships password reset.
+
+After that: on the SDK 55 build of `com.misopets.app`: sign in with Google and with email, switch accounts
 (A, sign out, B) and confirm B sees their own pets and is asked for assistant consent, and
 confirm the FCM token reaches the backend. If Google sign-in fails with `DEVELOPER_ERROR`, the
 Android OAuth client in project `1000214284290` is missing the package or SHA-1

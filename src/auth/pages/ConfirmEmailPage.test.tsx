@@ -8,7 +8,7 @@ import { AxiosError, AxiosHeaders } from "axios";
 import ConfirmEmailPage from "./ConfirmEmailPage";
 
 const mockTranslate = (key: string) => key;
-const mockRouter = { replace: jest.fn(), push: jest.fn() };
+const mockRouter = { replace: jest.fn(), push: jest.fn(), dismissAll: jest.fn() };
 const mockConfirm = jest.fn();
 const mockResend = jest.fn();
 
@@ -29,6 +29,7 @@ jest.mock("expo-router", () => ({
 
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children }: { children: ReactNode }) => children,
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
 jest.mock("react-native-toast-message", () => ({
@@ -58,7 +59,7 @@ const apiFailure = (status: number, code: string, errors?: Record<string, string
   return error;
 };
 
-const signIn = { pathname: "/(auth)/sign-in", params: { mode: "login" } };
+const signIn = "/(auth)/sign-in";
 
 const submitCode = (code: string) => {
   const utils = render(<ConfirmEmailPage />);
@@ -78,7 +79,8 @@ describe("ConfirmEmailPage", () => {
     );
     submitCode("123456");
 
-    await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith(signIn));
+    await waitFor(() => expect(mockRouter.push).toHaveBeenCalledWith(signIn));
+    expect(mockRouter.dismissAll).toHaveBeenCalled();
     expect(toastMock).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success", text1: "errors:codes.EMAIL_ALREADY_CONFIRMED" })
     );
@@ -95,7 +97,7 @@ describe("ConfirmEmailPage", () => {
       expect(toastMock).toHaveBeenCalledWith({ type: "error", text1: `errors:codes.${code}` })
     );
     expect(utils.getByPlaceholderText("auth:confirmEmail.codePlaceholder").props.value).toBe("");
-    expect(mockRouter.replace).not.toHaveBeenCalled();
+    expect(mockRouter.push).not.toHaveBeenCalled();
   });
 
   it("keeps a mistyped code in place for correction", async () => {
@@ -138,6 +140,17 @@ describe("ConfirmEmailPage", () => {
     const utils = render(<ConfirmEmailPage />);
     fireEvent.press(utils.getByText("auth:confirmEmail.resend"));
 
-    await waitFor(() => expect(mockRouter.replace).toHaveBeenCalledWith(signIn));
+    await waitFor(() => expect(mockRouter.push).toHaveBeenCalledWith(signIn));
+    expect(mockRouter.dismissAll).toHaveBeenCalled();
+  });
+
+  it("leaves for sign-in without a toast when the user goes back", () => {
+    const utils = render(<ConfirmEmailPage />);
+
+    fireEvent.press(utils.getByText("auth:confirmEmail.backToSignIn"));
+
+    expect(mockRouter.dismissAll).toHaveBeenCalled();
+    expect(mockRouter.push).toHaveBeenCalledWith(signIn);
+    expect(toastMock).not.toHaveBeenCalled();
   });
 });
