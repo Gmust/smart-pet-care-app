@@ -151,9 +151,12 @@ describe("SignInForm", () => {
     const utils = renderForm();
     const password = utils.getByPlaceholderText("auth:fields.passwordPlaceholder");
     expect(password.props.secureTextEntry).toBe(true);
+    expect(password.props.autoCorrect).toBe(false);
 
     fireEvent.press(utils.getByRole("button", { name: "auth:fields.showPassword" }));
     expect(password.props.secureTextEntry).toBe(false);
+    // Android drops the password flag once revealed; no suggestions keeps the keyboard from learning it.
+    expect(password.props.autoCorrect).toBe(false);
     expect(utils.getByRole("button", { name: "auth:fields.hidePassword" })).toBeTruthy();
   });
 

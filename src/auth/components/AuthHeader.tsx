@@ -14,11 +14,11 @@ export const AuthHeader = ({ title, subtitle }: AuthHeaderProps) => {
       <Text variant="display" style={styles.title}>
         {title}
       </Text>
-      {subtitle ? (
+      {!!subtitle && (
         <Text variant="body" style={styles.subtitle}>
           {subtitle}
         </Text>
-      ) : null}
+      )}
     </View>
   );
 };

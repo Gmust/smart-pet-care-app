@@ -33,6 +33,7 @@ type Props = {
 const STATUS_OPTIONS: { status: ReminderStatus; variant: ButtonVariant }[] = [
   { status: ReminderStatus.Completed, variant: "primary" },
   { status: ReminderStatus.Missed, variant: "danger" },
+  // Deliberately the white bordered "secondary"; the old green look is now "tonal".
   { status: ReminderStatus.Cancelled, variant: "secondary" },
 ];
 

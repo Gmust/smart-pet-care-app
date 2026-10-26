@@ -50,6 +50,8 @@ export const AuthField = ({
         error={errors.length > 0}
         helperText={errors.length > 0 ? undefined : hint}
         secureTextEntry={secure && !revealed}
+        // A revealed field loses the Android password flag; without these the keyboard may learn it.
+        {...(secure ? { autoCorrect: false, spellCheck: false } : {})}
         rightSlot={
           secure ? (
             <Button
