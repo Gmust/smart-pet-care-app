@@ -1,124 +1,84 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
-import { Image } from "expo-image";
-import { LinearGradient } from "expo-linear-gradient";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
-import { palette } from "@/styles/palette";
 
-import { AgreementsDialog } from "../components/AgreementsDialog";
-import { WelcomeHero } from "../components/WelcomeHero";
+import { AuthBackground } from "../components/AuthBackground";
+import { AuthSwitchRow } from "../components/AuthSwitchRow";
+import { HeroSilhouette } from "../components/HeroSilhouette";
+import { PeekingCat } from "../components/PeekingCat";
 
-const peekingCat = require("../../../assets/images/onboarding/peeking-cat.png");
+const HERO_OPACITY = 0.15;
 
 export default function WelcomePage() {
   const { t } = useTranslation(["auth"]);
+  const { theme } = useUnistyles();
   const router = useRouter();
-  const [agreementsOpen, setAgreementsOpen] = useState(false);
-
-  const handleAgree = () => {
-    setAgreementsOpen(false);
-    router.push({ pathname: "/(auth)/sign-in", params: { agreed: "1" } });
-  };
 
   return (
-    <LinearGradient
-      colors={[palette.brand.primaryXsoft, palette.brand.surfacePage]}
-      locations={[0, 0.75]}
-      style={styles.gradient}
-    >
-      <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
-        <View style={styles.content}>
-          <WelcomeHero />
+    <AuthBackground>
+      <View style={styles.content}>
+        <View style={styles.intro}>
+          <HeroSilhouette size={theme.spacing(50.25)} opacity={HERO_OPACITY} style={styles.hero} />
 
-          <Text style={styles.title}>{t("auth:welcome.title")}</Text>
-          <Text style={styles.subtitle}>{t("auth:welcome.subtitle")}</Text>
-
-          <View style={styles.spacer} />
-
-          <View style={styles.footer}>
-            <View pointerEvents="none" style={styles.catWrap}>
-              <Image source={peekingCat} style={styles.cat} contentFit="contain" />
-            </View>
-            <Button
-              size="lg"
-              variant="primary"
-              style={styles.cta}
-              onPress={() => setAgreementsOpen(true)}
-            >
-              {t("auth:welcome.getStarted")}
-            </Button>
-          </View>
+          <Text variant="display" style={styles.title}>
+            {t("auth:welcome.title")}
+          </Text>
+          <Text variant="body" style={styles.subtitle}>
+            {t("auth:welcome.subtitle")}
+          </Text>
         </View>
-      </SafeAreaView>
 
-      <AgreementsDialog
-        open={agreementsOpen}
-        onOpenChange={setAgreementsOpen}
-        onAgree={handleAgree}
-      />
-    </LinearGradient>
+        <View style={styles.actions}>
+          <Button variant="primary" onPress={() => router.push("/(auth)/sign-up")}>
+            {t("auth:welcome.getStarted")}
+          </Button>
+          <PeekingCat style={styles.cat} />
+          <AuthSwitchRow
+            tone="body"
+            prompt={t("auth:footer.haveAccount")}
+            action={t("auth:footer.signIn")}
+            onPress={() => router.push("/(auth)/sign-in")}
+          />
+        </View>
+      </View>
+    </AuthBackground>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  gradient: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-  },
   content: {
     flex: 1,
+    gap: theme.spacing(8),
+    padding: theme.spacing(5),
+  },
+  intro: {
+    flex: 1,
     alignItems: "center",
-    paddingHorizontal: theme.spacing(5),
-    paddingTop: theme.spacing(10),
-    paddingBottom: theme.spacing(5),
     gap: theme.spacing(8),
   },
+  hero: {
+    marginTop: theme.spacing(13.75),
+  },
   title: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["3xl"],
-    lineHeight: theme.textSizing(2.25),
     textAlign: "center",
     color: theme.palette.brand.textBody,
-    letterSpacing: -0.25,
   },
   subtitle: {
-    maxWidth: theme.spacing(78),
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.textSizing(1.4),
+    maxWidth: theme.spacing(71.25),
     textAlign: "center",
     color: theme.palette.brand.textBody,
   },
-  spacer: {
-    flex: 1,
+  actions: {
+    gap: theme.spacing(4),
   },
-  footer: {
-    width: "100%",
-    alignItems: "center",
-  },
-  catWrap: {
-    position: "absolute",
-    bottom: theme.spacing(9),
-    width: theme.spacing(42),
-    height: theme.spacing(21),
-    zIndex: 12,
-  },
+  // Laid over the top edge of the button, after it in the tree so it paints on top.
   cat: {
-    width: "100%",
-    height: "100%",
-  },
-  cta: {
-    width: "100%",
-    height: theme.spacing(13.5),
-    borderRadius: theme.borderRadius.lg,
-    zIndex: 1,
+    position: "absolute",
+    top: -theme.spacing(17.75),
+    alignSelf: "center",
   },
 }));

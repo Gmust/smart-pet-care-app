@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { ActionRow } from "@/common/components/ActionRow";
 import { ImageEdit } from "@/icons/image-edit";
 import { UserIcon } from "@/icons/user";
-import { Button } from "@/shadecn/ui/button";
 import type { DialogHandler } from "@/shadecn/ui/dialog";
 import {
   Dialog,
@@ -14,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/shadecn/ui/dialog";
-import { palette } from "@/styles/palette";
 
 import { EditProfileDrawer } from "./EditProfileDrawer";
 import { UpdateAvatarDrawer } from "./UpdateAvatarDrawer";
@@ -48,12 +47,18 @@ export const UpdateSelectionDialog = ({ isOpen, setIsOpen }: Props) => {
           </DialogHeader>
 
           <View style={styles.content}>
-            <Button icon={<ImageEdit color={palette.white} />} onPress={handleSetNewAvatar}>
-              {t("editSelectionDialog.newAvatarBtn")}
-            </Button>
-            <Button icon={<UserIcon color={palette.white} />} onPress={handleOpenEditProfile}>
-              {t("editSelectionDialog.profileInfoBtn")}
-            </Button>
+            <ActionRow
+              size="lg"
+              icon={ImageEdit}
+              label={t("editSelectionDialog.newAvatarBtn")}
+              onPress={handleSetNewAvatar}
+            />
+            <ActionRow
+              size="lg"
+              icon={UserIcon}
+              label={t("editSelectionDialog.profileInfoBtn")}
+              onPress={handleOpenEditProfile}
+            />
           </View>
         </DialogContent>
       </Dialog>
@@ -65,6 +70,6 @@ export const UpdateSelectionDialog = ({ isOpen, setIsOpen }: Props) => {
 
 const styles = StyleSheet.create((theme) => ({
   content: {
-    gap: theme.spacing(4),
+    gap: theme.spacing(1),
   },
 }));

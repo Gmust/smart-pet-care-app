@@ -12,8 +12,8 @@ const inputVariants = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   label: (error: boolean = false) => ({
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
+    fontFamily: theme.textStyles.bodyS.fontFamily,
+    fontSize: theme.textStyles.bodyS.fontSize,
     color: error ? theme.palette.brand.danger : theme.palette.brand.textSecondary,
   }),
   root: (
@@ -74,15 +74,15 @@ const inputVariants = StyleSheet.create((theme) => ({
   }),
   input: (multiline: boolean = false) => ({
     flex: 1,
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
+    fontFamily: theme.textStyles.body.fontFamily,
+    fontSize: theme.textStyles.body.fontSize,
     color: theme.palette.brand.textPrimary,
     paddingVertical: theme.spacing(3),
     textAlignVertical: multiline ? "top" : "center",
   }),
   helperText: (error: boolean = false) => ({
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
+    fontFamily: theme.textStyles.caption.fontFamily,
+    fontSize: theme.textStyles.caption.fontSize,
     color: error ? theme.palette.brand.danger : theme.palette.brand.textFaint,
   }),
   slot: {

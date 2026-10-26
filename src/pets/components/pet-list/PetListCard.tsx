@@ -138,7 +138,7 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
 
         <View pointerEvents="box-none" style={styles.actionBar}>
           <View pointerEvents="none" style={styles.viewInfo}>
-            <Text variant="bodySemiBold" style={styles.ctaText}>
+            <Text variant="controlM" style={styles.ctaText}>
               {t("pets:petListCard.viewInfo")}
             </Text>
             <ChevronIcon
@@ -156,6 +156,8 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
               accessibilityLabel={t("pets:petListCard.assessmentAccessibilityLabel", {
                 name: pet.name,
               })}
+              textStyle={styles.assessmentText}
+              hitSlop={(theme.minTouchTarget - theme.fontPx[12]) / 2}
               onPress={() =>
                 router.push({ pathname: "/(tabs)/pets/assessment", params: { petId: pet.id } })
               }
@@ -256,5 +258,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   ctaText: {
     color: theme.palette.brand.primaryDefault,
+  },
+  assessmentText: {
+    ...theme.textStyles.controlM,
   },
 }));

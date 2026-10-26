@@ -18,8 +18,8 @@ import type { Reminder, ReminderTone } from "../types";
 
 const toneColors: Record<ReminderTone, { bg: string; fg: string }> = {
   primary: { bg: palette.brand.primarySoft, fg: palette.brand.primaryDark },
-  peach: { bg: palette.brand.peachSoft, fg: palette.brand.peachDefault },
-  warn: { bg: palette.brand.peachSoft, fg: palette.brand.warn },
+  peach: { bg: palette.brand.peachTint, fg: palette.brand.peachDefault },
+  warn: { bg: palette.brand.peachIconBg, fg: palette.brand.peachDefault },
 };
 
 const statusChipProps: Record<

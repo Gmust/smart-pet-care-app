@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { ActionRow } from "@/common/components/ActionRow";
 import { TriangleAlertIcon } from "@/icons/alert";
 import { EllipsisIcon } from "@/icons/ellipsis";
 import { ImageEdit } from "@/icons/image-edit";
@@ -13,8 +13,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shadecn/ui/dropdown-menu";
-import { Text } from "@/shadecn/ui/text";
-import { palette } from "@/styles/palette";
 
 type PetProfilePageActionsProps = {
   disabled?: boolean;
@@ -30,6 +28,7 @@ export function PetProfilePageActions({
   onDelete,
 }: PetProfilePageActionsProps) {
   const { t } = useTranslation("pets");
+  const { theme } = useUnistyles();
 
   if (disabled) {
     return (
@@ -39,7 +38,11 @@ export function PetProfilePageActions({
         accessibilityLabel={t("petProfilePage.actions.open")}
         disabled={disabled}
       >
-        <EllipsisIcon width={16} height={16} color={palette.brand.primaryDark} />
+        <EllipsisIcon
+          width={theme.iconSize.md}
+          height={theme.iconSize.md}
+          color={theme.palette.brand.primaryDark}
+        />
       </Button>
     );
   }
@@ -51,37 +54,34 @@ export function PetProfilePageActions({
         accessibilityLabel={t("petProfilePage.actions.open")}
         style={(state) => [styles.trigger, state.pressed && styles.triggerPressed]}
       >
-        <EllipsisIcon width={16} height={16} color={palette.brand.primaryDark} />
+        <EllipsisIcon
+          width={theme.iconSize.md}
+          height={theme.iconSize.md}
+          color={theme.palette.brand.primaryDark}
+        />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent>
         <DropdownMenuItem accessibilityLabel={t("petProfilePage.actions.edit")} onPress={onEdit}>
-          <View style={styles.itemIcon}>
-            <PencilLineIcon width={18} height={18} color={palette.brand.primaryDefault} />
-          </View>
-          <Text style={styles.itemText}>{t("petProfilePage.actions.edit")}</Text>
+          <ActionRow icon={PencilLineIcon} label={t("petProfilePage.actions.edit")} />
         </DropdownMenuItem>
 
         <DropdownMenuItem
           accessibilityLabel={t("petProfilePage.actions.changePhoto")}
           onPress={onChangePhoto}
         >
-          <View style={styles.itemIcon}>
-            <ImageEdit width={18} height={18} color={palette.brand.primaryDefault} />
-          </View>
-          <Text style={styles.itemText}>{t("petProfilePage.actions.changePhoto")}</Text>
+          <ActionRow icon={ImageEdit} label={t("petProfilePage.actions.changePhoto")} />
         </DropdownMenuItem>
 
         <DropdownMenuItem
           accessibilityLabel={t("petProfilePage.actions.delete")}
           onPress={onDelete}
         >
-          <View style={[styles.itemIcon, styles.itemIconDanger]}>
-            <TriangleAlertIcon width={18} height={18} color={palette.brand.danger} />
-          </View>
-          <Text style={[styles.itemText, styles.itemTextDanger]}>
-            {t("petProfilePage.actions.delete")}
-          </Text>
+          <ActionRow
+            icon={TriangleAlertIcon}
+            tone="danger"
+            label={t("petProfilePage.actions.delete")}
+          />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -101,25 +101,5 @@ const styles = StyleSheet.create((theme) => ({
   },
   triggerPressed: {
     opacity: 0.82,
-  },
-  itemIcon: {
-    width: theme.spacing(9),
-    height: theme.spacing(9),
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: theme.borderRadius.lg,
-    backgroundColor: theme.palette.brand.primaryXsoft,
-  },
-  itemIconDanger: {
-    backgroundColor: theme.palette.brand.dangerBg,
-  },
-  itemText: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
-    color: theme.palette.brand.textPrimary,
-  },
-  itemTextDanger: {
-    color: theme.palette.brand.danger,
   },
 }));

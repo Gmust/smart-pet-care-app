@@ -142,14 +142,11 @@ const styles = StyleSheet.create((theme) => ({
   header: { gap: theme.spacing(1.5), textAlign: "center" },
   footer: { gap: theme.spacing(2) },
   title: {
+    ...theme.textStyles.titleL,
     textAlign: "center",
-    fontFamily: theme.fonts.black,
-    fontSize: theme.fontSize.xl,
-    textTransform: "uppercase",
-    letterSpacing: -0.25,
-    color: theme.palette.black,
+    color: theme.palette.brand.textPrimary,
   },
-  description: { color: theme.palette.black },
+  description: { color: theme.palette.brand.textSecondary },
   close: {
     position: "absolute",
     top: theme.spacing(3),

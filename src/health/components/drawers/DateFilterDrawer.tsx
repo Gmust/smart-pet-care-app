@@ -71,8 +71,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   footer: {
-    flexDirection: "row",
-    gap: theme.spacing(3),
+    gap: theme.spacing(2),
     paddingHorizontal: theme.spacing(4),
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(2),

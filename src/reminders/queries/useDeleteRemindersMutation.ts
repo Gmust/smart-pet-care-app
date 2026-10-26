@@ -2,6 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { deleteApiRemindersId } from "@/api";
 
+import { reminderQueryKeys } from "./reminderQueryKeys";
+
 export const useDeleteRemindersMutation = () => {
   const queryClient = useQueryClient();
 
@@ -11,7 +13,7 @@ export const useDeleteRemindersMutation = () => {
       await deleteApiRemindersId(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reminders"] });
+      queryClient.invalidateQueries({ queryKey: reminderQueryKeys.all() });
     },
   });
 };

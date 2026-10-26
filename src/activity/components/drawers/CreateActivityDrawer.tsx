@@ -376,7 +376,6 @@ export const CreateActivityDrawer = ({ isOpen, setIsOpen, petId, activity }: Pro
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
               <Button
-                size="lg"
                 variant="primary"
                 style={styles.submitButton}
                 disabled={!canSubmit || isSaving}

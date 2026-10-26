@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
 import {
@@ -9,9 +10,12 @@ import {
 
 import type { AuthResponse } from "@/api/generated";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { GoogleIcon } from "@/icons/google";
 import { Button } from "@/shadecn/ui/button";
 
 import { useGoogleMobileAuthMutation } from "../queries/useGoogleMobileAuthMutation";
+
+import { GoogleConsentDrawer } from "./GoogleConsentDrawer";
 
 // The id_token's audience is the Web client ID — this is what the backend
 // verifies. The native Android/iOS client is matched automatically by Google
@@ -26,21 +30,26 @@ GoogleSignin.configure({
 });
 
 interface GoogleAuthButtonProps {
-  onAuthenticated: (response: AuthResponse) => void;
+  onAuthenticated: (response: AuthResponse) => Promise<void>;
 }
 
 export function GoogleAuthButton({ onAuthenticated }: GoogleAuthButtonProps) {
   const { t } = useTranslation(["auth"]);
   const googleMobileMutation = useGoogleMobileAuthMutation();
+  const [consentOpen, setConsentOpen] = useState(false);
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const agreedRef = useRef(false);
 
   const isConfigured = Boolean(webClientId);
+  const isBusy = isSigningIn || googleMobileMutation.isPending;
 
-  const handlePress = async () => {
+  const signInWithGoogle = async () => {
     if (!isConfigured) {
       Toast.show({ type: "info", text1: t("auth:errors.googleUnavailable") });
       return;
     }
 
+    setIsSigningIn(true);
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
 
@@ -57,7 +66,7 @@ export function GoogleAuthButton({ onAuthenticated }: GoogleAuthButtonProps) {
       }
 
       const result = await googleMobileMutation.mutateAsync({ idToken });
-      onAuthenticated(result);
+      await onAuthenticated(result);
     } catch (error) {
       if (isErrorWithCode(error)) {
         // Cancelled / already in progress are not real errors — stay silent.
@@ -72,18 +81,37 @@ export function GoogleAuthButton({ onAuthenticated }: GoogleAuthButtonProps) {
         type: "error",
         text1: getApiErrorMessage(error, t("auth:errors.googleFailed")),
       });
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
   return (
-    <Button
-      size="lg"
-      variant="secondary"
-      disabled={googleMobileMutation.isPending}
-      isLoading={googleMobileMutation.isPending}
-      onPress={handlePress}
-    >
-      {t("auth:actions.google")}
-    </Button>
+    <>
+      <Button
+        variant="secondary"
+        icon={<GoogleIcon />}
+        disabled={isBusy}
+        isLoading={isBusy}
+        onPress={() => setConsentOpen(true)}
+      >
+        {t("auth:actions.google")}
+      </Button>
+
+      <GoogleConsentDrawer
+        open={consentOpen}
+        onOpenChange={setConsentOpen}
+        onAgree={() => {
+          agreedRef.current = true;
+        }}
+        // Google's account picker is a native Activity: starting it while the sheet is still
+        // closing would trip the drawer's native-activity recovery, so wait for the dismiss.
+        onDismiss={() => {
+          if (!agreedRef.current) return;
+          agreedRef.current = false;
+          signInWithGoogle();
+        }}
+      />
+    </>
   );
 }

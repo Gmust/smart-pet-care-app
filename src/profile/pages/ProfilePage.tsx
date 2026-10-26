@@ -258,6 +258,5 @@ const styles = StyleSheet.create((theme) => ({
     fontFamily: theme.fonts.regular,
     fontSize: theme.fontSize.base,
     lineHeight: theme.fontSize.base * 1.45,
-    color: theme.palette.brand.textBody,
   },
 }));

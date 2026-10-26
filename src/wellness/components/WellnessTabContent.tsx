@@ -73,7 +73,7 @@ export const WellnessTabContent = ({ petId }: WellnessTabContentProps) => {
           </Text>
           {/* The query does not retry on mount, so without this only a hidden
               pull-to-refresh could recover from one transient failure. */}
-          <Button size="sm" variant="secondary" onPress={() => void refetch()}>
+          <Button size="sm" variant="tonal" onPress={() => void refetch()}>
             {t("common:errors.tryAgain")}
           </Button>
         </Card>
@@ -177,7 +177,7 @@ export const WellnessTabContent = ({ petId }: WellnessTabContentProps) => {
                         {suggestion.text}
                       </Text>
                       <Button
-                        variant="secondary"
+                        variant="tonal"
                         size="sm"
                         onPress={() => setSelectedSuggestion(suggestion)}
                       >

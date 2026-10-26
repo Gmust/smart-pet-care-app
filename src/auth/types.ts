@@ -1,7 +1,5 @@
 import type { AuthResponse } from "@/api/generated";
 
-export type AuthMode = "register" | "login";
-
 export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
 export interface AuthSession {

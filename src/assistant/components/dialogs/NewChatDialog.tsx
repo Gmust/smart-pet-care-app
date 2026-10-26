@@ -51,6 +51,5 @@ const styles = StyleSheet.create((theme) => ({
     textAlign: "center",
     fontSize: theme.fontSize.base,
     lineHeight: theme.fontSize.base * 1.5,
-    color: theme.palette.brand.textBody,
   },
 }));

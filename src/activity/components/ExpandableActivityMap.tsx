@@ -102,7 +102,7 @@ export const ExpandableActivityMap = ({ style, onMapClick, onMarkerClick, ...map
               <Text variant="caption" style={styles.hint}>
                 {t("activity:map.pickHint")}
               </Text>
-              <Button size="lg" variant="primary" onPress={close}>
+              <Button variant="primary" onPress={close}>
                 {t("activity:map.done")}
               </Button>
             </View>

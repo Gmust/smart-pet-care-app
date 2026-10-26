@@ -36,10 +36,10 @@ The native client IDs are matched by Google automatically via package name + SHA
 
 Both email and Google flows call the same backend endpoint:
 
-```ts
+```text
 // Email sign-in/register
-await POST /api/Auth/login   // or POST /api/Auth/register
-await POST /api/Auth/oauth/google/mobile  // Google OAuth
+POST /api/Auth/login   // or POST /api/Auth/register
+POST /api/Auth/oauth/google/mobile  // Google OAuth
 ```
 
 Both return an `AuthResponse` with `accessToken`, `refreshToken`, optional `id`, optional `email`, and optional `expiresAtUtc`. The session is passed to `AuthProvider.signIn()` and persisted to secure storage.
@@ -56,12 +56,12 @@ Calling `signOut()` clears the secure-store session and updates auth context. Th
 
 ## Email Authentication
 
-`EmailAuthForm` (controlled via TanStack Form) validates and submits email/password credentials:
+`SignInForm` and `SignUpForm` (TanStack Form) validate and submit email/password credentials:
 
-- **Login**: `email` + `password` → `POST /api/Auth/login`
-- **Register**: `email` + `password` + `passwordConfirm` → `POST /api/Auth/register`
+- **Sign in**: `email` + `password` → `POST /api/Auth/login`
+- **Sign up**: `email` + `password` + `passwordConfirm` + `termsAccepted` → `POST /api/Auth/register`
 
-Validation is performed on form change and submit using Zod schemas in `src/auth/schemas/auth.schema.ts`.
+Validation uses the Zod schemas in `src/auth/schemas/auth.schema.ts` and runs on every change, but a field shows its errors only after the user leaves it or tries to submit (`useVisibleFieldErrors`).
 
 ### Password Requirements
 
@@ -84,6 +84,6 @@ The backend validates the idToken's audience against `EXPO_PUBLIC_GOOGLE_WEB_CLI
 
 ## Terms & Privacy
 
-Before account creation, users must agree to Terms of Service and Privacy Policy. `AgreementsDialog` displays links and tracks acceptance. Users can proceed directly to sign-in without agreeing (pre-acceptance not enforced on native Google sign-in).
+Creating an account by email requires the consent checkbox on the sign-up screen (`SignUpConsent`); its value is sent as `termsAccepted` to `POST /api/Auth/register`.
 
-When creating an account via email, the `termsAccepted` flag is sent to `POST /api/Auth/register`.
+`GoogleAuthButton` opens a consent sheet (`GoogleConsentDrawer`) on both the sign-in and sign-up screens, because a Google sign-in can create an account. Google's account picker starts only after the user taps "Agree & continue" and the sheet has closed. The Google request carries only the `idToken`, so this acceptance is not recorded server-side.

@@ -219,6 +219,16 @@ export const CreateReminderDrawer = ({
                 : "reminders:createReminderDrawer.title"
             )}
           </DrawerTitle>
+          {isEditMode && !!reminder && !isPetsLoading && (
+            <Text variant="bodyS" style={styles.subtitle}>
+              {[
+                pets?.find((pet) => pet.id === reminder.petId)?.name,
+                reminder.type && t(`reminders:types.${reminder.type}`),
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </Text>
+          )}
         </DrawerHeader>
 
         <DrawerScrollView
@@ -226,44 +236,48 @@ export const CreateReminderDrawer = ({
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          <form.Field name="petId">
-            {(field) => {
-              const selected = pets?.find((pet) => pet.id === field.state.value);
-              return (
-                <View style={styles.field}>
-                  <Text style={styles.label}>{t("reminders:createReminderDrawer.fields.pet")}</Text>
-                  {isPetsLoading ? (
-                    <ReminderPetSelectSkeleton />
-                  ) : (
-                    <Select
-                      containerStyle={styles.selectContainer}
-                      disabled={isEditMode}
-                      value={
-                        selected?.id != null
-                          ? { value: selected.id, label: selected.name ?? "" }
-                          : undefined
-                      }
-                      onValueChange={(option) => field.handleChange(option?.value ?? "")}
-                    >
-                      <SelectTrigger style={styles.selectTrigger}>
-                        <SelectValue
-                          placeholder={t("reminders:createReminderDrawer.placeholders.pet")}
-                        />
-                      </SelectTrigger>
-                      <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
-                        {pets?.map((pet) =>
-                          pet.id != null ? (
-                            <SelectItem key={pet.id} value={pet.id} label={pet.name ?? ""} />
-                          ) : null
-                        )}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  <FieldError errors={field.state.meta.errors} />
-                </View>
-              );
-            }}
-          </form.Field>
+          {/* The API cannot change a reminder's pet or type, so both fields are only for create. */}
+          {!isEditMode && (
+            <form.Field name="petId">
+              {(field) => {
+                const selected = pets?.find((pet) => pet.id === field.state.value);
+                return (
+                  <View style={styles.field}>
+                    <Text style={styles.label}>
+                      {t("reminders:createReminderDrawer.fields.pet")}
+                    </Text>
+                    {isPetsLoading ? (
+                      <ReminderPetSelectSkeleton />
+                    ) : (
+                      <Select
+                        containerStyle={styles.selectContainer}
+                        value={
+                          selected?.id != null
+                            ? { value: selected.id, label: selected.name ?? "" }
+                            : undefined
+                        }
+                        onValueChange={(option) => field.handleChange(option?.value ?? "")}
+                      >
+                        <SelectTrigger style={styles.selectTrigger}>
+                          <SelectValue
+                            placeholder={t("reminders:createReminderDrawer.placeholders.pet")}
+                          />
+                        </SelectTrigger>
+                        <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
+                          {pets?.map((pet) =>
+                            pet.id != null ? (
+                              <SelectItem key={pet.id} value={pet.id} label={pet.name ?? ""} />
+                            ) : null
+                          )}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <FieldError errors={field.state.meta.errors} />
+                  </View>
+                );
+              }}
+            </form.Field>
+          )}
 
           <form.Field name="title">
             {(field) => (
@@ -302,37 +316,40 @@ export const CreateReminderDrawer = ({
             )}
           </form.Field>
 
-          <form.Field name="type">
-            {(field) => (
-              <View style={styles.field}>
-                <Text style={styles.label}>{t("reminders:createReminderDrawer.fields.type")}</Text>
-                <Select
-                  containerStyle={styles.selectContainer}
-                  disabled={isEditMode}
-                  value={{
-                    value: field.state.value,
-                    label: t(`reminders:types.${field.state.value}`),
-                  }}
-                  onValueChange={(option) => {
-                    const next = REMINDER_TYPES.find((type) => type === option?.value);
-                    if (next) field.handleChange(next);
-                  }}
-                >
-                  <SelectTrigger style={styles.selectTrigger}>
-                    <SelectValue
-                      placeholder={t("reminders:createReminderDrawer.placeholders.type")}
-                    />
-                  </SelectTrigger>
-                  <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
-                    {REMINDER_TYPES.map((type) => (
-                      <SelectItem key={type} value={type} label={t(`reminders:types.${type}`)} />
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FieldError errors={field.state.meta.errors} />
-              </View>
-            )}
-          </form.Field>
+          {!isEditMode && (
+            <form.Field name="type">
+              {(field) => (
+                <View style={styles.field}>
+                  <Text style={styles.label}>
+                    {t("reminders:createReminderDrawer.fields.type")}
+                  </Text>
+                  <Select
+                    containerStyle={styles.selectContainer}
+                    value={{
+                      value: field.state.value,
+                      label: t(`reminders:types.${field.state.value}`),
+                    }}
+                    onValueChange={(option) => {
+                      const next = REMINDER_TYPES.find((type) => type === option?.value);
+                      if (next) field.handleChange(next);
+                    }}
+                  >
+                    <SelectTrigger style={styles.selectTrigger}>
+                      <SelectValue
+                        placeholder={t("reminders:createReminderDrawer.placeholders.type")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
+                      {REMINDER_TYPES.map((type) => (
+                        <SelectItem key={type} value={type} label={t(`reminders:types.${type}`)} />
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={field.state.meta.errors} />
+                </View>
+              )}
+            </form.Field>
+          )}
 
           <form.Field name="repeatType">
             {(field) => (
@@ -544,9 +561,8 @@ export const CreateReminderDrawer = ({
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
               <Button
-                size="lg"
                 variant="primary"
-                disabled={!canSubmit || isReminderSaving}
+                disabled={!canSubmit || isReminderSaving || (isEditMode && !reminder)}
                 isLoading={isSubmitting || isReminderSaving}
                 onPress={() => form.handleSubmit()}
               >
@@ -571,6 +587,10 @@ const styles = StyleSheet.create((theme) => ({
   title: {
     fontSize: theme.fontSize.xl,
     letterSpacing: 0,
+  },
+  subtitle: {
+    textAlign: "center",
+    color: theme.palette.brand.textSecondary,
   },
   scroll: {
     paddingTop: theme.spacing(4),

@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useRefreshControl } from "@/common/hooks/useRefreshControl";
+import { reminderQueryKeys } from "@/reminders/queries/reminderQueryKeys";
 
 import { feedingQueryKeys } from "../queries/feedingQueryKeys";
 
@@ -12,7 +13,7 @@ export const useFeedingRefresh = () => {
   return useRefreshControl(() =>
     Promise.all([
       queryClient.refetchQueries({ queryKey: feedingQueryKeys.all(), type: "active" }),
-      queryClient.refetchQueries({ queryKey: ["reminders"], type: "active" }),
+      queryClient.refetchQueries({ queryKey: reminderQueryKeys.all(), type: "active" }),
     ])
   );
 };

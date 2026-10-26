@@ -4,6 +4,8 @@ import { postApiRemindersIdComplete } from "@/api";
 import type { CompleteReminderDto } from "@/api/generated";
 import { healthQueryKeys } from "@/health/queries/healthQueryKeys";
 
+import { reminderQueryKeys } from "./reminderQueryKeys";
+
 type Variables = {
   id: string;
   // Omitted means "performed now". Pass `performedAt` for a missed slot recorded after the fact, or
@@ -21,7 +23,7 @@ export const useCompleteReminderMutation = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["reminders"] });
+      queryClient.invalidateQueries({ queryKey: reminderQueryKeys.all() });
       queryClient.invalidateQueries({ queryKey: healthQueryKeys.allRecords() });
     },
   });

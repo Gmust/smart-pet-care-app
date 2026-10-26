@@ -2,6 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { postApiRemindersRunsRunIdAcknowledge } from "@/api";
 
+import { reminderQueryKeys } from "./reminderQueryKeys";
+
 export const useAcknowledgeReminderRunMutation = () => {
   const queryClient = useQueryClient();
 
@@ -12,7 +14,7 @@ export const useAcknowledgeReminderRunMutation = () => {
       return data;
     },
     onSuccess: (_data, { reminderId }) => {
-      queryClient.invalidateQueries({ queryKey: ["reminders", "runs", reminderId] });
+      queryClient.invalidateQueries({ queryKey: reminderQueryKeys.runs(reminderId) });
     },
   });
 };

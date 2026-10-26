@@ -6,7 +6,21 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Current state
 
-- Branch: `feature/feeding-nutrition`, with `main` merged in at `bab6138`.
+- Branch: `feature/auth-flow-redesign`, off `main` at `45374d7` (feeding and nutrition merged).
+- Auth redesign (Figma "Full Design"): Welcome, SignIn and SignUp are separate routes and Confirm
+  email is rebuilt in the same style. Terms are a checkbox on sign-up; Google asks in a consent
+  sheet on both screens, and the server records no consent for it. Forgot password is not built:
+  the backend has no endpoint.
+- Shared pieces touched: new `Checkbox` and `ActionRow`; `Button` (`tonal`, `secondary`,
+  `dangerText`, `inline` size; no `lg`); `DialogTitle` (`titleL` in all dialogs); `Input` type;
+  `theme` (`controlS/M/L`, `shadows.card`, tight line height 1.25); `Tabs` (generic over its keys,
+  state-driven indicator, `chips` variant); `Card` (`pressDelay`); `Chip` (`onDark` variant);
+  `Text`; `SectionHeader`; `drawer` (footer fade, titles no longer upper-case, scrollable drawers
+  claim taps so a tap inside does not reach the backdrop); `DropdownMenuContent` (safe-area
+  insets); `PetProfilePage`, `Fab`, `PetListCard`, `HealthPetCard`, `(tabs)/_layout`,
+  `pets/_layout`, `jest.setup.ts`.
+- Reminders: the edit form no longer offers pet or type (the PATCH takes neither), a saved PATCH
+  response goes into the detail cache, and query keys live in `reminderQueryKeys`.
 - The Wellness screen moved from `/pets/wellness` (route removed) into the first tab of
   `AssessmentPage` (`/(tabs)/pets/assessment?petId=…`), opened by the "Assessment" button on a pet
   card.
@@ -29,11 +43,6 @@ Keep it short and factual: what is true now, what was actually verified, what is
   entries with Edit / Delete.
 - The schedule card opens the pet profile on its Reminders tab (`tab` param).
 - Pull-to-refresh on the feeding screens, Wellness and every pet-profile tab (`useRefreshControl`).
-- Shared pieces touched: `Tabs` (generic over its keys, state-driven indicator, `chips` variant),
-  `Card` (`pressDelay`), `Chip` (`onDark` variant), `Button` (`inline` size), `SectionHeader`,
-  `drawer` (footer fade; titles no longer upper-case, `textPrimary`), `theme` (`shadows.card`,
-  tight line height 1.25), `PetProfilePage`, `Fab`, `PetListCard`, `HealthPetCard`,
-  `(tabs)/_layout`, `pets/_layout`, `jest.setup.ts`.
 - `PhotoViewer` (`src/common/components/`) opens a photo full screen in a native `Modal` on a tap
   (pet profile hero and `ProfileAvatar`, only when a photo exists); a tap or Android back closes
   it. No pinch-zoom.
@@ -43,10 +52,8 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `revokeAiConsent` (`AuthContext.tsx`) at `signOut` and before `signIn` stores new tokens; it is
   stored per device. If the revoke cannot be done, `signIn` throws and stores nothing.
 - Legal links: `src/common/utils/legalUrls.ts` builds `/terms.html` and `/privacy.html` from
-  `EXPO_PUBLIC_API_URL`. They show in the Welcome agreements dialog, under the Google button on
-  `AuthPage` and in a Legal section on Profile, and open in the system browser (an error toast if
-  that fails). `AuthPage` gates register on acceptance: without `agreed=1` it starts in login, and
-  "Create an account" opens the agreements dialog first.
+  `EXPO_PUBLIC_API_URL`. They show in the sign-up consent row, in the Google consent sheet and in a
+  Legal section on Profile, and open in the system browser (an error toast if that fails).
 - Maps: Apple Maps on iOS (iOS 17+; `expo-maps` renders nothing below), Google Maps on Android;
   the 6 s load timeout and POI-as-tap are Android-only. `ExpandableActivityMap` is a static
   preview, and a tap opens a fullscreen `Modal`; that Modal must not register a drawer native
@@ -70,11 +77,15 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Verified evidence
 
-- `pnpm check` on this branch with `main` merged in (SDK 55): lint and typecheck clean, 70 suites
-  / 642 tests. `act` warnings come only from suites outside this feature (activity, assistant,
-  pet notes) and vary with timing.
+- `pnpm check` on this branch (SDK 55): lint and typecheck clean, 74 suites / 666 tests. `act`
+  warnings come only from suites outside this feature (activity, assistant, pet notes) and vary
+  with timing.
 - The feeding tests were mutation-checked (about 400 mutants); the survivors are equivalent or
   visual-only.
+- Checked on an Android device: the auth screens (Welcome, SignIn, SignUp, the consent sheet,
+  Confirm email), the button, dialog and drawer restyling, taps inside scrollable
+  drawers (`Gesture.Manual` in `drawer.tsx`), the dropdown near the bottom edge, and editing a
+  reminder's time twice in a row.
 - Checked on an Android device: the whole Feeding flow (tab, log screen, weight history, goal
   sheet, meal logging through the FAB and through a slot, the analysis run), the drawers, and the
   Home entry with Back.
@@ -100,8 +111,6 @@ Keep it short and factual: what is true now, what was actually verified, what is
   physical iPhone are ruled out. Backend follow-up is in Jira KAN-91.
 - Accepted: if SecureStore fails to delete the access token at sign-out, the app shows signed out
   but the next start restores that account until its first 401.
-- `onAuthenticated` is not awaited (`EmailAuthForm.tsx`, `GoogleAuthButton.tsx`), so a throw from
-  `signIn` is an unhandled rejection: the user stays on the auth screen after a success toast.
 - `restoreSession`'s `clearStoredSession` (`AuthContext.tsx`) has no catch; a throw leaves the
   app on "loading".
 - A note saved offline is queued in memory, so an app kill drops it, and create is not
@@ -130,6 +139,8 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `AGENTS.md`.
 
 ## Next task
+
+The two ForgotPassword screens, once the backend ships password reset.
 
 On the SDK 55 build of `com.misopets.app`: sign in with Google and with email, switch accounts
 (A, sign out, B) and confirm B sees their own pets and is asked for assistant consent, and
