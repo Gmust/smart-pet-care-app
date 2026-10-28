@@ -1,0 +1,38 @@
+{
+  "button": {
+    "a11y": "Voice command"
+  },
+  "drawer": {
+    "listeningTitle": "Listening…",
+    "listeningHint": "Try “Milo weighs 12 kilos” or “Add a note for Milo: he skipped breakfast”.",
+    "heard": "“{{transcript}}”",
+    "done": "Done",
+    "tryAgain": "Try again",
+    "openSettings": "Open settings",
+    "failures": {
+      "unrecognized": {
+        "title": "I didn't catch a command",
+        "body": "For now I can log a weight or add a note. Try “Luna weighs 4.2 kilos”."
+      },
+      "noSpeech": {
+        "title": "I didn't hear anything",
+        "body": "Tap Try again and start speaking."
+      },
+      "notAllowed": {
+        "title": "Microphone access is off",
+        "body": "Allow the microphone and speech recognition for the app in Settings."
+      },
+      "unavailable": {
+        "title": "Speech recognition isn't available",
+        "body": "Check your connection and try again."
+      }
+    }
+  },
+  "speech": {
+    "weight": "{{weight}} kilograms for {{name}}. Check it and tap save.",
+    "weightNoValue": "Weight for {{name}}. How much?",
+    "note": "Here's your note for {{name}}. Go back to save it.",
+    "whichPet": "Which pet?",
+    "unrecognized": "Sorry, I didn't catch that."
+  }
+}

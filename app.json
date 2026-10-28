@@ -110,6 +110,13 @@
         }
       ],
       "@react-native-google-signin/google-signin",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow Miso to use the microphone so you can log things for your pets by voice.",
+          "speechRecognitionPermission": "Allow Miso to turn what you say into notes and entries for your pets."
+        }
+      ],
       "@react-native-community/datetimepicker",
       [
         "expo-maps",

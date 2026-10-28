@@ -71,7 +71,7 @@ const storedLog = {
 
 const clients: QueryClient[] = [];
 
-const renderDrawer = (log?: PetWeightLogResponseDto) => {
+const renderDrawer = (log?: PetWeightLogResponseDto, prefill?: { weightKg: string }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { gcTime: Infinity, retry: false },
@@ -84,9 +84,10 @@ const renderDrawer = (log?: PetWeightLogResponseDto) => {
   );
 
   const setIsOpen = jest.fn();
-  const screen = render(<LogWeightDrawer isOpen setIsOpen={setIsOpen} petId={PET_ID} log={log} />, {
-    wrapper,
-  });
+  const screen = render(
+    <LogWeightDrawer isOpen setIsOpen={setIsOpen} petId={PET_ID} log={log} prefill={prefill} />,
+    { wrapper }
+  );
 
   return { ...screen, setIsOpen };
 };
@@ -180,6 +181,22 @@ describe("LogWeightDrawer — logging a new weight", () => {
       text1: "Some details aren't valid. Check them and try again.",
     });
     expect(screen.setIsOpen).not.toHaveBeenCalled();
+  });
+});
+
+describe("LogWeightDrawer — prefilled by a voice command", () => {
+  it("saves the spoken weight without any typing", async () => {
+    const screen = renderDrawer(undefined, { weightKg: "12.5" });
+
+    expect(screen.getByDisplayValue("12.5")).toBeTruthy();
+    fireEvent.press(screen.getByText("Save weight"));
+
+    await waitFor(() => expect(createMock).toHaveBeenCalledTimes(1));
+    expect(createMock).toHaveBeenCalledWith(PET_ID, {
+      measuredAt: expect.any(String),
+      weightKg: 12.5,
+      notes: null,
+    });
   });
 });
 

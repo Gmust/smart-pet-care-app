@@ -27,6 +27,11 @@ type Props = {
   noteId?: string;
   initialTitle: string;
   initialContent: string;
+  /**
+   * Text to start a new note with (a voice command). Unlike `initialContent` it is not part of the
+   * saved baseline, so leaving the screen untouched still creates the note.
+   */
+  draftContent?: string;
 };
 
 export const SingleNoteEditor = ({
@@ -35,6 +40,7 @@ export const SingleNoteEditor = ({
   noteId,
   initialTitle,
   initialContent,
+  draftContent,
 }: Props) => {
   const { t } = useTranslation(["pets", "common"]);
   const { theme } = useUnistyles();
@@ -59,7 +65,7 @@ export const SingleNoteEditor = ({
     redo,
     canUndo,
     canRedo,
-  } = useUndoRedoText(initialContent);
+  } = useUndoRedoText(draftContent ?? initialContent);
 
   const { mutateAsync: createNote } = useCreateNoteMutation();
   const { mutateAsync: updateNote } = useUpdateNoteMutation();

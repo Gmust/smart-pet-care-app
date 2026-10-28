@@ -34,15 +34,20 @@ type Props = {
   setIsOpen: (open: boolean) => void;
   petId: string;
   log?: PetWeightLogResponseDto;
+  /** Seeds a new entry, e.g. from a voice command. Pass a stable object: it re-seeds on change. */
+  prefill?: Pick<WeightLogFormValues, "weightKg">;
 };
 
-const toFormValues = (log?: PetWeightLogResponseDto): WeightLogFormValues => ({
-  weightKg: String(toApiNumber(log?.weightKg) ?? ""),
+const toFormValues = (
+  log?: PetWeightLogResponseDto,
+  prefill?: Props["prefill"]
+): WeightLogFormValues => ({
+  weightKg: prefill?.weightKg ?? String(toApiNumber(log?.weightKg) ?? ""),
   measuredAt: log?.measuredAt ?? new Date().toISOString(),
   notes: log?.notes ?? "",
 });
 
-export const LogWeightDrawer = ({ isOpen, setIsOpen, petId, log }: Props) => {
+export const LogWeightDrawer = ({ isOpen, setIsOpen, petId, log, prefill }: Props) => {
   const { t } = useTranslation(["feeding", "common"]);
 
   const isEditMode = !!log;
@@ -52,7 +57,7 @@ export const LogWeightDrawer = ({ isOpen, setIsOpen, petId, log }: Props) => {
   const isSaving = isCreating || isUpdating;
 
   const form = useForm({
-    defaultValues: toFormValues(log),
+    defaultValues: toFormValues(log, prefill),
     validators: {
       onChange: weightLogSchema(t),
       onSubmit: weightLogSchema(t),
@@ -94,8 +99,8 @@ export const LogWeightDrawer = ({ isOpen, setIsOpen, petId, log }: Props) => {
   // draft the user started.
   useEffect(() => {
     if (!isOpen || isEditMode || form.state.isDirty) return;
-    form.reset(toFormValues());
-  }, [isOpen, isEditMode, form]);
+    form.reset(toFormValues(undefined, prefill));
+  }, [isOpen, isEditMode, form, prefill]);
 
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>

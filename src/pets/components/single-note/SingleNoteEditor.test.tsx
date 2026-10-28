@@ -120,6 +120,16 @@ describe("SingleNoteEditor save-on-exit", () => {
     expect(createMock).toHaveBeenCalledWith(PET_ID, { title: "Vet visit", content: "" });
   });
 
+  it("creates a dictated note even when the user leaves without editing it", async () => {
+    createMock.mockResolvedValue(apiResponse({ id: "new-note" }));
+    const { getByDisplayValue, unmount } = renderEditor({ draftContent: "Skipped breakfast" });
+
+    expect(getByDisplayValue("Skipped breakfast")).toBeTruthy();
+    await act(async () => unmount());
+
+    expect(createMock).toHaveBeenCalledWith(PET_ID, { title: "", content: "Skipped breakfast" });
+  });
+
   it("does nothing for a new, untouched note", async () => {
     const { unmount } = renderEditor();
 

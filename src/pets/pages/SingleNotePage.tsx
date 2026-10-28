@@ -15,6 +15,7 @@ export default function SingleNotePage() {
   const parsedParams = noteParamsSchema.safeParse(useLocalSearchParams());
   const petId = parsedParams.success ? parsedParams.data.petId : undefined;
   const noteId = parsedParams.success ? parsedParams.data.noteId : undefined;
+  const draft = parsedParams.success && !noteId ? parsedParams.data.draft : undefined;
 
   const { data: pet } = usePetQuery(petId);
   const {
@@ -84,6 +85,7 @@ export default function SingleNotePage() {
       noteId={noteId}
       initialTitle={existingNote?.title ?? ""}
       initialContent={existingNote?.content ?? ""}
+      draftContent={draft}
     />
   );
 }

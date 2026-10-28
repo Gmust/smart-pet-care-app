@@ -9,6 +9,7 @@ import { useAuth } from "@/auth/hooks/useAuth";
 import { Fab } from "@/common/components/Fab";
 import { OfflineBanner } from "@/common/components/OfflineBanner";
 import { TabBar } from "@/common/components/TabBar";
+import { VoiceCommandEntry } from "@/voice/components/VoiceCommandEntry";
 
 import { Redirect, Tabs, usePathname } from "expo-router";
 
@@ -49,6 +50,8 @@ export default function TabLayout() {
         <Tabs.Screen name="assistant-pet-selection" options={{ href: null }} />
         <Tabs.Screen name="assistant-new-pet" options={{ href: null }} />
       </Tabs>
+      {/* Before the FAB, so its open menu's backdrop covers the mic too. */}
+      {pathname.endsWith("/home") && <VoiceCommandEntry />}
       {pathname.endsWith("/home") && <Fab />}
       {!isAssistantFlow && <OfflineBanner />}
     </View>

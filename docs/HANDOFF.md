@@ -4,6 +4,22 @@ Session state for the next agent or developer. Update it at the end of any sessi
 that changed code, contracts, or checks — see the Definition of Done in `AGENTS.md`.
 Keep it short and factual: what is true now, what was actually verified, what is not.
 
+## Voice commands (prototype, branch `feature/voice-commands` off `main` at `7f312ac`)
+
+- A mic button left of the Home FAB listens for one English phrase (`expo-speech-recognition`,
+  pet names passed as `contextualStrings`) and answers aloud (`expo-speech`).
+- `src/voice/utils/parseVoiceCommand.ts` is rule-based and supports two actions: a weight
+  ("Milo weighs 12 kg", pounds converted) opens `LogWeightDrawer` with the new `prefill` prop, and
+  a note ("Add a note for Milo: …") opens the note screen with the new `draft` param, saved on
+  exit like any note. Nothing is written without the user's confirmation on that screen. No pet
+  named and several pets: `PetPickerDrawer` asks. An on-device model can later return the same
+  `VoiceParseResult`.
+- `VoiceCommandEntry` loads the button lazily and only when both native modules exist, so an old
+  binary shows no mic instead of crashing Home.
+- Verified: `pnpm lint`, `pnpm typecheck`, `pnpm test` (parser, weight prefill, dictated note
+  save). Not verified: anything on a device: recognition, permissions, TTS, the drawers.
+- Needs a new development build (native modules plus a config plugin); `pnpm exec expo prebuild`.
+
 ## Current state
 
 - Branch: `feature/auth-flow-redesign`, off `main` at `45374d7` (feeding and nutrition merged).
