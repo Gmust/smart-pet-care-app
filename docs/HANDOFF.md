@@ -78,6 +78,9 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `44433327` (miso); it now matches. Run `eas build`/`eas update` from the CLI with
   `GOOGLE_SERVICES_JSON=./google-services.json` (see `SETUP.md`); without it the first build
   failed with "Runtime version mismatch".
+- From this branch (`a13e83c`): `preview` build `746acf59` and update group `674a99de` share
+  runtime `6d41f023…`. The `preview` channel had no linked branch, so no APK on it could get an
+  update; it now points at the `preview` branch (an EAS-side setting, not in the repo).
 - Pet notes are first-class entities behind `/api/pets/{petId}/notes`; the route
   `/(tabs)/pets/note` takes `petId` and an optional `noteId`. `SingleNoteEditor` saves on unmount
   and sends only the changed fields.
@@ -156,8 +159,8 @@ Android OAuth client in project `1000214284290` is missing the package or SHA-1
 `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25`; the owner also has to confirm the
 Maps key restriction. On the iOS simulator, check Google sign-in with the new iOS client ID.
 
-EAS: after this branch merges, run a `preview` Android build and an `eas update` from the same
-`main` commit and confirm the installed APK picks the update up. Google sign-in in an EAS APK
+EAS: install build `746acf59` on a device, publish a small `eas update` to `preview`, and
+confirm the app picks it up after a relaunch; not yet verified. Google sign-in in an EAS APK
 needs the EAS keystore SHA-1 above added to the Android OAuth client; until then expect
 `DEVELOPER_ERROR`. `eas-build.yml` and `eas-update.yml` have never run; in CI they lack
 `google-services.json` and should hit the same runtime mismatch.
