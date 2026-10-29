@@ -69,8 +69,18 @@ Keep it short and factual: what is true now, what was actually verified, what is
   is `src/index.ts`, so the Unistyles config loads before the routes. On iOS, `app.json` passes
   `GoogleUtilities` and `RecaptchaInterop` as `extraPods` with `modular_headers`, or `pod install`
   fails. EAS (`@reflexivecdvs-team/miso`) has `GOOGLE_SERVICES_JSON`, `EXPO_PUBLIC_API_URL`, the
-  Google client IDs and `GOOGLE_MAPS_API_KEY` in all three profiles; no EAS build has run with
-  them yet.
+  Google client IDs and `GOOGLE_MAPS_API_KEY` in all three profiles. The first EAS build,
+  `preview` Android `0d70eeee` from `7f312ac`, finished on 29 October 2026 (runtime `3ac597b4…`).
+  It was built before this branch, so it still carries the old `updates.url` and receives no OTA
+  updates. EAS generated the release keystore on that run: SHA-1
+  `36:C5:68:76:55:DC:E9:1F:DB:02:6F:7F:3C:49:A8:70:CC:BE:BB:3F`.
+- `updates.url` pointed at the pre-rename EAS project `05b59c80` while `projectId` was
+  `44433327` (miso); it now matches. Run `eas build`/`eas update` from the CLI with
+  `GOOGLE_SERVICES_JSON=./google-services.json` (see `SETUP.md`); without it the first build
+  failed with "Runtime version mismatch".
+- From this branch (`a13e83c`): `preview` build `746acf59` and update group `674a99de` share
+  runtime `6d41f023…`. The `preview` channel had no linked branch, so no APK on it could get an
+  update; it now points at the `preview` branch (an EAS-side setting, not in the repo).
 - Pet notes are first-class entities behind `/api/pets/{petId}/notes`; the route
   `/(tabs)/pets/note` takes `petId` and an optional `noteId`. `SingleNoteEditor` saves on unmount
   and sends only the changed fields.
@@ -147,8 +157,13 @@ On the SDK 55 build of `com.misopets.app`: sign in with Google and with email, s
 confirm the FCM token reaches the backend. If Google sign-in fails with `DEVELOPER_ERROR`, the
 Android OAuth client in project `1000214284290` is missing the package or SHA-1
 `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25`; the owner also has to confirm the
-Maps key restriction. On the iOS simulator, check Google sign-in with the new iOS client ID. Then
-an EAS `preview` Android build, to confirm the EAS variables reach the build.
+Maps key restriction. On the iOS simulator, check Google sign-in with the new iOS client ID.
+
+EAS: install build `746acf59` on a device, publish a small `eas update` to `preview`, and
+confirm the app picks it up after a relaunch; not yet verified. Google sign-in in an EAS APK
+needs the EAS keystore SHA-1 above added to the Android OAuth client; until then expect
+`DEVELOPER_ERROR`. `eas-build.yml` and `eas-update.yml` have never run; in CI they lack
+`google-services.json` and should hit the same runtime mismatch.
 
 Feeding: bring back a place in the app for `behavioralNotes` (see Limitations) and decide with the
 designer where the field lives. Waiting on the backend: calories from grams, undoing a
