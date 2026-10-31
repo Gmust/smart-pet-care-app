@@ -29,6 +29,18 @@ Keep it short and factual: what is true now, what was actually verified, what is
        the page is only reached without the app (desktop, app missing): say "open this link on
        your phone with Miso installed" or offer a web form.
     3. iOS Universal Links are out of scope (no paid Apple account).
+
+    The task for the backend developer is written out in `backend-task-password-reset.md` (repo
+    root), with only the debug fingerprint: the APKs handed to testers are built locally,
+    and `release` in the generated `build.gradle` signs with the debug key too.
+
+  - **Known limitation: that key is public.** `debug.keystore` is the stock React Native template
+    key, identical in every RN project. Anyone can sign an APK as `com.misopets.app` with it; it
+    would pass App Link verification and could even install over Miso as an update. It needs the
+    victim to sideload it, which is far harder than registering `miso://`, so it is acceptable for
+    tester builds. Before real users: own signing key (EAS), its SHA-256 into `assetlinks.json`,
+    its SHA-1 into the Google Android OAuth client (sign-in is bound to the debug SHA-1 today),
+    and every tester reinstalls once (a new signature cannot update the old APK).
   - Reset posts token + new password (register rules, shared `newPassword` in `auth.schema.ts`).
     `204` → toast; signed out → sign-in, signed in → `dismissTo("/(tabs)/home")` (not
     `replace("/")`, which would mount a second `(tabs)`). No `signOut` here: the link may belong to
@@ -60,6 +72,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
     Both screens scroll with `KeyboardAwareScrollView`: the confirm field used to sit under the
     keyboard (found in manual testing, fix checked on the device). The developer then tested the
     flow by hand on the S20 FE and reported it working.
+
 - Auth redesign (Figma "Full Design"): Welcome, SignIn and SignUp are separate routes and Confirm
   email is rebuilt in the same style. Terms are a checkbox on sign-up; Google asks in a consent
   sheet on both screens, and the server records no consent for it.
