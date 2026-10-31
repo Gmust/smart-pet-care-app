@@ -42,6 +42,12 @@ src/
 Routes are thin: they re-export `RouteErrorFallback as ErrorBoundary` and render a feature page.
 New features follow the shape above — `src/health/` is the reference implementation.
 
+- Route params are untrusted input: `useLocalSearchParams()` returns `string | string[]` whatever
+  its generic says (a repeated key is an array). Narrow with a zod `safeParse`
+  (`assistantRouteParamsSchema`, `resetPasswordRouteParamsSchema`), never the generic.
+- An `(auth)` screen a signed-in user can reach (via a deep link or a dead-link redirect) must not
+  lead to sign-in or sign-up while the session is live, nor while it is still `loading`.
+
 ## Commands
 
 Package manager: **pnpm** (with `node-linker=hoisted` in `.npmrc` for RN/Metro compatibility).
@@ -190,6 +196,11 @@ Conventions and traps, all of which have bitten before:
   Spread conditionally rather than passing `undefined`.
 - Guard optional native UI so a missing module degrades to a fallback instead of taking the screen
   down. React error boundaries catch JS throws only — a native crash needs correct configuration.
+- **Deep links that carry a credential (reset, magic-link, invite tokens) must use verified https
+  App Links / Universal Links, never the custom `miso://` scheme.** Any installed app can register
+  the same scheme and receive the token. `miso://` is for links with no secret in them. Such a
+  flow ships only once `adb shell pm get-app-links com.misopets.app` shows the host `verified`
+  on a device — a declared `autoVerify` filter is not proof.
 - See `SETUP.md` for the development-build and API-key steps.
 
 ## Definition of Done

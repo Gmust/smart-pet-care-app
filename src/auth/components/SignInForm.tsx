@@ -93,6 +93,21 @@ export const SignInForm = ({ onAuthenticated, children }: SignInFormProps) => {
             />
           )}
         </form.Field>
+
+        <View style={styles.forgotRow}>
+          <Button
+            variant="text"
+            size="inline"
+            onPress={() =>
+              router.push({
+                pathname: "/(auth)/forgot-password",
+                params: { email: form.getFieldValue("email") },
+              })
+            }
+          >
+            {t("auth:forgotPassword.link")}
+          </Button>
+        </View>
       </View>
 
       <View style={styles.actions}>
@@ -120,6 +135,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   fields: {
     gap: theme.spacing(4),
+  },
+  forgotRow: {
+    alignItems: "flex-end",
   },
   actions: {
     gap: theme.spacing(4),

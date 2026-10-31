@@ -6,11 +6,63 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Current state
 
-- Branch: `feature/auth-flow-redesign`, off `main` at `45374d7` (feeding and nutrition merged).
+- Branch: `feature/password-reset`, off `main` at `7f312ac` (auth redesign merged).
+- Password reset v1 (backend spec "Password reset v1"; `pnpm api:update` pulled
+  `forgot-password` / `reset-password`):
+  - Sign-in has "Forgot password?" → `(auth)/forgot-password` (email prefilled). Every `202`
+    shows "Check your inbox" with "Send again": the server answers the same for unknown addresses.
+  - The emailed link is `https://smart-pet-care.duckdns.org/reset-password?token=…`. The app
+    declares it as an Android App Link (`app.json` `intentFilters`, `autoVerify`) for
+    `(auth)/reset-password`; without verification the API's page opens
+    `miso://reset-password?token=…` instead. The scheme changed `smartpetcareapp` → `miso` to match
+    the backend's default `PASSWORD_RESET_APP_LINK`; nothing else used the old scheme.
+  - **Release blocker — do not ship this flow in any distributed APK until backend asks 1 and 2
+    are done and `pm get-app-links` shows the host `verified`.** Until then every real reset goes
+    through the `miso://` fallback, which carries the token; any installed app can register `miso`
+    and take over the account. Hiding "Forgot password?" would not help: `forgot-password` is
+    public, so an attacker can send the victim the email. Rule in `AGENTS.md`. Backend asks:
+    1. Serve `/.well-known/assetlinks.json` on the API host (`application/json`, no redirect) for
+       `com.misopets.app` with SHA-256 fingerprints: debug
+       `FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C`
+       plus the release/EAS key (owner to take it from EAS credentials).
+    2. `GET /reset-password` must stop opening `miso://` with the token. With App Links verified
+       the page is only reached without the app (desktop, app missing): say "open this link on
+       your phone with Miso installed" or offer a web form.
+    3. iOS Universal Links are out of scope (no paid Apple account).
+  - Reset posts token + new password (register rules, shared `newPassword` in `auth.schema.ts`).
+    `204` → toast; signed out → sign-in, signed in → `dismissTo("/(tabs)/home")` (not
+    `replace("/")`, which would mount a second `(tabs)`). No `signOut` here: the link may belong to
+    another account, and if it was this one, the revoked refresh token signs the device out via
+    `setUnauthorizedHandler` on the next refresh. `auth_reset_token_invalid` / `_expired` → Forgot
+    password. The token is parsed with zod (`resetPasswordRouteParamsSchema`): missing, blank or
+    repeated → "This link is incomplete" instead of the form.
+  - Reachable signed in, so neither screen offers sign-in over a live session: Reset hides its
+    footer unless `unauthenticated`; Forgot shows "Back to the app" (`/(tabs)/home`) when signed
+    in, "Back to sign in" when signed out, nothing while `loading`.
+  - Push re-registration after a reset needs nothing new: `NotificationProvider` posts the device
+    token on every sign-in.
+  - `AuthHeader` gained an optional `icon` badge. `ConfirmEmailPage` still draws its own badge.
+  - Not done: a 60 s cooldown on "Send again" (the server sends nothing inside 60 s; the old link
+    stays live).
+  - Verified: `pnpm check`, `ResetPasswordPage.test.tsx` (9 cases) and
+    `ForgotPasswordPage.test.tsx` (5), each new branch checked to fail when broken, real API: an invalid token returns `400 auth_reset_token_invalid`, an empty
+    one `errors.Token: auth_reset_token_required`. On the S20 FE (debug build, before the review
+    fixes): `miso://reset-password?token=bogus` cold-starts into the reset screen; Save → "This
+    reset link no longer works" and Forgot password; an address with no account → "Check your
+    inbox"; Back to sign in; the sign-in link carries the typed email over. After the fixes and a
+    `prebuild`: the manifest has the `autoVerify` https filter, `pm get-app-links` shows the debug
+    signature above and state `1024` (verification failed: no `assetlinks.json` yet);
+    `https://…/reset-password` opened with the package set shows "This link is incomplete" →
+    Request a new link → Forgot password; with `?token=` it shows the form. Not verified: a real
+    emailed link, a successful reset, App Link verification, and the signed-in paths of the second
+    review round (Back to the app, `dismissTo` home) on a device. On the device after that round:
+    `…/reset-password?token=a&token=b` cold-starts into "This link is incomplete", no crash.
+    Both screens scroll with `KeyboardAwareScrollView`: the confirm field used to sit under the
+    keyboard (found in manual testing, fix checked on the device). The developer then tested the
+    flow by hand on the S20 FE and reported it working.
 - Auth redesign (Figma "Full Design"): Welcome, SignIn and SignUp are separate routes and Confirm
   email is rebuilt in the same style. Terms are a checkbox on sign-up; Google asks in a consent
-  sheet on both screens, and the server records no consent for it. Forgot password is not built:
-  the backend has no endpoint.
+  sheet on both screens, and the server records no consent for it.
 - Shared pieces touched: new `Checkbox` and `ActionRow`; `Button` (`tonal`, `secondary`,
   `dangerText`, `inline` size; no `lg`); `DialogTitle` (`titleL` in all dialogs); `Input` type;
   `theme` (`controlS/M/L`, `shadows.card`, tight line height 1.25); `Tabs` (generic over its keys,
@@ -140,7 +192,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Next task
 
-The two ForgotPassword screens, once the backend ships password reset.
+Password reset on a device, end to end with a real email: request a link, open it from the mail
+app, set a password, sign in with it. Then a signed-in second device should be signed out on its
+next refresh. `android/` still lists the old `smartpetcareapp` scheme next to `miso` until a
+`prebuild --clean`.
 
 On the SDK 55 build of `com.misopets.app`: sign in with Google and with email, switch accounts
 (A, sign out, B) and confirm B sees their own pets and is asked for assistant consent, and
