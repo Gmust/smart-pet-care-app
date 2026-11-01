@@ -30,9 +30,9 @@ Keep it short and factual: what is true now, what was actually verified, what is
        your phone with Miso installed" or offer a web form.
     3. iOS Universal Links are out of scope (no paid Apple account).
 
-    The task for the backend developer is written out in `backend-task-password-reset.md` (repo
-    root), with only the debug fingerprint: the APKs handed to testers are built locally,
-    and `release` in the generated `build.gradle` signs with the debug key too.
+    The backend task is Jira KAN-93 (follow-up to KAN-92), with only the debug fingerprint: the APKs
+    handed to testers are built locally, and `release` in the generated `build.gradle` signs with
+    the debug key too.
 
   - **Known limitation: that key is public.** `debug.keystore` is the stock React Native template
     key, identical in every RN project. Anyone can sign an APK as `com.misopets.app` with it; it
