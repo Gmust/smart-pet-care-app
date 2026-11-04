@@ -13,26 +13,22 @@ Keep it short and factual: what is true now, what was actually verified, what is
     shows "Check your inbox" with "Send again": the server answers the same for unknown addresses.
   - The emailed link is `https://smart-pet-care.duckdns.org/reset-password?token=…`. The app
     declares it as an Android App Link (`app.json` `intentFilters`, `autoVerify`) for
-    `(auth)/reset-password`; without verification the API's page opens
-    `miso://reset-password?token=…` instead. The scheme changed `smartpetcareapp` → `miso` to match
-    the backend's default `PASSWORD_RESET_APP_LINK`; nothing else used the old scheme.
-  - **Release blocker — do not ship this flow in any distributed APK until backend asks 1 and 2
-    are done and `pm get-app-links` shows the host `verified`.** Until then every real reset goes
-    through the `miso://` fallback, which carries the token; any installed app can register `miso`
-    and take over the account. Hiding "Forgot password?" would not help: `forgot-password` is
-    public, so an attacker can send the victim the email. Rule in `AGENTS.md`. Backend asks:
-    1. Serve `/.well-known/assetlinks.json` on the API host (`application/json`, no redirect) for
-       `com.misopets.app` with SHA-256 fingerprints: debug
-       `FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C`
-       plus the release/EAS key (owner to take it from EAS credentials).
-    2. `GET /reset-password` must stop opening `miso://` with the token. With App Links verified
-       the page is only reached without the app (desktop, app missing): say "open this link on
-       your phone with Miso installed" or offer a web form.
-    3. iOS Universal Links are out of scope (no paid Apple account).
-
-    The backend task is Jira KAN-93 (follow-up to KAN-92), with only the debug fingerprint: the APKs
-    handed to testers are built locally, and `release` in the generated `build.gradle` signs with
-    the debug key too.
+    `(auth)/reset-password`. Reached without the app (desktop, app missing, link not verified),
+    the API's page only says to open the link on a phone with Miso installed; it no longer hands
+    the token to `miso://`. The scheme changed `smartpetcareapp` → `miso` to match the backend's
+    default `PASSWORD_RESET_APP_LINK`; nothing else used the old scheme.
+  - **Release blocker lifted on 2026-11-04** (backend fix in Jira KAN-93, follow-up to KAN-92).
+    The blocker was a `miso://` fallback that carried the token, so any app registering `miso`
+    could take over the account. Rule in `AGENTS.md`. Checked against the live API:
+    `/.well-known/assetlinks.json` answers `200 application/json` without a redirect, for
+    `com.misopets.app` with the debug SHA-256
+    `FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C`
+    only. `GET /reset-password` with a live token shows "Your reset link is ready / open this link
+    on your phone" with no link, script, meta refresh or echoed token (`Cache-Control: no-store`,
+    `Referrer-Policy: no-referrer`); a dead token shows "This link no longer works". The OpenAPI
+    spec did not change. Only the debug key is listed because the APKs handed to testers are built
+    locally, and `release` in the generated `build.gradle` signs with the debug key too. iOS
+    Universal Links are out of scope (no paid Apple account).
 
   - **Known limitation: that key is public.** `debug.keystore` is the stock React Native template
     key, identical in every RN project. Anyone can sign an APK as `com.misopets.app` with it; it
@@ -65,13 +61,18 @@ Keep it short and factual: what is true now, what was actually verified, what is
     `prebuild`: the manifest has the `autoVerify` https filter, `pm get-app-links` shows the debug
     signature above and state `1024` (verification failed: no `assetlinks.json` yet);
     `https://…/reset-password` opened with the package set shows "This link is incomplete" →
-    Request a new link → Forgot password; with `?token=` it shows the form. Not verified: a real
-    emailed link, a successful reset, App Link verification, and the signed-in paths of the second
-    review round (Back to the app, `dismissTo` home) on a device. On the device after that round:
-    `…/reset-password?token=a&token=b` cold-starts into "This link is incomplete", no crash.
-    Both screens scroll with `KeyboardAwareScrollView`: the confirm field used to sit under the
-    keyboard (found in manual testing, fix checked on the device). The developer then tested the
-    flow by hand on the S20 FE and reported it working.
+    Request a new link → Forgot password; with `?token=` it shows the form. On the device after
+    the second review round: `…/reset-password?token=a&token=b` cold-starts into "This link is
+    incomplete", no crash. Both screens scroll with `KeyboardAwareScrollView`: the confirm field
+    used to sit under the keyboard (found in manual testing, fix checked on the device). The
+    developer then tested the flow by hand on the S20 FE and reported it working.
+  - Verified on 2026-11-04 on the S20 FE (Android 13, debug build of this branch, after KAN-93):
+    `pm get-app-links com.misopets.app` → `smart-pet-care.duckdns.org: verified`;
+    `resolve-activity` for the https link → `com.misopets.app/.MainActivity` (no chooser). By the
+    developer, by hand: a real emailed link opened the app straight on the reset screen, the reset
+    succeeded, sign-in with the new password worked, and a second device signed in to the same
+    account was signed out on its next refresh. Not verified on a device: the signed-in paths of
+    the second review round (Back to the app, `dismissTo` home).
 
 - Auth redesign (Figma "Full Design"): Welcome, SignIn and SignUp are separate routes and Confirm
   email is rebuilt in the same style. Terms are a checkbox on sign-up; Google asks in a consent
@@ -205,10 +206,11 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Next task
 
-Password reset on a device, end to end with a real email: request a link, open it from the mail
-app, set a password, sign in with it. Then a signed-in second device should be signed out on its
-next refresh. `android/` still lists the old `smartpetcareapp` scheme next to `miso` until a
-`prebuild --clean`.
+Password reset, signed in, on a device: Forgot password shows "Back to the app" (→ Home), and a
+reset opened while signed in returns Home through `dismissTo`. Before a build goes to real users:
+an own signing key (EAS), its SHA-256 into `assetlinks.json` (backend) and its SHA-1 into the
+Google Android OAuth client. `android/` still lists the old `smartpetcareapp` scheme next to
+`miso` until a `prebuild --clean`.
 
 On the SDK 55 build of `com.misopets.app`: sign in with Google and with email, switch accounts
 (A, sign out, B) and confirm B sees their own pets and is asked for assistant consent, and
