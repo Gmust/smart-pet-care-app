@@ -48,12 +48,24 @@ describe("getReminderStatus", () => {
     ).toBe(ReminderStatus.Active);
   });
 
-  it("never downgrades a status the API already settled", () => {
+  it("shows a finished reminder that was actually done as Completed", () => {
     expect(
       getReminderStatus(
-        reminder({ status: ReminderStatus.Completed, nextTriggerAt: "2026-09-01T08:00:00.000Z" })
+        reminder({
+          status: ReminderStatus.Completed,
+          nextTriggerAt: "2026-09-01T08:00:00.000Z",
+          lastCompletedAt: "2026-09-01T08:05:00.000Z",
+        })
       )
     ).toBe(ReminderStatus.Completed);
+  });
+
+  it("shows a finished reminder nobody completed as Missed, not Done", () => {
+    // Regression: a one-off that fired and was ignored came back `Completed`
+    // (= no triggers left) and was badged "Done".
+    expect(
+      getReminderStatus(reminder({ status: ReminderStatus.Completed, lastCompletedAt: null }))
+    ).toBe(ReminderStatus.Missed);
   });
 });
 

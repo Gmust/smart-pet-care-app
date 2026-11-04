@@ -25,24 +25,19 @@ import { useUpdateRemindersMutation } from "../queries/useUpdateRemindersMutatio
 type Props = {
   reminderId: string;
   onClose: () => void;
-  markMissedOnDismiss?: boolean;
   /** Set when the drawer is opened from a notification that carried a run id. */
   runId?: string;
 };
 
+// No "Missed": the server marks a run missed on its own, and PATCHing any status but
+// `Active` switches the reminder off in the scheduler, so it would never fire again.
 const STATUS_OPTIONS: { status: ReminderStatus; variant: ButtonVariant }[] = [
   { status: ReminderStatus.Completed, variant: "primary" },
-  { status: ReminderStatus.Missed, variant: "danger" },
   // Deliberately the white bordered "secondary"; the old green look is now "tonal".
   { status: ReminderStatus.Cancelled, variant: "secondary" },
 ];
 
-export const ReminderStatusDrawer = ({
-  reminderId,
-  onClose,
-  markMissedOnDismiss = false,
-  runId,
-}: Props) => {
+export const ReminderStatusDrawer = ({ reminderId, onClose, runId }: Props) => {
   const { t } = useTranslation(["reminders", "common"]);
   const { data: reminder, isLoading: isReminderLoading } = useGetReminderById(reminderId);
   const { mutateAsync: updateReminder, isPending: isUpdating } = useUpdateRemindersMutation();
@@ -85,12 +80,6 @@ export const ReminderStatusDrawer = ({
   const handleOpenChange = (open: boolean) => {
     if (open || resolvedRef.current) return;
     resolvedRef.current = true;
-    if (markMissedOnDismiss) {
-      void updateReminder({
-        id: reminderId,
-        payload: { status: ReminderStatus.Missed },
-      }).catch((e: unknown) => console.error(e));
-    }
     onClose();
   };
 

@@ -34,7 +34,6 @@ export function ReminderStatusPrompt() {
       reminderId={target.reminderId}
       runId={target.runId}
       onClose={() => setTarget(null)}
-      markMissedOnDismiss
     />
   );
 }
