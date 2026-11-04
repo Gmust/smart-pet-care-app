@@ -74,6 +74,12 @@ export const getReminderStatus = (reminder: ReminderResponseDto): ReminderStatus
     return ReminderStatus.Missed;
   }
 
+  // API `Completed` means "no triggers left", not "someone did it": a one-off
+  // that fired and was ignored is `Completed` too. Only `lastCompletedAt` says it was done.
+  if (reminder.status === ReminderStatus.Completed && !reminder.lastCompletedAt) {
+    return ReminderStatus.Missed;
+  }
+
   return reminder.status ?? ReminderStatus.Active;
 };
 

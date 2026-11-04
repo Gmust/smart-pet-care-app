@@ -21,6 +21,12 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `pets/_layout`, `jest.setup.ts`.
 - Reminders: the edit form no longer offers pet or type (the PATCH takes neither), a saved PATCH
   response goes into the detail cache, and query keys live in `reminderQueryKeys`.
+- Reminder status (`fix/reminder-status-truth`): API `status: Completed` means "no triggers
+  left", not "done". `getReminderStatus` shows `Completed` with `lastCompletedAt: null` as
+  "Missed" (a one-off that fired and was ignored used to read "Done"). The push status prompt no
+  longer PATCHes `Missed`, from its button or on dismiss: any status but `Active` switches the
+  reminder off in the scheduler, so a dismissed prompt stopped a recurring reminder for good.
+  "Cancel reminder" still PATCHes `Cancelled` until the backend offers `/cancel`.
 - The Wellness screen moved from `/pets/wellness` (route removed) into the first tab of
   `AssessmentPage` (`/(tabs)/pets/assessment?petId=…`), opened by the "Assessment" button on a pet
   card.
@@ -77,6 +83,9 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Verified evidence
 
+- `fix/reminder-status-truth`: `pnpm check` clean, 74 suites / 667 tests. The new
+  `reminderGroups` test fails with the `lastCompletedAt` guard removed. The status prompt was not
+  re-checked on a device.
 - `pnpm check` on this branch (SDK 55): lint and typecheck clean, 74 suites / 666 tests. `act`
   warnings come only from suites outside this feature (activity, assistant, pet notes) and vary
   with timing.
@@ -106,6 +115,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Limitations
 
+- Reminders already PATCHed to `Missed` by the old prompt stay switched off in the scheduler;
+  restoring them to `Active` is a backend question. A recurring reminder that ended by `endAt`
+  shows "Done" if any earlier run was completed, even when its last run was missed: the run
+  history is the exact record.
 - No paid Apple Developer account: iOS push is out of scope (APNs keys need the paid program and
   the backend sends through FCM), so notifications stay Android-only, and TestFlight and a
   physical iPhone are ruled out. Backend follow-up is in Jira KAN-91.
@@ -154,3 +167,7 @@ Feeding: bring back a place in the app for `behavioralNotes` (see Limitations) a
 designer where the field lives. Waiting on the backend: calories from grams, undoing a
 completion, `isOverdue`, a weekly analysis mode, the PATCH `null` gap, a target source on the
 analysis DTO.
+
+Reminders: once the backend ships `/cancel` (or limits PATCH `status`), move "Cancel reminder"
+onto it and stop sending `status` in PATCH. Then check the push prompt on a device: dismissing
+it must leave the reminder `Active` and firing.
