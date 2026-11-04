@@ -20,6 +20,7 @@
     "auth_terms_not_accepted": "Accept the terms to continue.",
     "auth_confirmation_code_required": "Enter the confirmation code.",
     "auth_confirmation_code_malformed": "That code doesn't look right. Check your email and try again.",
+    "auth_reset_token_required": "This reset link is incomplete. Request a new one.",
     "chat_pet_id_required": "Choose a pet to start a chat.",
     "chat_client_message_id_required": "Your message couldn't be sent. Please try again.",
     "chat_message_text_required": "Type a message first.",
@@ -88,6 +89,8 @@
     "auth_invalid_credentials": "Incorrect email or password.",
     "auth_google_failed": "Google sign-in didn't complete. Please try again.",
     "auth_oauth_code_required": "Google sign-in didn't complete. Please try again.",
+    "auth_reset_token_invalid": "This reset link no longer works. Request a new one.",
+    "auth_reset_token_expired": "This reset link has expired. Request a new one.",
 
     "user_not_found": "This account couldn't be found.",
     "user_avatar_not_found": "No profile photo yet.",

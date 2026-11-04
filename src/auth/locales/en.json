@@ -31,11 +31,34 @@
     "resend": "Resend",
     "backToSignIn": "Back to sign in"
   },
+  "forgotPassword": {
+    "link": "Forgot password?",
+    "title": "Forgot your password?",
+    "subtitle": "Enter your account email and we'll send you a link to choose a new one.",
+    "submit": "Send reset link",
+    "sentTitle": "Check your inbox",
+    "sentBody": "If {{email}} has an account, a reset link is on its way.",
+    "resendPrompt": "Didn't get it?",
+    "resend": "Send again",
+    "backToSignIn": "Back to sign in",
+    "backToApp": "Back to the app"
+  },
+  "resetPassword": {
+    "title": "Choose a new password",
+    "subtitle": "You'll use it to sign in. Devices signed in to this account will be signed out.",
+    "submit": "Save password",
+    "linkMissingTitle": "This link is incomplete",
+    "linkMissingBody": "Open the link from the email again, or request a new one.",
+    "requestNewLink": "Request a new link",
+    "backToSignIn": "Back to sign in"
+  },
   "fields": {
     "email": "Email",
     "emailPlaceholder": "you@example.com",
     "password": "Password",
     "passwordPlaceholder": "Your password",
+    "newPassword": "New password",
+    "newPasswordPlaceholder": "Your new password",
     "passwordHint": "6+ characters, with a letter, a number and a symbol",
     "passwordConfirm": "Confirm password",
     "passwordConfirmPlaceholder": "Re-enter your password",
@@ -77,6 +100,8 @@
     "emailConfirmedBody": "You can now sign in.",
     "codeResentTitle": "Code sent",
     "welcomeBackTitle": "Welcome back",
-    "welcomeBackBody": "You're signed in."
+    "welcomeBackBody": "You're signed in.",
+    "passwordResetTitle": "Password changed",
+    "passwordResetBody": "Sign in with your new password."
   }
 }

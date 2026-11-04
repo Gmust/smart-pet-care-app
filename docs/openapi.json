@@ -4003,6 +4003,150 @@
         }
       }
     },
+    "/terms": {
+      "get": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "304": {
+            "description": "Not Modified"
+          }
+        }
+      },
+      "head": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "304": {
+            "description": "Not Modified"
+          }
+        }
+      }
+    },
+    "/privacy": {
+      "get": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "304": {
+            "description": "Not Modified"
+          }
+        }
+      },
+      "head": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "304": {
+            "description": "Not Modified"
+          }
+        }
+      }
+    },
+    "/terms.pdf": {
+      "get": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {}
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {}
+            }
+          }
+        }
+      }
+    },
+    "/privacy.pdf": {
+      "get": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {}
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {}
+            }
+          }
+        }
+      }
+    },
+    "/terms.html": {
+      "get": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/html": {}
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/html": {}
+            }
+          }
+        }
+      }
+    },
+    "/privacy.html": {
+      "get": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/html": {}
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": ["Legal"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/html": {}
+            }
+          }
+        }
+      }
+    },
     "/api/pets/{petId}/journal": {
       "get": {
         "tags": ["JournalEntry"],
@@ -6547,6 +6691,166 @@
         }
       }
     },
+    "/api/auth/forgot-password": {
+      "post": {
+        "tags": ["Auth"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "tags": ["Auth"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Gone",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/auth/login": {
       "post": {
         "tags": ["Auth"],
@@ -6613,6 +6917,26 @@
           },
           "403": {
             "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
             "content": {
               "text/plain": {
                 "schema": {
@@ -6706,6 +7030,46 @@
     "/api/auth/logout": {
       "post": {
         "tags": ["Auth"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/LogoutRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/LogoutRequest"
+                  }
+                ]
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/LogoutRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "204": {
             "description": "No Content"
@@ -6907,6 +7271,28 @@
           }
         },
         "security": []
+      }
+    },
+    "/reset-password": {
+      "get": {
+        "tags": ["Auth"],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/html": {}
+            }
+          }
+        }
       }
     },
     "/api/pets/{petId}/activity-logs": {
@@ -8891,6 +9277,15 @@
       "FoodType": {
         "enum": ["DryFood", "WetFood", "Homemade", "Treat", "Supplement", "Other"]
       },
+      "ForgotPasswordRequest": {
+        "required": ["email"],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
       "GoogleMobileRequest": {
         "type": "object",
         "properties": {
@@ -9041,6 +9436,14 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "LogoutRequest": {
+        "type": "object",
+        "properties": {
+          "deviceToken": {
+            "type": ["null", "string"]
           }
         }
       },
@@ -10120,6 +10523,23 @@
           }
         }
       },
+      "ResetPasswordRequest": {
+        "required": ["token", "password", "passwordConfirm"],
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "password": {
+            "minLength": 6,
+            "pattern": "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[\\W_]).+$",
+            "type": "string"
+          },
+          "passwordConfirm": {
+            "type": "string"
+          }
+        }
+      },
       "SessionMessageResponseDto": {
         "required": ["answer", "disclaimer"],
         "type": "object",
@@ -10536,6 +10956,9 @@
     },
     {
       "name": "Note"
+    },
+    {
+      "name": "Legal"
     },
     {
       "name": "JournalEntry"
