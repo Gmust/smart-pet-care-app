@@ -47,4 +47,4 @@ Changing the bundled sound list requires regenerating and rebuilding the native 
 
 ## Reminder status routing
 
-When a reminder notification carries `data.reminderId`, tapping it opens the app and shows a status drawer (`ReminderStatusPrompt` → `ReminderStatusDrawer`) for that reminder. The user picks a status (`Completed`, `Missed`, or `Cancelled`), persisted via `PATCH /api/reminders/{id}`. Dismissing the drawer without choosing marks the reminder `Missed`. Notifications without a string `data.reminderId` open the app with no drawer.
+When a reminder notification carries `data.reminderId`, tapping it opens the app and shows a status drawer (`ReminderStatusPrompt` → `ReminderStatusDrawer`) for that reminder. The user picks `Completed` (`POST /api/reminders/{id}/complete`) or `Cancelled` (`PATCH /api/reminders/{id}` with `status: Cancelled`). There is no `Missed` option and dismissing the drawer changes nothing: the server marks missed runs itself, and PATCHing any status but `Active` switches the reminder off in the scheduler. Notifications without a string `data.reminderId` open the app with no drawer.
