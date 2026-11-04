@@ -19,10 +19,10 @@ import { useAuth } from "../hooks/useAuth";
 import { useResetPasswordMutation } from "../queries/useResetPasswordMutation";
 import { resetPasswordRouteParamsSchema, resetPasswordSchema } from "../schemas/auth.schema";
 
-// The supported way in is the emailed https://<api>/reset-password?token=… as a verified Android
-// App Link. The API's fallback page still opens miso://reset-password?token=…, which any app can
-// register and intercept — a known backend gap that blocks shipping this flow (docs/HANDOFF.md,
-// AGENTS.md). Only the submit can tell a live token from a dead one.
+// The way in is the emailed https://<api>/reset-password?token=… as a verified Android App Link.
+// The API's browser fallback never hands the token to miso:// (KAN-93), so a miso:// URL reaching
+// this screen did not come from the reset email. Only the submit can tell a live token from a dead
+// one.
 export default function ResetPasswordPage() {
   const { t } = useTranslation(["auth"]);
   const { theme } = useUnistyles();
@@ -35,18 +35,13 @@ export default function ResetPasswordPage() {
   const schema = useMemo(() => resetPasswordSchema(t), [t]);
   const token = params.success ? params.data.token : null;
 
-  // A missing, spent, superseded or expired link cannot be fixed here: the next step is a new one.
-  const requestNewLink = (message: string) => {
-    Toast.show({ type: "error", text1: message });
-    router.replace("/(auth)/forgot-password");
-  };
-
   const form = useForm({
     defaultValues: { password: "", passwordConfirm: "" },
     validators: { onChange: schema, onSubmit: schema },
     onSubmit: async ({ value }) => {
-      // Narrowing only: without a token the form is not rendered.
-      if (!token) return;
+      // Without a token the form is not rendered. While the session is loading, where to go
+      // afterwards is unknown: sign-in would land on top of a session that is about to be live.
+      if (!token || status === "loading") return;
 
       try {
         await resetPassword({
@@ -56,8 +51,10 @@ export default function ResetPasswordPage() {
         });
       } catch (error) {
         const { code } = getApiError(error);
+        // A spent, superseded or expired link cannot be fixed here: the next step is a new one.
         if (code === "auth_reset_token_invalid" || code === "auth_reset_token_expired") {
-          requestNewLink(getApiErrorMessage(error));
+          Toast.show({ type: "error", text1: getApiErrorMessage(error) });
+          router.replace("/(auth)/forgot-password");
           return;
         }
         setApiFieldErrors(form, error);
@@ -128,7 +125,7 @@ export default function ResetPasswordPage() {
                 {(isSubmitting) => (
                   <Button
                     variant="primary"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || status === "loading"}
                     isLoading={isSubmitting}
                     onPress={() => form.handleSubmit()}
                   >

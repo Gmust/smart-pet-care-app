@@ -46,13 +46,16 @@ Keep it short and factual: what is true now, what was actually verified, what is
     repeated → "This link is incomplete" instead of the form.
   - Reachable signed in, so neither screen offers sign-in over a live session: Reset hides its
     footer unless `unauthenticated`; Forgot shows "Back to the app" (`/(tabs)/home`) when signed
-    in, "Back to sign in" when signed out, nothing while `loading`.
+    in, "Back to sign in" when signed out, nothing while `loading`. Reset's Save is disabled while
+    `loading` (and `onSubmit` returns early): the destination after a reset is picked from
+    `status`, and a cold start from the App Link would otherwise send a soon-signed-in device to
+    sign-in. The test fails only with both guards removed; each one alone holds it.
   - Push re-registration after a reset needs nothing new: `NotificationProvider` posts the device
     token on every sign-in.
   - `AuthHeader` gained an optional `icon` badge. `ConfirmEmailPage` still draws its own badge.
   - Not done: a 60 s cooldown on "Send again" (the server sends nothing inside 60 s; the old link
     stays live).
-  - Verified: `pnpm check`, `ResetPasswordPage.test.tsx` (9 cases) and
+  - Verified: `pnpm check`, `ResetPasswordPage.test.tsx` (10 cases) and
     `ForgotPasswordPage.test.tsx` (5), each new branch checked to fail when broken, real API: an invalid token returns `400 auth_reset_token_invalid`, an empty
     one `errors.Token: auth_reset_token_required`. On the S20 FE (debug build, before the review
     fixes): `miso://reset-password?token=bogus` cold-starts into the reset screen; Save → "This

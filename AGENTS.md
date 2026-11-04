@@ -200,7 +200,10 @@ Conventions and traps, all of which have bitten before:
   App Links / Universal Links, never the custom `miso://` scheme.** Any installed app can register
   the same scheme and receive the token. `miso://` is for links with no secret in them. Such a
   flow ships only once `adb shell pm get-app-links com.misopets.app` shows the host `verified`
-  on a device — a declared `autoVerify` filter is not proof.
+  on a device — a declared `autoVerify` filter is not proof. `verified` only says who signed the
+  APK: the stock React Native `debug.keystore` is public, so its fingerprint in `assetlinks.json`
+  is acceptable for tester builds only. A build for real users needs a private release key (EAS)
+  listed there instead.
 - See `SETUP.md` for the development-build and API-key steps.
 
 ## Definition of Done

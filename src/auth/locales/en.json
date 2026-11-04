@@ -45,7 +45,7 @@
   },
   "resetPassword": {
     "title": "Choose a new password",
-    "subtitle": "You'll use it to sign in. Any other devices will be signed out.",
+    "subtitle": "You'll use it to sign in. Devices signed in to this account will be signed out.",
     "submit": "Save password",
     "linkMissingTitle": "This link is incomplete",
     "linkMissingBody": "Open the link from the email again, or request a new one.",

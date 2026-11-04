@@ -115,6 +115,17 @@ describe("ResetPasswordPage", () => {
     expect(queryByText("auth:resetPassword.backToSignIn")).toBeNull();
   });
 
+  // A cold start from the App Link restores the session; until it settles, a submit would pick
+  // sign-in and stack it on top of a session that is about to be live.
+  it("does not submit while the session is still loading", async () => {
+    mockStatus = "loading";
+    submitPassword("New-pass1!");
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(mockResetPassword).not.toHaveBeenCalled();
+    expect(mockRouter.dismissTo).not.toHaveBeenCalled();
+  });
+
   it.each([
     [400, "auth_reset_token_invalid"],
     [410, "auth_reset_token_expired"],
