@@ -10,8 +10,8 @@ const GOOGLE_SIGNIN_PLUGIN = "@react-native-google-signin/google-signin";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: config.name ?? "smart-pet-care-app",
-  slug: config.slug ?? "smart-pet-care-app",
+  name: config.name ?? "Miso",
+  slug: config.slug ?? "miso",
   // app.json may list the plugin bare or as [name, options]; keep any options.
   plugins: config.plugins?.map((plugin) => {
     if (!googleIosUrlScheme) return plugin;

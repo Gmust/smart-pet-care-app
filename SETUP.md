@@ -33,7 +33,8 @@ this prevents shipping a broken update.
 
 ## What's already in the repo
 
-- `app.json` — `updates.url` (points at EAS project `05b59c80-...`) and
+- `app.json` — `updates.url` (points at EAS project `44433327-...`, `@reflexivecdvs-team/miso`;
+  it must match `extra.eas.projectId`, or installed builds never see an update) and
   `runtimeVersion.policy: "fingerprint"`.
 - `expo-updates` added to `package.json` dependencies.
 - `eas.json` — `development`, `preview`, `production` build profiles, each mapped to
@@ -104,9 +105,15 @@ These require interactive login / secrets and can't be done from this session.
 ## Manual publish / build from the CLI (optional)
 
 ```bash
+export GOOGLE_SERVICES_JSON=./google-services.json
 eas update --branch preview --message "quick fix"      # publish an OTA update now
 eas build -p android --profile preview                 # native rebuild now
 ```
+
+Set `GOOGLE_SERVICES_JSON` first. On EAS it is a secret file variable, which the CLI cannot
+read, and the fingerprint includes the file's contents. Without the local copy the CLI computes a
+different runtime version than the builder: `eas build` fails in "Configure expo-updates" with
+"Runtime version mismatch", and `eas update` publishes an update no build will accept.
 
 ## Development builds (required since the activity tracker landed)
 
