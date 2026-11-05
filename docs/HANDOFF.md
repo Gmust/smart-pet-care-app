@@ -97,6 +97,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
   longer PATCHes `Missed`, from its button or on dismiss: any status but `Active` switches the
   reminder off in the scheduler, so a dismissed prompt stopped a recurring reminder for good.
   "Cancel reminder" still PATCHes `Cancelled` until the backend offers `/cancel`.
+- Deleting a pet (`useDeletePet`) invalidates the whole query cache. The server deletes the pet's
+  reminders, meals, activities, records and notes with it, and with the one-hour `staleTime`
+  Home kept showing a deleted pet's reminder until the app restarted (found in the 2026-11-05
+  device run).
 - The Wellness screen moved from `/pets/wellness` (route removed) into the first tab of
   `AssessmentPage` (`/(tabs)/pets/assessment?petId=…`), opened by the "Assessment" button on a pet
   card.
@@ -163,6 +167,15 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Verified evidence
 
+- Release APK from `main` `a8ef8ad` (local `assembleRelease` after `prebuild --clean`, signed with
+  the debug key, handed to testers) on the S20 FE on 2026-11-05, driven over adb: App Link
+  `verified`; signed in, Forgot password shows "Back to the app" → Home; a signed-in https reset
+  link opens the form without "Back to sign in", and a dead token → toast + Forgot password;
+  pet create and delete; a one-off reminder's push arrived on time (the FCM token reaches the
+  backend), the status prompt offers only Mark completed / Cancel reminder, and dismissing it left
+  the reminder shown as "Missed"; the Google Map renders (Poznań); a meal is logged; the assistant
+  asks for consent after a fresh sign-in. No `FATAL EXCEPTION`. Not checked: Google sign-in, an
+  account switch, a recurring reminder firing again after a dismissed prompt, Mark completed.
 - `main` after the three merges (`ef012b0`): lint and typecheck clean, 76 suites / 682 tests.
   Five suites (ConfirmEmail, NutritionAnalysis, CreateActivityDrawer, Assistant, FeedingTabContent)
   failed once on `waitFor` timeouts with the machine at load average 25 and passed when re-run
@@ -237,16 +250,13 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Next task
 
-Password reset, signed in, on a device: Forgot password shows "Back to the app" (→ Home), and a
-reset opened while signed in returns Home through `dismissTo`. Before a build goes to real users:
-the EAS release keystore already exists (SHA-1 under Current state); take its SHA-256 from
-`eas credentials` and have the backend add it to `assetlinks.json`, and add the SHA-1 to the
-Google Android OAuth client. Drop the public debug fingerprint once testers move to EAS builds. `android/` still lists the old `smartpetcareapp` scheme next to
-`miso` until a `prebuild --clean`.
+Before a build goes to real users: the EAS release keystore already exists (SHA-1 under Current
+state); take its SHA-256 from `eas credentials` and have the backend add it to
+`assetlinks.json`, and add the SHA-1 to the Google Android OAuth client. Drop the public debug
+fingerprint once testers move to EAS builds.
 
-On the SDK 55 build of `com.misopets.app`: sign in with Google and with email, switch accounts
-(A, sign out, B) and confirm B sees their own pets and is asked for assistant consent, and
-confirm the FCM token reaches the backend. If Google sign-in fails with `DEVELOPER_ERROR`, the
+On the SDK 55 build of `com.misopets.app`: sign in with Google, switch accounts (A, sign out, B)
+and confirm B sees their own pets. If Google sign-in fails with `DEVELOPER_ERROR`, the
 Android OAuth client in project `1000214284290` is missing the package or SHA-1
 `5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25`; the owner also has to confirm the
 Maps key restriction. On the iOS simulator, check Google sign-in with the new iOS client ID.
