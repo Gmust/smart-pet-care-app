@@ -10,9 +10,10 @@ export const useDeletePet = () => {
     mutationFn: async (petId: string) => {
       await deleteApiPetsId(petId);
     },
-    onSuccess: (_, petId) => {
-      queryClient.invalidateQueries({ queryKey: ["pets"] });
-      queryClient.invalidateQueries({ queryKey: ["pets", petId] });
+    // The server deletes the pet's reminders, meals, activities, records and notes with it, and
+    // those are cached under other features' keys with a one-hour staleTime: refresh them all.
+    onSuccess: () => {
+      queryClient.invalidateQueries();
     },
   });
 };
