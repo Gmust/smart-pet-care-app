@@ -6,7 +6,8 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Current state
 
-- Branch: `feature/password-reset`, off `main` at `7f312ac` (auth redesign merged).
+- Branch: `main` at `ef012b0`, with #29 (EAS `updates.url`), #30 (reminder status) and #31
+  (password reset) merged on 2026-11-04.
 - Password reset v1 (backend spec "Password reset v1"; `pnpm api:update` pulled
   `forgot-password` / `reset-password`):
   - Sign-in has "Forgot password?" → `(auth)/forgot-password` (email prefilled). Every `202`
@@ -69,7 +70,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
     incomplete", no crash. Both screens scroll with `KeyboardAwareScrollView`: the confirm field
     used to sit under the keyboard (found in manual testing, fix checked on the device). The
     developer then tested the flow by hand on the S20 FE and reported it working.
-  - Verified on 2026-11-04 on the S20 FE (Android 13, debug build of this branch, after KAN-93):
+  - Verified on 2026-11-04 on the S20 FE (Android 13, debug build of #31, after KAN-93):
     `pm get-app-links com.misopets.app` → `smart-pet-care.duckdns.org: verified`;
     `resolve-activity` for the https link → `com.misopets.app/.MainActivity` (no chooser). By the
     developer, by hand: a real emailed link opened the app straight on the reset screen, the reset
@@ -90,7 +91,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `pets/_layout`, `jest.setup.ts`.
 - Reminders: the edit form no longer offers pet or type (the PATCH takes neither), a saved PATCH
   response goes into the detail cache, and query keys live in `reminderQueryKeys`.
-- Reminder status (`fix/reminder-status-truth`): API `status: Completed` means "no triggers
+- Reminder status (#30): API `status: Completed` means "no triggers
   left", not "done". `getReminderStatus` shows `Completed` with `lastCompletedAt: null` as
   "Missed" (a one-off that fired and was ignored used to read "Done"). The push status prompt no
   longer PATCHes `Missed`, from its button or on dismiss: any status but `Active` switches the
@@ -146,14 +147,14 @@ Keep it short and factual: what is true now, what was actually verified, what is
   fails. EAS (`@reflexivecdvs-team/miso`) has `GOOGLE_SERVICES_JSON`, `EXPO_PUBLIC_API_URL`, the
   Google client IDs and `GOOGLE_MAPS_API_KEY` in all three profiles. The first EAS build,
   `preview` Android `0d70eeee` from `7f312ac`, finished on 29 October 2026 (runtime `3ac597b4…`).
-  It was built before this branch, so it still carries the old `updates.url` and receives no OTA
+  It was built before #29, so it still carries the old `updates.url` and receives no OTA
   updates. EAS generated the release keystore on that run: SHA-1
   `36:C5:68:76:55:DC:E9:1F:DB:02:6F:7F:3C:49:A8:70:CC:BE:BB:3F`.
 - `updates.url` pointed at the pre-rename EAS project `05b59c80` while `projectId` was
   `44433327` (miso); it now matches. Run `eas build`/`eas update` from the CLI with
   `GOOGLE_SERVICES_JSON=./google-services.json` (see `SETUP.md`); without it the first build
   failed with "Runtime version mismatch".
-- From this branch (`a13e83c`): `preview` build `746acf59` and update group `674a99de` share
+- From #29 (`a13e83c`): `preview` build `746acf59` and update group `674a99de` share
   runtime `6d41f023…`. The `preview` channel had no linked branch, so no APK on it could get an
   update; it now points at the `preview` branch (an EAS-side setting, not in the repo).
 - Pet notes are first-class entities behind `/api/pets/{petId}/notes`; the route
@@ -162,10 +163,14 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Verified evidence
 
-- `fix/reminder-status-truth`: `pnpm check` clean, 74 suites / 667 tests. The new
+- `main` after the three merges (`ef012b0`): lint and typecheck clean, 76 suites / 682 tests.
+  Five suites (ConfirmEmail, NutritionAnalysis, CreateActivityDrawer, Assistant, FeedingTabContent)
+  failed once on `waitFor` timeouts with the machine at load average 25 and passed when re-run
+  alone (139 tests).
+- #30: `pnpm check` clean, 74 suites / 667 tests. The new
   `reminderGroups` test fails with the `lastCompletedAt` guard removed. The status prompt was not
   re-checked on a device.
-- `pnpm check` on this branch (SDK 55): lint and typecheck clean, 74 suites / 666 tests. `act`
+- `pnpm check` on the auth redesign (#28, SDK 55): lint and typecheck clean, 74 suites / 666 tests. `act`
   warnings come only from suites outside this feature (activity, assistant, pet notes) and vary
   with timing.
 - The feeding tests were mutation-checked (about 400 mutants); the survivors are equivalent or
@@ -177,7 +182,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
 - Checked on an Android device: the whole Feeding flow (tab, log screen, weight history, goal
   sheet, meal logging through the FAB and through a slot, the analysis run), the drawers, and the
   Home entry with Back.
-- Checked before this branch, on a Samsung phone with SDK 55: pets list and profile, the photo
+- Checked before #27, on a Samsung phone with SDK 55: pets list and profile, the photo
   viewer, Terms opening the HTML page, notification permission with no FCM warning, the activity
   map (current location, fullscreen tap, Poznań default); the whole note CRUD and its offline
   paths against the live backend. iOS: prebuild and pods pass, the welcome screen renders on a
@@ -234,8 +239,9 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 Password reset, signed in, on a device: Forgot password shows "Back to the app" (→ Home), and a
 reset opened while signed in returns Home through `dismissTo`. Before a build goes to real users:
-an own signing key (EAS), its SHA-256 into `assetlinks.json` (backend) and its SHA-1 into the
-Google Android OAuth client. `android/` still lists the old `smartpetcareapp` scheme next to
+the EAS release keystore already exists (SHA-1 under Current state); take its SHA-256 from
+`eas credentials` and have the backend add it to `assetlinks.json`, and add the SHA-1 to the
+Google Android OAuth client. Drop the public debug fingerprint once testers move to EAS builds. `android/` still lists the old `smartpetcareapp` scheme next to
 `miso` until a `prebuild --clean`.
 
 On the SDK 55 build of `com.misopets.app`: sign in with Google and with email, switch accounts
