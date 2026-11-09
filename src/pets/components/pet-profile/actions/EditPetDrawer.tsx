@@ -10,6 +10,8 @@ import { AnimalSpecies, type PetResponseDto, Sex } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
+import { PET_SPECIES } from "@/pets/constants";
+import { useSpeciesLabel } from "@/pets/hooks/useSpeciesLabel";
 import { useUpdatePetMutation } from "@/pets/queries/useUpdatePetMutation";
 import type { CreatePetForm } from "@/pets/schemas/create-pet.schema";
 import { createPetSchema } from "@/pets/schemas/create-pet.schema";
@@ -35,7 +37,6 @@ type Props = {
   setIsOpen: (open: boolean) => void;
 };
 
-const SPECIES = ["Dog", "Cat", "Bird", "Rabbit", "Other"] as const;
 const SEX_OPTIONS: Sex[] = [Sex.Unknown, Sex.Male, Sex.Female];
 const SELECT_PORTAL_HOST = "select";
 
@@ -56,10 +57,7 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
 
   const defaultValues = useMemo(() => getPetFormValues(pet), [pet]);
 
-  const speciesLabel = (value: string) => {
-    const known = SPECIES.find((species) => species === value);
-    return known ? t(`pets:species.${known}`) : value;
-  };
+  const speciesLabel = useSpeciesLabel();
 
   const form = useForm({
     defaultValues,
@@ -159,7 +157,7 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
                     <SelectValue placeholder={t("pets:createPetDrawer.placeholders.species")} />
                   </SelectTrigger>
                   <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
-                    {SPECIES.map((species) => (
+                    {PET_SPECIES.map((species) => (
                       <SelectItem
                         key={species}
                         value={species}

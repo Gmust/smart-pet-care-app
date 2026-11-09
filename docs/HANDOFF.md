@@ -101,6 +101,14 @@ Keep it short and factual: what is true now, what was actually verified, what is
   reminders, meals, activities, records and notes with it, and with the one-hour `staleTime`
   Home kept showing a deleted pet's reminder until the app restarted (found in the 2026-11-05
   device run).
+- Species (branch `feature/all-animal-species`): the create and edit pickers offer every
+  `AnimalSpecies` but `Unknown`. `PET_SPECIES` (`src/pets/constants.ts`) is derived from the
+  generated enum, so a species the backend adds shows up after `pnpm api:generate`, and typecheck
+  fails until it has a `pets:species.*` key. `useSpeciesLabel` translates the species on the
+  profile Basics row, the profile flag and the assistant pet picker, which showed raw values such
+  as `GuineaPig`. `PetSpeciesImage`: Hamster and Guinea pig → `RatIcon`, Fish → `FishSymbolIcon`,
+  Other → `PawPrintIcon`, and new `BirdIcon` / `TurtleIcon` copied from Lucide 1.70.0 (the
+  existing `RatIcon` matches that release path for path). Unknown or no species stays blank.
 - The Wellness screen moved from `/pets/wellness` (route removed) into the first tab of
   `AssessmentPage` (`/(tabs)/pets/assessment?petId=…`), opened by the "Assessment" button on a pet
   card.
@@ -167,6 +175,9 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Verified evidence
 
+- Species branch: `pnpm check` clean, 77 suites / 683 tests; deleting the `Turtle` key fails
+  typecheck. Not checked on a device: the 9-item species dropdown (height, scrolling) and the new
+  icons.
 - Release APK from `main` `a8ef8ad` (local `assembleRelease` after `prebuild --clean`, signed with
   the debug key, handed to testers) on the S20 FE on 2026-11-05, driven over adb: App Link
   `verified`; signed in, Forgot password shows "Back to the app" → Home; a signed-in https reset
@@ -249,6 +260,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `AGENTS.md`.
 
 ## Next task
+
+Species branch: on a device, open Create pet and scroll the species list to Other, create a
+Guinea pig and a Turtle without photos, and check the list card, profile hero, Basics row and the
+assistant pet picker.
 
 Before a build goes to real users: the EAS release keystore already exists (SHA-1 under Current
 state); take its SHA-256 from `eas credentials` and have the backend add it to

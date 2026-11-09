@@ -7,6 +7,7 @@ import type { PetResponseDto } from "@/api/generated";
 import { AiIcon } from "@/icons/ai-icon";
 import { ChevronIcon } from "@/icons/chevron";
 import { PetSpeciesImage } from "@/pets/components/PetSpeciesImage";
+import { useSpeciesLabel } from "@/pets/hooks/useSpeciesLabel";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 
@@ -28,6 +29,7 @@ export function PetSelection({
   goToPets: () => void;
 }) {
   const { t } = useTranslation(["assistant"]);
+  const speciesLabel = useSpeciesLabel();
   return (
     <SafeAreaView style={styles.selectionScreen}>
       <ScrollView
@@ -70,7 +72,9 @@ export function PetSelection({
                 <View style={styles.petOptionCopy}>
                   <Text style={styles.petOptionName}>{pet.name}</Text>
                   <Text style={styles.petOptionMeta} numberOfLines={1}>
-                    {[pet.species, pet.breed].filter(Boolean).join(" · ") || t("pets.profile")}
+                    {[pet.species && speciesLabel(pet.species), pet.breed]
+                      .filter(Boolean)
+                      .join(" · ") || t("pets.profile")}
                   </Text>
                 </View>
                 <View style={styles.petOptionAction}>

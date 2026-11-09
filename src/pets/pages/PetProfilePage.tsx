@@ -30,6 +30,7 @@ import { EmptyTabPlaceholder } from "../components/tabs/EmptyTabPlaceholder";
 import { OverviewTabContent } from "../components/tabs/OverviewTabContent";
 import { RemindersTabContent } from "../components/tabs/RemindersTabContent";
 import { useBackToOrigin } from "../hooks/useBackToOrigin";
+import { useSpeciesLabel } from "../hooks/useSpeciesLabel";
 import { usePetQuery } from "../queries/usePetQuery";
 import {
   petProfileParamsSchema,
@@ -59,6 +60,7 @@ export default function PetProfilePage() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { t } = useTranslation(["pets", "common"]);
+  const speciesLabel = useSpeciesLabel();
 
   const petId = parsedParams.success ? parsedParams.data.petId : undefined;
   const goBackToOrigin = useBackToOrigin(parsedParams.success ? parsedParams.data.from : undefined);
@@ -101,7 +103,7 @@ export default function PetProfilePage() {
       });
     }
     if (!flags.length && pet.species) {
-      flags.push({ id: "species", label: pet.species, tone: "ok" });
+      flags.push({ id: "species", label: speciesLabel(pet.species), tone: "ok" });
     }
   }
 
