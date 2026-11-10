@@ -1,0 +1,42 @@
+appId: com.misopets.app
+name: FR-16 Feeding log (Meals > See all)
+env:
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
+# Pets list > "Assessment" button (label "Open assessment for <name>") opens
+# the Assessment screen; the card body itself opens the profile.
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+      selected: true
+    timeout: 20000
+- tapOn: "Pets"
+- extendedWaitUntil:
+    visible: "Open assessment for ${PET_NAME}"
+    timeout: 15000
+- tapOn: "Open assessment for ${PET_NAME}"
+- extendedWaitUntil:
+    visible:
+      text: "Wellness"
+      selected: true
+    timeout: 15000
+- tapOn: "Feeding"
+- assertVisible:
+    text: "Feeding"
+    selected: true
+- extendedWaitUntil:
+    visible: "See all"
+    timeout: 15000
+- tapOn: "See all"
+- extendedWaitUntil:
+    visible: "Feeding log"
+    timeout: 15000
+- assertVisible: "All"
+# Loaded list: the empty message, or a day header "TODAY · 300 KCAL" / "TODAY · 1 MEAL"
+# (label variant renders upper-case; kcal wins when any meal has calories).
+- extendedWaitUntil:
+    visible: '(?i)(No meals logged today|.* · \d+ (meals?|kcal))'
+    timeout: 15000
+- takeScreenshot: evidence/FR-16

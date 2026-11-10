@@ -1,0 +1,50 @@
+appId: com.misopets.app
+name: LIMIT Coming-soon placeholders (Recommendations, Care)
+env:
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
+# Negative evidence on purpose: both tabs ship and render only
+# EmptyTabPlaceholder. Recommendations is in Assessment, Care in the profile.
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+      selected: true
+    timeout: 20000
+- tapOn: "Pets"
+- extendedWaitUntil:
+    visible: "Open assessment for ${PET_NAME}"
+    timeout: 15000
+- tapOn: "Open assessment for ${PET_NAME}"
+- extendedWaitUntil:
+    visible:
+      text: "Wellness"
+      selected: true
+    timeout: 15000
+- tapOn: "Recommendations"
+- assertVisible:
+    text: "Recommendations"
+    selected: true
+- extendedWaitUntil:
+    visible: "Recommendations are coming soon"
+    timeout: 5000
+- takeScreenshot: evidence/LIMIT-coming-soon-recommendations
+- tapOn:
+    text: "Back"
+    above: "Recommendations"
+- extendedWaitUntil:
+    visible: "View ${PET_NAME}"
+    timeout: 15000
+- tapOn: "View ${PET_NAME}"
+- extendedWaitUntil:
+    visible: "Overview"
+    timeout: 15000
+- tapOn: "Care"
+- assertVisible:
+    text: "Care"
+    selected: true
+- extendedWaitUntil:
+    visible: "Coming soon"
+    timeout: 5000
+- takeScreenshot: evidence/LIMIT-coming-soon

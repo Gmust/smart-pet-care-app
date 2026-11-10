@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites><testsuite name="Test Suite" device="RFCT6094RAY" tests="1" failures="0" time="26.728" timestamp="2026-11-10T16:02:09">
+    <testcase id="FR-13 Delete account (open confirmation, cancel)" name="FR-13 Delete account (open confirmation, cancel)" classname="FR-13 Delete account (open confirmation, cancel)" file=".maestro/evidence/fr-13-delete-account.yaml" time="26.717" timestamp="2026-11-10T16:02:09" status="SUCCESS" />
+  </testsuite>
+<testsuite name="Test Suite" device="adb-RFCT6094RAY-Bmgy3L._adb-tls-connect._tcp" tests="1" failures="0" time="63.492" timestamp="2026-11-10T15:41:06">
+    <testcase id="FR-14 Health records (list, Add record drawer)" name="FR-14 Health records (list, Add record drawer)" classname="FR-14 Health records (list, Add record drawer)" file=".maestro/evidence/fr-14-health-records.yaml" time="63.479" timestamp="2026-11-10T15:41:06" status="SUCCESS" />
+  </testsuite>
+<testsuite name="Test Suite" device="adb-RFCT6094RAY-Bmgy3L._adb-tls-connect._tcp" tests="1" failures="0" time="48.137" timestamp="2026-11-10T15:42:55">
+    <testcase id="FR-15 Activity logs (list, filters, Add activity drawer)" name="FR-15 Activity logs (list, filters, Add activity drawer)" classname="FR-15 Activity logs (list, filters, Add activity drawer)" file=".maestro/evidence/fr-15-activity-logs.yaml" time="48.125" timestamp="2026-11-10T15:42:55" status="SUCCESS" />
+  </testsuite>
+<testsuite name="Test Suite" device="RFCT6094RAY" tests="1" failures="0" time="33.022" timestamp="2026-11-10T16:03:10">
+    <testcase id="FR-16 Feeding log (Meals &gt; See all)" name="FR-16 Feeding log (Meals &gt; See all)" classname="FR-16 Feeding log (Meals &gt; See all)" file=".maestro/evidence/fr-16-feeding-log.yaml" time="33.009" timestamp="2026-11-10T16:03:10" status="SUCCESS" />
+  </testsuite>
+<testsuite name="Test Suite" device="RFCT6094RAY" tests="1" failures="0" time="42.92" timestamp="2026-11-10T16:04:17">
+    <testcase id="FR-17 Nutrition goal drawer and nutrition analysis" name="FR-17 Nutrition goal drawer and nutrition analysis" classname="FR-17 Nutrition goal drawer and nutrition analysis" file=".maestro/evidence/fr-17-nutrition-goal.yaml" time="42.906" timestamp="2026-11-10T16:04:17" status="SUCCESS" />
+  </testsuite>
+<testsuite name="Test Suite" device="RFCT6094RAY" tests="1" failures="0" time="38.897" timestamp="2026-11-10T16:34:11">
+    <testcase id="FR-18 Weight history with chart" name="FR-18 Weight history with chart" classname="FR-18 Weight history with chart" file=".maestro/evidence/fr-18-weight-history.yaml" time="38.888" timestamp="2026-11-10T16:34:11" status="SUCCESS" />
+  </testsuite>
+<testsuite name="Test Suite" device="adb-RFCT6094RAY-Bmgy3L._adb-tls-connect._tcp" tests="1" failures="0" time="53.503" timestamp="2026-11-10T16:23:43">
+    <testcase id="FR-19 Wellness score (Home card &gt; Assessment, Wellness tab)" name="FR-19 Wellness score (Home card &gt; Assessment, Wellness tab)" classname="FR-19 Wellness score (Home card &gt; Assessment, Wellness tab)" file=".maestro/evidence/fr-19-wellness-score.yaml" time="53.491" timestamp="2026-11-10T16:23:43" status="SUCCESS" />
+  </testsuite>
+<testsuite name="Test Suite" device="RFCT6094RAY" tests="1" failures="0" time="34.708" timestamp="2026-11-10T16:06:58">
+    <testcase id="FR-20 Pet notes (open editor, leave without saving)" name="FR-20 Pet notes (open editor, leave without saving)" classname="FR-20 Pet notes (open editor, leave without saving)" file=".maestro/evidence/fr-20-pet-notes.yaml" time="34.697" timestamp="2026-11-10T16:06:58" status="SUCCESS" />
+  </testsuite>
+<testsuite name="Test Suite" device="adb-RFCT6094RAY-Bmgy3L._adb-tls-connect._tcp" tests="1" failures="0" time="62.537" timestamp="2026-11-10T15:52:47">
+    <testcase id="LIMIT Coming-soon placeholders (Recommendations, Care)" name="LIMIT Coming-soon placeholders (Recommendations, Care)" classname="LIMIT Coming-soon placeholders (Recommendations, Care)" file=".maestro/evidence/limitations-coming-soon.yaml" time="62.527" timestamp="2026-11-10T15:52:47" status="SUCCESS" />
+  </testsuite>
+<testsuite name="Test Suite" device="adb-RFCT6094RAY-Bmgy3L._adb-tls-connect._tcp" tests="1" failures="0" time="112.455" timestamp="2026-11-10T15:54:45">
+    <testcase id="FR-21 Password reset request (signed out)" name="FR-21 Password reset request (signed out)" classname="FR-21 Password reset request (signed out)" file=".maestro/evidence/fr-21-password-reset.yaml" time="112.443" timestamp="2026-11-10T15:54:45" status="SUCCESS" />
+  </testsuite>
+</testsuites>

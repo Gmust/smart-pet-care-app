@@ -1,0 +1,40 @@
+appId: com.misopets.app
+name: FR-15 Activity logs (list, filters, Add activity drawer)
+# "Filters" and "Add activity" are accessibility labels (ActivityTrackerPage).
+# The create drawer's title is also "Add activity", so its open state is
+# asserted on the submit button. Opening it only reads the location grant.
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+      selected: true
+    timeout: 20000
+- tapOn: "Activity"
+- assertVisible:
+    text: "Activity"
+    selected: true
+# Loaded list: an entry card (label "<type> — open actions") or the empty message.
+- extendedWaitUntil:
+    visible: '(No activity recorded yet\. Add the first walk, play, or training session\.|.+ — open actions)'
+    timeout: 15000
+- tapOn: "Filters"
+- extendedWaitUntil:
+    visible: "Filter activity"
+    timeout: 5000
+- assertVisible: "Activity type"
+- assertVisible: "Intensity"
+- tapOn: "Close"
+- extendedWaitUntil:
+    notVisible: "Filter activity"
+    timeout: 5000
+- tapOn: "Add activity"
+- extendedWaitUntil:
+    visible: "Save activity"
+    timeout: 5000
+- tapOn: "Close"
+- extendedWaitUntil:
+    notVisible: "Save activity"
+    timeout: 5000
+- assertVisible: '(No activity recorded yet\. Add the first walk, play, or training session\.|.+ — open actions)'
+- takeScreenshot: evidence/FR-15

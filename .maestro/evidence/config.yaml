@@ -1,0 +1,30 @@
+# Evidence flows: one per documented requirement, each ending in a screenshot.
+# Run by explicit path only: `maestro test .maestro/evidence -e PET_NAME=<pet>`.
+# Kept out of the perf run: scripts/perf.sh calls its five flows by file path,
+# and the parent .maestro/config.yaml glob ("*.yaml") is not recursive.
+#
+# Preconditions on the device:
+# - the app is signed in;
+# - the PET_NAME pet has at least 1 nutrition analysis (fr-17), at least 1 weight
+#   entry in the last 90 days (fr-18; the chart plot draws from 2) and a wellness evaluation (fr-19);
+# - fr-21 leaves the app signed out: sign back in by hand before the next run.
+flows:
+  - "*.yaml"
+executionOrder:
+  continueOnFailure: true
+  # Entries match each flow's `name:` value; the file name is used only when a
+  # flow has no `name:`. An unmatched first entry throws; an unmatched later
+  # entry silently ends the sequence there. Check `sequence=FlowSequence(...)`
+  # under "Created execution plan" in the run's maestro.log.
+  # fr-21 signs the app out, so it must run last: every other flow needs a session.
+  flowsOrder:
+    - "FR-13 Delete account (open confirmation, cancel)"
+    - "FR-14 Health records (list, Add record drawer)"
+    - "FR-15 Activity logs (list, filters, Add activity drawer)"
+    - "FR-16 Feeding log (Meals > See all)"
+    - "FR-17 Nutrition goal drawer and nutrition analysis"
+    - "FR-18 Weight history with chart"
+    - "FR-19 Wellness score (Home card > Assessment, Wellness tab)"
+    - "FR-20 Pet notes (open editor, leave without saving)"
+    - "LIMIT Coming-soon placeholders (Recommendations, Care)"
+    - "FR-21 Password reset request (signed out)"

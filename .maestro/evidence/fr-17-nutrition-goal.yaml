@@ -1,0 +1,55 @@
+appId: com.misopets.app
+name: FR-17 Nutrition goal drawer and nutrition analysis
+env:
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
+# The goal drawer opens only once the summary has loaded, so the flow waits for
+# "Edit goal" (shown from then on) and taps it. The drawer has no close button,
+# and Android back closes any open drawer (drawer.tsx BackHandler). The analysis screen opens only from an
+# existing analysis card ("Open nutrition analysis"): with no analysis the block
+# offers "Run analysis" instead, which runs the AI and does not navigate.
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+      selected: true
+    timeout: 20000
+- tapOn: "Pets"
+- extendedWaitUntil:
+    visible: "Open assessment for ${PET_NAME}"
+    timeout: 15000
+- tapOn: "Open assessment for ${PET_NAME}"
+- extendedWaitUntil:
+    visible:
+      text: "Wellness"
+      selected: true
+    timeout: 15000
+- tapOn: "Feeding"
+- extendedWaitUntil:
+    visible: "Edit goal"
+    timeout: 15000
+- tapOn: "Edit goal"
+- extendedWaitUntil:
+    visible: "Daily goal"
+    timeout: 5000
+- assertVisible: "Calories per day"
+- assertVisible: "Save goal"
+- back
+- extendedWaitUntil:
+    notVisible: "Save goal"
+    timeout: 5000
+- scrollUntilVisible:
+    element: "Open nutrition analysis"
+    direction: DOWN
+    # A target left under the floating tab bar takes the tap.
+    centerElement: true
+- tapOn: "Open nutrition analysis"
+- extendedWaitUntil:
+    visible: "Nutrition analysis"
+    timeout: 15000
+# SectionHeader renders its label upper-case on screen.
+- extendedWaitUntil:
+    visible: "(?i)Latest"
+    timeout: 15000
+- takeScreenshot: evidence/FR-17

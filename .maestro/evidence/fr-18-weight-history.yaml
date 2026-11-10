@@ -1,0 +1,46 @@
+appId: com.misopets.app
+name: FR-18 Weight history with chart
+env:
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
+# The weight card (label "History") exists only once the pet has at least 1
+# weight entry in the last 90 days; the chart plot draws from two entries on and has no selector of its own, so
+# the asserts cover the chart card's value and the period chips, and the
+# screenshot shows the plot.
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+      selected: true
+    timeout: 20000
+- tapOn: "Pets"
+- extendedWaitUntil:
+    visible: "Open assessment for ${PET_NAME}"
+    timeout: 15000
+- tapOn: "Open assessment for ${PET_NAME}"
+- extendedWaitUntil:
+    visible:
+      text: "Wellness"
+      selected: true
+    timeout: 15000
+- tapOn: "Feeding"
+- extendedWaitUntil:
+    visible: "See all"
+    timeout: 15000
+- scrollUntilVisible:
+    element: "History"
+    direction: DOWN
+    # A target left under the floating tab bar takes the tap.
+    centerElement: true
+- tapOn: "History"
+- extendedWaitUntil:
+    visible: "Weight history"
+    timeout: 15000
+- assertVisible: "1 month"
+- assertVisible: "3 months"
+- assertVisible: "1 year"
+- extendedWaitUntil:
+    visible: '\d+(\.\d+)? kg'
+    timeout: 15000
+- takeScreenshot: evidence/FR-18
