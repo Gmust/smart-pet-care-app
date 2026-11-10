@@ -157,7 +157,6 @@ const styles = StyleSheet.create((theme) => ({
   petOptionMeta: {
     fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
-    textTransform: "capitalize",
   },
   petOptionAction: {
     width: theme.spacing(9),

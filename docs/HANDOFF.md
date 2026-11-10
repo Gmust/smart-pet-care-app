@@ -176,8 +176,11 @@ Keep it short and factual: what is true now, what was actually verified, what is
 ## Verified evidence
 
 - Species branch: `pnpm check` clean, 77 suites / 683 tests; deleting the `Turtle` key fails
-  typecheck. Not checked on a device: the 9-item species dropdown (height, scrolling) and the new
-  icons.
+  typecheck. On the S20 FE on 2026-11-10 (dev build, driven over adb): Create and Edit list the 9
+  species with "Guinea pig"; pet J edited through Guinea pig, Turtle, Bird, Fish and Other saved
+  each time, and the profile hero showed the mapped icon while the Basics row and flag showed the
+  translated name. The assistant pet picker read "Guinea Pig" until its `textTransform:
+"capitalize"` was removed, then "Guinea pig". J was set back to Hamster; no `FATAL EXCEPTION`.
 - Release APK from `main` `a8ef8ad` (local `assembleRelease` after `prebuild --clean`, signed with
   the debug key, handed to testers) on the S20 FE on 2026-11-05, driven over adb: App Link
   `verified`; signed in, Forgot password shows "Back to the app" → Home; a signed-in https reset
@@ -223,6 +226,11 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Limitations
 
+- The species dropdown holds 9 items and cuts off exactly after Turtle: "Other" is reachable by
+  scrolling, but no partial row or scrollbar shows that the list scrolls. A fix belongs in the
+  shared `Select` (a max height that leaves half a row visible), which touches every dropdown.
+- The assistant pet picker shows the breed exactly as typed now that the meta line no longer
+  capitalises every word.
 - Reminders already PATCHed to `Missed` by the old prompt stay switched off in the scheduler;
   restoring them to `Active` is a backend question. A recurring reminder that ended by `endAt`
   shows "Done" if any earlier run was completed, even when its last run was missed: the run
@@ -261,9 +269,9 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Next task
 
-Species branch: on a device, open Create pet and scroll the species list to Other, create a
-Guinea pig and a Turtle without photos, and check the list card, profile hero, Basics row and the
-assistant pet picker.
+Species branch: push `feature/all-animal-species` and open the PR. Then decide whether to drop the
+placeholder Care (pet profile) and Recommendations (Assessment) tabs: both render only
+`EmptyTabPlaceholder`, nothing links to them, and removing both leaves that component unused.
 
 Before a build goes to real users: the EAS release keystore already exists (SHA-1 under Current
 state); take its SHA-256 from `eas credentials` and have the backend add it to
