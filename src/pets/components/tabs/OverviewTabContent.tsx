@@ -8,6 +8,7 @@ import { SectionHeader } from "@/common/components/SectionHeader";
 import { Button } from "@/shadecn/ui/button";
 import { ListCard } from "@/shadecn/ui/card";
 
+import { useSpeciesLabel } from "../../hooks/useSpeciesLabel";
 import { useNotesQuery } from "../../queries/notes/useNotesQuery";
 import type { usePetQuery } from "../../queries/usePetQuery";
 import { InfoRow } from "../pet-profile/InfoRow";
@@ -22,6 +23,7 @@ type Props = {
 
 export const OverviewTabContent = ({ pet }: Props) => {
   const { t } = useTranslation(["pets", "common"]);
+  const speciesLabel = useSpeciesLabel();
   const router = useRouter();
 
   const { data: notes = [] } = useNotesQuery(pet.id);
@@ -47,7 +49,9 @@ export const OverviewTabContent = ({ pet }: Props) => {
       <ListCard style={styles.listCard}>
         <InfoRow
           label={t("petProfilePage.basics.species")}
-          value={pet.species ?? t("petProfilePage.fallbacks.speciesUnknown")}
+          value={
+            pet.species ? speciesLabel(pet.species) : t("petProfilePage.fallbacks.speciesUnknown")
+          }
         />
         <InfoRow
           label={t("petProfilePage.basics.breed")}

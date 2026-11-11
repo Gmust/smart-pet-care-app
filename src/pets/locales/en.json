@@ -128,10 +128,15 @@
     "kg": "kg"
   },
   "species": {
+    "Unknown": "Unknown",
     "Dog": "Dog",
     "Cat": "Cat",
     "Bird": "Bird",
     "Rabbit": "Rabbit",
+    "Hamster": "Hamster",
+    "GuineaPig": "Guinea pig",
+    "Fish": "Fish",
+    "Turtle": "Turtle",
     "Other": "Other"
   },
   "sex": {

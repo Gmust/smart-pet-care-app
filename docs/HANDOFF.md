@@ -101,6 +101,24 @@ Keep it short and factual: what is true now, what was actually verified, what is
   reminders, meals, activities, records and notes with it, and with the one-hour `staleTime`
   Home kept showing a deleted pet's reminder until the app restarted (found in the 2026-11-05
   device run).
+- Species (branch `feature/all-animal-species`): the create and edit pickers offer every
+  `AnimalSpecies` but `Unknown`. `PET_SPECIES` (`src/pets/constants.ts`) is derived from the
+  generated enum, so a species the backend adds shows up after `pnpm api:generate`, and typecheck
+  fails until it has a `pets:species.*` key. `useSpeciesLabel` translates the species on the
+  profile Basics row, the profile flag and the assistant pet picker, which showed raw values such
+  as `GuineaPig`. `PetSpeciesImage`: Hamster and Guinea pig → `RatIcon`, Fish → `FishSymbolIcon`,
+  Other → `PawPrintIcon`, and new `BirdIcon` / `TurtleIcon` copied from Lucide 1.70.0 (the
+  existing `RatIcon` matches that release path for path). Unknown or no species stays blank, and
+  the profile flag skips it instead of showing a green "Unknown". Edit Pet now PATCHes only the
+  fields that changed (`src/pets/utils/buildPetPatch.ts`): text trimmed, blank list rows dropped,
+  a cleared list sent as `null` and a cleared breed as `""` (the server reads `breed: null` as "not
+  sent"), and an unchanged species never resent. The server rejects `species: "Unknown"` with
+  `pet_species_invalid`, so before this every save of a pet stored as `Unknown` failed; and every
+  field went out raw (`allergies: [""]`), overwriting concurrent edits. Edit Pet no longer has a
+  Weight field (`editPetSchema` = create schema minus `weightKg`): `UpdatePetDto` has no
+  `weightKg` and the server ignores it (`{"weightKg": 10}` alone → `pet_update_empty`), so a typed
+  weight was thrown away behind a success toast. Weight changes through the weight log
+  (Assessment → Feeding → weight history); creating a pet seeds its first log entry.
 - The Wellness screen moved from `/pets/wellness` (route removed) into the first tab of
   `AssessmentPage` (`/(tabs)/pets/assessment?petId=…`), opened by the "Assessment" button on a pet
   card.
@@ -167,6 +185,22 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Verified evidence
 
+- Species branch: `pnpm check` clean, 78 suites / 690 tests; deleting the `Turtle` key fails
+  typecheck. `buildPetPatch.test.ts` fails when the species is always sent, when list rows are not
+  trimmed, when the breed is not trimmed, when a blanked breed is sent as `null`, or when a stored
+  name or breed is compared untrimmed (each checked
+  by breaking the helper). On the S20 FE on 2026-11-11 (dev build, test account, pet J): with Edit
+  open, breed `Syrian` and allergies `["Dust"]` were PATCHed from curl; renaming J on the phone
+  saved the name and both server values survived. Clearing the breed on the phone stored `null`
+  (the first try, sending `null`, was silently ignored by the server, which is how the `""` rule
+  was found). After the Weight field was removed, Edit showed no weight row and a rename still
+  saved with the weight unchanged. J was restored to its baseline. The Unknown profile flag was **not** checked on a
+  device: the server refuses `Unknown` on create and update, so no test pet can carry it.
+  On the S20 FE on 2026-11-10 (dev build, driven over adb): Create and Edit list the 9
+  species with "Guinea pig"; pet J edited through Guinea pig, Turtle, Bird, Fish and Other saved
+  each time, and the profile hero showed the mapped icon while the Basics row and flag showed the
+  translated name. The assistant pet picker read "Guinea Pig" until its capitalize
+  `textTransform` was removed, then "Guinea pig". J was set back to Hamster; no `FATAL EXCEPTION`.
 - Release APK from `main` `a8ef8ad` (local `assembleRelease` after `prebuild --clean`, signed with
   the debug key, handed to testers) on the S20 FE on 2026-11-05, driven over adb: App Link
   `verified`; signed in, Forgot password shows "Back to the app" → Home; a signed-in https reset
@@ -212,6 +246,20 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Limitations
 
+- Not checked: whether the server updates `pet.weightKg` when a later weight log is added (the
+  client assumes so and invalidates `["pets"]` after every weight-log mutation).
+- `UpdatePetDto`'s plain nullable fields (`name`, `species`, `breed`, `birthDate`, `sex`) ignore
+  `null`: each sent alone as `null` returns `pet_update_empty`. `""` clears `breed`; no way to
+  clear `birthDate` is known (`""` was not tried). Recorded in `AGENTS.md`; raise with the backend.
+- Signing out in the dev build logged `Failed to unregister the Android notification token`
+  (401, `notificationRegistration.ts:54`), seen on 2026-11-11. The unregister call seems to run
+  after the session is gone, so the server may keep pushing to this device for the old account.
+  Not investigated.
+- The species dropdown holds 9 items and cuts off exactly after Turtle: "Other" is reachable by
+  scrolling, but no partial row or scrollbar shows that the list scrolls. A fix belongs in the
+  shared `Select` (a max height that leaves half a row visible), which touches every dropdown.
+- The assistant pet picker shows the breed exactly as typed now that the meta line no longer
+  capitalises every word.
 - Reminders already PATCHed to `Missed` by the old prompt stay switched off in the scheduler;
   restoring them to `Active` is a backend question. A recurring reminder that ended by `endAt`
   shows "Done" if any earlier run was completed, even when its last run was missed: the run
@@ -249,6 +297,10 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `AGENTS.md`.
 
 ## Next task
+
+Species branch: push `feature/all-animal-species` and open the PR. Then decide whether to drop the
+placeholder Care (pet profile) and Recommendations (Assessment) tabs: both render only
+`EmptyTabPlaceholder`, nothing links to them, and removing both leaves that component unused.
 
 Before a build goes to real users: the EAS release keystore already exists (SHA-1 under Current
 state); take its SHA-256 from `eas credentials` and have the backend add it to

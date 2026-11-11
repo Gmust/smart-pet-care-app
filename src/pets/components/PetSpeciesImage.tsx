@@ -3,9 +3,10 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { Image } from "expo-image";
 
+import { FishSymbolIcon } from "@/icons/fish-symbol";
 import type { IconProps } from "@/icons/icons";
-import { CatIcon, DogIcon } from "@/icons/pets";
-import { RabbitIcon } from "@/icons/pets/rabbit";
+import { PawPrintIcon } from "@/icons/paw-print";
+import { BirdIcon, CatIcon, DogIcon, RabbitIcon, RatIcon, TurtleIcon } from "@/icons/pets";
 import { palette } from "@/styles/palette";
 
 type PetSpeciesImageVariant = "card" | "hero";
@@ -20,6 +21,12 @@ const SPECIES_ICONS: Record<string, ComponentType<IconProps>> = {
   cat: CatIcon,
   dog: DogIcon,
   rabbit: RabbitIcon,
+  hamster: RatIcon,
+  guineapig: RatIcon,
+  bird: BirdIcon,
+  fish: FishSymbolIcon,
+  turtle: TurtleIcon,
+  other: PawPrintIcon,
 };
 
 export function PetSpeciesImage({ photoUrl, species, variant = "card" }: PetSpeciesImageProps) {

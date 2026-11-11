@@ -141,6 +141,11 @@ const styles = StyleSheet.create((theme) => ({
 - **PATCH endpoints use `PatchFieldOf<T>` semantics: an omitted key is left unchanged, `null`
   clears the value.** Send only the fields that actually changed, or a stale form will silently
   overwrite someone else's concurrent edit.
+- `UpdatePetDto` breaks that rule for its plain nullable fields (`name`, `species`, `breed`,
+  `birthDate`, `sex`): the server ignores `null` (any of them sent alone as `null` returns
+  `pet_update_empty`; checked 2026-11-11). Clear `breed` with `""`; no way to clear `birthDate` is
+  known. Only the `PatchFieldOf*` fields (lists, photo) clear with `null`. The server trims text
+  and drops blank list rows on write.
 - Known spec gap: `PatchFieldOf*` **enum** types have no `null` member, so enum fields cannot be
   cleared through PATCH even though their description says otherwise. Do not paper over this with
   an `as` cast — constrain the form instead, and raise it with the backend.
