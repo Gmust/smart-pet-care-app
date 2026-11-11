@@ -1,0 +1,47 @@
+appId: com.misopets.app
+name: FR-20 Pet notes (open editor, leave without saving)
+env:
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
+# The editor saves on leave only when dirty; a new note left blank returns early
+# (SingleNoteEditor isEmpty), so leaving it untouched makes no request.
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+      selected: true
+    timeout: 20000
+- tapOn: "Pets"
+- extendedWaitUntil:
+    visible: "View ${PET_NAME}"
+    timeout: 15000
+- tapOn: "View ${PET_NAME}"
+- extendedWaitUntil:
+    visible:
+      text: "Overview"
+      selected: true
+    timeout: 15000
+- scrollUntilVisible:
+    element: "Add note"
+    direction: DOWN
+    # A target left under the floating tab bar takes the tap.
+    centerElement: true
+- tapOn: "Add note"
+- extendedWaitUntil:
+    visible: "Untitled"
+    timeout: 5000
+- assertVisible: "Start typing…"
+# The editor is the evidence; the flow must leave it before it ends.
+- takeScreenshot: evidence/FR-20-editor
+# The "Untitled" title shares the header row with Back: pin to the body below.
+- tapOn:
+    text: "Back"
+    above: "Start typing…"
+- extendedWaitUntil:
+    visible:
+      text: "Overview"
+      selected: true
+    timeout: 15000
+- assertVisible: "(?i)Notes"
+- takeScreenshot: evidence/FR-20

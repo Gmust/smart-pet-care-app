@@ -1,0 +1,48 @@
+appId: com.misopets.app
+name: FR-14 Health records (list, Add record drawer)
+env:
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
+# Pet profile > Health tab > "Vet visits" tile opens the record list
+# (HealthHistorySection, type=VetVisit). "Add record" is the list's icon button.
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+      selected: true
+    timeout: 20000
+- tapOn: "Pets"
+- extendedWaitUntil:
+    visible: "View ${PET_NAME}"
+    timeout: 15000
+- tapOn: "View ${PET_NAME}"
+- extendedWaitUntil:
+    visible: "Overview"
+    timeout: 15000
+- tapOn: "Health"
+- assertVisible:
+    text: "Health"
+    selected: true
+- extendedWaitUntil:
+    visible: "Vet visits"
+    timeout: 15000
+- assertVisible: "Vaccinations"
+- assertVisible: "Deworming"
+- assertVisible: "Anti-parasite"
+- tapOn: "Vet visits"
+- extendedWaitUntil:
+    visible: "Search by title, description, provider"
+    timeout: 15000
+- assertVisible: "Vet visits"
+- tapOn: "Add record"
+- extendedWaitUntil:
+    visible: "Add Vet visits record"
+    timeout: 5000
+- assertVisible: "Save record"
+- tapOn: "Close"
+- extendedWaitUntil:
+    notVisible: "Add Vet visits record"
+    timeout: 5000
+- assertVisible: "Search by title, description, provider"
+- takeScreenshot: evidence/FR-14

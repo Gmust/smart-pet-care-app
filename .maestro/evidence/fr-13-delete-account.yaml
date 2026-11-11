@@ -1,0 +1,40 @@
+appId: com.misopets.app
+name: FR-13 Delete account (open confirmation, cancel)
+# SAFETY: the dialog's confirm button reads "Delete account", the same text as
+# the menu row that opens it. The row is opened through its description and that
+# label is never tapped; inside the dialog only "Cancel" is pressed.
+# `?` is a regex quantifier in Maestro selectors, so the dialog title is escaped.
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+      selected: true
+    timeout: 20000
+- tapOn: "Profile"
+- assertVisible:
+    text: "Profile"
+    selected: true
+- extendedWaitUntil:
+    visible: "Leave this device"
+    timeout: 15000
+- scrollUntilVisible:
+    element: "Permanently remove your data"
+    direction: DOWN
+    # A target left under the floating tab bar takes the tap.
+    centerElement: true
+- tapOn: "Permanently remove your data"
+- extendedWaitUntil:
+    visible: 'Delete account\?'
+    timeout: 5000
+- assertVisible: "This will permanently remove your account and all of your pets. This action cannot be undone."
+# The confirmation is the evidence; the flow must cancel before it ends.
+- takeScreenshot: evidence/FR-13-dialog
+- tapOn:
+    text: "Cancel"
+    below: 'Delete account\?'
+- extendedWaitUntil:
+    notVisible: 'Delete account\?'
+    timeout: 5000
+- assertVisible: "Permanently remove your data"
+- takeScreenshot: evidence/FR-13

@@ -1,0 +1,53 @@
+appId: com.misopets.app
+name: FR-19 Wellness score (Home card > Assessment, Wellness tab)
+env:
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
+# On the Home card only the nested score block ("Wellness score") opens
+# Assessment with tab=wellness; the card body opens the profile. The label
+# "Wellness score" exists only there: the Assessment screen does not render it.
+# Card eyebrow and SectionHeader labels are upper-cased on screen, hence (?i).
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      text: "Home"
+      selected: true
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "(?i)How .+ is doing"
+    timeout: 15000
+# Home shows one pet card at a time (carousel): swipe to this pet's card.
+- repeat:
+    times: 5
+    while:
+      notVisible: "(?i)How ${PET_NAME} is doing"
+    commands:
+      - swipe:
+          from:
+            text: "(?i)How .+ is doing"
+          direction: LEFT
+      - waitForAnimationToEnd
+- assertVisible: "(?i)How ${PET_NAME} is doing"
+# Pin the tap to this pet's card when Home shows several.
+- tapOn:
+    text: "Wellness score"
+    below: "(?i)How ${PET_NAME} is doing"
+- extendedWaitUntil:
+    visible:
+      text: "Wellness"
+      selected: true
+    timeout: 15000
+# Loaded evaluation: its data-status line. Signals render below the score and
+# summary cards, so scroll to them.
+- extendedWaitUntil:
+    visible: "(Based on .+ data|Not enough data yet)"
+    timeout: 15000
+- scrollUntilVisible:
+    element: "(?i)Signals"
+    direction: DOWN
+- scrollUntilVisible:
+    element: "Baseline"
+    direction: DOWN
+- assertVisible: "Preventive care"
+- takeScreenshot: evidence/FR-19
