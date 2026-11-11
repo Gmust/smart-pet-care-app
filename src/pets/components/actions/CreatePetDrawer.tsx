@@ -136,11 +136,7 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
                   </SelectTrigger>
                   <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
                     {PET_SPECIES.map((species) => (
-                      <SelectItem
-                        key={species}
-                        value={species}
-                        label={t(`pets:species.${species}`)}
-                      />
+                      <SelectItem key={species} value={species} label={speciesLabel(species)} />
                     ))}
                   </SelectContent>
                 </Select>

@@ -8,6 +8,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useQueryClient } from "@tanstack/react-query";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
+import { AnimalSpecies } from "@/api/generated";
 import { BackButton } from "@/common/components/BackButton";
 import { PhotoViewer } from "@/common/components/PhotoViewer";
 import { useRefreshControl } from "@/common/hooks/useRefreshControl";
@@ -102,7 +103,7 @@ export default function PetProfilePage() {
         tone: "warn",
       });
     }
-    if (!flags.length && pet.species) {
+    if (!flags.length && pet.species && pet.species !== AnimalSpecies.Unknown) {
       flags.push({ id: "species", label: speciesLabel(pet.species), tone: "ok" });
     }
   }
