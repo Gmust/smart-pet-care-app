@@ -45,3 +45,9 @@ export const createPetSchema = (t: TFunction<"pets">) =>
 
 type CreatePetSchema = ReturnType<typeof createPetSchema>;
 export type CreatePetForm = z.input<CreatePetSchema>;
+
+// Edit has no weight: `UpdatePetDto` takes no `weightKg`, so weight changes only through the
+// weight log (create seeds the first entry).
+export const editPetSchema = (t: TFunction<"pets">) => createPetSchema(t).omit({ weightKg: true });
+
+export type EditPetForm = z.input<ReturnType<typeof editPetSchema>>;

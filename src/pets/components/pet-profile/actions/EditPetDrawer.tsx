@@ -6,15 +6,16 @@ import { StyleSheet } from "react-native-unistyles";
 import { useForm } from "@tanstack/react-form";
 import dayjs from "dayjs";
 
-import { AnimalSpecies, type PetResponseDto, Sex } from "@/api/generated";
+import { type PetResponseDto, Sex } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { setApiFieldErrors } from "@/errors/utils/setApiFieldErrors";
 import { PET_SPECIES } from "@/pets/constants";
 import { useSpeciesLabel } from "@/pets/hooks/useSpeciesLabel";
 import { useUpdatePetMutation } from "@/pets/queries/useUpdatePetMutation";
-import type { CreatePetForm } from "@/pets/schemas/create-pet.schema";
-import { createPetSchema } from "@/pets/schemas/create-pet.schema";
+import type { EditPetForm } from "@/pets/schemas/create-pet.schema";
+import { editPetSchema } from "@/pets/schemas/create-pet.schema";
+import { buildPetPatch } from "@/pets/utils/buildPetPatch";
 import { Button } from "@/shadecn/ui/button";
 import {
   Drawer,
@@ -40,12 +41,11 @@ type Props = {
 const SEX_OPTIONS: Sex[] = [Sex.Unknown, Sex.Male, Sex.Female];
 const SELECT_PORTAL_HOST = "select";
 
-const getPetFormValues = (pet: PetResponseDto): CreatePetForm => ({
+const getPetFormValues = (pet: PetResponseDto): EditPetForm => ({
   name: pet.name ?? "",
   species: pet.species ?? "",
   breed: pet.breed ?? "",
   birthDate: pet.birthDate ?? null,
-  weightKg: pet.weightKg !== null && pet.weightKg !== undefined ? String(pet.weightKg) : "",
   sex: pet.sex ?? Sex.Unknown,
   allergies: pet.allergies?.length ? pet.allergies : [""],
   chronicConditions: pet.chronicConditions?.length ? pet.chronicConditions : [""],
@@ -61,7 +61,7 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
 
   const form = useForm({
     defaultValues,
-    validators: { onChange: createPetSchema(t), onSubmit: createPetSchema(t) },
+    validators: { onChange: editPetSchema(t), onSubmit: editPetSchema(t) },
     onSubmit: async ({ value }) => {
       if (!pet.id) {
         Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
@@ -69,26 +69,10 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
       }
 
       try {
-        const species = Object.values(AnimalSpecies).find(
-          (animalSpecies) => animalSpecies === value.species
-        );
-        if (!species) {
-          Toast.show({ type: "error", text1: t("common:errors.somethingWentWrong") });
-          return;
+        const payload = buildPetPatch(value, pet);
+        if (Object.keys(payload).length > 0) {
+          await updatePet({ id: pet.id, payload });
         }
-
-        await updatePet({
-          id: pet.id,
-          payload: {
-            name: value.name,
-            species,
-            breed: value.breed,
-            birthDate: value.birthDate,
-            sex: value.sex,
-            allergies: value.allergies,
-            chronicConditions: value.chronicConditions,
-          },
-        });
         Toast.show({ type: "success", text1: t("pets:updateSuccessMessage") });
         setIsOpen(false);
       } catch (e) {
@@ -158,11 +142,7 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
                   </SelectTrigger>
                   <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
                     {PET_SPECIES.map((species) => (
-                      <SelectItem
-                        key={species}
-                        value={species}
-                        label={t(`pets:species.${species}`)}
-                      />
+                      <SelectItem key={species} value={species} label={speciesLabel(species)} />
                     ))}
                   </SelectContent>
                 </Select>
@@ -229,23 +209,6 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
                   error={field.state.meta.errors.length > 0}
                   onChange={(date) => field.handleChange(date.toISOString())}
                   onBlur={field.handleBlur}
-                />
-                <FieldError errors={field.state.meta.errors} />
-              </View>
-            )}
-          </form.Field>
-
-          <form.Field name="weightKg">
-            {(field) => (
-              <View style={styles.field}>
-                <Input
-                  label={t("pets:createPetDrawer.fields.weight")}
-                  placeholder={t("pets:createPetDrawer.placeholders.weight")}
-                  keyboardType="decimal-pad"
-                  value={field.state.value ?? ""}
-                  onChangeText={field.handleChange}
-                  onBlur={field.handleBlur}
-                  error={field.state.meta.errors.length > 0}
                 />
                 <FieldError errors={field.state.meta.errors} />
               </View>
