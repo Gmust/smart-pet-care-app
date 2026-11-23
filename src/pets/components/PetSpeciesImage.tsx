@@ -8,8 +8,11 @@ import type { IconProps } from "@/icons/icons";
 import { PawPrintIcon } from "@/icons/paw-print";
 import { BirdIcon, CatIcon, DogIcon, RabbitIcon, RatIcon, TurtleIcon } from "@/icons/pets";
 import { palette } from "@/styles/palette";
+import { theme } from "@/styles/theme";
 
-type PetSpeciesImageVariant = "card" | "hero";
+type PetSpeciesImageVariant = "card" | "hero" | "avatar";
+
+const PLACEHOLDER_ICON_SIZE = { card: 52, hero: 96 };
 
 type PetSpeciesImageProps = {
   photoUrl?: string | null;
@@ -43,7 +46,7 @@ export function PetSpeciesImage({ photoUrl, species, variant = "card" }: PetSpec
 
   const SpeciesIcon = SPECIES_ICONS[species?.trim().toLowerCase() ?? ""];
   const isHero = variant === "hero";
-  const iconSize = isHero ? 96 : 52;
+  const iconSize = variant === "avatar" ? theme.iconSize["3xl"] : PLACEHOLDER_ICON_SIZE[variant];
 
   return (
     <View style={[styles.placeholder, isHero && styles.placeholderHero]}>

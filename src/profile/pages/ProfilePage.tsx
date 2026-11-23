@@ -3,46 +3,44 @@ import { useTranslation } from "react-i18next";
 import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/auth/hooks/useAuth";
+import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
+import { SettingRow } from "@/common/components/SettingRow";
+import { NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { openLegalUrl, PRIVACY_URL, TERMS_URL } from "@/common/utils/legalUrls";
-import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
 import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
 import { TriangleAlertIcon } from "@/icons/alert";
 import { FileTextIcon } from "@/icons/file-text";
+import { LayoutListIcon } from "@/icons/layout-list";
 import { PencilLineIcon } from "@/icons/pencil-line";
 import { ShieldIcon } from "@/icons/shield";
 import { UserIcon } from "@/icons/user";
+import { usePetListMode } from "@/pets/hooks/usePetListMode";
 import { Button } from "@/shadecn/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shadecn/ui/dialog";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
 import { InfoRow } from "../components/InfoRow";
 import { ProfileAvatar } from "../components/ProfileAvatar";
+import { ProfileLinkRow } from "../components/ProfileLinkRow";
 import { ProfileMenuRow } from "../components/ProfileMenuRow";
 import { SectionHeader } from "../components/SectionHeader";
 import { SignOutDrawer } from "../components/SignOutDrawer";
-import { UpdateSelectionDialog } from "../components/update-info/UpdateSelectionDialog";
+import { EditProfileDrawer } from "../components/update-info/EditProfileDrawer";
 import { useDeleteAccountMutation } from "../queries/useDeleteAccountMutation";
 import { ProfileHeroSkeleton, ProfilePageSkeleton } from "../skeletons/ProfilePageSkeleton";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation(["profile", "common"]);
   const { signOut } = useAuth();
+  const { isListEnabled, setMode } = usePetListMode();
   const { data: profile, isLoading } = useProfileMeQuery();
   const { mutateAsync: deleteAccount, isPending: isDeleting } = useDeleteAccountMutation();
 
@@ -69,16 +67,10 @@ export default function ProfilePage() {
       return;
     }
 
-    try {
-      await deleteAccount(profile.id);
-      Toast.show({ type: "success", text1: t("profile:deleteSuccessMessage") });
-      setIsDeleteOpen(false);
-      await signOut();
-      router.replace("/(auth)/welcome");
-    } catch (e) {
-      console.error(e);
-      Toast.show({ type: "error", text1: getApiErrorMessage(e) });
-    }
+    await deleteAccount(profile.id);
+    Toast.show({ type: "success", text1: t("profile:deleteSuccessMessage") });
+    await signOut();
+    router.replace("/(auth)/welcome");
   };
 
   return (
@@ -88,13 +80,22 @@ export default function ProfilePage() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>{t("profile:profilePage.eyebrow")}</Text>
+          <Text variant="body" style={styles.eyebrow}>
+            {t("profile:profilePage.eyebrow")}
+          </Text>
           <Button
             size="icon"
             variant="icon"
+            accessibilityLabel={t("profile:profilePage.editProfile")}
             disabled={!profile}
             onPress={() => setIsEditOpen(true)}
-            icon={<PencilLineIcon width={18} height={18} color={palette.brand.primaryDefault} />}
+            icon={
+              <PencilLineIcon
+                width={theme.iconSize.lg}
+                height={theme.iconSize.lg}
+                color={palette.brand.primaryDefault}
+              />
+            }
           />
         </View>
 
@@ -104,9 +105,13 @@ export default function ProfilePage() {
           <View style={styles.hero}>
             <ProfileAvatar />
             <View style={styles.heroCopy}>
-              <Text style={styles.heroName}>{heading}</Text>
+              <Text variant="titleL" style={styles.heroName}>
+                {heading}
+              </Text>
               {profile?.displayName && profile?.email ? (
-                <Text style={styles.heroEmail}>{profile.email}</Text>
+                <Text variant="bodyS" style={styles.heroEmail}>
+                  {profile.email}
+                </Text>
               ) : null}
             </View>
           </View>
@@ -125,16 +130,49 @@ export default function ProfilePage() {
           </View>
         )}
 
+        <SectionHeader label={t("profile:profilePage.sections.customize")} />
+        <View style={styles.card}>
+          <SettingRow
+            icon={
+              <LayoutListIcon
+                width={theme.iconSize.md}
+                height={theme.iconSize.md}
+                color={palette.brand.primaryDefault}
+              />
+            }
+            title={t("profile:profilePage.customize.toggleTitle")}
+            subtitle={t("profile:profilePage.customize.toggleSubtitle")}
+            checked={isListEnabled}
+            onCheckedChange={(checked) => setMode(checked ? "on" : "off")}
+          />
+          <ProfileLinkRow
+            label={t("profile:profilePage.customize.seeHow")}
+            onPress={() => router.navigate("/(tabs)/pet-list-settings")}
+          />
+        </View>
+
         <SectionHeader label={t("profile:profilePage.sections.manage")} />
         <View style={styles.card}>
           <ProfileMenuRow
-            icon={<UserIcon width={18} height={18} color={palette.brand.primaryDefault} />}
+            icon={
+              <UserIcon
+                width={theme.iconSize.lg}
+                height={theme.iconSize.lg}
+                color={palette.brand.primaryDefault}
+              />
+            }
             label={t("profile:profilePage.menu.signOut")}
             description={t("profile:profilePage.menu.signOutDescription")}
             onPress={() => setIsSignOutOpen(true)}
           />
           <ProfileMenuRow
-            icon={<TriangleAlertIcon width={18} height={18} color={palette.brand.danger} />}
+            icon={
+              <TriangleAlertIcon
+                width={theme.iconSize.lg}
+                height={theme.iconSize.lg}
+                color={palette.brand.danger}
+              />
+            }
             label={t("profile:profilePage.menu.deleteAccount")}
             description={t("profile:profilePage.menu.deleteAccountDescription")}
             tone="danger"
@@ -146,21 +184,35 @@ export default function ProfilePage() {
         <SectionHeader label={t("profile:profilePage.sections.legal")} />
         <View style={styles.card}>
           <ProfileMenuRow
-            icon={<FileTextIcon width={18} height={18} color={palette.brand.primaryDefault} />}
+            icon={
+              <FileTextIcon
+                width={theme.iconSize.lg}
+                height={theme.iconSize.lg}
+                color={palette.brand.primaryDefault}
+              />
+            }
             label={t("profile:profilePage.menu.terms")}
             description={t("profile:profilePage.menu.termsDescription")}
+            pressDelay={NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS}
             onPress={() => openLegalUrl(TERMS_URL)}
           />
           <ProfileMenuRow
-            icon={<ShieldIcon width={18} height={18} color={palette.brand.primaryDefault} />}
+            icon={
+              <ShieldIcon
+                width={theme.iconSize.lg}
+                height={theme.iconSize.lg}
+                color={palette.brand.primaryDefault}
+              />
+            }
             label={t("profile:profilePage.menu.privacy")}
             description={t("profile:profilePage.menu.privacyDescription")}
+            pressDelay={NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS}
             onPress={() => openLegalUrl(PRIVACY_URL)}
           />
         </View>
       </ScrollView>
 
-      {!!profile && <UpdateSelectionDialog isOpen={isEditOpen} setIsOpen={setIsEditOpen} />}
+      {!!profile && <EditProfileDrawer isOpen={isEditOpen} setIsOpen={setIsEditOpen} />}
 
       <SignOutDrawer
         isOpen={isSignOutOpen}
@@ -168,32 +220,14 @@ export default function ProfilePage() {
         onConfirm={handleSignOut}
       />
 
-      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("profile:profilePage.deleteDialog.title")}</DialogTitle>
-            <DialogDescription style={styles.deleteDialogDescription}>
-              {t("profile:profilePage.deleteDialog.description")}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="danger"
-              size="md"
-              isLoading={isDeleting}
-              disabled={isDeleting}
-              onPress={handleDeleteAccount}
-            >
-              {t("profile:profilePage.deleteDialog.confirm")}
-            </Button>
-            <DialogClose asChild>
-              <Button variant="ghost" size="md" disabled={isDeleting}>
-                {t("profile:profilePage.deleteDialog.cancel")}
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteConfirmDialog
+        isOpen={isDeleteOpen}
+        setIsOpen={setIsDeleteOpen}
+        title={t("profile:profilePage.deleteDialog.title")}
+        description={t("profile:profilePage.deleteDialog.description")}
+        isDeleting={isDeleting}
+        onConfirm={handleDeleteAccount}
+      />
     </View>
   );
 }
@@ -206,13 +240,10 @@ const styles = StyleSheet.create((theme) => ({
   content: {
     paddingHorizontal: theme.spacing(5),
     paddingBottom: theme.spacing(28),
-    gap: theme.spacing(4),
+    gap: theme.spacing(2),
   },
   eyebrow: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
     color: theme.palette.brand.textSecondary,
   },
   header: {
@@ -220,29 +251,20 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  title: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
-    letterSpacing: 0,
-    color: theme.palette.brand.textPrimary,
-  },
   hero: {
     alignItems: "center",
     gap: theme.spacing(3),
-    paddingVertical: theme.spacing(2),
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(4),
   },
   heroCopy: {
     alignItems: "center",
     gap: theme.spacing(1),
   },
   heroName: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize.xl,
     color: theme.palette.brand.textPrimary,
   },
   heroEmail: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   card: {
@@ -252,11 +274,6 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius["2xl"],
     backgroundColor: theme.palette.white,
     boxShadow: theme.shadows.card,
-  },
-  deleteDialogDescription: {
-    textAlign: "center",
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.45,
+    marginBottom: theme.spacing(4),
   },
 }));

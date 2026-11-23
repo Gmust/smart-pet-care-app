@@ -91,8 +91,10 @@ export const ReminderStatusDrawer = ({ reminderId, onClose, runId }: Props) => {
         <DrawerCloseButton />
 
         <DrawerHeader style={styles.header}>
-          <DrawerTitle style={styles.title}>{t("reminders:statusPrompt.title")}</DrawerTitle>
-          <Text style={styles.subtitle}>{t("reminders:statusPrompt.subtitle")}</Text>
+          <DrawerTitle>{t("reminders:statusPrompt.title")}</DrawerTitle>
+          <Text variant="bodyS" style={styles.subtitle}>
+            {t("reminders:statusPrompt.subtitle")}
+          </Text>
         </DrawerHeader>
 
         {isReminderLoading && (
@@ -103,8 +105,10 @@ export const ReminderStatusDrawer = ({ reminderId, onClose, runId }: Props) => {
 
         {!!reminder && (
           <View style={styles.summary}>
-            <Text style={styles.summaryTitle}>{reminder.title}</Text>
-            <Text style={styles.summaryMeta}>
+            <Text variant="body" style={styles.summaryTitle}>
+              {reminder.title}
+            </Text>
+            <Text variant="bodyS" style={styles.summaryMeta}>
               {[reminder.type ? t(`reminders:types.${reminder.type}`) : null, timeOfDay]
                 .filter(Boolean)
                 .join(" · ")}
@@ -134,13 +138,7 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     gap: theme.spacing(1),
   },
-  title: {
-    fontSize: theme.fontSize.xl,
-    letterSpacing: 0,
-  },
   subtitle: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
     textAlign: "center",
   },
@@ -151,13 +149,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.surfacePage,
   },
   summaryTitle: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.base,
     color: theme.palette.brand.textPrimary,
   },
   summaryMeta: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   actions: {

@@ -2,10 +2,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList, RefreshControl, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
 import { CirclePlusIcon } from "@/icons/plus";
+import { SettingsIcon } from "@/icons/settings";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
@@ -24,6 +25,7 @@ export default function PetListPage() {
 
   const { t } = useTranslation(["pets"]);
   const router = useRouter();
+  const { theme } = useUnistyles();
   const { data: pets, isLoading, refetch, isRefetching } = usePetsQuery();
 
   const handleOpenPet = (petId: string) => {
@@ -46,6 +48,19 @@ export default function PetListPage() {
               </Text>
             )}
           </View>
+          <Button
+            size="icon"
+            variant="icon"
+            accessibilityLabel={t("pets:petListPage.settings")}
+            icon={
+              <SettingsIcon
+                width={theme.iconSize.lg}
+                height={theme.iconSize.lg}
+                color={theme.palette.brand.primaryDark}
+              />
+            }
+            onPress={() => router.navigate("/(tabs)/pet-list-settings")}
+          />
         </View>
 
         <FlatList

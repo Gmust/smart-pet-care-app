@@ -64,5 +64,14 @@
   "imagePicker": {
     "title": "Add Photo",
     "remove": "Remove photo"
-  }
+  },
+  "petSelector": {
+    "label": "Selected pet: {{name}}",
+    "hint": "Change pet",
+    "drawerTitle": "Choose a pet",
+    "select": "Select {{name}}",
+    "createPet": "Add a new pet",
+    "settings": "Pet list settings"
+  },
+  "gotIt": "Got it"
 }

@@ -32,9 +32,16 @@ type SwitchProps = {
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
   size?: SwitchSize;
+  accessibilityLabel?: string;
 };
 
-export function Switch({ checked, onCheckedChange, disabled = false, size = "md" }: SwitchProps) {
+export function Switch({
+  checked,
+  onCheckedChange,
+  disabled = false,
+  size = "md",
+  accessibilityLabel,
+}: SwitchProps) {
   const { theme } = useUnistyles();
   const { width, height, thumb, padding } = SWITCH_SIZES[size];
   const travel = width - thumb - padding * 2;
@@ -60,6 +67,7 @@ export function Switch({ checked, onCheckedChange, disabled = false, size = "md"
       disabled={disabled}
     >
       <AnimatedPressable
+        accessibilityLabel={accessibilityLabel}
         style={[
           styles.root,
           { width, height, borderRadius: height / 2, padding },

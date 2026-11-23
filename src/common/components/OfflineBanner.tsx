@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useIsOnline } from "@/common/hooks/useIsOnline";
 import { Text } from "@/shadecn/ui/text";
@@ -10,6 +10,7 @@ import { Text } from "@/shadecn/ui/text";
 export function OfflineBanner() {
   const { t } = useTranslation(["common"]);
   const insets = useSafeAreaInsets();
+  const { theme } = useUnistyles();
   const isOnline = useIsOnline();
   const [dismissed, setDismissed] = useState(false);
 
@@ -21,14 +22,16 @@ export function OfflineBanner() {
   if (isOnline || dismissed) return null;
 
   return (
-    <View style={[styles.wrapper, { top: insets.top + 8 }]} pointerEvents="box-none">
+    <View style={[styles.wrapper, { top: insets.top + theme.spacing(2) }]} pointerEvents="box-none">
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={t("offline.dismiss")}
         style={styles.banner}
         onPress={() => setDismissed(true)}
       >
-        <Text style={styles.text}>{t("offline.bannerMessage")}</Text>
+        <Text variant="bodySemiBold" style={styles.text}>
+          {t("offline.bannerMessage")}
+        </Text>
       </Pressable>
     </View>
   );
@@ -49,8 +52,6 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.textBody,
   },
   text: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.white,
   },
 }));

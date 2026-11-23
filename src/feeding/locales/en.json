@@ -1,10 +1,4 @@
 {
-  "tabs": {
-    "wellness": "Wellness",
-    "feeding": "Feeding",
-    "recommendations": "Recommendations",
-    "recommendationsHint": "Recommendations are coming soon"
-  },
   "today": {
     "label": "Today",
     "editGoal": "Edit goal",

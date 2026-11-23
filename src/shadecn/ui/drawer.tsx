@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import type { PressableProps, StyleProp, ViewProps, ViewStyle } from "react-native";
 import { AppState, BackHandler, Keyboard, Platform, Pressable, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -6,7 +7,6 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Easing } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Ionicons } from "@expo/vector-icons";
 import type { BottomSheetBackdropProps, BottomSheetFooterProps } from "@gorhom/bottom-sheet";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -19,15 +19,20 @@ import BottomSheet, {
 import * as Slot from "@rn-primitives/slot";
 import { LinearGradient } from "expo-linear-gradient";
 
+import { CrossIcon } from "@/icons/cross";
+
+import { Button } from "./button";
 import { Text } from "./text";
 
-const TRANSPARENT_WHITE = "rgba(255, 255, 255, 0)";
+/** White at zero opacity: a gradient to plain `transparent` would pass through grey. */
+export const TRANSPARENT_WHITE = "rgba(255, 255, 255, 0)";
 /**
  * Spacing-unit height of the footer's top fade (see `footerFade` below).
  * Scrollable drawer content needs at least this much bottom padding, or the
  * last item can never fully scroll clear of the fade.
  */
 export const DRAWER_FOOTER_FADE_SPACING = 30;
+export const DRAWER_FOOTER_SOFT_FADE_SPACING = 20;
 /**
  * gorhom's own Android default is a fixed 250ms regardless of how far the
  * sheet travels — fine for a short sheet (DateFilterDrawer's 45%), but a
@@ -206,15 +211,16 @@ type DrawerCloseButtonProps = Omit<PressableProps, "children"> & {
 };
 
 /** Absolute-positioned "X" in the top-right corner of the drawer that dismisses it. */
-function DrawerCloseButton({ size = 22, style, onPress, ...props }: DrawerCloseButtonProps) {
+function DrawerCloseButton({ size, style, onPress, ...props }: DrawerCloseButtonProps) {
   useDrawerContext("DrawerCloseButton");
+  const { t } = useTranslation(["common"]);
   const close = useDrawerClose();
   const { theme } = useUnistyles();
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Close"
+      accessibilityLabel={t("common:actions.close")}
       hitSlop={8}
       style={(state) => [styles.closeButton, typeof style === "function" ? style(state) : style]}
       onPress={(event) => {
@@ -223,9 +229,22 @@ function DrawerCloseButton({ size = 22, style, onPress, ...props }: DrawerCloseB
       }}
       {...props}
     >
-      <Ionicons name="close" size={size} color={theme.palette.slate[600]} />
+      <CrossIcon
+        width={size ?? theme.iconSize.md}
+        height={size ?? theme.iconSize.md}
+        color={theme.palette.brand.textPrimary}
+      />
     </Pressable>
   );
+}
+
+function DrawerHeaderButton({
+  style,
+  ...props
+}: Omit<React.ComponentProps<typeof Button>, "style"> & { style?: StyleProp<ViewStyle> }) {
+  useDrawerContext("DrawerHeaderButton");
+
+  return <Button variant="icon" size="icon" style={[styles.headerButton, style]} {...props} />;
 }
 
 function DrawerContent({
@@ -247,6 +266,7 @@ function DrawerContent({
   ...props
 }: DrawerContentProps) {
   const insets = useSafeAreaInsets();
+  const { theme } = useUnistyles();
   const { modalRef, open, setOpen } = useDrawerContext("DrawerContent");
   const openRef = React.useRef(open);
   React.useEffect(() => {
@@ -416,6 +436,16 @@ function DrawerContent({
       ref={modalRef}
       index={index}
       backdropComponent={renderBackdrop}
+      backgroundStyle={{
+        borderTopLeftRadius: theme.borderRadius["4xl"],
+        borderTopRightRadius: theme.borderRadius["4xl"],
+      }}
+      handleIndicatorStyle={{
+        width: theme.spacing(15),
+        height: theme.spacing(1),
+        borderRadius: theme.borderRadius.sm,
+        backgroundColor: theme.palette.brand.surfaceBorder,
+      }}
       onDismiss={() => {
         // A deliberate close (close button, hardware back) always wins, even
         // if isRecoveringNativeActivityRef is still stuck true from a picker
@@ -490,7 +520,16 @@ function DrawerContent({
           <BottomSheetView
             style={[styles.content, { paddingBottom: insets.bottom + 24 }, contentStyle]}
           >
-            {children}
+            {enableContentPanningGesture === false ? (
+              // With the content pan gesture off nothing inside claims a tap on empty space, so it
+              // lands on the backdrop and closes the sheet. A Manual gesture claims it, as it does
+              // for a scrollable sheet.
+              <GestureDetector gesture={contentTouchClaim}>
+                <View style={styles.claimedContent}>{children}</View>
+              </GestureDetector>
+            ) : (
+              children
+            )}
           </BottomSheetView>
         )}
       </DrawerContext.Provider>
@@ -516,18 +555,38 @@ function DrawerHeader({ style, children, ...props }: ViewProps) {
   );
 }
 
-function DrawerFooter({ style, children, ...props }: ViewProps) {
+function DrawerFooter({
+  style,
+  children,
+  onLayout,
+  softFade,
+  ...props
+}: ViewProps & {
+  softFade?: boolean;
+}) {
   const { scrollable } = useDrawerContext("DrawerFooter");
   const { theme } = useUnistyles();
+  const [height, setHeight] = React.useState(0);
+  const fadeHeight = height + theme.spacing(DRAWER_FOOTER_SOFT_FADE_SPACING);
 
   return (
-    <View style={[styles.footer, scrollable && styles.footerScrollable, style]} {...props}>
+    <View
+      style={[styles.footer, scrollable && styles.footerScrollable, style]}
+      onLayout={(event) => {
+        setHeight(event.nativeEvent.layout.height);
+        onLayout?.(event);
+      }}
+      {...props}
+    >
       {scrollable ? (
         <LinearGradient
           pointerEvents="none"
           colors={[TRANSPARENT_WHITE, theme.palette.white]}
-          locations={[0, 0.55]}
-          style={styles.footerFade}
+          locations={softFade ? [0, 1 - height / fadeHeight] : [0, 0.55]}
+          style={[
+            styles.footerFade,
+            { height: softFade ? fadeHeight : theme.spacing(DRAWER_FOOTER_FADE_SPACING) },
+          ]}
         />
       ) : null}
       {children}
@@ -552,12 +611,32 @@ function DrawerScrollView({
   );
 }
 
+function DrawerKeyboardDismiss({
+  children,
+  fill,
+}: React.PropsWithChildren<{
+  fill?: boolean;
+}>) {
+  const { scrollable } = useDrawerContext("DrawerKeyboardDismiss");
+
+  return (
+    <Pressable
+      accessible={false}
+      onPress={Keyboard.dismiss}
+      // Without a fill it wraps the header, whose edge fade must paint over the scroll below it.
+      style={(fill ?? scrollable) ? styles.contentFill : styles.headerLayer}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
 function DrawerTitle({ style, ...props }: React.ComponentProps<typeof Text>) {
   return <Text variant="titleL" style={[styles.title, style]} {...props} />;
 }
 
 function DrawerDescription({ style, ...props }: React.ComponentProps<typeof Text>) {
-  return <Text style={[styles.description, style]} {...props} />;
+  return <Text variant="body" style={[styles.description, style]} {...props} />;
 }
 
 const styles = StyleSheet.create((theme) => ({
@@ -566,25 +645,39 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(6),
     paddingTop: theme.spacing(2),
   },
+  claimedContent: {
+    gap: theme.spacing(6),
+  },
   contentFill: {
     flex: 1,
+  },
+  headerLayer: {
+    zIndex: 2,
   },
   // Scrollable drawers butt the header/footer against the scroll so the edge
   // fades line up with the scroll's top/bottom instead of a flex gap.
   contentScrollable: {
     gap: 0,
   },
+  headerButton: {
+    position: "absolute",
+    top: theme.spacing(2),
+    right: theme.spacing(4),
+    zIndex: 3,
+  },
   closeButton: {
     position: "absolute",
     top: theme.spacing(2),
     right: theme.spacing(4),
     zIndex: 3,
-    width: theme.spacing(8),
-    height: theme.spacing(8),
+    width: theme.spacing(9),
+    height: theme.spacing(9),
     alignItems: "center",
     justifyContent: "center",
     borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.palette.slate[100],
+    backgroundColor: theme.palette.white,
+    borderWidth: 1,
+    borderColor: theme.palette.brand.surfaceBorder,
   },
   header: {
     paddingHorizontal: theme.spacing(10),
@@ -627,10 +720,9 @@ const styles = StyleSheet.create((theme) => ({
     textAlign: "center",
   },
   description: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.textSizing(1.4),
-    color: theme.palette.slate[600],
+    marginHorizontal: -theme.spacing(10),
+    color: theme.palette.brand.textSecondary,
+    textAlign: "center",
   },
 }));
 
@@ -644,6 +736,8 @@ export {
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
+  DrawerHeaderButton,
+  DrawerKeyboardDismiss,
   DrawerScrollView,
   DrawerTitle,
   DrawerTrigger,

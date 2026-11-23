@@ -1,37 +1,48 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshControl, View } from "react-native";
+import { Pressable, RefreshControl, View } from "react-native";
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
+import Animated, {
+  type EntryAnimationsValues,
+  type ExitAnimationsValues,
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+  withDelay,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useQueryClient } from "@tanstack/react-query";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
-import { AnimalSpecies } from "@/api/generated";
-import { BackButton } from "@/common/components/BackButton";
+import { PetPickerDrawer } from "@/common/components/PetPickerDrawer";
+import { PetSwitcher } from "@/common/components/PetSwitcher";
 import { PhotoViewer } from "@/common/components/PhotoViewer";
+import { usePetSelection } from "@/common/hooks/usePetSelection";
 import { useRefreshControl } from "@/common/hooks/useRefreshControl";
+import { FeedingTabContent } from "@/feeding/components/FeedingTabContent";
+import { useFeedingRefresh } from "@/feeding/hooks/useFeedingRefresh";
 import { HealthTabContent } from "@/health/components/HealthTabContent";
 import { healthQueryKeys } from "@/health/queries/healthQueryKeys";
 import { AiIcon } from "@/icons/ai-icon";
-import { reminderQueryKeys } from "@/reminders/queries/reminderQueryKeys";
 import { Button } from "@/shadecn/ui/button";
 import { Tabs, tabsContentEntering } from "@/shadecn/ui/tabs";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
+import { WellnessTabContent } from "@/wellness/components/WellnessTabContent";
+import { useWellnessRefresh } from "@/wellness/hooks/useWellnessRefresh";
 
+import { CreatePetDrawer } from "../components/actions/CreatePetDrawer";
 import { DeletePetConfirmation } from "../components/pet-profile/actions/DeletePetConfirmation";
 import { EditPetDrawer } from "../components/pet-profile/actions/EditPetDrawer";
 import { PetProfilePageActions } from "../components/pet-profile/actions/PetProfilePageActions";
 import { UploadPetPhotoDrawer } from "../components/pet-profile/actions/UploadPetPhotoDrawer";
 import { FlagChip } from "../components/pet-profile/FlagChip";
 import { PetSpeciesImage } from "../components/PetSpeciesImage";
-import { EmptyTabPlaceholder } from "../components/tabs/EmptyTabPlaceholder";
 import { OverviewTabContent } from "../components/tabs/OverviewTabContent";
-import { RemindersTabContent } from "../components/tabs/RemindersTabContent";
 import { useBackToOrigin } from "../hooks/useBackToOrigin";
-import { useSpeciesLabel } from "../hooks/useSpeciesLabel";
+import { usePetHeroHeight } from "../hooks/usePetHeroHeight";
 import { usePetQuery } from "../queries/usePetQuery";
 import {
   petProfileParamsSchema,
@@ -44,13 +55,15 @@ import type { PetFlag } from "../types";
 const PROFILE_TAB_REFRESH_KEYS: Record<ProfileTabKey, readonly (readonly string[])[]> = {
   overview: [],
   health: [healthQueryKeys.allRecords()],
-  care: [],
-  reminders: [reminderQueryKeys.all()],
+  wellness: [],
+  feeding: [],
 };
 
 export default function PetProfilePage() {
   const parsedParams = petProfileParamsSchema.safeParse(useLocalSearchParams());
 
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -59,24 +72,44 @@ export default function PetProfilePage() {
   );
 
   const insets = useSafeAreaInsets();
+  const { theme } = useUnistyles();
+  const heroHeight = usePetHeroHeight();
   const router = useRouter();
   const { t } = useTranslation(["pets", "common"]);
-  const speciesLabel = useSpeciesLabel();
 
-  const petId = parsedParams.success ? parsedParams.data.petId : undefined;
-  const goBackToOrigin = useBackToOrigin(parsedParams.success ? parsedParams.data.from : undefined);
+  const paramPetId = parsedParams.success ? parsedParams.data.petId : undefined;
+  const {
+    pets,
+    isLoading: isPetsLoading,
+    selectedPetId: petId,
+    setSelectedPetId,
+  } = usePetSelection();
+  useBackToOrigin(parsedParams.success ? parsedParams.data.from : undefined);
   const queryClient = useQueryClient();
   const { data: pet, isLoading: isPetLoading } = usePetQuery(petId);
   // The pet key also covers its notes, so the Overview tab needs nothing more.
-  const { isRefreshing, onRefresh } = useRefreshControl(() =>
+  const profileRefresh = useRefreshControl(() =>
     Promise.all(
       [["pets", petId ?? ""] as const, ...PROFILE_TAB_REFRESH_KEYS[activeTab]].map((queryKey) =>
         queryClient.refetchQueries({ queryKey, type: "active" })
       )
     )
   );
+  const wellnessRefresh = useWellnessRefresh(petId);
+  const feedingRefresh = useFeedingRefresh();
+  const { isRefreshing, onRefresh } = {
+    overview: profileRefresh,
+    health: profileRefresh,
+    wellness: wellnessRefresh,
+    feeding: feedingRefresh,
+  }[activeTab];
   const petName = pet?.name;
   const tabParam = parsedParams.success ? parsedParams.data.tab : undefined;
+
+  // A link to a pet (from Home, a note) selects it. Before paint, so the previous pet is not shown.
+  useLayoutEffect(() => {
+    if (paramPetId) setSelectedPetId(paramPetId);
+  }, [paramPetId, setSelectedPetId]);
 
   // Re-opening a mounted screen with another tab changes its params, not its state.
   useEffect(() => {
@@ -94,19 +127,73 @@ export default function PetProfilePage() {
     const hasChronicConditions = (pet.chronicConditions ?? []).some(Boolean);
 
     if (hasAllergies) {
-      flags.push({ id: "allergies", label: t("petProfilePage.flags.allergies"), tone: "warn" });
+      flags.push({
+        id: "allergies",
+        label: t("petProfilePage.flags.allergies"),
+        details: (pet.allergies ?? []).filter(Boolean),
+      });
     }
     if (hasChronicConditions) {
       flags.push({
         id: "chronic-conditions",
         label: t("petProfilePage.flags.chronicCondition"),
-        tone: "warn",
+        details: (pet.chronicConditions ?? []).filter(Boolean),
       });
     }
-    if (!flags.length && pet.species && pet.species !== AnimalSpecies.Unknown) {
-      flags.push({ id: "species", label: speciesLabel(pet.species), tone: "ok" });
-    }
   }
+
+  // The hero photo grows out of, and shrinks back into, the switcher's avatar circle. The target
+  // is where that avatar sits in the top bar: its padding, chip border and chip padding.
+  const avatarSize = theme.spacing(9);
+  const avatarInset = theme.spacing(0.375) + theme.spacing(1);
+  const avatarX = theme.spacing(4) + avatarInset;
+  const avatarY = insets.top + theme.spacing(2) + avatarInset;
+  const heroRadius = theme.borderRadius["2xl"];
+  const heroDuration = 260;
+
+  const heroEntering = (values: EntryAnimationsValues) => {
+    "worklet";
+    return {
+      initialValues: {
+        originX: avatarX,
+        originY: avatarY,
+        width: avatarSize,
+        height: avatarSize,
+        borderRadius: avatarSize / 2,
+        opacity: 0,
+      },
+      animations: {
+        originX: withTiming(values.targetOriginX, { duration: heroDuration }),
+        originY: withTiming(values.targetOriginY, { duration: heroDuration }),
+        width: withTiming(values.targetWidth, { duration: heroDuration }),
+        height: withTiming(values.targetHeight, { duration: heroDuration }),
+        borderRadius: withTiming(heroRadius, { duration: heroDuration }),
+        opacity: withTiming(1, { duration: heroDuration / 2 }),
+      },
+    };
+  };
+
+  const heroExiting = (values: ExitAnimationsValues) => {
+    "worklet";
+    return {
+      initialValues: {
+        originX: values.currentOriginX,
+        originY: values.currentOriginY,
+        width: values.currentWidth,
+        height: values.currentHeight,
+        borderRadius: heroRadius,
+        opacity: 1,
+      },
+      animations: {
+        originX: withTiming(avatarX, { duration: heroDuration }),
+        originY: withTiming(avatarY, { duration: heroDuration }),
+        width: withTiming(avatarSize, { duration: heroDuration }),
+        height: withTiming(avatarSize, { duration: heroDuration }),
+        borderRadius: withTiming(avatarSize / 2, { duration: heroDuration }),
+        opacity: withDelay(heroDuration - 60, withTiming(0, { duration: 60 })),
+      },
+    };
+  };
 
   const goToTabBy = (offset: number) => {
     const nextIndex = PROFILE_TAB_KEYS.indexOf(activeTab) + offset;
@@ -126,18 +213,45 @@ export default function PetProfilePage() {
       .onEnd(() => goToTabBy(-1))
   );
 
-  if (isPetLoading) {
+  if (isPetsLoading || isPetLoading) {
     return <PetProfilePageSkeleton />;
+  }
+
+  if (!pets?.length) {
+    return (
+      <>
+        <View style={[styles.screen, styles.emptyScreen, { paddingTop: insets.top }]}>
+          <Text variant="body" style={styles.emptyText}>
+            {t("petProfilePage.empty.title")}
+          </Text>
+          <Button onPress={() => setIsCreateOpen(true)}>{t("petProfilePage.empty.action")}</Button>
+        </View>
+
+        <CreatePetDrawer
+          isOpen={isCreateOpen}
+          setIsOpen={setIsCreateOpen}
+          onCreated={(createdPet) => {
+            if (createdPet.id) setSelectedPetId(createdPet.id);
+          }}
+        />
+      </>
+    );
   }
 
   return (
     <>
       <View style={styles.screen}>
-        <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
-          <BackButton onBackPress={goBackToOrigin} />
-          <Text variant="titleL" style={styles.topBarTitle}>
-            {petName}
-          </Text>
+        <View style={[styles.topBar, { paddingTop: insets.top + theme.spacing(2) }]}>
+          <View style={styles.topBarLeading}>
+            {!!pet && (
+              <PetSwitcher
+                selectedPet={pet}
+                canSwitch
+                showAvatar={activeTab !== "overview"}
+                onPress={() => setIsPickerOpen(true)}
+              />
+            )}
+          </View>
           <PetProfilePageActions
             disabled={!pet}
             onEdit={() => setIsEditOpen(true)}
@@ -149,24 +263,31 @@ export default function PetProfilePage() {
         {activeTab === "overview" &&
           (pet ? (
             <Animated.View
-              style={styles.hero}
-              entering={FadeIn.duration(200)}
-              exiting={FadeOut.duration(150)}
+              style={[styles.hero, { height: heroHeight }]}
+              entering={heroEntering}
+              exiting={heroExiting}
             >
               {pet.photoUrl ? (
                 <PhotoViewer uri={pet.photoUrl} style={StyleSheet.absoluteFill}>
                   <PetSpeciesImage photoUrl={pet.photoUrl} species={pet.species} variant="hero" />
                 </PhotoViewer>
               ) : (
-                <PetSpeciesImage species={pet.species} variant="hero" />
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t("petProfilePage.actions.changePhoto")}
+                  style={StyleSheet.absoluteFill}
+                  onPress={() => setIsPhotoOpen(true)}
+                >
+                  <PetSpeciesImage species={pet.species} variant="hero" />
+                </Pressable>
               )}
               <View style={styles.aiButton}>
                 <Button
-                  accessibilityLabel="ai-assistant"
-                  variant="icon"
+                  accessibilityLabel={t("pets:petProfilePage.assistantButton")}
+                  variant="iconOnPhoto"
                   size="icon"
                   disabled={!pet?.id}
-                  icon={<AiIcon width={20} height={20} color={palette.brand.textPrimary} />}
+                  icon={<AiIcon width={16} height={16} color={palette.brand.peachIconBg} />}
                   onPress={() =>
                     router.navigate({
                       pathname: "/(tabs)/assistant",
@@ -183,7 +304,7 @@ export default function PetProfilePage() {
             </Animated.View>
           ) : (
             <Animated.View
-              style={[styles.hero, styles.heroEmpty]}
+              style={[styles.hero, styles.heroEmpty, { height: heroHeight }]}
               entering={FadeIn.duration(200)}
               exiting={FadeOut.duration(150)}
             >
@@ -193,7 +314,7 @@ export default function PetProfilePage() {
             </Animated.View>
           ))}
 
-        <Animated.View layout={LinearTransition.duration(200)}>
+        <Animated.View layout={LinearTransition.duration(200)} style={styles.tabs}>
           <Tabs
             items={PROFILE_TAB_KEYS.map((key) => ({
               key,
@@ -215,13 +336,48 @@ export default function PetProfilePage() {
           >
             {!!pet && activeTab === "overview" && <OverviewTabContent pet={pet} />}
             {!!pet && activeTab === "health" && <HealthTabContent pet={pet} />}
-            {!!pet && activeTab === "care" && (
-              <EmptyTabPlaceholder label={t("petProfilePage.careComingSoon")} />
+            {!!pet?.id && activeTab === "wellness" && <WellnessTabContent petId={pet.id} />}
+            {!!pet?.id && activeTab === "feeding" && (
+              <FeedingTabContent
+                petId={pet.id}
+                onSeeAllMeals={() =>
+                  router.push({ pathname: "/(tabs)/pets/feeding-log", params: { petId: pet.id } })
+                }
+                onOpenAnalysis={() =>
+                  router.push({
+                    pathname: "/(tabs)/pets/nutrition-analysis",
+                    params: { petId: pet.id },
+                  })
+                }
+                onOpenSchedule={() => router.push("/(tabs)/reminders")}
+                onOpenWeightHistory={() =>
+                  router.push({
+                    pathname: "/(tabs)/pets/weight-history",
+                    params: { petId: pet.id },
+                  })
+                }
+              />
             )}
-            {!!pet && activeTab === "reminders" && <RemindersTabContent petId={pet.id ?? ""} />}
           </Animated.ScrollView>
         </GestureDetector>
       </View>
+      <PetPickerDrawer
+        isOpen={isPickerOpen}
+        setIsOpen={setIsPickerOpen}
+        pets={pets ?? []}
+        selectedPetId={petId}
+        onSelect={setSelectedPetId}
+        onCreatePet={() => setIsCreateOpen(true)}
+      />
+
+      <CreatePetDrawer
+        isOpen={isCreateOpen}
+        setIsOpen={setIsCreateOpen}
+        onCreated={(createdPet) => {
+          if (createdPet.id) setSelectedPetId(createdPet.id);
+        }}
+      />
+
       {!!pet && <EditPetDrawer pet={pet} isOpen={isEditOpen} setIsOpen={setIsEditOpen} />}
 
       {!!pet?.id && (
@@ -253,16 +409,27 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(4),
     paddingBottom: theme.spacing(2),
   },
-  topBarTitle: {
+  topBarLeading: {
     flex: 1,
     minWidth: 0,
-    textAlign: "center",
-    color: theme.palette.brand.textSecondary,
+    alignItems: "flex-start",
+  },
+  tabs: {
+    zIndex: 1,
   },
   hero: {
-    height: theme.spacing(38.5),
+    flexShrink: 0,
+    marginHorizontal: theme.spacing(4),
+    marginBottom: theme.spacing(3),
+    borderRadius: theme.borderRadius["2xl"],
     overflow: "hidden",
     backgroundColor: theme.palette.brand.surfaceSunken,
+  },
+  emptyScreen: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: theme.spacing(4),
+    paddingHorizontal: theme.spacing(6),
   },
   heroEmpty: {
     alignItems: "center",
@@ -278,8 +445,7 @@ const styles = StyleSheet.create((theme) => ({
     left: theme.spacing(3.5),
     right: theme.spacing(3.5),
     bottom: theme.spacing(1.5),
-    // Chips are not interactive: let every tap reach the photo underneath.
-    pointerEvents: "none",
+    pointerEvents: "box-none",
     flexDirection: "row",
     gap: theme.spacing(2),
   },

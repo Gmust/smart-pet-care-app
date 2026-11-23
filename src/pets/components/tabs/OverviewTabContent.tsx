@@ -89,7 +89,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius["2xl"],
     backgroundColor: theme.palette.white,
     boxShadow: theme.shadows.card,
-    marginBottom: theme.spacing(5),
+    marginBottom: theme.spacing(4),
   },
   notesHeader: {
     flexDirection: "row",

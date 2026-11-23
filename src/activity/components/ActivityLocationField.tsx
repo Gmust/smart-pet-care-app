@@ -85,7 +85,9 @@ export const ActivityLocationField = ({
 
   return (
     <View style={styles.field}>
-      <Text style={styles.label}>{t("activity:forms.activity.fields.location")}</Text>
+      <Text variant="bodyS" style={styles.label}>
+        {t("activity:forms.activity.fields.location")}
+      </Text>
 
       <Input
         placeholder={t("activity:forms.activity.placeholders.locationLabel")}
@@ -136,8 +138,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   label: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   map: {

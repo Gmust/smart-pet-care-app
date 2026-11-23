@@ -58,14 +58,18 @@ export function TabBar({ state, navigation }: TabBarProps) {
       pointerEvents="box-none"
     >
       <View style={styles.bar}>
-        {state.routes.map((route, index) => {
+        {state.routes.map((route) => {
           const meta = TAB_META[route.name];
           if (!meta) {
             return null;
           }
 
-          const isFocused = state.index === index;
-          const shouldNavigateToTab = !isFocused;
+          const focusedName = state.routes[state.index]?.name;
+          // The pet list settings are a hidden screen that belongs to the Pets tab.
+          const isFocused =
+            focusedName === route.name ||
+            (route.name === "pets" && focusedName === "pet-list-settings");
+          const shouldNavigateToTab = focusedName !== route.name;
           const color = isFocused ? ACTIVE_COLOR : INACTIVE_COLOR;
           const Glyph = meta.icon;
 

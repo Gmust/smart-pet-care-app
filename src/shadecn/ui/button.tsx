@@ -1,6 +1,7 @@
 import React from "react";
 import type { PressableStateCallbackType, StyleProp, TextStyle } from "react-native";
 import { ActivityIndicator, Pressable, View } from "react-native";
+import Animated, { type CSSTransitionProperties } from "react-native-reanimated";
 import type { UnistylesVariants } from "react-native-unistyles";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -16,11 +17,18 @@ export type ButtonVariant =
   | "dangerText"
   | "text"
   | "link"
-  | "icon";
+  | "icon"
+  | "iconOnPhoto";
 export type ButtonSize = "sm" | "md" | "icon" | "hug" | "inline";
 
 // In `spacing` units; the touch-target padding below reads it too.
 const SM_HEIGHT = 10;
+
+const COLOR_TRANSITION_MS = 200;
+const TEXT_TRANSITION: CSSTransitionProperties = {
+  transitionProperty: "color",
+  transitionDuration: COLOR_TRANSITION_MS,
+};
 
 const buttonVariants = StyleSheet.create((theme) => {
   const { brand } = theme.palette;
@@ -96,7 +104,12 @@ const buttonVariants = StyleSheet.create((theme) => {
           icon: {
             backgroundColor: pressed && !disabled ? brand.surfaceSunken : theme.palette.white,
             borderWidth: 1,
-            borderColor: disabled ? brand.surfaceBorder : brand.surfaceBorder,
+            borderColor: brand.surfaceBorder,
+          },
+          iconOnPhoto: {
+            backgroundColor: pressed ? `${brand.peachDefault}b3` : `${brand.peachDefault}80`,
+            borderWidth: 1,
+            borderColor: brand.peachDefault,
           },
         },
         size: {
@@ -115,7 +128,6 @@ const buttonVariants = StyleSheet.create((theme) => {
     }),
 
     text: (disabled: boolean = false, pressed: boolean = false, dotted: boolean = false) => ({
-      fontFamily: theme.fontFamily.semiBold,
       variants: {
         variant: {
           primary: {
@@ -148,6 +160,9 @@ const buttonVariants = StyleSheet.create((theme) => {
           icon: {
             color: disabled ? brand.textFaint : brand.textPrimary,
           },
+          iconOnPhoto: {
+            color: brand.peachIconBg,
+          },
         },
         size: {
           sm: { ...theme.textStyles.bodySemiBold },
@@ -158,6 +173,19 @@ const buttonVariants = StyleSheet.create((theme) => {
         },
       },
     }),
+
+    animatedShell: {
+      backgroundColor: theme.palette.transparent,
+      overflow: "hidden",
+    },
+    fillLayer: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      borderRadius: theme.borderRadius.lg,
+    },
 
     iconColor: (disabled: boolean = false, pressed: boolean = false, dotted: boolean = false) => ({
       variants: {
@@ -191,6 +219,9 @@ const buttonVariants = StyleSheet.create((theme) => {
           icon: {
             color: disabled ? brand.textFaint : brand.textPrimary,
           },
+          iconOnPhoto: {
+            color: brand.peachIconBg,
+          },
         },
       },
     }),
@@ -206,6 +237,7 @@ type ButtonProps = React.ComponentProps<typeof Pressable> &
     textStyle?: StyleProp<TextStyle>;
     isLoading?: boolean;
     dotted?: boolean;
+    animateDisabled?: boolean;
   };
 
 function Button({
@@ -220,6 +252,7 @@ function Button({
   textStyle,
   isLoading = false,
   dotted = false,
+  animateDisabled = false,
   hitSlop,
   ...props
 }: ButtonProps) {
@@ -240,7 +273,17 @@ function Button({
 
     return React.Children.map(props.children, (child) => {
       if (typeof child === "string") {
-        return <Text style={resolvedTextStyle}>{child}</Text>;
+        return animateDisabled ? (
+          <Animated.Text
+            // Reanimated types an array style as plain text style, which has no room for the CSS
+            // transition keys it reads at runtime.
+            style={[resolvedTextStyle, TEXT_TRANSITION] as StyleProp<TextStyle>}
+          >
+            {child}
+          </Animated.Text>
+        ) : (
+          <Text style={resolvedTextStyle}>{child}</Text>
+        );
       }
       return child;
     });
@@ -266,6 +309,7 @@ function Button({
         }
         style={(state) => [
           buttonVariants.button(isDisabled, state.pressed, dotted),
+          animateDisabled && buttonVariants.animatedShell,
           typeof style === "function" ? style(state) : style,
         ]}
       >
@@ -279,6 +323,24 @@ function Button({
           ).color;
           return (
             <>
+              {animateDisabled ? (
+                <Animated.View
+                  pointerEvents="none"
+                  style={[
+                    buttonVariants.fillLayer,
+                    {
+                      // Unistyles returns the resolved style object; only its fill is read here.
+                      backgroundColor: (
+                        buttonVariants.button(isDisabled, state.pressed, dotted) as {
+                          backgroundColor: string;
+                        }
+                      ).backgroundColor,
+                      transitionProperty: "backgroundColor",
+                      transitionDuration: COLOR_TRANSITION_MS,
+                    },
+                  ]}
+                />
+              ) : null}
               {variant === "ghost" && dotted ? (
                 <DashedBorder
                   color={

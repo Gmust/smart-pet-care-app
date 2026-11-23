@@ -214,7 +214,7 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
                       const selected = pets?.find((pet) => pet.id === field.state.value);
                       return (
                         <View style={styles.field}>
-                          <Text style={styles.label}>
+                          <Text variant="bodyS" style={styles.label}>
                             {t("health:forms.healthRecord.fields.pet")}
                           </Text>
                           <Select
@@ -231,7 +231,7 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
                                 placeholder={t("health:forms.healthRecord.placeholders.pet")}
                               />
                             </SelectTrigger>
-                            <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
+                            <SelectContent portalHost={SELECT_PORTAL_HOST}>
                               {pets?.map((pet) =>
                                 pet.id != null ? (
                                   <SelectItem key={pet.id} value={pet.id} label={pet.name ?? ""} />
@@ -250,7 +250,7 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
                   <form.Field name="type">
                     {(field) => (
                       <View style={styles.field}>
-                        <Text style={styles.label}>
+                        <Text variant="bodyS" style={styles.label}>
                           {t("health:forms.healthRecord.fields.type")}
                         </Text>
                         <View style={styles.chips}>
@@ -358,7 +358,7 @@ export function AddHealthRecordDrawer({ petId, type, record, isOpen, setIsOpen }
                               const selected = field.state.value;
                               return (
                                 <View style={styles.field}>
-                                  <Text style={styles.label}>
+                                  <Text variant="bodyS" style={styles.label}>
                                     {t("health:forms.healthRecord.fields.symptoms")}
                                   </Text>
                                   <View style={styles.chips}>
@@ -453,8 +453,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   label: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   chips: {

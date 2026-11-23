@@ -33,7 +33,8 @@ export default function AssistantPetSelectionPage() {
     setConsent(null);
     setConsentDialogOpen(false);
     await clearAiUsingConsent();
-    router.replace("/(tabs)/home");
+    if (router.canGoBack()) router.back();
+    else router.replace("/(tabs)/home");
   };
 
   const handleGetConsent = useCallback(async () => {

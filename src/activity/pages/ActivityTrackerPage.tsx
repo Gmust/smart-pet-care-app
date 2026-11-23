@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -10,19 +10,19 @@ import { useRouter } from "expo-router";
 import type { ActivityLogResponseDto } from "@/api/generated";
 import { AddButton } from "@/common/components/AddButton";
 import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
-import { usePetsQuery } from "@/pets/queries/usePetsQuery";
+import { PetPickerDrawer } from "@/common/components/PetPickerDrawer";
+import { PetSwitcher } from "@/common/components/PetSwitcher";
+import { usePetSelection } from "@/common/hooks/usePetSelection";
 import { Button } from "@/shadecn/ui/button";
 import { Text } from "@/shadecn/ui/text";
 
 import { ActivityListEmpty } from "../components/ActivityListEmpty";
 import { ActivityListSection } from "../components/ActivityListSection";
 import { ActivityMap, type ActivityMapMarker } from "../components/ActivityMap";
-import { ActivityPetSelector } from "../components/ActivityPetSelector";
 import { ActivityActionsDrawer } from "../components/drawers/ActivityActionsDrawer";
 import { ActivityDetailsDrawer } from "../components/drawers/ActivityDetailsDrawer";
 import { ActivityFilterDrawer } from "../components/drawers/ActivityFilterDrawer";
 import { CreateActivityDrawer } from "../components/drawers/CreateActivityDrawer";
-import { PetPickerDrawer } from "../components/drawers/PetPickerDrawer";
 import { DEFAULT_RANGE_DAYS } from "../constants";
 import { useActivityLogDelete } from "../hooks/useActivityLogDelete";
 import { useActivityLogsQuery } from "../queries/useActivityLogsQuery";
@@ -35,7 +35,6 @@ import { groupActivitiesByDay } from "../utils/groupActivitiesByDay";
 const NO_FILTERS: ActivityFilters = { types: [], intensities: [] };
 
 export default function ActivityTrackerPage() {
-  const [selectedPetId, setSelectedPetId] = useState<string | undefined>(undefined);
   const [isPetPickerOpen, setIsPetPickerOpen] = useState(false);
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -66,7 +65,14 @@ export default function ActivityTrackerPage() {
   const tabBarOverlay =
     theme.spacing(15) + Math.max(insets.bottom, theme.spacing(4)) - insets.bottom;
 
-  const { data: pets, isLoading: isPetsLoading, isError: isPetsError } = usePetsQuery();
+  const {
+    pets,
+    isLoading: isPetsLoading,
+    isError: isPetsError,
+    selectedPet,
+    selectedPetId,
+    setSelectedPetId,
+  } = usePetSelection();
   const {
     data: activities,
     isLoading,
@@ -80,7 +86,6 @@ export default function ActivityTrackerPage() {
   });
   const { requestDelete, dialogProps } = useActivityLogDelete(selectedPetId);
 
-  const selectedPet = pets?.find((pet) => pet.id === selectedPetId);
   const hasPets = !isPetsLoading && (pets?.length ?? 0) > 0;
 
   // Type and intensity are filtered here, not by the API — it only accepts
@@ -116,15 +121,6 @@ export default function ActivityTrackerPage() {
   const activeFilterCount =
     filters.types.length + filters.intensities.length + (hasDateFilter ? 1 : 0);
 
-  // Select the first pet when nothing is selected, and re-select when the
-  // chosen pet is gone (deleted elsewhere) — otherwise every request keeps
-  // targeting a pet that no longer exists and the selector disappears.
-  useEffect(() => {
-    if (isPetsLoading) return;
-    if (selectedPetId && pets?.some((pet) => pet.id === selectedPetId)) return;
-    setSelectedPetId(pets?.[0]?.id);
-  }, [pets, isPetsLoading, selectedPetId]);
-
   const clearFilters = () => {
     setFilters(NO_FILTERS);
     setFrom(defaultFrom);
@@ -145,7 +141,7 @@ export default function ActivityTrackerPage() {
       <SafeAreaView style={styles.screen}>
         <View style={styles.topBar}>
           {selectedPet ? (
-            <ActivityPetSelector
+            <PetSwitcher
               selectedPet={selectedPet}
               canSwitch={(pets?.length ?? 0) > 1}
               onPress={() => setIsPetPickerOpen(true)}
@@ -218,6 +214,7 @@ export default function ActivityTrackerPage() {
           selectedPetId={selectedPetId}
           // Filters deliberately survive a pet switch.
           onSelect={setSelectedPetId}
+          showSettings={false}
         />
       )}
 

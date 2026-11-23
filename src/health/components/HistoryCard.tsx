@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { cardVariants } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 
@@ -27,7 +28,8 @@ export function HistoryCard({
       accessibilityRole="button"
       accessibilityLabel={title}
       onPress={onPress}
-      style={({ pressed }) => [cardVariants.card, styles.card, pressed && styles.cardPressed]}
+      unstable_pressDelay={NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS}
+      style={({ pressed }) => [cardVariants.card, styles.card, pressed && cardVariants.pressed]}
     >
       <View style={styles.iconBg}>{icon}</View>
       <Text variant="titleM" style={styles.title}>
@@ -52,9 +54,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
     paddingHorizontal: theme.spacing(2.5),
     paddingVertical: theme.spacing(3.5),
-  },
-  cardPressed: {
-    backgroundColor: theme.palette.brand.surfaceSunken,
   },
   iconBg: {
     width: theme.spacing(13.75),

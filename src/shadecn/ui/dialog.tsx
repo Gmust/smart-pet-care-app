@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import type { ViewProps } from "react-native";
 import { View } from "react-native";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
@@ -114,12 +115,13 @@ function DialogCloseButton({
   ref?: React.RefObject<DialogPrimitive.CloseRef>;
   size?: number;
 }) {
+  const { t } = useTranslation(["common"]);
   const { theme } = useUnistyles();
 
   return (
     <DialogPrimitive.Close
       style={(state) => [styles.close, typeof style === "function" ? style(state) : style]}
-      accessibilityLabel="Close"
+      accessibilityLabel={t("common:actions.close")}
       {...props}
     >
       <Ionicons name="close" size={size} color={theme.palette.slate[600]} />

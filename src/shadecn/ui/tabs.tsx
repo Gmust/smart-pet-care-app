@@ -11,7 +11,7 @@ export type TabItem<K extends string = string> = {
   label: string;
 };
 
-export type TabsVariant = "segmented" | "pill" | "chips";
+export type TabsVariant = "segmented" | "pill" | "chips" | "track";
 
 export type TabsTone = "primary" | "peach";
 
@@ -31,7 +31,7 @@ const tabsVariants = StyleSheet.create((theme) => {
             alignItems: "flex-start",
             borderWidth: 1,
             borderColor: brand.surfaceBorder,
-            backgroundColor: theme.palette.white,
+            backgroundColor: brand.surfacePage,
             paddingHorizontal: theme.spacing(5),
           },
           pill: {
@@ -41,6 +41,12 @@ const tabsVariants = StyleSheet.create((theme) => {
           chips: {
             flexDirection: "row",
             gap: theme.spacing(2),
+          },
+          track: {
+            flexDirection: "row",
+            height: theme.spacing(7.5),
+            borderRadius: theme.borderRadius.full,
+            backgroundColor: brand.surfacePage,
           },
         },
       },
@@ -71,6 +77,14 @@ const tabsVariants = StyleSheet.create((theme) => {
             borderRadius: theme.borderRadius.full,
             backgroundColor: brand.primarySoft,
           },
+          track: {
+            top: 0,
+            bottom: 0,
+            borderRadius: theme.borderRadius.full,
+            borderWidth: 1,
+            borderColor: brand.surfaceBorder,
+            backgroundColor: brand.peachIconBg,
+          },
         },
       },
     }),
@@ -100,6 +114,12 @@ const tabsVariants = StyleSheet.create((theme) => {
             borderWidth: theme.spacing(0.25),
             borderColor: active ? theme.palette.transparent : brand.surfaceBorder,
           },
+          track: {
+            flex: 1,
+            minWidth: 0,
+            alignItems: "center",
+            justifyContent: "center",
+          },
         },
       },
     }),
@@ -118,6 +138,10 @@ const tabsVariants = StyleSheet.create((theme) => {
           chips: {
             ...theme.textStyles.controlM,
             color: active ? brand.primaryDark : brand.textSecondary,
+          },
+          track: {
+            ...theme.textStyles.controlM,
+            color: active ? brand.peachDefault : brand.textBody,
           },
         },
       },

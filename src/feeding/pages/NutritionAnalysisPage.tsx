@@ -145,7 +145,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.surfacePage,
   },
   content: {
-    gap: theme.spacing(4),
+    gap: theme.spacing(6),
     paddingHorizontal: theme.spacing(4),
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(28),

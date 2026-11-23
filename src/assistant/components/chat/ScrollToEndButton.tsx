@@ -35,8 +35,9 @@ ScrollToEndButton.displayName = "ScrollToEndButton";
 const styles = StyleSheet.create((theme) => ({
   scrollToEndButton: {
     position: "absolute",
-    right: theme.spacing(4),
-    bottom: theme.spacing(4),
+    right: theme.spacing(2),
+    // Clears PetSelectorChip, which floats spacing(14) above the composer on the same side.
+    bottom: theme.spacing(16),
     width: theme.spacing(10),
     height: theme.spacing(10),
     alignItems: "center",

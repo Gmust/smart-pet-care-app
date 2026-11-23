@@ -8,6 +8,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/api/queryClient";
 import { toastConfig } from "@/common/components/AppToast";
 import { installOnlineManager } from "@/common/utils/installOnlineManager";
+import { PetListModeProvider } from "@/pets/providers/PetListModeProvider";
+
+import { PetSelectionProvider } from "./PetSelectionProvider";
 
 installOnlineManager();
 
@@ -19,7 +22,11 @@ export default function AppProvider({ children }: AppProviderProps) {
   return (
     <KeyboardProvider>
       <BottomSheetModalProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+        <QueryClientProvider client={queryClient}>
+          <PetSelectionProvider>
+            <PetListModeProvider>{children}</PetListModeProvider>
+          </PetSelectionProvider>
+        </QueryClientProvider>
       </BottomSheetModalProvider>
       <PortalHost />
       <PortalHost name="dialog" />

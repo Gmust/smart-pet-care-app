@@ -21,7 +21,6 @@ export default function PetsLayout() {
       <Stack.Screen name="pet-profile" options={animationForOrigin} />
       <Stack.Screen name="health-record-list" />
       <Stack.Screen name="note" />
-      <Stack.Screen name="assessment" options={animationForOrigin} />
       <Stack.Screen name="feeding-log" />
       <Stack.Screen name="nutrition-analysis" />
       <Stack.Screen name="weight-history" />

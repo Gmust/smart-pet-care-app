@@ -1,10 +1,10 @@
 {
   "validation": {
-    "nameRequired": "Give your pet a name.",
-    "speciesRequired": "Pick a species.",
+    "nameRequired": "Name is required",
+    "speciesRequired": "Species is required",
     "birthDateInvalid": "Enter a valid birth date.",
     "weightInvalid": "Enter a weight greater than 0.",
-    "weightRequired": "Enter your pet's weight."
+    "weightRequired": "Weight is required"
   },
   "successMessage": "Pet added successfully!",
   "updateSuccessMessage": "Pet updated successfully!",
@@ -14,17 +14,18 @@
     "companions_one": "{{count}} companion",
     "companions_other": "{{count}} companions",
     "emptyState": "No pets yet",
-    "addPet": "Add a new pet"
+    "addPet": "Add a new pet",
+    "settings": "Pet list settings"
   },
   "petProfilePage": {
     "goBack": "Go back",
+    "assistantButton": "Open AI assistant",
     "notFound": "Pet not found",
-    "careComingSoon": "Coming soon",
     "tabs": {
       "overview": "Overview",
       "health": "Health",
-      "care": "Care",
-      "reminders": "Reminders"
+      "wellness": "Wellness",
+      "feeding": "Feeding"
     },
     "basics": {
       "title": "Basics",
@@ -34,7 +35,19 @@
       "sex": "Sex",
       "weight": "Weight",
       "allergies": "Allergies",
-      "chronicConditions": "Chronic conditions"
+      "chronicConditions": "Chronic conditions",
+      "segments": {
+        "allergies": "Allergies",
+        "chronicConditions": "Conditions",
+        "behavioralNotes": "Behavior"
+      },
+      "edit": "Edit {{section}}",
+      "add": "Add to {{section}}",
+      "addEmpty": {
+        "allergies": "Add allergies",
+        "chronicConditions": "Add conditions",
+        "behavioralNotes": "Add behavior"
+      }
     },
     "fallbacks": {
       "notAdded": "Not added",
@@ -61,9 +74,11 @@
     },
     "deleteDialog": {
       "title": "Delete pet?",
-      "description": "This will permanently remove {{name}} from your pets.",
-      "confirm": "Delete pet",
-      "cancel": "Cancel"
+      "description": "This will permanently remove {{name}} from your pets."
+    },
+    "empty": {
+      "title": "No pets yet",
+      "action": "Add a new pet"
     }
   },
   "singleNotePage": {
@@ -80,33 +95,59 @@
     }
   },
   "createPetDrawer": {
-    "title": "Add a new Pet",
+    "title": "Add a new pet",
     "fields": {
-      "name": "Name",
-      "species": "Species",
+      "name": "Name *",
+      "species": "Species *",
       "breed": "Breed",
       "birthDate": "Birth date",
-      "weight": "Weight (kg)",
+      "weight": "Weight (kg) *",
       "sex": "Sex",
       "allergies": "Allergies",
-      "chronicConditions": "Chronic conditions"
+      "chronicConditions": "Chronic conditions",
+      "behavioralNotes": "Behavior"
     },
     "placeholders": {
       "name": "e.g. Miso",
-      "species": "Select a species",
+      "species": "Select species",
       "breed": "e.g. British Shorthair",
-      "birthDate": "Select a date",
-      "weight": "e.g. 3.8",
+      "birthDate": "DD / MM / YYYY",
+      "weight": "0.0",
       "sex": "Select",
       "allergies": "Anything they react to",
-      "chronicConditions": "Ongoing health conditions"
+      "chronicConditions": "Ongoing health conditions",
+      "behavioralNotes": "How they act, what they fear"
     },
-    "addAllergy": "Add allergy",
-    "addChronicCondition": "Add chronic condition",
+    "submit": "Add pet",
+    "healthTitle": "Add health info",
+    "stepOfTotal": "Step {{current}} of {{total}}",
+    "next": "Next",
+    "back": "Back",
+    "close": "Close",
+    "intro": {
+      "prefix": "Optional, but it makes ",
+      "highlight": "analysis and advice",
+      "suffix": " more accurate. You can edit this anytime in the Health tab"
+    },
+    "hints": {
+      "allergies": "Things your pet reacts to, e.g. certain foods, pollen or flea bites.",
+      "chronicConditions": "Long-term health issues diagnosed by a vet, e.g. diabetes, kidney disease, arthritis.",
+      "behavioralNotes": "How your pet usually acts, e.g. afraid of loud noises or shy with strangers."
+    },
+    "infoLabel": "About {{field}}",
+    "add": {
+      "allergies": "Add allergy",
+      "chronicConditions": "Add chronic condition",
+      "behavioralNotes": "Add behavior note"
+    },
+    "removeItem": {
+      "allergies": "Remove allergy",
+      "chronicConditions": "Remove chronic condition",
+      "behavioralNotes": "Remove behavior note"
+    },
     "remove": "Remove",
-    "removeAllergy": "Remove allergy",
-    "removeChronicCondition": "Remove chronic condition",
-    "submit": "Add pet"
+    "forPet": "for {{name}}",
+    "clear": "Clear form"
   },
   "editPetDrawer": {
     "title": "Edit pet info",
@@ -122,9 +163,6 @@
     "statusStable": "Stable",
     "noVetVisit": "No vet visit",
     "lastActivityPlaceholder": "Not tracked",
-    "viewInfo": "View info",
-    "assessment": "Assessment",
-    "assessmentAccessibilityLabel": "Open assessment for {{name}}",
     "kg": "kg"
   },
   "species": {
@@ -146,5 +184,42 @@
   },
   "healthTab": {
     "comingSoon": "Coming soon"
+  },
+  "editBasicsDrawer": {
+    "title": "Edit basics",
+    "submit": "Save",
+    "addItem": "Add another",
+    "removeItem": "Remove",
+    "placeholders": {
+      "allergies": "Anything they react to",
+      "chronicConditions": "Ongoing health conditions",
+      "behavioralNotes": "How they act, what they fear"
+    }
+  },
+  "addBasicsItemDrawer": {
+    "title": "Add to {{section}}",
+    "submit": "Save",
+    "placeholder": "Type here",
+    "hint": "Type something to add."
+  },
+  "petListSettings": {
+    "title": "Pet list",
+    "subtitle": "Customize app",
+    "toggleTitle": "Show pets as a list",
+    "toggleSubtitle": "Pets tab opens your list of pets first",
+    "howItLooks": "How it looks",
+    "whatChanges": "What changes",
+    "singleLabel": "Single pet",
+    "listLabel": "Pet list",
+    "singleDescription": "Pets tab opens one pet’s profile. Switch pets from the top.",
+    "listDescription": "Pets tab opens your list of pets first. Tap a pet to open its profile.",
+    "callout": "Best for <highlight>many pets</highlight>: see how each one is doing at a glance."
+  },
+  "petListSuggestion": {
+    "title": "Switch to list view?",
+    "description": "You have {{petCount}} pets now. A list shows how each one is doing at a glance.",
+    "hint": "Change it anytime in Profile → Customize app, or with the settings icon in Choose a pet.",
+    "confirm": "Switch",
+    "dismiss": "Don’t show again"
   }
 }

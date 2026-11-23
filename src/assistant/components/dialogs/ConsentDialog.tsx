@@ -35,11 +35,15 @@ export const ConsentDialog = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle style={styles.dialogTitle}>{t("consent.title")}</DialogTitle>
+          <DialogTitle>{t("consent.title")}</DialogTitle>
         </DialogHeader>
-        <Text style={styles.body}>{t("consent.information")}</Text>
-        <Text style={styles.body}>{t(`consent.privacy.${persistenceStatus}`)}</Text>
-        <Text accessibilityRole="alert" style={styles.emergencyText}>
+        <Text variant="body" style={styles.body}>
+          {t("consent.information")}
+        </Text>
+        <Text variant="body" style={styles.body}>
+          {t(`consent.privacy.${persistenceStatus}`)}
+        </Text>
+        <Text accessibilityRole="alert" variant="bodySemiBold" style={styles.emergencyText}>
           {t("consent.emergency")}
         </Text>
         <DialogFooter>
@@ -54,22 +58,12 @@ export const ConsentDialog = ({
 };
 
 const styles = StyleSheet.create((theme) => ({
-  dialogTitle: {
-    fontFamily: theme.fonts.display,
-    textTransform: "none",
-    color: theme.palette.brand.textPrimary,
-  },
   body: {
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.5,
-    color: theme.palette.brand.textBody,
+    color: theme.palette.brand.textSecondary,
     textAlign: "center",
   },
   emergencyText: {
     textAlign: "center",
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.base,
     color: theme.palette.brand.danger,
-    lineHeight: theme.fontSize.base * 1.5,
   },
 }));

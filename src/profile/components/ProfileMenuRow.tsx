@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { ChevronIcon } from "@/icons/chevron";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
@@ -12,6 +13,7 @@ type ProfileMenuRowProps = {
   description?: string;
   tone?: "default" | "danger";
   disabled?: boolean;
+  pressDelay?: number;
   onPress?: () => void;
 };
 
@@ -21,8 +23,11 @@ export function ProfileMenuRow({
   description,
   tone = "default",
   disabled = false,
+  pressDelay = PRESS_HIGHLIGHT_DELAY_MS,
   onPress,
 }: ProfileMenuRowProps) {
+  const { theme } = useUnistyles();
+
   const isDanger = tone === "danger";
 
   return (
@@ -30,18 +35,25 @@ export function ProfileMenuRow({
       accessibilityRole="button"
       accessibilityLabel={label}
       disabled={disabled}
+      unstable_pressDelay={pressDelay}
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && !disabled && styles.rowPressed]}
     >
       <View style={[styles.iconWrap, isDanger && styles.iconWrapDanger]}>{icon}</View>
       <View style={styles.copy}>
-        <Text style={[styles.label, isDanger && styles.labelDanger]}>{label}</Text>
-        {!!description && <Text style={styles.description}>{description}</Text>}
+        <Text variant="bodySemiBold" style={[styles.label, isDanger && styles.labelDanger]}>
+          {label}
+        </Text>
+        {!!description && (
+          <Text variant="bodyS" style={styles.description}>
+            {description}
+          </Text>
+        )}
       </View>
       <ChevronIcon
         direction="right"
-        width={18}
-        height={18}
+        width={theme.iconSize.lg}
+        height={theme.iconSize.lg}
         color={isDanger ? palette.brand.danger : palette.brand.textSecondary}
       />
     </Pressable>
@@ -78,18 +90,12 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(0.5),
   },
   label: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.4,
     color: theme.palette.brand.textPrimary,
   },
   labelDanger: {
     color: theme.palette.brand.danger,
   },
   description: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.35,
     color: theme.palette.brand.textSecondary,
   },
 }));

@@ -194,7 +194,10 @@ const getTriggerTimestamp = (reminder: ReminderResponseDto): number => {
 
 export type ReminderGroup = { key: ReminderGroupKey; reminders: Reminder[] };
 
-export const toReminderGroups = (reminders: ReminderResponseDto[]): ReminderGroup[] => {
+export const toReminderGroups = (
+  reminders: ReminderResponseDto[],
+  petNames: ReadonlyMap<string, string> = new Map()
+): ReminderGroup[] => {
   const buckets = new Map<ReminderGroupKey, Reminder[]>();
 
   const ordered = [...reminders].sort(
@@ -209,6 +212,7 @@ export const toReminderGroups = (reminders: ReminderResponseDto[]): ReminderGrou
       icon: REMINDER_ICON[reminder.type ?? "Activity"],
       tone: getReminderTone(reminder.type),
       title: reminder.title ?? "",
+      petName: reminder.petId ? petNames.get(reminder.petId) : undefined,
       time: formatReminderTime(reminder),
       status: getReminderStatus(reminder),
     });

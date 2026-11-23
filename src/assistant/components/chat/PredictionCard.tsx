@@ -23,16 +23,24 @@ export function PredictionCard({
   });
   return (
     <View style={[styles.predictionCard, deemphasized && styles.predictionCardDeemphasized]}>
-      <Text style={styles.urgency}>⚕ {t("assessment.urgency", { urgency: urgencyLabel })}</Text>
-      <Text style={styles.section}>{t("assessment.nextSteps")}</Text>
+      <Text variant="bodySemiBold" style={styles.urgency}>
+        ⚕ {t("assessment.urgency", { urgency: urgencyLabel })}
+      </Text>
+      <Text variant="bodySemiBold" style={styles.section}>
+        {t("assessment.nextSteps")}
+      </Text>
       {prediction.homeAdvice.map((advice) => (
-        <Text key={advice}>• {advice}</Text>
+        <Text key={advice} variant="bodyS" style={styles.advice}>
+          • {advice}
+        </Text>
       ))}
-      <Text style={styles.possibleCondition}>
+      <Text variant="bodySemiBold" style={styles.possibleCondition}>
         {t("assessment.possibleCondition", { condition: prediction.predictedCondition })}
       </Text>
-      <Text style={styles.possibleConditionNote}>{t("assessment.possibleConditionNote")}</Text>
-      <Text style={styles.meta}>
+      <Text variant="caption" style={styles.possibleConditionNote}>
+        {t("assessment.possibleConditionNote")}
+      </Text>
+      <Text variant="bodyS" style={styles.meta}>
         {specialistLabel} · {categoryLabel}
       </Text>
     </View>
@@ -50,13 +58,10 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.white,
   },
   predictionCardDeemphasized: { opacity: 0.6 },
-  section: { fontFamily: theme.fonts.bold, marginTop: theme.spacing(2) },
-  urgency: { fontFamily: theme.fonts.bold, color: theme.palette.brand.primaryDark },
-  possibleCondition: { fontFamily: theme.fonts.semiBold, marginTop: theme.spacing(2) },
-  possibleConditionNote: {
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.45,
-    color: theme.palette.brand.textSecondary,
-  },
-  meta: { fontSize: theme.fontSize.sm, color: theme.palette.brand.textBody },
+  section: { marginTop: theme.spacing(2) },
+  urgency: { color: theme.palette.brand.primaryDark },
+  advice: { color: theme.palette.brand.textBody },
+  possibleCondition: { marginTop: theme.spacing(2) },
+  possibleConditionNote: { color: theme.palette.brand.textSecondary },
+  meta: { color: theme.palette.brand.textBody },
 }));

@@ -1,15 +1,12 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useRouter } from "expo-router";
+import { StyleSheet } from "react-native-unistyles";
 
 import type { PetResponseDto } from "@/api/generated";
 import { ReminderType } from "@/api/generated";
-import { ChevronIcon } from "@/icons/chevron";
 import { TrendingUpIcon } from "@/icons/trending";
 import { useGetRemindersByPet } from "@/reminders/queries/useGetReminderByPet";
-import { Button } from "@/shadecn/ui/button";
 import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 
@@ -25,8 +22,6 @@ type PetListCardProps = {
 
 export function PetListCard({ pet, onPress }: PetListCardProps) {
   const { t } = useTranslation(["pets"]);
-  const { theme } = useUnistyles();
-  const router = useRouter();
 
   const [isPressed, setIsPressed] = useState(false);
 
@@ -135,37 +130,6 @@ export function PetListCard({ pet, onPress }: PetListCardProps) {
             )}
           </View>
         </View>
-
-        <View pointerEvents="box-none" style={styles.actionBar}>
-          <View pointerEvents="none" style={styles.viewInfo}>
-            <Text variant="controlM" style={styles.ctaText}>
-              {t("pets:petListCard.viewInfo")}
-            </Text>
-            <ChevronIcon
-              direction="right"
-              width={theme.iconSize.md}
-              height={theme.iconSize.md}
-              color={styles.ctaText.color}
-            />
-          </View>
-
-          {!!pet.id && (
-            <Button
-              variant="text"
-              size="inline"
-              accessibilityLabel={t("pets:petListCard.assessmentAccessibilityLabel", {
-                name: pet.name,
-              })}
-              textStyle={styles.assessmentText}
-              hitSlop={(theme.minTouchTarget - theme.fontPx[12]) / 2}
-              onPress={() =>
-                router.push({ pathname: "/(tabs)/pets/assessment", params: { petId: pet.id } })
-              }
-            >
-              {t("pets:petListCard.assessment")}
-            </Button>
-          )}
-        </View>
       </View>
     </View>
   );
@@ -213,7 +177,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2.5),
     paddingHorizontal: theme.spacing(3),
     paddingTop: theme.spacing(3),
-    paddingBottom: theme.spacing(2.5),
+    paddingBottom: theme.spacing(3),
   },
   headerRow: {
     flexDirection: "row",
@@ -242,24 +206,5 @@ const styles = StyleSheet.create((theme) => ({
   statsRow: {
     flexDirection: "row",
     gap: theme.spacing(1),
-  },
-  actionBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: theme.spacing(2),
-    backgroundColor: theme.palette.brand.primaryXsoft,
-    paddingHorizontal: theme.spacing(4),
-    paddingVertical: theme.spacing(2),
-  },
-  viewInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  ctaText: {
-    color: theme.palette.brand.primaryDefault,
-  },
-  assessmentText: {
-    ...theme.textStyles.controlM,
   },
 }));

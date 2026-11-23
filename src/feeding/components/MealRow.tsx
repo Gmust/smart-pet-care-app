@@ -4,6 +4,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import dayjs from "dayjs";
 
 import type { FeedingLogResponseDto } from "@/api/generated";
+import { PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { UtensilsIcon } from "@/icons/utensils";
 import { Chip } from "@/shadecn/ui/chip";
 import {
@@ -14,7 +15,7 @@ import {
 } from "@/shadecn/ui/dropdown-menu";
 import { Text } from "@/shadecn/ui/text";
 
-import { FOOD_TYPE_ICONS, PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
+import { FOOD_TYPE_ICONS } from "../constants";
 import type { FeedingListRow, FeedingSlot } from "../types";
 import { toApiNumber } from "../utils/toApiNumber";
 

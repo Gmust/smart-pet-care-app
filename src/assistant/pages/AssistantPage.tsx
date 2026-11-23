@@ -109,7 +109,8 @@ export default function AssistantPage() {
     setConsent(null);
     setConsentDialogOpen(false);
     await clearAiUsingConsent();
-    router.replace("/(tabs)/home");
+    if (router.canGoBack()) router.back();
+    else router.replace("/(tabs)/home");
   };
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -374,7 +375,9 @@ export default function AssistantPage() {
     return (
       <SafeAreaView style={styles.loadingScreen} edges={["top"]}>
         <ActivityIndicator color={styles.loadingIndicator.color} />
-        <Text style={styles.loadingText}>{t("conversation.restoring")}</Text>
+        <Text variant="bodyS" style={styles.loadingText}>
+          {t("conversation.restoring")}
+        </Text>
       </SafeAreaView>
     );
 
@@ -382,8 +385,12 @@ export default function AssistantPage() {
     return (
       <SafeAreaView style={styles.loadingScreen} edges={["top"]}>
         <View accessibilityRole="alert" style={styles.stateCard}>
-          <Text style={styles.stateTitle}>{t("errors.sessionTitle")}</Text>
-          <Text style={styles.stateText}>{t("errors.session")}</Text>
+          <Text variant="titleM" style={styles.stateTitle}>
+            {t("errors.sessionTitle")}
+          </Text>
+          <Text variant="bodyS" style={styles.stateText}>
+            {t("errors.session")}
+          </Text>
           <Button onPress={sessionBootstrap.retry}>{t("errors.retry")}</Button>
         </View>
       </SafeAreaView>
@@ -398,7 +405,9 @@ export default function AssistantPage() {
     return (
       <SafeAreaView style={styles.loadingScreen} edges={["top"]}>
         <ActivityIndicator color={styles.loadingIndicator.color} />
-        <Text style={styles.loadingText}>{t("conversation.restoring")}</Text>
+        <Text variant="bodyS" style={styles.loadingText}>
+          {t("conversation.restoring")}
+        </Text>
       </SafeAreaView>
     );
 
@@ -408,7 +417,7 @@ export default function AssistantPage() {
         <SafeAreaView style={styles.screen} edges={["top"]}>
           <ChatHeader onNewChat={requestNewChat} />
           {sessionBootstrap.isError && activeSessionId && (
-            <Text accessibilityRole="alert" style={styles.warning}>
+            <Text accessibilityRole="alert" variant="bodyS" style={styles.warning}>
               {t("errors.newSession")}
             </Text>
           )}
@@ -433,8 +442,12 @@ export default function AssistantPage() {
                 ListEmptyComponent={
                   messagesQuery.isError ? (
                     <View accessibilityRole="alert" style={styles.stateCard}>
-                      <Text style={styles.stateTitle}>{t("errors.historyTitle")}</Text>
-                      <Text style={styles.stateText}>{t("errors.history")}</Text>
+                      <Text variant="titleM" style={styles.stateTitle}>
+                        {t("errors.historyTitle")}
+                      </Text>
+                      <Text variant="bodyS" style={styles.stateText}>
+                        {t("errors.history")}
+                      </Text>
                       <Button onPress={() => void messagesQuery.refetch()}>
                         {t("errors.retry")}
                       </Button>
@@ -498,7 +511,9 @@ export default function AssistantPage() {
                   sendMessage.isPending || retryMessage.isPending || sessionBootstrap.isCreating
                 }
               />
-              <Text style={styles.composerNote}>{t("conversation.disclaimer")}</Text>
+              <Text variant="caption" style={styles.composerNote}>
+                {t("conversation.disclaimer")}
+              </Text>
             </View>
           </KeyboardAvoidingView>
         </SafeAreaView>
@@ -510,7 +525,13 @@ export default function AssistantPage() {
       />
       <ConsentDialog
         isOpen={consentDialogOpen}
-        onOpenChange={setConsentDialogOpen}
+        onOpenChange={(open) => {
+          if (!open && !consentAccepted) {
+            void declineConsent();
+            return;
+          }
+          setConsentDialogOpen(open);
+        }}
         onAccept={() => void acceptConsent()}
         onDecline={declineConsent}
         persistenceStatus={ASSISTANT_PERSISTENCE_STATUS}
@@ -530,7 +551,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.surfacePage,
   },
   loadingIndicator: { color: theme.palette.brand.primaryDefault },
-  loadingText: { fontSize: theme.fontSize.sm, color: theme.palette.brand.textSecondary },
+  loadingText: { color: theme.palette.brand.textSecondary },
   stateCard: {
     alignItems: "center",
     gap: theme.spacing(3),
@@ -542,8 +563,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   stateTitle: {
     textAlign: "center",
-    fontFamily: theme.fonts.displayRegular,
-    fontSize: theme.fontSize.xl,
     color: theme.palette.brand.textPrimary,
   },
   stateText: { textAlign: "center", color: theme.palette.brand.textBody },
@@ -561,12 +580,11 @@ const styles = StyleSheet.create((theme) => ({
   trayCorner: {
     position: "absolute",
     top: -theme.spacing(14),
-    right: theme.spacing(4),
+    right: theme.spacing(2),
     zIndex: 10,
   },
   composerNote: {
     textAlign: "center",
-    fontSize: theme.fontSize.xs,
     color: theme.palette.brand.textSecondary,
   },
   warning: {

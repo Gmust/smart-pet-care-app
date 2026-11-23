@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { cardVariants } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 
@@ -28,7 +29,8 @@ export function HealthOverviewRow({
       accessibilityRole="button"
       accessibilityLabel={title}
       onPress={onPress}
-      style={({ pressed }) => [cardVariants.card, styles.row, pressed && styles.rowPressed]}
+      unstable_pressDelay={NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS}
+      style={({ pressed }) => [cardVariants.card, styles.row, pressed && cardVariants.pressed]}
     >
       <View style={[styles.iconBg, tone === "peach" ? styles.iconBgPeach : styles.iconBgPrimary]}>
         {icon}
@@ -50,9 +52,6 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing(2.5),
-  },
-  rowPressed: {
-    backgroundColor: theme.palette.brand.surfaceSunken,
   },
   iconBg: {
     width: theme.spacing(10),

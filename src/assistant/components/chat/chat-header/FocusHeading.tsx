@@ -14,16 +14,15 @@ export function FocusHeading({ text }: { text: string }) {
 
   return (
     <View ref={ref} accessible accessibilityRole="header" accessibilityLabel={text}>
-      <Text style={styles.title}>{text}</Text>
+      <Text variant="titleL" style={styles.title}>
+        {text}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   title: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize.xl,
-    lineHeight: theme.fontSize.xl * 1.3,
     color: theme.palette.brand.textPrimary,
   },
 }));

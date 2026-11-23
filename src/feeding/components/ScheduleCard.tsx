@@ -2,11 +2,10 @@ import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { UtensilsIcon } from "@/icons/utensils";
 import { Card } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
-
-import { NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
 
 type ScheduleCardProps = {
   mealsPerDay: number;

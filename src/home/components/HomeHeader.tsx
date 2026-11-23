@@ -22,11 +22,15 @@ export function HomeHeader({ username }: Props) {
   return (
     <View style={styles.root}>
       <View style={styles.greetings}>
-        <Text style={styles.date}>{dayjs().format("dddd · MMM D")}</Text>
-        <Text style={styles.message}>{t("greetings", { username, daytime: getDaytime() })}</Text>
+        <Text variant="bodyS" style={styles.date}>
+          {dayjs().format("dddd · MMM D")}
+        </Text>
+        <Text variant="titleL" style={styles.message}>
+          {t("greetings", { username, daytime: getDaytime() })}
+        </Text>
       </View>
       <Button
-        accessibilityLabel="ai-assistant"
+        accessibilityLabel={t("assistantButton")}
         variant="icon"
         size="icon"
         icon={<AiIcon width={16} height={16} color={palette.brand.textPrimary} />}
@@ -44,17 +48,12 @@ const styles = StyleSheet.create((theme) => ({
     maxWidth: "100%",
   },
   date: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   greetings: {
     maxWidth: "90%",
   },
   message: {
-    marginTop: theme.spacing(1),
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
     letterSpacing: 0,
     color: theme.palette.brand.textPrimary,
   },

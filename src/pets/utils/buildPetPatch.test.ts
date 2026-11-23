@@ -15,24 +15,19 @@ const pet: PetResponseDto = {
   birthDate: "2021-04-02T00:00:00.000Z",
   weightKg: 3.8,
   sex: Sex.Female,
-  allergies: ["Chicken"],
-  chronicConditions: null,
 };
 
-// What EditPetDrawer seeds the form with for `pet`, including its blank chronic-conditions row.
 const formFor = (overrides: Partial<EditPetForm> = {}): EditPetForm => ({
   name: "Miso",
   species: AnimalSpecies.Cat,
   breed: "British Shorthair",
   birthDate: "2021-04-02T00:00:00.000Z",
   sex: Sex.Female,
-  allergies: ["Chicken"],
-  chronicConditions: [""],
   ...overrides,
 });
 
 describe("buildPetPatch", () => {
-  it("sends nothing when nothing changed, blank list rows included", () => {
+  it("sends nothing when nothing changed", () => {
     expect(buildPetPatch(formFor(), pet)).toEqual({});
   });
 
@@ -68,12 +63,5 @@ describe("buildPetPatch", () => {
 
     expect(buildPetPatch(untouched, untrimmedPet)).toEqual({});
     expect(buildPetPatch({ ...untouched, sex: Sex.Male }, untrimmedPet)).toEqual({ sex: Sex.Male });
-  });
-
-  it("sends trimmed lists without blank rows, and null when every row is removed", () => {
-    expect(buildPetPatch(formFor({ chronicConditions: [" Asthma ", ""] }), pet)).toEqual({
-      chronicConditions: ["Asthma"],
-    });
-    expect(buildPetPatch(formFor({ allergies: [""] }), pet)).toEqual({ allergies: null });
   });
 });

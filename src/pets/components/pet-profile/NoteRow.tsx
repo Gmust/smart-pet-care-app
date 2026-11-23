@@ -3,8 +3,10 @@ import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import type { NoteResponseDto } from "@/api/generated";
+import { NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { ChevronIcon } from "@/icons/chevron";
 import { PencilLineIcon } from "@/icons/pencil-line";
+import { cardVariants } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
@@ -27,7 +29,8 @@ export const NoteRow = ({ note, onPress }: NoteRowProps) => {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={title}
-      style={styles.noteRow}
+      unstable_pressDelay={NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS}
+      style={({ pressed }) => [styles.noteRow, pressed && cardVariants.pressed]}
       onPress={onPress}
     >
       <View style={styles.noteIconBg}>

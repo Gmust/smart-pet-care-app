@@ -33,8 +33,10 @@ export const SignOutDrawer = ({ isOpen, setIsOpen, onConfirm }: Props) => {
           </DrawerDescription>
         </DrawerHeader>
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t("profile:profilePage.signOutDrawer.cardTitle")}</Text>
-          <Text style={styles.cardDescription}>
+          <Text variant="bodySemiBold" style={styles.cardTitle}>
+            {t("profile:profilePage.signOutDrawer.cardTitle")}
+          </Text>
+          <Text variant="bodyS" style={styles.cardDescription}>
             {t("profile:profilePage.signOutDrawer.cardDescription")}
           </Text>
         </View>
@@ -61,15 +63,10 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(4),
   },
   cardTitle: {
-    fontFamily: theme.fonts.bold,
-    fontSize: theme.fontSize.sm,
     textTransform: "uppercase",
     color: theme.palette.brand.textPrimary,
   },
   cardDescription: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.3,
     color: theme.palette.brand.textBody,
   },
 }));

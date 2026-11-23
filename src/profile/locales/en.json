@@ -11,6 +11,7 @@
     "editProfile": "Edit profile",
     "sections": {
       "details": "Account details",
+      "customize": "Customize app",
       "manage": "Manage account",
       "legal": "Legal"
     },
@@ -42,20 +43,13 @@
     },
     "deleteDialog": {
       "title": "Delete account?",
-      "description": "This will permanently remove your account and all of your pets. This action cannot be undone.",
-      "confirm": "Delete account",
-      "cancel": "Cancel"
+      "description": "This will permanently remove your account and all of your pets. This action cannot be undone."
+    },
+    "customize": {
+      "toggleTitle": "Show pets as a list",
+      "toggleSubtitle": "Pets tab opens your list of pets first",
+      "seeHow": "See how it looks"
     }
-  },
-  "editSelectionDialog": {
-    "title": "What would you like to do?",
-    "profileInfoBtn": "Update profile info",
-    "newAvatarBtn": "Set new avatar"
-  },
-  "setNewAvatarDrawer": {
-    "title": "Set new avatar",
-    "saveBtn": "Save new avatar",
-    "successMessage": "Avatar updated successfully!"
   },
   "editProfileDrawer": {
     "title": "Edit profile",
@@ -67,6 +61,7 @@
       "displayName": "e.g. Alex Morgan",
       "phoneNumber": "e.g. +1 555 123 4567"
     },
-    "submit": "Save changes"
+    "submit": "Save changes",
+    "changePhoto": "Change photo"
   }
 }

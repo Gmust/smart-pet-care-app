@@ -16,6 +16,9 @@
   },
   "addReminder": "Add reminder",
   "noTime": "No time",
+  "row": {
+    "petAndTime": "{{petName}} · {{time}}"
+  },
   "remindersPage": {
     "title": "Reminders",
     "subtitle_one": "{{count}} reminder",

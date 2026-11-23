@@ -22,6 +22,7 @@ depends on — and it drifts from `DESIGN.md` the moment a token changes.
 | A bottom sheet                                 | `Drawer`                                          | a custom animated `View`      |
 | A single-select from a list                    | `Select`                                          | a custom picker               |
 | A contextual action menu                       | `DropdownMenu`                                    | a custom popover              |
+| A tap-to-open explanation with an arrow        | `Tooltip` (an "i" for a field: `InfoHint`)        | a hand-made popover           |
 | A boolean toggle                               | `Switch`                                          | a custom pressable            |
 | A grouped content surface                      | `Card` / `ListCard`                               | a styled `View`               |
 | A validation message under a field             | `FieldError`                                      | a styled `Text`               |
@@ -59,10 +60,10 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 
 ### `Button` — `@/shadecn/ui/button`
 
-- Variants: `primary`, `tonal`, `secondary`, `ghost`, `danger`, `dangerText`, `text`, `link`, `icon`;
+- Variants: `primary`, `tonal`, `secondary`, `ghost`, `danger`, `dangerText`, `text`, `link`, `icon`, `iconOnPhoto`;
   `ghost` with `dotted` is the Figma dashed button
 - Sizes: `sm`, `md`, `icon`, `hug`, `inline`
-- Props: `icon`, `iconPosition`, `isLoading`, `disabled`, `dotted`, `textStyle`, plus standard `Pressable` props
+- Props: `icon`, `iconPosition`, `isLoading`, `disabled`, `dotted`, `textStyle`, `animateDisabled`, plus standard `Pressable` props
 - String children render through the shared `Text` with themed button typography
 - `isLoading` disables the button and swaps the content for an activity indicator
 - **`icon` is rendered as given — `Button` does not tint it.** Pass the color explicitly to match
@@ -76,7 +77,7 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 ### `Text` — `@/shadecn/ui/text`
 
 - `variant` maps to `theme.textStyles`: `display`, `titleL`, `titleM`, `body`, `bodyS`,
-  `bodySemiBold`, `label`, `caption`, `controlS`, `controlM`, `controlL`
+  `bodySemiBold`, `label`, `labelCaps`, `caption`, `controlS`, `controlM`, `controlL`
 - Prefer a `variant` over ad-hoc `fontSize` / `fontFamily`
 
 ### `Input` — `@/shadecn/ui/input`
@@ -108,11 +109,12 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 
 ### `Chip` — `@/shadecn/ui/chip`
 
-- Variants: `default`, `ghost`, `onDark`; tones: `neutral`, `primary`, `ok`, `peach`, `warn`,
+- Variants: `default`, `ghost`, `onDark`, `onPhoto`; tones: `neutral`, `primary`, `ok`, `peach`, `warn`,
   `danger`; sizes: `sm`, `md`
 - `onDark` is for a dark strip: no fill, a status-coloured outline and light text. It takes only
   the `ok`, `warn` and `danger` tones
-- Props: `label`, `icon`, `iconSize`, `onPress`, `disabled`
+- `onPhoto` is for a label over a photo; it takes no tone
+- Props: `label`, `icon`, `iconSize`, `onPress`, `disabled`, `selected` (announced for one option of a group)
 - Use for statuses, tags, and multi-select filter toggles
 - Without `onPress` it is a plain `View`, so it does not swallow taps meant for a card or row
 
@@ -132,6 +134,7 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
   `BottomSheet`, `BottomSheetScrollView`
 - Hooks: `useDrawerNativeActivity`, `useDrawerSetOpen`, `useDrawerClose`
 - Controlled via `open` / `onOpenChange`; `DrawerContent` handles bottom safe-area spacing
+- `DrawerCloseButton` is the sheet's "X"; `DrawerHeaderButton` is any other round icon action in that corner
 - Pass `scrollable` with `DrawerScrollView` for long forms
 
 ### `Select` — `@/shadecn/ui/select`
@@ -142,7 +145,8 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 ### `Tabs` — `@/shadecn/ui/tabs`
 
 - `variant`: `segmented` (default, underline), `pill`, `chips` (a `Chip`-sized outline with a
-  fill that slides to the active tab, for filters). `tone`: `primary` | `peach`, `segmented` only
+  fill that slides to the active tab, for filters), `track` (the Health "Basics" switch: equal
+  segments in a rounded track, peach fill). `tone`: `primary` | `peach`, `segmented` only
 - Do not give tabs `flex: 1`: a zero flex basis hands every tab an equal share and clips the
   longest label
 
@@ -159,16 +163,23 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
 - A card with its own look (no border, a photo, a custom shadow) is hand-written:
   `ActivityCard`, `PetListCard`
 
+### `Tooltip` — `@/shadecn/ui/tooltip`
+
+- Props: `trigger`, `children` (the text), `dismissLabel` (optional), `variant` (`peach` or `white`)
+- A card with an arrow pointing at the trigger, built on `DropdownMenu`. `InfoHint` in
+  `@/common/components/` is the "i" built on it
+
 ### Others
 
 - `DropdownMenu` — `DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`
-- `Switch` — boolean toggle
+- `Switch` — boolean toggle; sizes `md` and `sm`
 - `FieldError` — renders TanStack Form `field.state.meta.errors`
 
 ## Shared app components
 
 Beyond the primitives, `src/common/components/` holds composites worth reusing:
-`ActionRow`, `AddButton`, `BackButton`, `DeleteConfirmDialog`, `DateTimeField`, `SectionHeader`,
+`ActionRow`, `AddButton`, `BackButton`, `Callout`,
+`DeleteConfirmDialog`, `DateTimeField`, `SectionHeader`, `SettingRow`,
 `SkeletonBox`, `ImagePicker`, `OfflineBanner`, `RouteErrorFallback`, `QueryErrorState`,
 `PhotoViewer` (tap a thumbnail to see the photo full screen).
 

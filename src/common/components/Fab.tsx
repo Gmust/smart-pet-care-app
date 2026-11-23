@@ -15,8 +15,8 @@ import { StyleSheet } from "react-native-unistyles";
 import * as Haptics from "expo-haptics";
 
 import { CreateActivityDrawer } from "@/activity/components/drawers/CreateActivityDrawer";
-import { PetPickerDrawer } from "@/activity/components/drawers/PetPickerDrawer";
 import { HealthRecordType } from "@/api/generated";
+import { PetPickerDrawer } from "@/common/components/PetPickerDrawer";
 import { LogMealDrawer } from "@/feeding/components/drawers/LogMealDrawer";
 import { AddHealthRecordDrawer } from "@/health/components/drawers/AddHealthRecordDrawer";
 import { ActivityIcon } from "@/icons/activity";
@@ -185,6 +185,7 @@ export function Fab() {
         pets={pets ?? []}
         selectedPetId={activityPetId ?? undefined}
         onSelect={setActivityPetId}
+        showSettings={false}
       />
       <PetPickerDrawer
         isOpen={isFeedingPetPickerOpen}
@@ -192,6 +193,7 @@ export function Fab() {
         pets={pets ?? []}
         selectedPetId={feedingPetId ?? undefined}
         onSelect={setFeedingPetId}
+        showSettings={false}
       />
       {!!feedingPetId && (
         <LogMealDrawer

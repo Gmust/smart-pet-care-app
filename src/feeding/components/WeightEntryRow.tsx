@@ -4,6 +4,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import dayjs from "dayjs";
 
 import type { PetWeightLogResponseDto } from "@/api/generated";
+import { PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/shadecn/ui/dropdown-menu";
 import { Text } from "@/shadecn/ui/text";
-
-import { PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
 
 type WeightEntryRowProps = {
   entry: PetWeightLogResponseDto;
