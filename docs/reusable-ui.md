@@ -133,6 +133,8 @@ a variant to `button.tsx` so every screen gets it — do not override it locally
   `DrawerTitle`, `DrawerDescription`, `DrawerClose`, `DrawerCloseButton`, `DrawerScrollView`,
   `BottomSheet`, `BottomSheetScrollView`
 - Hooks: `useDrawerNativeActivity`, `useDrawerSetOpen`, `useDrawerClose`
+- Also exports `DrawerKeyboardDismiss` (a tap on empty space drops the field focus; `fill={false}` when it wraps only the header) and the constants `DRAWER_FOOTER_FADE_SPACING`, `DRAWER_FOOTER_SOFT_FADE_SPACING`, `TRANSPARENT_WHITE`
+- `DrawerFooter` takes `softFade` for a longer, softer fade over the content behind it; scrollable content needs bottom padding of at least the fade spacing
 - Controlled via `open` / `onOpenChange`; `DrawerContent` handles bottom safe-area spacing
 - `DrawerCloseButton` is the sheet's "X"; `DrawerHeaderButton` is any other round icon action in that corner
 - Pass `scrollable` with `DrawerScrollView` for long forms

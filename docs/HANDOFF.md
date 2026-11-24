@@ -23,7 +23,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
   drawer button, back from each entry. Not checked: the suggestion sheet (needs an unset choice and
   5 pets), Home and Activity entries through the drawer, iOS.
 - Review fixes: `theme.textStyles.labelCaps` (Figma: Inter SemiBold 12, 0.3% spacing) replaces hand-set `letterSpacing` on uppercase labels (dropdown, select, reminders, home cards); the score and "/100" on the Home pet card no longer override the `display`/`titleL` spacing; `hitSlop` on the search-clear button follows `(minTouchTarget - size) / 2` (larger areas elsewhere were left alone); `SelectContent` defaults `sideOffset` to `spacing(1.5)`; `DialogCloseButton` label is translated; `button.tsx` lost its base `fontFamily` (every `hug` button is icon-only). `DESIGN.md` typography, colours and component typography now mirror `theme.ts`/`palette.ts`. `pnpm check` green (85 suites, 726 tests). Not checked on a device: caps-label spacing, Select menu offset. Open: `tabs.tsx` pill still sets Inter Medium 12 by hand (no token; used by `RemindersPage`); `HomeHeader` forces `letterSpacing: 0` on `titleL`.
-- Pet list card (`src/pets/components/pet-list/PetListCard.tsx`) lost its "View info" action bar: the whole card is the tap target, as in Figma. `pets:petListCard.viewInfo` removed. The list page is still not wired to the Pets tab, so this was not looked at on a device; `pnpm check` is green.
+- Pet list card (`src/pets/components/pet-list/PetListCard.tsx`) lost its "View info" action bar: the whole card is the tap target, as in Figma. `pets:petListCard.viewInfo` removed. The list page is shown by `PetsTabPage` when list mode is on; looked at on the phone.
 - Branch: `main` at `ef012b0`, with #29 (EAS `updates.url`), #30 (reminder status) and #31
   (password reset) merged on 2026-11-04.
 - Password reset v1 (backend spec "Password reset v1"; `pnpm api:update` pulled
@@ -203,7 +203,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
   and sends only the changed fields.
 
 - Pet profile cleanup (branch `chore/pet-profile-tabs-cleanup`, from `origin/main` `0af2a57`;
-  not committed or pushed yet):
+  PR #36):
   - Pet profile tabs are Overview / Health / Wellness / Feeding. Care, Reminders and the
     Recommendations placeholder are removed, and `AssessmentPage` with its route, params schema
     and hero is deleted; its Wellness and Feeding content now renders in `PetProfilePage`, and the
@@ -221,12 +221,11 @@ Keep it short and factual: what is true now, what was actually verified, what is
     namespace). The picker has an "Add a new pet" action (`onCreatePet`, profile only). The chosen
     pet is shared by Activity and the profile (`PetSelectionProvider` in `AppProvider`,
     `usePetSelection`); a pick that is no longer in the list falls back to the first pet. The
-    profile has no back button now; the hardware back still honours `from=home`.
-  - The Pets tab (`(tabs)/pets/index`) renders `PetProfilePage`; `petId` in its params is optional
-    and selects that pet. With no pets it shows an "Add a new pet" empty state.
-  - `PetListPage`, `PetListCard` and their skeletons and locale keys are kept but unused, so a
-    list for owners with many pets can be offered later (a setting); the assessment button was
-    removed from the card.
+    profile has no back button at the tab root; the pushed `pet-profile` route (list mode, Home links) shows one, and the hardware back honours `from=home`.
+  - The Pets tab (`(tabs)/pets/index`) renders `PetsTabPage`: `PetProfilePage`, or `PetListPage` when list mode is on; `petId` in the profile's params is optional
+    and selects that pet once the pets are loaded (a link to a pet that is gone keeps the current pick and toasts "Pet not found"). With no pets it shows an "Add a new pet" empty state; a failed pets request shows the error state, not the empty one.
+  - `PetListPage` and `PetListCard` are the list mode of the Pets tab (a setting, off by default);
+    the assessment button was removed from the card.
   - Look at on the phone (written without a device): the Basics card gliding between segments,
     the switcher/hero morph between Overview and the other tabs (`heroEntering` / `heroExiting`
     in `PetProfilePage`), tap-outside to drop focus in the pet drawers (`DrawerKeyboardDismiss`),
@@ -268,12 +267,11 @@ Keep it short and factual: what is true now, what was actually verified, what is
     the empty part of the chip row reaches the photo (`pointerEvents: "box-none"`). Checked on the
     phone: both chips, and the photo still opens. Not checked: long lists, a chip near the right edge, TalkBack.
     `FlagChip` now draws a `Chip` with the new `variant="onPhoto"` (translucent brown fill, peach outline, light label), inside a
-    `Pressable` for the tooltip. The AI button on the photo uses a 16 icon like the one on Home. The `rgba(122,58,26,...)` fill is still
-    not a theme token and is written in both `chip.tsx` and `button.tsx`; it waits for the Figma colours.
+    `Pressable` for the tooltip. The AI button on the photo uses a 16 icon like the one on Home. The translucent fill is
+    `${brand.peachDefault}80` in both `chip.tsx` and `button.tsx`.
   - The AI button on the pet photo is `Button` `variant="iconOnPhoto"`: the same translucent brown fill, peach outline and light icon as the
-    status chips there. The fill values (`rgba(122,58,26,...)`) are not theme tokens and are repeated in `FlagChip`; both
-    wait for the Figma colours or an `onPhoto` chip variant. Checked on the phone in its normal state; not pressed, not disabled.
-  - Not done yet: the LEGACY style migration. Figma's share button on Wellness and Feeding is
+    status chips there. The fill is built from `brand.peachDefault` (as in the `onPhoto` chip). Checked on the phone in its normal state; not pressed, not disabled.
+  - Not done yet: Figma's share button on Wellness and Feeding is
     not built (the profile keeps its "..." menu). The Basics card shows Figma's dashed "Add ..."
     button when the active list is empty. `PetSwitcher` follows Figma (sunken chip, Title/M name,
     36 px avatar, no avatar on Overview), so the Activity chip changed with it.
@@ -296,8 +294,8 @@ Keep it short and factual: what is true now, what was actually verified, what is
   `label` (reminder group titles, `DropdownMenuLabel`); the dead `trendLabel` style in
   `HealthPetCard` is deleted; the `DrawerTitle` size overrides in `EditPetDrawer` and
   `UploadPetPhotoDrawer` are gone (title is now `titleL` 24 with its own letter spacing).
-  `pnpm check` passes; not yet looked at on the phone. Regular/Medium/Fraunces cases without an
-  exact style are still LEGACY and go through Figma screen by screen.
+  `pnpm check` passes. The remaining LEGACY cases were migrated later in this branch; the tokens
+  are gone from `theme.ts`.
 - `DrawerDescription` is now `body` 15 in `textSecondary` (was Regular 16, slate-600); its only user is
   `SignOutDrawer`; it spans the drawer's full content width (negative margin cancels the header's
   side padding, which only the title needs). Seen on the phone after an app restart (fast refresh
@@ -516,16 +514,19 @@ Keep it short and factual: what is true now, what was actually verified, what is
 
 ## Next task
 
-Pet profile cleanup (branch `chore/pet-profile-tabs-cleanup`): next is the LEGACY style migration
-(list the files and the LEGACY → PERMANENT token mapping first and check it against Figma). Tabs,
-the reminder pet name, the Basics card and the shared pet switcher are done, with `pnpm check`
-green. On an Android device, still to
-look at: the switcher and its picker (including "Add a new pet" opening the create drawer after
-the picker closes, and the new pet being selected), the Pets tab with zero pets, Activity
-following the same pet, the four tabs and swiping between them, pull-to-refresh on each, the sliding Basics
-switch, the pencil and plus drawers (autofocus and keyboard in the plus drawer), the pet name on
-reminder cards, Home → Wellness, Feeding → Schedule → reminders. Layout and animation were not
-looked at on a device.
+Pet profile cleanup (PR #36, branch `chore/pet-profile-tabs-cleanup`): review fixes are in. The
+Maestro flows in `.maestro/` were rewritten for the new navigation (`subflows/open-pet-profile.yaml`
+picks the pet from the switcher; the Reminders tab, the assessment route and the
+Recommendations/Care placeholders are gone, and `limitations-coming-soon` was deleted) and were run on
+a Samsung phone with `PET_NAME=Miso` on 2026-11-24: `02`, `04`, `05` and `evidence/fr-14` to `fr-20`
+pass. Not run: `03` (needs an image in the system photo picker), `fr-13` (opens account deletion) and
+`fr-21` (signs the app out). `04` taps the time dialog's button by id because its label follows the phone's
+language. `PetPickerDrawer` was looked at with a shrunken window (screen density 640): at its height
+cap the list scrolls to the last row. OpenSpec is gitignored, so `openspec/` was not checked: the pet
+selection and list mode have no change of their own there, and two specs may still say a bad pet link
+redirects to the pet list. On a device, still to look at: swiping between the four profile tabs,
+pull-to-refresh on each, the Basics card and its drawers, Home → Wellness, Feeding → Schedule →
+reminders.
 
 Before a build goes to real users: the EAS release keystore already exists (SHA-1 under Current
 state); take its SHA-256 from `eas credentials` and have the backend add it to

@@ -13,6 +13,7 @@ jest.mock("@/api", () => ({ getApiPets: jest.fn() }));
 
 const mockGetApiPets = jest.mocked(getApiPets);
 
+// The cast: the hook reads only id and name, and the response type has more required fields.
 const respondWith = (ids: string[]) =>
   mockGetApiPets.mockImplementation(() =>
     Promise.resolve({ data: ids.map((id) => ({ id, name: id })) } as Awaited<

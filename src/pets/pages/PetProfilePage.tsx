@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, RefreshControl, View } from "react-native";
 import { Directions, Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -12,13 +12,16 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useQueryClient } from "@tanstack/react-query";
 import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 
+import { BackButton } from "@/common/components/BackButton";
 import { PetPickerDrawer } from "@/common/components/PetPickerDrawer";
 import { PetSwitcher } from "@/common/components/PetSwitcher";
 import { PhotoViewer } from "@/common/components/PhotoViewer";
+import { QueryErrorState } from "@/common/components/QueryErrorState";
 import { usePetSelection } from "@/common/hooks/usePetSelection";
 import { useRefreshControl } from "@/common/hooks/useRefreshControl";
 import { FeedingTabContent } from "@/feeding/components/FeedingTabContent";
@@ -59,7 +62,11 @@ const PROFILE_TAB_REFRESH_KEYS: Record<ProfileTabKey, readonly (readonly string[
   feeding: [],
 };
 
-export default function PetProfilePage() {
+type Props = {
+  showBack?: boolean;
+};
+
+export default function PetProfilePage({ showBack = false }: Props) {
   const parsedParams = petProfileParamsSchema.safeParse(useLocalSearchParams());
 
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -70,6 +77,7 @@ export default function PetProfilePage() {
   const [activeTab, setActiveTab] = useState<ProfileTabKey>(
     (parsedParams.success && parsedParams.data.tab) || "overview"
   );
+  const checkedParamPetIdRef = useRef<string | undefined>(undefined);
 
   const insets = useSafeAreaInsets();
   const { theme } = useUnistyles();
@@ -81,10 +89,12 @@ export default function PetProfilePage() {
   const {
     pets,
     isLoading: isPetsLoading,
+    isError: isPetsError,
+    refetch: refetchPets,
     selectedPetId: petId,
     setSelectedPetId,
   } = usePetSelection();
-  useBackToOrigin(parsedParams.success ? parsedParams.data.from : undefined);
+  const goBackToOrigin = useBackToOrigin(parsedParams.success ? parsedParams.data.from : undefined);
   const queryClient = useQueryClient();
   const { data: pet, isLoading: isPetLoading } = usePetQuery(petId);
   // The pet key also covers its notes, so the Overview tab needs nothing more.
@@ -106,10 +116,22 @@ export default function PetProfilePage() {
   const petName = pet?.name;
   const tabParam = parsedParams.success ? parsedParams.data.tab : undefined;
 
-  // A link to a pet (from Home, a note) selects it. Before paint, so the previous pet is not shown.
+  // A link to a pet (from Home, a note) selects it, once the pets are known. Before paint, so the
+  // previous pet is not shown. The boolean keeps a later refetch from re-applying the link over a
+  // pet picked from the switcher.
+  const isParamPetKnown = !!paramPetId && !!pets?.some((pet) => pet.id === paramPetId);
   useLayoutEffect(() => {
-    if (paramPetId) setSelectedPetId(paramPetId);
-  }, [paramPetId, setSelectedPetId]);
+    if (paramPetId && isParamPetKnown) setSelectedPetId(paramPetId);
+  }, [paramPetId, isParamPetKnown, setSelectedPetId]);
+
+  // A link to a pet that is gone keeps the current selection and says so once per link.
+  useEffect(() => {
+    if (!paramPetId || !pets || checkedParamPetIdRef.current === paramPetId) return;
+    checkedParamPetIdRef.current = paramPetId;
+    if (!pets.some((pet) => pet.id === paramPetId)) {
+      Toast.show({ type: "error", text1: t("petProfilePage.notFound") });
+    }
+  }, [paramPetId, pets, t]);
 
   // Re-opening a mounted screen with another tab changes its params, not its state.
   useEffect(() => {
@@ -217,6 +239,9 @@ export default function PetProfilePage() {
     return <PetProfilePageSkeleton />;
   }
 
+  // A failed list is not an empty one: offering "add a pet" would invite a duplicate.
+  if (isPetsError && !pets) return <QueryErrorState onRetry={refetchPets} />;
+
   if (!pets?.length) {
     return (
       <>
@@ -243,6 +268,7 @@ export default function PetProfilePage() {
       <View style={styles.screen}>
         <View style={[styles.topBar, { paddingTop: insets.top + theme.spacing(2) }]}>
           <View style={styles.topBarLeading}>
+            {showBack && <BackButton onBackPress={goBackToOrigin} />}
             {!!pet && (
               <PetSwitcher
                 selectedPet={pet}
@@ -412,7 +438,9 @@ const styles = StyleSheet.create((theme) => ({
   topBarLeading: {
     flex: 1,
     minWidth: 0,
-    alignItems: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing(2),
   },
   tabs: {
     zIndex: 1,

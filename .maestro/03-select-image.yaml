@@ -1,15 +1,15 @@
 appId: com.misopets.app
 name: Select pet photo from gallery
 env:
-  PET_NAME: Rex
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
 # Requires at least one image on the device: `adb push photo.jpg /sdcard/Pictures/`
 # then `adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/Pictures/photo.jpg`.
 # System photo picker + crop UI differ per Android version — tune the two
 # "system" steps below once with `maestro studio`.
 ---
 - launchApp
-- tapOn: "Pets"
-- tapOn: "View ${PET_NAME}"
+- runFlow: subflows/open-pet-profile.yaml
 - tapOn: "Open pet actions"
 - tapOn: "Set pet photo"
 - tapOn: "Add Photo"

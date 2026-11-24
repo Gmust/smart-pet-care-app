@@ -1,13 +1,13 @@
 appId: com.misopets.app
 name: Exchange messages with AI assistant
 env:
-  PET_NAME: Rex
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
   MESSAGES: "3"
 ---
 - launchApp
-- tapOn: "Pets"
-- tapOn: "View ${PET_NAME}"
-- tapOn: "ai-assistant"
+- runFlow: subflows/open-pet-profile.yaml
+- tapOn: "Open AI assistant"
 # consent dialog on first open
 - tapOn:
     text: "I understand and continue"

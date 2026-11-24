@@ -1,11 +1,11 @@
 appId: com.misopets.app
 name: Load pet records
 env:
-  PET_NAME: Rex
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
 ---
 - launchApp
-- tapOn: "Pets"
-- tapOn: "View ${PET_NAME}"
+- runFlow: subflows/open-pet-profile.yaml
 - extendedWaitUntil:
     visible:
       text: "Overview"
@@ -15,12 +15,4 @@ env:
     visible:
       text: "Health"
     timeout: 15000
-- tapOn: "Reminders"
-- extendedWaitUntil:
-    visible:
-      text: "Reminders"
-    timeout: 15000
-# "Back" alone also matches the system navigation bar button.
-- tapOn:
-    text: "Back"
-    above: "Overview"
+- assertVisible: "Vet visits"

@@ -1,17 +1,19 @@
 appId: com.misopets.app
 name: Schedule a reminder (push notification)
 env:
-  PET_NAME: Rex
+  # A plain constant here would override `-e PET_NAME=...`; this form only defaults.
+  PET_NAME: ${PET_NAME || "Rex"}
 # Time is set via the native Android clock dialog; the tap sequence below
 # assumes the default Material time picker ("OK" confirms). Tune once with
 # `maestro studio` if the device uses a different picker.
 ---
 - launchApp
-- tapOn: "Pets"
-- tapOn: "View ${PET_NAME}"
-- tapOn: "Reminders"
-# Opened from the pet's profile, the drawer preselects that pet.
-- tapOn: "Add reminder"
+- tapOn: "Home"
+- tapOn: "See all"
+# The Reminders page does not preselect a pet: pick PET_NAME in the drawer.
+- tapOn: "New reminder"
+- tapOn: "Select a pet"
+- tapOn: "${PET_NAME}"
 - tapOn: "e.g. Morning feeding"
 - inputText: "Perf reminder ${TS}"
 - hideKeyboard
@@ -24,7 +26,9 @@ env:
     element: "Time"
     direction: DOWN
 - tapOn: "Time"
-- tapOn: "OK"
+# The positive button by id: its label follows the device language ("ОК" in Cyrillic on a Russian phone).
+- tapOn:
+    id: "android:id/button1"
 - tapOn: "Create reminder"
 - extendedWaitUntil:
     visible:

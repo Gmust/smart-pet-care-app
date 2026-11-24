@@ -48,7 +48,7 @@ export function BasicsCard({ pet }: BasicsCardProps) {
         <>
           <Animated.View key={segment} entering={FadeIn.duration(220)} style={styles.list}>
             {items.map((item, index) => (
-              <Text key={index} style={styles.item}>
+              <Text key={index} variant="body" style={styles.item}>
                 {item}
               </Text>
             ))}

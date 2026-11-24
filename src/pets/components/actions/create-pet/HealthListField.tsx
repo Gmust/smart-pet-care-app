@@ -48,10 +48,9 @@ export const HealthListField = ({ form, name }: HealthListFieldProps) => {
                   placeholder={t(`pets:createPetDrawer.placeholders.${name}`)}
                   value={itemField.state.value}
                   onChangeText={itemField.handleChange}
-                  onBlur={() => {
-                    itemField.handleBlur();
-                    if (!itemField.state.value.trim()) field.removeValue(index);
-                  }}
+                  // Rows are keyed by index, so removing one on blur (when "Add" moves the focus) shifts
+                  // the new row away. Blank rows are dropped when the form is submitted.
+                  onBlur={itemField.handleBlur}
                   returnKeyType="done"
                   onSubmitEditing={Keyboard.dismiss}
                   rightSlot={

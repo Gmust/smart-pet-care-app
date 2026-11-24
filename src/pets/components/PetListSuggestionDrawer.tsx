@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { useIsFocused } from "expo-router";
 
 import { Callout } from "@/common/components/Callout";
 import { Button } from "@/shadecn/ui/button";
@@ -22,11 +23,15 @@ export const PetListSuggestionDrawer = () => {
   const { t } = useTranslation(["pets"]);
   const { mode, isLoaded, setMode, isSuggestionDismissed, dismissSuggestion } = usePetListMode();
   const { data: pets, isStale } = usePetsQuery();
+  const isFocused = useIsFocused();
 
   const petCount = pets?.length ?? 0;
   // Stale data is not trusted: right after a delete the cache still holds the old count until the
-  // refetch lands, and the sheet would flash up for a pet that is already gone.
+  // refetch lands, and the sheet would flash up for a pet that is already gone. Tab screens stay
+  // mounted once visited and the sheet is presented at the root, so without the focus check it
+  // would open over another tab, e.g. after a pet is added from the Home button.
   const isOpen =
+    isFocused &&
     isLoaded &&
     mode === undefined &&
     !isSuggestionDismissed &&

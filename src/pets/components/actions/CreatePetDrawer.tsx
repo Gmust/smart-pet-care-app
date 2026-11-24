@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import { KeyboardEvents } from "react-native-keyboard-controller";
@@ -36,6 +36,7 @@ type Props = {
 
 const STEP_COUNT = 2;
 const FADE_MS = 200;
+const STEP_ONE_FIELDS = ["name", "species", "weightKg", "birthDate", "breed"] as const;
 
 export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
   const { t } = useTranslation(["pets"]);
@@ -48,6 +49,10 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
   // end of the fields, and it is gone before the footer is uncovered again.
   const [isKeyboardShown, setIsKeyboardShown] = useState(false);
   const [footerHeight, setFooterHeight] = useState(0);
+  // Callers pass inline functions; keeping them in refs stops a re-render of the caller from
+  // re-running the effects below, which would send the user from step 2 back to step 1.
+  const onCreatedRef = useRef(onCreated);
+  const setIsOpenRef = useRef(setIsOpen);
   const { form, registerOnCreated } = useCreatePetDraft();
 
   useEffect(() => {
@@ -59,14 +64,24 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
     };
   }, []);
 
+  useLayoutEffect(() => {
+    onCreatedRef.current = onCreated;
+    setIsOpenRef.current = setIsOpen;
+  });
+
+  useEffect(() => {
+    if (isOpen) setStep(1);
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
-    setStep(1);
+    // `onCreated` goes first: AssistantNewPetPage marks the pet as created there, and its
+    // close handler reads that mark.
     return registerOnCreated((pet) => {
-      setIsOpen(false);
-      onCreated?.(pet);
+      onCreatedRef.current?.(pet);
+      setIsOpenRef.current(false);
     });
-  }, [isOpen, onCreated, registerOnCreated, setIsOpen]);
+  }, [isOpen, registerOnCreated]);
 
   const stepOneSchema = createPetStepOneSchema(t);
 
@@ -82,7 +97,17 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
           animateDisabled
           disabled={step === 1 && !isStepOneValid}
           isLoading={isSubmitting}
-          onPress={step === 1 ? () => setStep(2) : () => form.handleSubmit()}
+          onPress={
+            step === 1
+              ? () => setStep(2)
+              : async () => {
+                  await form.handleSubmit();
+                  const hasStepOneError = STEP_ONE_FIELDS.some(
+                    (name) => (form.getFieldMeta(name)?.errors.length ?? 0) > 0
+                  );
+                  if (hasStepOneError) setStep(1);
+                }
+          }
         >
           {step === 1 ? t("pets:createPetDrawer.next") : t("pets:createPetDrawer.submit")}
         </Button>

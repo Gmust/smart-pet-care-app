@@ -26,5 +26,4 @@ executionOrder:
     - "FR-18 Weight history with chart"
     - "FR-19 Wellness score (Home card > Assessment, Wellness tab)"
     - "FR-20 Pet notes (open editor, leave without saving)"
-    - "LIMIT Coming-soon placeholders (Recommendations, Care)"
     - "FR-21 Password reset request (signed out)"

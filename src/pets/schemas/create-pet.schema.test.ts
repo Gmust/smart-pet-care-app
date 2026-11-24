@@ -2,8 +2,9 @@
 
 import type { TFunction } from "i18next";
 
-import { editPetSchema } from "./create-pet.schema";
+import { createPetSchema, editPetSchema } from "./create-pet.schema";
 
+// The cast: the schema only calls `t(key)`; a stub cannot satisfy the full TFunction overloads.
 const t = ((key: string) => key) as TFunction<"pets">;
 
 const base = { name: "Miso", species: "Cat" };
@@ -21,5 +22,21 @@ describe("editPetSchema birthDate", () => {
 
   it("rejects text that is not a date", () => {
     expect(editPetSchema(t).safeParse({ ...base, birthDate: "13.11.2025" }).success).toBe(false);
+  });
+});
+
+describe("createPetSchema health lists", () => {
+  it("drops blank rows, so the form can leave them in place until it is submitted", () => {
+    const result = createPetSchema(t).parse({
+      name: "Miso",
+      species: "Cat",
+      weightKg: "3",
+      allergies: ["Chicken", "  ", ""],
+      chronicConditions: ["", " "],
+      behavioralNotes: [],
+    });
+
+    expect(result.allergies).toEqual(["Chicken"]);
+    expect(result.chronicConditions).toBeNull();
   });
 });

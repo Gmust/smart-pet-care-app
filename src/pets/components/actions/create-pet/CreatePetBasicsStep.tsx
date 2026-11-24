@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { Sex } from "@/api/generated";
 import { DateTimeField } from "@/common/components/DateTimeField";
 import type { CreatePetFormApi } from "@/pets/hooks/useCreatePetForm";
+import { FieldError } from "@/shadecn/ui/field-error";
 
 import { FormInputField } from "./FormInputField";
 import { SexChips } from "./SexChips";
@@ -44,16 +45,20 @@ export const CreatePetBasicsStep = ({ form }: { form: CreatePetFormApi }) => {
         <View style={styles.half}>
           <form.Field name="birthDate">
             {(field) => (
-              <DateTimeField
-                mode="date"
-                label={t("pets:createPetDrawer.fields.birthDate")}
-                placeholder={t("pets:createPetDrawer.placeholders.birthDate")}
-                value={field.state.value ? new Date(field.state.value) : null}
-                display={(date) => dayjs(date).format("MMM D, YYYY")}
-                maximumDate={new Date()}
-                onChange={(date) => field.handleChange(date.toISOString())}
-                onBlur={field.handleBlur}
-              />
+              <>
+                <DateTimeField
+                  mode="date"
+                  label={t("pets:createPetDrawer.fields.birthDate")}
+                  placeholder={t("pets:createPetDrawer.placeholders.birthDate")}
+                  value={field.state.value ? new Date(field.state.value) : null}
+                  display={(date) => dayjs(date).format("MMM D, YYYY")}
+                  maximumDate={new Date()}
+                  error={field.state.meta.errors.length > 0}
+                  onChange={(date) => field.handleChange(date.toISOString())}
+                  onBlur={field.handleBlur}
+                />
+                <FieldError errors={field.state.meta.errors} />
+              </>
             )}
           </form.Field>
         </View>

@@ -5,6 +5,7 @@ import { notifyManager, QueryClient, QueryClientProvider } from "@tanstack/react
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 import type { AxiosResponse } from "axios";
 import { AxiosHeaders } from "axios";
+import { useIsFocused } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 
 const mockTranslate = (key: string, options?: object) =>
@@ -20,6 +21,8 @@ jest.mock("expo-secure-store", () => ({
   getItemAsync: jest.fn(),
   setItemAsync: jest.fn(),
 }));
+
+jest.mock("expo-router", () => ({ useIsFocused: jest.fn(() => true) }));
 
 jest.mock("@/api", () => ({ getApiPets: jest.fn() }));
 
@@ -84,6 +87,7 @@ const clients: QueryClient[] = [];
 
 const renderDrawer = async ({ petCount, stored }: { petCount: number; stored: string | null }) => {
   jest.mocked(SecureStore.getItemAsync).mockResolvedValue(stored);
+  // `as never`: the sheet reads only the pet count, and the generated DTO requires more fields.
   jest
     .mocked(getApiPets)
     .mockResolvedValue(
@@ -113,7 +117,10 @@ describe("PetListSuggestionDrawer", () => {
   // React Query batches notifications on a timer, which lands outside act().
   beforeAll(() => notifyManager.setScheduler((callback) => callback()));
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.mocked(useIsFocused).mockReturnValue(true);
+  });
 
   afterEach(() => {
     clients.forEach((client) => client.clear());
@@ -168,6 +175,7 @@ describe("PetListSuggestionDrawer", () => {
 
   it("stays closed after the screen remounts once it was closed without an answer", async () => {
     jest.mocked(SecureStore.getItemAsync).mockResolvedValue(null);
+    // `as never`: only the pet count is read; the generated DTO requires more fields.
     jest
       .mocked(getApiPets)
       .mockResolvedValue(
@@ -199,6 +207,7 @@ describe("PetListSuggestionDrawer", () => {
   it("does not trust an invalidated count until the pets have been refetched", async () => {
     jest.mocked(SecureStore.getItemAsync).mockResolvedValue(null);
     let resolvePets: (value: unknown) => void = () => {};
+    // `as never`: a hand-resolved promise has no response type to match.
     jest
       .mocked(getApiPets)
       .mockImplementation(() => new Promise((resolve) => (resolvePets = resolve)) as never);
@@ -227,6 +236,23 @@ describe("PetListSuggestionDrawer", () => {
     });
 
     expect(screen.queryByTestId("drawer")).toBeNull();
+  });
+
+  it("does not open over another tab, and does not count that as a dismiss", async () => {
+    jest.mocked(useIsFocused).mockReturnValue(false);
+    await renderDrawer({ petCount: 5, stored: null });
+    expect(screen.queryByTestId("drawer")).toBeNull();
+
+    // The mock is not reactive; a changed pet list stands in for the re-render that focus causes.
+    jest.mocked(useIsFocused).mockReturnValue(true);
+    await act(async () => {
+      clients[0].setQueryData(
+        ["pets"],
+        Array.from({ length: 6 }, (_, index) => ({ id: `pet-${index}` }))
+      );
+    });
+
+    expect(screen.getByTestId("drawer")).toBeTruthy();
   });
 
   it("still asks when the pets grow to five after a start with four", async () => {
