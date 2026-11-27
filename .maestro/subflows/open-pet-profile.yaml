@@ -1,9 +1,13 @@
 appId: com.misopets.app
 # Opens the PET_NAME pet's profile from the Pets tab. The tab shows a profile (the first pet by
-# default), so the pet is picked from the switcher chip; "Select <name>" is a row of its drawer.
-# Assumes list mode is off, which is the default.
+# default), so the pet is picked from the switcher; "Select <name>" is a row of its drawer.
+# Assumes list mode was never chosen. With 5 or more pets the "Switch to list view?" sheet opens
+# over the switcher, so it is answered with "Don't show again" (this stores `off` on the device).
 ---
 - tapOn: "Pets"
+- tapOn:
+    text: "Don.t show again"
+    optional: true
 - extendedWaitUntil:
     visible: "Selected pet: .*"
     timeout: 15000
@@ -13,5 +17,5 @@ appId: com.misopets.app
     timeout: 5000
 - tapOn: "Select ${PET_NAME}"
 - extendedWaitUntil:
-    visible: "Overview"
+    visible: "Selected pet: ${PET_NAME}"
     timeout: 15000

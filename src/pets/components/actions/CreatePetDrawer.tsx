@@ -36,7 +36,7 @@ type Props = {
 
 const STEP_COUNT = 2;
 const FADE_MS = 200;
-const STEP_ONE_FIELDS = ["name", "species", "weightKg", "birthDate", "breed"] as const;
+const STEP_TWO_FIELDS = new Set(["allergies", "chronicConditions", "behavioralNotes"]);
 
 export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
   const { t } = useTranslation(["pets"]);
@@ -102,8 +102,10 @@ export const CreatePetDrawer = ({ isOpen, setIsOpen, onCreated }: Props) => {
               ? () => setStep(2)
               : async () => {
                   await form.handleSubmit();
-                  const hasStepOneError = STEP_ONE_FIELDS.some(
-                    (name) => (form.getFieldMeta(name)?.errors.length ?? 0) > 0
+                  // List rows are named "allergies[0]", so compare the part before the bracket.
+                  const hasStepOneError = Object.entries(form.state.fieldMeta).some(
+                    ([name, meta]) =>
+                      !STEP_TWO_FIELDS.has(name.split("[")[0]) && (meta?.errors.length ?? 0) > 0
                   );
                   if (hasStepOneError) setStep(1);
                 }

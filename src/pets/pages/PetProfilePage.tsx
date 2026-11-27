@@ -124,7 +124,7 @@ export default function PetProfilePage({ showBack = false }: Props) {
     if (paramPetId && isParamPetKnown) setSelectedPetId(paramPetId);
   }, [paramPetId, isParamPetKnown, setSelectedPetId]);
 
-  // A link to a pet that is gone keeps the current selection and says so once per link.
+  // A link to a pet that is gone keeps the current selection and says so once for that id.
   useEffect(() => {
     if (!paramPetId || !pets || checkedParamPetIdRef.current === paramPetId) return;
     checkedParamPetIdRef.current = paramPetId;
@@ -165,10 +165,12 @@ export default function PetProfilePage({ showBack = false }: Props) {
   }
 
   // The hero photo grows out of, and shrinks back into, the switcher's avatar circle. The target
-  // is where that avatar sits in the top bar: its padding, chip border and chip padding.
+  // is where that avatar sits in the top bar: its padding, the back button when shown, chip border
+  // and chip padding.
   const avatarSize = theme.spacing(9);
   const avatarInset = theme.spacing(0.375) + theme.spacing(1);
-  const avatarX = theme.spacing(4) + avatarInset;
+  const avatarX =
+    theme.spacing(4) + (showBack ? theme.spacing(9) + theme.spacing(2) : 0) + avatarInset;
   const avatarY = insets.top + theme.spacing(2) + avatarInset;
   const heroRadius = theme.borderRadius["2xl"];
   const heroDuration = 260;
@@ -240,12 +242,19 @@ export default function PetProfilePage({ showBack = false }: Props) {
   }
 
   // A failed list is not an empty one: offering "add a pet" would invite a duplicate.
-  if (isPetsError && !pets) return <QueryErrorState onRetry={refetchPets} />;
+  if (isPetsError && !pets) {
+    return <QueryErrorState onRetry={() => refetchPets()} onBackPress={goBackToOrigin} />;
+  }
 
   if (!pets?.length) {
     return (
       <>
         <View style={[styles.screen, styles.emptyScreen, { paddingTop: insets.top }]}>
+          {showBack && (
+            <View style={[styles.emptyBack, { top: insets.top + theme.spacing(2) }]}>
+              <BackButton onBackPress={goBackToOrigin} />
+            </View>
+          )}
           <Text variant="body" style={styles.emptyText}>
             {t("petProfilePage.empty.title")}
           </Text>
@@ -458,6 +467,10 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     gap: theme.spacing(4),
     paddingHorizontal: theme.spacing(6),
+  },
+  emptyBack: {
+    position: "absolute",
+    left: theme.spacing(4),
   },
   heroEmpty: {
     alignItems: "center",

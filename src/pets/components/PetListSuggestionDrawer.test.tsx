@@ -238,20 +238,25 @@ describe("PetListSuggestionDrawer", () => {
     expect(screen.queryByTestId("drawer")).toBeNull();
   });
 
-  it("does not open over another tab, and does not count that as a dismiss", async () => {
-    jest.mocked(useIsFocused).mockReturnValue(false);
+  it("closes when the tab loses focus without counting that as a dismiss, and opens again on return", async () => {
     await renderDrawer({ petCount: 5, stored: null });
-    expect(screen.queryByTestId("drawer")).toBeNull();
+    expect(screen.getByTestId("drawer")).toBeTruthy();
 
     // The mock is not reactive; a changed pet list stands in for the re-render that focus causes.
-    jest.mocked(useIsFocused).mockReturnValue(true);
-    await act(async () => {
-      clients[0].setQueryData(
-        ["pets"],
-        Array.from({ length: 6 }, (_, index) => ({ id: `pet-${index}` }))
-      );
-    });
+    const rerenderWith = async (petCount: number) =>
+      act(async () => {
+        clients[0].setQueryData(
+          ["pets"],
+          Array.from({ length: petCount }, (_, index) => ({ id: `pet-${index}` }))
+        );
+      });
 
+    jest.mocked(useIsFocused).mockReturnValue(false);
+    await rerenderWith(6);
+    expect(screen.queryByTestId("drawer")).toBeNull();
+
+    jest.mocked(useIsFocused).mockReturnValue(true);
+    await rerenderWith(5);
     expect(screen.getByTestId("drawer")).toBeTruthy();
   });
 

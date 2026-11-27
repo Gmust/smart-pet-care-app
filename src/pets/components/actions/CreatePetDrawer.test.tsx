@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-import { AxiosHeaders } from "axios";
+import { AxiosError, AxiosHeaders } from "axios";
 
 import { AnimalSpecies, type PetResponseDto } from "@/api/generated";
 
@@ -91,7 +91,10 @@ const tree = (queryClient: QueryClient, onCreated: () => void, setIsOpen = jest.
 
 const newClient = () => {
   const queryClient = new QueryClient({
-    defaultOptions: { queries: { gcTime: Infinity, retry: false } },
+    defaultOptions: {
+      queries: { gcTime: Infinity, retry: false },
+      mutations: { gcTime: Infinity },
+    },
   });
   clients.push(queryClient);
   return queryClient;
@@ -159,5 +162,49 @@ describe("CreatePetDrawer", () => {
 
     expect(screen.getByText("pets:createPetDrawer.healthTitle")).toBeTruthy();
     expect(screen.queryByText("pets:createPetDrawer.title")).toBeNull();
+  });
+
+  it("sends what the schema makes of the form: blank list rows dropped, a decimal comma read as a dot", async () => {
+    render(tree(newClient(), () => undefined));
+    await fillStepOne();
+    await act(async () => {
+      draft?.form.setFieldValue("weightKg", "3,5");
+      draft?.form.setFieldValue("allergies", ["Chicken", ""]);
+    });
+    fireEvent.press(screen.getByText("pets:createPetDrawer.next"));
+
+    fireEvent.press(screen.getByText("pets:createPetDrawer.submit"));
+    await act(async () => {
+      await jest.runAllTimersAsync();
+    });
+
+    expect(postApiPets).toHaveBeenCalledWith(
+      expect.objectContaining({ weightKg: 3.5, allergies: ["Chicken"], chronicConditions: null })
+    );
+  });
+
+  it("goes back to step 1 when the server rejects a step-1 field, such as the sex", async () => {
+    jest.mocked(postApiPets).mockImplementation(() =>
+      Promise.reject(
+        new AxiosError("Bad Request", "ERR_BAD_REQUEST", undefined, undefined, {
+          status: 400,
+          statusText: "Bad Request",
+          headers: {},
+          config: { headers: new AxiosHeaders() },
+          data: { errors: { Sex: ["pet_weight_not_positive"] } },
+        })
+      )
+    );
+    render(tree(newClient(), () => undefined));
+    await fillStepOne();
+    fireEvent.press(screen.getByText("pets:createPetDrawer.next"));
+
+    fireEvent.press(screen.getByText("pets:createPetDrawer.submit"));
+    await act(async () => {
+      await jest.runAllTimersAsync();
+    });
+
+    expect(screen.getByText("pets:createPetDrawer.title")).toBeTruthy();
+    expect(screen.queryByText("pets:createPetDrawer.healthTitle")).toBeNull();
   });
 });

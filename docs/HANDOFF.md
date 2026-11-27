@@ -233,7 +233,7 @@ Keep it short and factual: what is true now, what was actually verified, what is
     above the keyboard (seen on the phone).
   - Creating a pet is two steps (Figma node 2622:4269): "About your pet" (name, species, weight,
     birth date, breed, sex as chips) and an optional "Add health info" (allergies, chronic
-    conditions, behavior; lists start empty, a blank row disappears on blur). One form
+    conditions, behavior; lists start empty; blank rows stay while typing and are dropped by the schema on submit). One form
     (`useCreatePetForm`) holds both steps and the pet is created only on the last "Add pet";
     "Next" stays disabled (it fades between the two looks) until name, species and a weight above
     zero are valid; errors show under a field once it was left. A tap on the header or on empty
@@ -520,11 +520,11 @@ picks the pet from the switcher; the Reminders tab, the assessment route and the
 Recommendations/Care placeholders are gone, and `limitations-coming-soon` was deleted) and were run on
 a Samsung phone with `PET_NAME=Miso` on 2026-11-24: `02`, `04`, `05` and `evidence/fr-14` to `fr-20`
 pass. Not run: `03` (needs an image in the system photo picker), `fr-13` (opens account deletion) and
-`fr-21` (signs the app out). `04` taps the time dialog's button by id because its label follows the phone's
+`fr-21` (signs the app out). After that run the subflow was changed (it now waits for the chosen pet and answers the list suggestion sheet) and has not been re-run: the dev-only LogBox pill "Failed to synchronize the Android notification token" covers the tab bar after launch, so close it before a run. `04` taps the time dialog's button by id because its label follows the phone's
 language. `PetPickerDrawer` was looked at with a shrunken window (screen density 640): at its height
 cap the list scrolls to the last row. OpenSpec is gitignored, so `openspec/` was not checked: the pet
 selection and list mode have no change of their own there, and two specs may still say a bad pet link
-redirects to the pet list. On a device, still to look at: swiping between the four profile tabs,
+redirects to the pet list. Checked on a phone after the second review round: pet switching on Pets and Activity, creating a pet from the picker (the list suggestion appears at 5 pets), the Basics drawer's autofocus and keyboard, the back button on the pushed route, deleting a pet. Not seen on a device: the hero photo's start point with the back button (the frame grab missed it), the empty state's back button, the error state's back button, the step-1 bounce after a server error (covered by a test), and the Assistant new-pet screen's X. Still to look at: swiping between the four profile tabs,
 pull-to-refresh on each, the Basics card and its drawers, Home → Wellness, Feeding → Schedule →
 reminders.
 

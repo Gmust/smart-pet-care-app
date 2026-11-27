@@ -38,7 +38,9 @@ export const useCreatePetForm = (onCreated: (pet: PetResponseDto) => void) => {
           return;
         }
 
-        const createdPet = await createPet({ ...value, species });
+        // Send the schema output: it drops blank list rows and reads "3,5" as 3.5.
+        const parsed = createPetSchema(t).parse(value);
+        const createdPet = await createPet({ ...parsed, species });
         Toast.show({ type: "success", text1: t("pets:successMessage") });
         form.reset();
         onCreated(createdPet);
