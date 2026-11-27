@@ -57,7 +57,7 @@ export function DeleteConfirmDialog({
         </View>
 
         <DialogHeader style={styles.header}>
-          <DialogTitle style={styles.title}>{title}</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           <DialogDescription style={styles.description}>{description}</DialogDescription>
         </DialogHeader>
 
@@ -98,11 +98,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   header: {
     gap: theme.spacing(1.5),
-  },
-  title: {
-    ...theme.textStyles.titleM,
-    textAlign: "center",
-    color: theme.palette.brand.textPrimary,
   },
   description: {
     ...theme.textStyles.body,

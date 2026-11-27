@@ -33,11 +33,9 @@ export const ReminderDescriptionDrawer = ({ reminderId, onClose }: Props) => {
         <DrawerCloseButton />
 
         <DrawerHeader style={styles.header}>
-          <DrawerTitle style={styles.title}>
-            {reminder?.title ?? t("reminders:descriptionDrawer.title")}
-          </DrawerTitle>
+          <DrawerTitle>{reminder?.title ?? t("reminders:descriptionDrawer.title")}</DrawerTitle>
           {!!reminder && (
-            <Text style={styles.meta}>
+            <Text variant="bodyS" style={styles.meta}>
               {[reminder.type ? t(`reminders:types.${reminder.type}`) : null, timeOfDay]
                 .filter(Boolean)
                 .join(" · ")}
@@ -51,7 +49,10 @@ export const ReminderDescriptionDrawer = ({ reminderId, onClose }: Props) => {
           </View>
         ) : (
           <DrawerScrollView>
-            <Text style={description ? styles.description : styles.empty}>
+            <Text
+              variant={description ? "body" : "bodyS"}
+              style={description ? styles.description : styles.empty}
+            >
               {description ?? t("reminders:descriptionDrawer.empty")}
             </Text>
           </DrawerScrollView>
@@ -65,13 +66,7 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     gap: theme.spacing(1),
   },
-  title: {
-    fontSize: theme.fontSize.xl,
-    letterSpacing: 0,
-  },
   meta: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
     textAlign: "center",
   },
@@ -80,14 +75,9 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
   },
   description: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.5,
     color: theme.palette.brand.textPrimary,
   },
   empty: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
     textAlign: "center",
   },

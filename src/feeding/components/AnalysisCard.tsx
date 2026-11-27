@@ -3,13 +3,14 @@ import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import type { NutritionAnalysisResponseDto } from "@/api/generated";
+import { NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { ChevronIcon } from "@/icons/chevron";
 import { Button } from "@/shadecn/ui/button";
 import { Card } from "@/shadecn/ui/card";
 import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 
-import { ANALYSIS_STATUS_TONE, NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
+import { ANALYSIS_STATUS_TONE } from "../constants";
 import { describeAnalysis } from "../utils/describeAnalysis";
 
 type AnalysisCardProps = {

@@ -9,6 +9,7 @@ import type { PetResponseDto } from "@/api";
 import { hexToRGBA } from "@/common/utils/colors";
 import { SquareActivityIcon } from "@/icons/activity";
 import { HeartPulseIcon } from "@/icons/heart";
+import { PawDecorationIcon } from "@/icons/paw-decoration";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 import { isWellnessStateOk, WELLNESS_CARD_STATE_KEYS } from "@/wellness/constants";
@@ -39,7 +40,7 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
 
   const openWellness = () =>
     router.push(
-      { pathname: "/(tabs)/pets/assessment", params: { petId, tab: "wellness", from: "home" } },
+      { pathname: "/(tabs)/pets/pet-profile", params: { petId, tab: "wellness", from: "home" } },
       { withAnchor: true }
     );
 
@@ -62,7 +63,7 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
         )
       }
     >
-      {!!photoUrl && (
+      {photoUrl ? (
         <>
           <Image
             source={{ uri: photoUrl }}
@@ -72,6 +73,15 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
           />
           <View style={styles.overlay} />
         </>
+      ) : (
+        <>
+          <View style={[styles.paw, styles.pawTop]}>
+            <PawDecorationIcon color={styles.pawColor.color} />
+          </View>
+          <View style={[styles.paw, styles.pawBottom]}>
+            <PawDecorationIcon color={styles.pawColor.color} />
+          </View>
+        </>
       )}
 
       <View style={styles.top}>
@@ -80,7 +90,7 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
             <HeartPulseIcon width={16} height={16} color={palette.brand.textOnDark} />
           </BlurView>
           <BlurView intensity={40} tint="dark" style={styles.namePill}>
-            <Text variant="label" style={styles.eyebrow}>
+            <Text variant="labelCaps" style={styles.eyebrow}>
               {t("healthPetCard.title", { petName })}
             </Text>
           </BlurView>
@@ -112,7 +122,7 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
 
       {!!wellness && (
         <View style={styles.signalRow}>
-          {WELLNESS_CARD_STATE_KEYS.map((key, index) => (
+          {WELLNESS_CARD_STATE_KEYS.map((key) => (
             <SignalStat
               key={key}
               signal={{
@@ -120,7 +130,6 @@ export function HealthPetCard({ pet, backgroundColor }: Props) {
                 value: t(`wellness:states.codes.${wellness.states[key]}`),
                 status: isWellnessStateOk(wellness.states[key]) ? "ok" : "warn",
               }}
-              first={index === 0}
             />
           ))}
         </View>
@@ -152,7 +161,26 @@ const styles = StyleSheet.create((theme) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: hexToRGBA(theme.palette.brand.primaryDark, 0.25),
+    backgroundColor: hexToRGBA(theme.palette.brand.primaryDark, 0.45),
+  },
+  pawColor: {
+    color: theme.palette.brand.primarySoft,
+  },
+  paw: {
+    position: "absolute",
+    marginLeft: -theme.spacing(8.75),
+    opacity: 0.08,
+    pointerEvents: "none",
+  },
+  pawTop: {
+    left: "90%",
+    top: theme.spacing(12.25),
+    transform: [{ rotate: "20.71deg" }],
+  },
+  pawBottom: {
+    left: "57.6%",
+    top: theme.spacing(22.5),
+    transform: [{ rotate: "-23.07deg" }],
   },
   top: {
     gap: theme.spacing(1),
@@ -179,7 +207,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(1),
   },
   eyebrow: {
-    letterSpacing: 0.4,
     textTransform: "uppercase",
     color: theme.palette.brand.textOnDark,
   },
@@ -191,11 +218,6 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius.full,
     paddingHorizontal: theme.spacing(2.75),
     paddingVertical: theme.spacing(1.25),
-  },
-  trendLabel: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
-    color: theme.palette.brand.textOnDark,
   },
   scoreBlock: {
     justifyContent: "center",
@@ -209,12 +231,10 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(0.5),
   },
   score: {
-    letterSpacing: -0.8,
     color: theme.palette.brand.textOnDark,
   },
   scoreMax: {
     marginBottom: theme.spacing(1),
-    letterSpacing: -0.5,
     color: theme.palette.brand.textSecondary,
   },
   status: {
@@ -223,9 +243,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   signalRow: {
     flexDirection: "row",
+    gap: theme.spacing(1),
     marginTop: theme.spacing(2),
-    paddingTop: theme.spacing(3.5),
-    borderTopWidth: 1,
-    borderTopColor: hexToRGBA(theme.palette.brand.textOnDark, 0.12),
   },
 }));

@@ -9,6 +9,7 @@ import { useAuth } from "@/auth/hooks/useAuth";
 import { Fab } from "@/common/components/Fab";
 import { OfflineBanner } from "@/common/components/OfflineBanner";
 import { TabBar } from "@/common/components/TabBar";
+import { CreatePetDraftProvider } from "@/pets/providers/CreatePetDraftProvider";
 
 import { Redirect, Tabs, usePathname } from "expo-router";
 
@@ -33,25 +34,29 @@ export default function TabLayout() {
   }
 
   return (
-    <View style={styles.root}>
-      <Tabs
-        tabBar={(props) => (hideTabBar ? null : <TabBar {...props} />)}
-        screenOptions={{
-          headerShown: false,
-          animation: "fade",
-        }}
-      >
-        {tabs.map((item) => (
-          <Tabs.Screen key={item} name={item} options={{ title: t(`navigationTabs.${item}`) }} />
-        ))}
-        <Tabs.Screen name="reminders" options={{ href: null }} />
-        <Tabs.Screen name="assistant" options={{ href: null }} />
-        <Tabs.Screen name="assistant-pet-selection" options={{ href: null }} />
-        <Tabs.Screen name="assistant-new-pet" options={{ href: null }} />
-      </Tabs>
-      {pathname.endsWith("/home") && <Fab />}
-      {!isAssistantFlow && <OfflineBanner />}
-    </View>
+    <CreatePetDraftProvider>
+      <View style={styles.root}>
+        <Tabs
+          tabBar={(props) => (hideTabBar ? null : <TabBar {...props} />)}
+          backBehavior="history"
+          screenOptions={{
+            headerShown: false,
+            animation: "fade",
+          }}
+        >
+          {tabs.map((item) => (
+            <Tabs.Screen key={item} name={item} options={{ title: t(`navigationTabs.${item}`) }} />
+          ))}
+          <Tabs.Screen name="reminders" options={{ href: null }} />
+          <Tabs.Screen name="pet-list-settings" options={{ href: null }} />
+          <Tabs.Screen name="assistant" options={{ href: null }} />
+          <Tabs.Screen name="assistant-pet-selection" options={{ href: null }} />
+          <Tabs.Screen name="assistant-new-pet" options={{ href: null }} />
+        </Tabs>
+        {pathname.endsWith("/home") && <Fab />}
+        {!isAssistantFlow && <OfflineBanner />}
+      </View>
+    </CreatePetDraftProvider>
   );
 }
 

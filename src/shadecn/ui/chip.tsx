@@ -7,8 +7,8 @@ import type { theme } from "@/styles/theme";
 
 export type ChipTone = "neutral" | "primary" | "ok" | "peach" | "warn" | "danger";
 export type ChipOnDarkTone = "ok" | "warn" | "danger";
-export type ChipVariant = "default" | "ghost" | "onDark";
-type ChipToneKey = ChipTone | `ghost-${ChipTone}` | `onDark-${ChipOnDarkTone}`;
+export type ChipVariant = "default" | "ghost" | "onDark" | "onPhoto";
+type ChipToneKey = ChipTone | `ghost-${ChipTone}` | `onDark-${ChipOnDarkTone}` | "onPhoto";
 type ChipSize = "md" | "sm";
 
 type AppTheme = typeof theme;
@@ -32,6 +32,7 @@ const getToneColors = (theme: AppTheme) => {
     "onDark-ok": brand.peachSoft,
     "onDark-warn": brand.peachSoft,
     "onDark-danger": brand.peachSoft,
+    onPhoto: brand.peachIconBg,
   } satisfies Record<ChipToneKey, string>;
 };
 
@@ -81,6 +82,7 @@ const chipVariants = StyleSheet.create((theme) => {
             backgroundColor: theme.palette.transparent,
             borderColor: brand.danger,
           },
+          onPhoto: { backgroundColor: `${brand.peachDefault}80`, borderColor: brand.peachDefault },
         },
         size: {
           md: {
@@ -115,6 +117,7 @@ const chipVariants = StyleSheet.create((theme) => {
           "onDark-ok": { color: toneColors["onDark-ok"] },
           "onDark-warn": { color: toneColors["onDark-warn"] },
           "onDark-danger": { color: toneColors["onDark-danger"] },
+          onPhoto: { color: toneColors.onPhoto },
         },
         size: {
           md: { ...theme.textStyles.controlM },
@@ -132,21 +135,25 @@ type ChipProps = {
   iconSize?: number;
   onPress?: () => void;
   disabled?: boolean;
+  selected?: boolean;
 } & (
-  | { variant?: Exclude<ChipVariant, "onDark">; tone?: ChipTone }
+  | { variant?: Exclude<ChipVariant, "onDark" | "onPhoto">; tone?: ChipTone }
   | { variant: "onDark"; tone: ChipOnDarkTone }
+  | { variant: "onPhoto"; tone?: undefined }
 );
 
 export function Chip(props: ChipProps) {
-  const { label, size = "md", icon: Icon, iconSize, onPress, disabled = false } = props;
+  const { label, size = "md", icon: Icon, iconSize, onPress, disabled = false, selected } = props;
 
   const tone = props.tone ?? "neutral";
   const toneKey: ChipToneKey =
     props.variant === "onDark"
       ? `onDark-${props.tone}`
-      : props.variant === "ghost"
-        ? `ghost-${tone}`
-        : tone;
+      : props.variant === "onPhoto"
+        ? "onPhoto"
+        : props.variant === "ghost"
+          ? `ghost-${tone}`
+          : tone;
   chipVariants.useVariants({ size, tone: toneKey });
   const { theme } = useUnistyles();
   const iconColor = getToneColors(theme)[toneKey];
@@ -177,7 +184,7 @@ export function Chip(props: ChipProps) {
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled, selected }}
       style={({ pressed }) => chipVariants.root(pressed && !disabled, disabled)}
     >
       {content}

@@ -5,6 +5,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { Image } from "expo-image";
 import * as ExpoImagePicker from "expo-image-picker";
 
+import { Button } from "@/shadecn/ui/button";
 import { useDrawerSetOpen } from "@/shadecn/ui/drawer";
 import { Text } from "@/shadecn/ui/text";
 
@@ -20,6 +21,9 @@ type ImagePickerProps = {
   value: ImagePickerValue | null;
   onChange: (value: ImagePickerValue | null) => void;
   onBlur?: () => void;
+  /** Fires before the picker opens, and before Android closes the enclosing drawer. */
+  onPickStart?: () => void;
+  accessibilityLabel?: string;
   label?: ReactNode;
   placeholder?: ReactNode;
   error?: boolean;
@@ -34,6 +38,8 @@ export function ImagePicker({
   value,
   onChange,
   onBlur,
+  onPickStart,
+  accessibilityLabel,
   label,
   placeholder,
   error = false,
@@ -48,6 +54,8 @@ export function ImagePicker({
 
   const pick = useCallback(async () => {
     if (disabled) return;
+
+    onPickStart?.();
 
     // The full-screen library + crop editor pause the Android Activity, which
     // dismisses the enclosing drawer's modal and can't be reliably kept open.
@@ -81,29 +89,36 @@ export function ImagePicker({
       onBlur?.();
       if (isAndroid) setDrawerOpen?.(true);
     }
-  }, [allowsEditing, aspect, disabled, onBlur, onChange, quality, setDrawerOpen]);
+  }, [allowsEditing, aspect, disabled, onBlur, onChange, onPickStart, quality, setDrawerOpen]);
 
   return (
     <View style={styles.wrapper}>
-      {!!label && <Text style={styles.label}>{label}</Text>}
+      {!!label && (
+        <Text variant="bodyS" style={styles.label}>
+          {label}
+        </Text>
+      )}
 
       <Pressable
         onPress={pick}
         disabled={disabled}
         style={[
           styles.box,
-          shape === "square" && styles.boxSquare,
+          shape === "square" && [styles.boxSquare, { aspectRatio: aspect[0] / aspect[1] }],
           !!error && styles.boxError,
           disabled && styles.boxDisabled,
         ]}
         accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
       >
         {value ? (
           <Image source={{ uri: value.uri }} style={styles.preview} contentFit="cover" />
         ) : (
           <View style={styles.placeholder}>
             {typeof placeholder === "string" || !placeholder ? (
-              <Text style={styles.placeholderText}>{placeholder ?? t("imagePicker.title")}</Text>
+              <Text variant="body" style={styles.placeholderText}>
+                {placeholder ?? t("imagePicker.title")}
+              </Text>
             ) : (
               placeholder
             )}
@@ -112,16 +127,15 @@ export function ImagePicker({
       </Pressable>
 
       {!!value && (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t("imagePicker.remove")}
+        <Button
+          variant="dangerText"
+          size="inline"
           style={styles.removeBtn}
           onPress={() => onChange(null)}
           disabled={disabled}
-          hitSlop={8}
         >
-          <Text style={styles.remove}>Remove</Text>
-        </Pressable>
+          {t("imagePicker.remove")}
+        </Button>
       )}
     </View>
   );
@@ -135,7 +149,6 @@ const styles = StyleSheet.create((theme) => ({
   label: {
     alignSelf: "flex-start",
     color: theme.palette.brand.textSecondary,
-    fontSize: theme.fontSize.sm,
   },
   box: {
     width: theme.spacing(28),
@@ -149,7 +162,6 @@ const styles = StyleSheet.create((theme) => ({
   boxSquare: {
     width: "100%",
     height: undefined,
-    aspectRatio: 16 / 9,
     borderRadius: theme.borderRadius["2xl"],
   },
   boxError: {
@@ -169,13 +181,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   placeholderText: {
     color: theme.palette.brand.textSecondary,
-    fontSize: theme.fontSize.sm,
   },
   removeBtn: {
     marginTop: theme.spacing(4),
-  },
-  remove: {
-    color: theme.palette.brand.danger,
-    fontSize: theme.fontSize.sm,
   },
 }));

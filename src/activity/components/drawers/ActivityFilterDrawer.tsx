@@ -72,7 +72,9 @@ export const ActivityFilterDrawer = ({ isOpen, setIsOpen, from, to, filters, onA
 
         <DrawerScrollView contentContainerStyle={styles.content}>
           <View style={styles.field}>
-            <Text style={styles.label}>{t("activity:filters.dateRange")}</Text>
+            <Text variant="bodyS" style={styles.label}>
+              {t("activity:filters.dateRange")}
+            </Text>
             <View style={styles.row}>
               <View style={styles.rowItem}>
                 <DateTimeField
@@ -103,7 +105,9 @@ export const ActivityFilterDrawer = ({ isOpen, setIsOpen, from, to, filters, onA
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.label}>{t("activity:filters.type")}</Text>
+            <Text variant="bodyS" style={styles.label}>
+              {t("activity:filters.type")}
+            </Text>
             <View style={styles.chips}>
               {ACTIVITY_TYPES.map((type) => {
                 const isSelected = pendingTypes.includes(type);
@@ -122,7 +126,9 @@ export const ActivityFilterDrawer = ({ isOpen, setIsOpen, from, to, filters, onA
           </View>
 
           <View style={styles.field}>
-            <Text style={styles.label}>{t("activity:filters.intensity")}</Text>
+            <Text variant="bodyS" style={styles.label}>
+              {t("activity:filters.intensity")}
+            </Text>
             <View style={styles.chips}>
               {ACTIVITY_INTENSITIES.map((intensity) => {
                 const isSelected = pendingIntensities.includes(intensity);
@@ -178,8 +184,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   label: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   row: {

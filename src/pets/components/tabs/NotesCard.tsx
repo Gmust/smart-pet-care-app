@@ -3,7 +3,8 @@ import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import type { NoteResponseDto } from "@/api/generated";
-import { Card } from "@/shadecn/ui/card";
+import { NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
+import { Card, cardVariants } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 
 import { NoteRow } from "../pet-profile/NoteRow";
@@ -30,7 +31,8 @@ export const NotesCard = ({ notes, onOpenNote }: Props) => {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t("petProfilePage.notes.addNoteA11y")}
-          style={styles.emptyCard}
+          unstable_pressDelay={NAVIGATION_PRESS_HIGHLIGHT_DELAY_MS}
+          style={({ pressed }) => [styles.emptyCard, pressed && cardVariants.pressed]}
           onPress={() => onOpenNote()}
         >
           <Text variant="body" style={styles.emptyText}>

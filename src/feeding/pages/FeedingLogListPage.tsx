@@ -160,7 +160,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(2),
   },
   content: {
-    gap: theme.spacing(4),
+    gap: theme.spacing(6),
     paddingHorizontal: theme.spacing(4),
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(28),

@@ -43,7 +43,7 @@ function FieldError({ errors, style }: FieldErrorProps) {
   return (
     <View role="alert" style={styles.container}>
       {messages.map((message) => (
-        <Text key={message} style={[styles.text, style]}>
+        <Text key={message} variant="caption" style={[styles.text, style]}>
           {isList ? `• ${message}` : message}
         </Text>
       ))}
@@ -58,8 +58,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(0.5),
   },
   text: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
     color: theme.palette.brand.danger,
   },
 }));

@@ -6,12 +6,6 @@
     "openMap": "Map",
     "openList": "List"
   },
-  "petSelector": {
-    "label": "Showing activity for {{name}}",
-    "hint": "Change pet",
-    "drawerTitle": "Choose a pet",
-    "select": "Select {{name}}"
-  },
   "list": {
     "today": "Today",
     "yesterday": "Yesterday",

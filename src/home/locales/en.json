@@ -1,5 +1,6 @@
 {
   "greetings": "Good {{daytime}}, {{username}}",
+  "assistantButton": "Open AI assistant",
   "healthPetCard": {
     "title": "How {{petName}} is doing",
     "signals": {

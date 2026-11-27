@@ -6,9 +6,16 @@ const PET_ID = "2464cb42-30db-4bbd-9bb6-9523f20fa329";
 
 describe("petProfileParamsSchema", () => {
   it("opens on the requested tab", () => {
-    const parsed = petProfileParamsSchema.parse({ petId: PET_ID, tab: "reminders" });
+    const parsed = petProfileParamsSchema.parse({ petId: PET_ID, tab: "wellness" });
 
-    expect(parsed.tab).toBe("reminders");
+    expect(parsed.tab).toBe("wellness");
+  });
+
+  it("opens on Overview for a tab that no longer exists", () => {
+    const result = petProfileParamsSchema.safeParse({ petId: PET_ID, tab: "reminders" });
+
+    expect(result.success).toBe(true);
+    expect(result.data?.tab).toBeUndefined();
   });
 
   it("has no tab when none is asked for", () => {
@@ -23,9 +30,7 @@ describe("petProfileParamsSchema", () => {
   });
 
   it("still rejects an id that is not a uuid, whatever the tab", () => {
-    expect(petProfileParamsSchema.safeParse({ petId: "nope", tab: "reminders" }).success).toBe(
-      false
-    );
+    expect(petProfileParamsSchema.safeParse({ petId: "nope", tab: "feeding" }).success).toBe(false);
   });
 
   it("keeps where the screen was opened from, and ignores an unknown origin", () => {

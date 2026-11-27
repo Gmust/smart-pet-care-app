@@ -51,8 +51,27 @@ describe("Tabs indicator", () => {
   });
 });
 
+describe("Tabs track", () => {
+  it("slides the fill to the active segment and reports the segment that was pressed", () => {
+    const onChange = jest.fn();
+    const view = render(<Tabs variant="track" items={ITEMS} value="one" onChange={onChange} />);
+
+    fireEvent(view.getByText("One"), "layout", layoutEvent(0, 100));
+    fireEvent(view.getByText("Two"), "layout", layoutEvent(100, 100));
+
+    const indicatorStyle = () => StyleSheet.flatten(view.getByTestId("tabs-indicator").props.style);
+    expect(indicatorStyle()).toMatchObject({ left: 0, width: 100 });
+
+    fireEvent.press(view.getByText("Two"));
+    expect(onChange).toHaveBeenCalledWith("two");
+
+    view.rerender(<Tabs variant="track" items={ITEMS} value="two" onChange={onChange} />);
+    expect(indicatorStyle()).toMatchObject({ left: 100, width: 100 });
+  });
+});
+
 describe("Tabs selection", () => {
-  it.each(["segmented", "pill", "chips"] as const)(
+  it.each(["segmented", "pill", "chips", "track"] as const)(
     "tells assistive tech which %s item is current, and only that one",
     (variant) => {
       const view = render(

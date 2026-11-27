@@ -7,8 +7,9 @@ import { StyleSheet } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
 import { ReminderStatus } from "@/api/generated";
+import { AddButton } from "@/common/components/AddButton";
+import { BackButton } from "@/common/components/BackButton";
 import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
-import { ChevronIcon } from "@/icons/chevron";
 import { CirclePlusIcon } from "@/icons/plus";
 import { Button } from "@/shadecn/ui/button";
 import type { TabItem } from "@/shadecn/ui/tabs";
@@ -18,6 +19,7 @@ import { palette } from "@/styles/palette";
 
 import { ReminderDrawers } from "../components/ReminderDrawers";
 import { ReminderRow } from "../components/ReminderRow";
+import { usePetNames } from "../hooks/usePetNames";
 import { useReminderActions } from "../hooks/useReminderActions";
 import { useGetReminders } from "../queries/useGetReminders";
 import { RemindersSectionSkeleton } from "../skeletons/RemindersSectionSkeleton";
@@ -60,7 +62,8 @@ export default function RemindersPage() {
         (reminders ?? []).filter((reminder) => getReminderStatus(reminder) === status)
       : (reminders ?? []);
   }, [reminders, filter]);
-  const groups = useMemo(() => toReminderGroups(filtered), [filtered]);
+  const petNames = usePetNames();
+  const groups = useMemo(() => toReminderGroups(filtered, petNames), [filtered, petNames]);
   const listItems = useMemo(() => {
     const items: ReminderListItem[] = [];
     groups.forEach((group, groupIndex) => {
@@ -118,30 +121,21 @@ export default function RemindersPage() {
     <>
       <View style={styles.screen}>
         <View style={[styles.topBar, { paddingTop: insets.top + 8 }]}>
-          <Button
-            size="icon"
-            variant="icon"
-            accessibilityLabel={t("reminders:remindersPage.goBack")}
-            onPress={handleBack}
-          >
-            <ChevronIcon direction="left" width={18} height={18} color={palette.brand.textBody} />
-          </Button>
+          <BackButton onBackPress={handleBack} />
           <View style={styles.topBarCopy}>
-            <Text style={styles.topBarTitle}>{t("reminders:remindersPage.title")}</Text>
+            <Text variant="titleL" style={styles.topBarTitle}>
+              {t("reminders:remindersPage.title")}
+            </Text>
             {!isLoading && (
-              <Text style={styles.topBarSubtitle}>
+              <Text variant="bodyS" style={styles.topBarSubtitle}>
                 {t("reminders:remindersPage.subtitle", { count: filtered.length })}
               </Text>
             )}
           </View>
-          <Button
-            size="icon"
-            variant="icon"
+          <AddButton
             accessibilityLabel={t("reminders:remindersPage.create")}
             onPress={() => setIsCreateOpen(true)}
-          >
-            <CirclePlusIcon width={22} height={22} color={palette.brand.primaryDefault} />
-          </Button>
+          />
         </View>
 
         <View style={styles.filters}>
@@ -193,12 +187,12 @@ export default function RemindersPage() {
               <RemindersSectionSkeleton />
             ) : (
               <View style={styles.emptyCard}>
-                <Text style={styles.emptyTitle}>
+                <Text variant="body" style={styles.emptyTitle}>
                   {filter === "all"
                     ? t("reminders:remindersPage.empty.all")
                     : t("reminders:remindersPage.empty.filtered")}
                 </Text>
-                <Text style={styles.emptyHint}>
+                <Text variant="bodyS" style={styles.emptyHint}>
                   {filter === "all"
                     ? t("reminders:remindersPage.empty.allHint")
                     : t("reminders:remindersPage.empty.filteredHint")}
@@ -242,25 +236,19 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: theme.spacing(2.5),
     paddingHorizontal: theme.spacing(4),
-    paddingBottom: theme.spacing(2),
+    paddingBottom: theme.spacing(3),
   },
   topBarCopy: {
     flex: 1,
     minWidth: 0,
     alignItems: "center",
-    gap: theme.spacing(0.5),
+    gap: theme.spacing(1),
   },
   topBarTitle: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
-    lineHeight: theme.fontSize["2xl"],
-    letterSpacing: -0.12,
     textAlign: "center",
     color: theme.palette.brand.textBody,
   },
   topBarSubtitle: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
     color: theme.palette.brand.textSecondary,
   },
   filters: {
@@ -273,9 +261,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing(28),
   },
   groupTitle: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
-    letterSpacing: 0.4,
+    ...theme.textStyles.labelCaps,
     textTransform: "uppercase",
     color: theme.palette.brand.textSecondary,
     marginBottom: theme.spacing(2),
@@ -298,13 +284,9 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(6),
   },
   emptyTitle: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.base,
     color: theme.palette.brand.textPrimary,
   },
   emptyHint: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     textAlign: "center",
     color: theme.palette.brand.textSecondary,
   },
@@ -313,9 +295,7 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: theme.spacing(2),
   },
   addButtonText: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
+    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.textSecondary,
   },
 }));

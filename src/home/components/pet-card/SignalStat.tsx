@@ -8,15 +8,16 @@ import type { Signal } from "../../types";
 
 type SignalStatProps = {
   signal: Signal;
-  first?: boolean;
 };
 
-export function SignalStat({ signal, first = false }: SignalStatProps) {
+export function SignalStat({ signal }: SignalStatProps) {
   return (
-    <View style={[styles.col, !first && styles.colDivided]}>
+    <View style={styles.col}>
       <View style={styles.labelRow}>
         <View style={[styles.dot, signal.status === "ok" ? styles.dotOk : styles.dotWarn]} />
-        <Text style={styles.label}>{signal.label}</Text>
+        <Text variant="caption" style={styles.label}>
+          {signal.label}
+        </Text>
       </View>
       <Text variant="label" style={styles.value}>
         {signal.value}
@@ -28,11 +29,12 @@ export function SignalStat({ signal, first = false }: SignalStatProps) {
 const styles = StyleSheet.create((theme) => ({
   col: {
     flex: 1,
-  },
-  colDivided: {
-    borderLeftWidth: 1,
-    borderLeftColor: hexToRGBA(theme.palette.brand.textOnDark, 0.12),
-    paddingLeft: theme.spacing(3),
+    minWidth: 0,
+    borderRadius: theme.borderRadius.lg,
+    borderCurve: "continuous",
+    backgroundColor: hexToRGBA(theme.palette.brand.primaryDark, 0.55),
+    paddingHorizontal: theme.spacing(2.5),
+    paddingVertical: theme.spacing(2),
   },
   labelRow: {
     flexDirection: "row",
@@ -51,8 +53,6 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.warnSoft,
   },
   label: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
     color: theme.palette.brand.textSecondary,
   },
   value: {

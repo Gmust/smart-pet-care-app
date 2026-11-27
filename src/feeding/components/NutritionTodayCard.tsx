@@ -3,11 +3,11 @@ import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import type { DailyNutritionSummaryResponseDto } from "@/api/generated";
+import { PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { Card } from "@/shadecn/ui/card";
 import { Chip } from "@/shadecn/ui/chip";
 import { Text } from "@/shadecn/ui/text";
 
-import { PRESS_HIGHLIGHT_DELAY_MS } from "../constants";
 import { toApiNumber } from "../utils/toApiNumber";
 
 type NutritionTodayCardProps = {

@@ -124,7 +124,7 @@ describe("HealthPetCard", () => {
 
     expect(mockPush).toHaveBeenCalledWith(
       {
-        pathname: "/(tabs)/pets/assessment",
+        pathname: "/(tabs)/pets/pet-profile",
         params: { petId: PET_ID, tab: "wellness", from: "home" },
       },
       { withAnchor: true }
@@ -144,7 +144,7 @@ describe("HealthPetCard", () => {
 
     expect(mockPush).toHaveBeenCalledWith(
       {
-        pathname: "/(tabs)/pets/assessment",
+        pathname: "/(tabs)/pets/pet-profile",
         params: { petId: PET_ID, tab: "wellness", from: "home" },
       },
       { withAnchor: true }

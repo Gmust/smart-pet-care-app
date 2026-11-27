@@ -18,6 +18,7 @@ function UserMessage({ content }: { content: string }) {
     <View style={styles.userMessage}>
       <Text
         selectable
+        variant="body"
         style={styles.userMessageText}
         accessibilityLabel={`${t("conversation.userSender")}: ${content}`}
       >
@@ -33,8 +34,12 @@ function PendingMessage({ localEmergency }: { localEmergency: boolean }) {
     <>
       {localEmergency && (
         <View accessibilityRole="alert" style={styles.emergencyWarning}>
-          <Text style={styles.emergencyWarningTitle}>{t("emergency.title")}</Text>
-          <Text style={styles.emergencyWarningText}>{t("emergency.body")}</Text>
+          <Text variant="bodySemiBold" style={styles.emergencyWarningTitle}>
+            {t("emergency.title")}
+          </Text>
+          <Text variant="bodyS" style={styles.emergencyWarningText}>
+            {t("emergency.body")}
+          </Text>
         </View>
       )}
       <View style={styles.assistantRow} accessibilityLiveRegion="polite">
@@ -43,7 +48,9 @@ function PendingMessage({ localEmergency }: { localEmergency: boolean }) {
         </View>
         <View style={styles.typingBubble}>
           <ActivityIndicator size="small" color={styles.loadingIndicator.color} />
-          <Text style={styles.typingText}>{t("conversation.pending")}</Text>
+          <Text variant="bodyS" style={styles.typingText}>
+            {t("conversation.pending")}
+          </Text>
         </View>
       </View>
     </>
@@ -78,8 +85,10 @@ function FailedMessage({
   return (
     <View accessibilityRole="alert" style={styles.failureRow}>
       <View style={styles.failure}>
-        <Text style={styles.failureTitle}>{t("errors.requestTitle")}</Text>
-        <Text style={styles.failureText}>
+        <Text variant="bodySemiBold" style={styles.failureTitle}>
+          {t("errors.requestTitle")}
+        </Text>
+        <Text variant="bodyS" style={styles.failureText}>
           {failure === "not-found"
             ? t("errors.sessionMissing")
             : failure === "rate-limited"
@@ -87,7 +96,9 @@ function FailedMessage({
               : t("errors.request")}
         </Text>
         {remaining > 0 && (
-          <Text style={styles.failureText}>{t("errors.retryAfter", { seconds: remaining })}</Text>
+          <Text variant="bodyS" style={styles.failureText}>
+            {t("errors.retryAfter", { seconds: remaining })}
+          </Text>
         )}
         <View style={styles.failureActions}>
           {retryable && (
@@ -124,7 +135,7 @@ function RestoredAssistantMessage({ content }: { content: string }) {
         <AiIcon width={15} height={15} color={styles.assistantAvatarIcon.color} />
       </View>
       <View style={styles.restoredBubble}>
-        <Text selectable style={styles.restoredText}>
+        <Text selectable variant="body" style={styles.restoredText}>
           {content}
         </Text>
       </View>
@@ -182,11 +193,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(2.5),
     backgroundColor: theme.palette.brand.primaryDefault,
   },
-  userMessageText: {
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.45,
-    color: theme.palette.brand.textOnDark,
-  },
+  userMessageText: { color: theme.palette.brand.textOnDark },
   assistantRow: {
     maxWidth: "94%",
     flexDirection: "row",
@@ -214,7 +221,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(3),
     backgroundColor: theme.palette.white,
   },
-  typingText: { fontSize: theme.fontSize.sm, color: theme.palette.brand.textSecondary },
+  typingText: { color: theme.palette.brand.textSecondary },
   loadingIndicator: { color: theme.palette.brand.primaryDefault },
   restoredBubble: {
     flex: 1,
@@ -223,11 +230,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(2),
     backgroundColor: theme.palette.white,
   },
-  restoredText: {
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.5,
-    color: theme.palette.brand.textBody,
-  },
+  restoredText: { color: theme.palette.brand.textBody },
   emergencyWarning: {
     gap: theme.spacing(2),
     borderWidth: 1,
@@ -236,7 +239,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.dangerBg,
     padding: theme.spacing(3),
   },
-  emergencyWarningTitle: { fontFamily: theme.fonts.bold, color: theme.palette.brand.danger },
+  emergencyWarningTitle: { color: theme.palette.brand.danger },
   emergencyWarningText: { color: theme.palette.brand.danger },
   failure: {
     flex: 1,
@@ -248,7 +251,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(3.5),
   },
   failureRow: { maxWidth: "94%", paddingLeft: theme.spacing(10) },
-  failureTitle: { fontFamily: theme.fonts.semiBold, color: theme.palette.brand.danger },
-  failureText: { lineHeight: theme.fontSize.base * 1.4, color: theme.palette.brand.textBody },
+  failureTitle: { color: theme.palette.brand.danger },
+  failureText: { color: theme.palette.brand.textBody },
   failureActions: { flexDirection: "row", alignItems: "center", gap: theme.spacing(2) },
 }));

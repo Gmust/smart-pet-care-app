@@ -24,6 +24,7 @@ import {
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
+  DrawerKeyboardDismiss,
   DrawerScrollView,
   DrawerTitle,
 } from "@/shadecn/ui/drawer";
@@ -47,8 +48,6 @@ const getPetFormValues = (pet: PetResponseDto): EditPetForm => ({
   breed: pet.breed ?? "",
   birthDate: pet.birthDate ?? null,
   sex: pet.sex ?? Sex.Unknown,
-  allergies: pet.allergies?.length ? pet.allergies : [""],
-  chronicConditions: pet.chronicConditions?.length ? pet.chronicConditions : [""],
 });
 
 export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
@@ -99,194 +98,128 @@ export const EditPetDrawer = ({ isOpen, pet, setIsOpen }: Props) => {
       >
         <DrawerCloseButton />
 
-        <DrawerHeader style={styles.header}>
-          <DrawerTitle style={styles.title}>{t("pets:editPetDrawer.title")}</DrawerTitle>
-        </DrawerHeader>
+        <DrawerKeyboardDismiss>
+          <DrawerHeader style={styles.header}>
+            <DrawerTitle>{t("pets:editPetDrawer.title")}</DrawerTitle>
+          </DrawerHeader>
 
-        <DrawerScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator
-        >
-          <form.Field name="name">
-            {(field) => (
-              <View style={styles.field}>
-                <Input
-                  label={t("pets:createPetDrawer.fields.name")}
-                  placeholder={t("pets:createPetDrawer.placeholders.name")}
-                  value={field.state.value ?? ""}
-                  onChangeText={field.handleChange}
-                  onBlur={field.handleBlur}
-                  error={field.state.meta.errors.length > 0}
-                />
-                <FieldError errors={field.state.meta.errors} />
-              </View>
-            )}
-          </form.Field>
+          <DrawerScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator
+          >
+            <form.Field name="name">
+              {(field) => (
+                <View style={styles.field}>
+                  <Input
+                    label={t("pets:createPetDrawer.fields.name")}
+                    placeholder={t("pets:createPetDrawer.placeholders.name")}
+                    value={field.state.value ?? ""}
+                    onChangeText={field.handleChange}
+                    onBlur={field.handleBlur}
+                    error={field.state.meta.errors.length > 0}
+                  />
+                  <FieldError errors={field.state.meta.errors} />
+                </View>
+              )}
+            </form.Field>
 
-          <form.Field name="species">
-            {(field) => (
-              <View style={styles.field}>
-                <Text style={styles.label}>{t("pets:createPetDrawer.fields.species")}</Text>
-                <Select
-                  containerStyle={styles.selectContainer}
-                  value={
-                    field.state.value
-                      ? { value: field.state.value, label: speciesLabel(field.state.value) }
-                      : undefined
-                  }
-                  onValueChange={(option) => field.handleChange(option?.value ?? "")}
-                >
-                  <SelectTrigger style={styles.selectTrigger}>
-                    <SelectValue placeholder={t("pets:createPetDrawer.placeholders.species")} />
-                  </SelectTrigger>
-                  <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
-                    {PET_SPECIES.map((species) => (
-                      <SelectItem key={species} value={species} label={speciesLabel(species)} />
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FieldError errors={field.state.meta.errors} />
-              </View>
-            )}
-          </form.Field>
+            <form.Field name="species">
+              {(field) => (
+                <View style={styles.field}>
+                  <Text variant="bodyS" style={styles.label}>
+                    {t("pets:createPetDrawer.fields.species")}
+                  </Text>
+                  <Select
+                    containerStyle={styles.selectContainer}
+                    value={
+                      field.state.value
+                        ? { value: field.state.value, label: speciesLabel(field.state.value) }
+                        : undefined
+                    }
+                    onValueChange={(option) => field.handleChange(option?.value ?? "")}
+                  >
+                    <SelectTrigger style={styles.selectTrigger}>
+                      <SelectValue placeholder={t("pets:createPetDrawer.placeholders.species")} />
+                    </SelectTrigger>
+                    <SelectContent portalHost={SELECT_PORTAL_HOST}>
+                      {PET_SPECIES.map((species) => (
+                        <SelectItem key={species} value={species} label={speciesLabel(species)} />
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={field.state.meta.errors} />
+                </View>
+              )}
+            </form.Field>
 
-          <form.Field name="breed">
-            {(field) => (
-              <View style={styles.field}>
-                <Input
-                  label={t("pets:createPetDrawer.fields.breed")}
-                  placeholder={t("pets:createPetDrawer.placeholders.breed")}
-                  value={field.state.value ?? ""}
-                  onChangeText={field.handleChange}
-                  onBlur={field.handleBlur}
-                  error={field.state.meta.errors.length > 0}
-                />
-                <FieldError errors={field.state.meta.errors} />
-              </View>
-            )}
-          </form.Field>
+            <form.Field name="breed">
+              {(field) => (
+                <View style={styles.field}>
+                  <Input
+                    label={t("pets:createPetDrawer.fields.breed")}
+                    placeholder={t("pets:createPetDrawer.placeholders.breed")}
+                    value={field.state.value ?? ""}
+                    onChangeText={field.handleChange}
+                    onBlur={field.handleBlur}
+                    error={field.state.meta.errors.length > 0}
+                  />
+                  <FieldError errors={field.state.meta.errors} />
+                </View>
+              )}
+            </form.Field>
 
-          <form.Field name="sex">
-            {(field) => (
-              <View style={styles.field}>
-                <Text style={styles.label}>{t("pets:createPetDrawer.fields.sex")}</Text>
-                <Select
-                  containerStyle={styles.selectContainer}
-                  value={{
-                    value: field.state.value ?? Sex.Unknown,
-                    label: t(`pets:sex.${field.state.value ?? Sex.Unknown}`),
-                  }}
-                  onValueChange={(option) => {
-                    const next = SEX_OPTIONS.find((sex) => sex === option?.value);
-                    if (next) field.handleChange(next);
-                  }}
-                >
-                  <SelectTrigger style={styles.selectTrigger}>
-                    <SelectValue placeholder={t("pets:createPetDrawer.placeholders.sex")} />
-                  </SelectTrigger>
-                  <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
-                    {SEX_OPTIONS.map((sex) => (
-                      <SelectItem key={sex} value={sex} label={t(`pets:sex.${sex}`)} />
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FieldError errors={field.state.meta.errors} />
-              </View>
-            )}
-          </form.Field>
+            <form.Field name="sex">
+              {(field) => (
+                <View style={styles.field}>
+                  <Text variant="bodyS" style={styles.label}>
+                    {t("pets:createPetDrawer.fields.sex")}
+                  </Text>
+                  <Select
+                    containerStyle={styles.selectContainer}
+                    value={{
+                      value: field.state.value ?? Sex.Unknown,
+                      label: t(`pets:sex.${field.state.value ?? Sex.Unknown}`),
+                    }}
+                    onValueChange={(option) => {
+                      const next = SEX_OPTIONS.find((sex) => sex === option?.value);
+                      if (next) field.handleChange(next);
+                    }}
+                  >
+                    <SelectTrigger style={styles.selectTrigger}>
+                      <SelectValue placeholder={t("pets:createPetDrawer.placeholders.sex")} />
+                    </SelectTrigger>
+                    <SelectContent portalHost={SELECT_PORTAL_HOST}>
+                      {SEX_OPTIONS.map((sex) => (
+                        <SelectItem key={sex} value={sex} label={t(`pets:sex.${sex}`)} />
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FieldError errors={field.state.meta.errors} />
+                </View>
+              )}
+            </form.Field>
 
-          <form.Field name="birthDate">
-            {(field) => (
-              <View style={styles.field}>
-                <DateTimeField
-                  mode="date"
-                  label={t("pets:createPetDrawer.fields.birthDate")}
-                  placeholder={t("pets:createPetDrawer.placeholders.birthDate")}
-                  value={field.state.value ? new Date(field.state.value) : null}
-                  display={(date) => dayjs(date).format("MMM D, YYYY")}
-                  maximumDate={new Date()}
-                  error={field.state.meta.errors.length > 0}
-                  onChange={(date) => field.handleChange(date.toISOString())}
-                  onBlur={field.handleBlur}
-                />
-                <FieldError errors={field.state.meta.errors} />
-              </View>
-            )}
-          </form.Field>
-
-          <form.Field name="allergies" mode="array">
-            {(field) => (
-              <View style={styles.field}>
-                <Text style={styles.label}>{t("pets:createPetDrawer.fields.allergies")}</Text>
-                {field.state.value.map((_, index) => (
-                  <form.Field key={index} name={`allergies[${index}]`}>
-                    {(itemField) => (
-                      <Input
-                        placeholder={t("pets:createPetDrawer.placeholders.allergies")}
-                        value={itemField.state.value}
-                        onChangeText={itemField.handleChange}
-                        onBlur={itemField.handleBlur}
-                        error={itemField.state.meta.errors.length > 0}
-                        rightSlot={
-                          <Button
-                            variant="dangerText"
-                            size="sm"
-                            accessibilityLabel={t("pets:createPetDrawer.removeAllergy")}
-                            onPress={() => field.removeValue(index)}
-                          >
-                            {t("pets:createPetDrawer.remove")}
-                          </Button>
-                        }
-                      />
-                    )}
-                  </form.Field>
-                ))}
-                <Button variant="ghost" size="sm" dotted onPress={() => field.pushValue("")}>
-                  {t("pets:createPetDrawer.addAllergy")}
-                </Button>
-                <FieldError errors={field.state.meta.errors} />
-              </View>
-            )}
-          </form.Field>
-
-          <form.Field name="chronicConditions" mode="array">
-            {(field) => (
-              <View style={styles.field}>
-                <Text style={styles.label}>
-                  {t("pets:createPetDrawer.fields.chronicConditions")}
-                </Text>
-                {field.state.value.map((_, index) => (
-                  <form.Field key={index} name={`chronicConditions[${index}]`}>
-                    {(itemField) => (
-                      <Input
-                        placeholder={t("pets:createPetDrawer.placeholders.chronicConditions")}
-                        value={itemField.state.value}
-                        onChangeText={itemField.handleChange}
-                        onBlur={itemField.handleBlur}
-                        error={itemField.state.meta.errors.length > 0}
-                        rightSlot={
-                          <Button
-                            variant="dangerText"
-                            size="sm"
-                            accessibilityLabel={t("pets:createPetDrawer.removeChronicCondition")}
-                            onPress={() => field.removeValue(index)}
-                          >
-                            {t("pets:createPetDrawer.remove")}
-                          </Button>
-                        }
-                      />
-                    )}
-                  </form.Field>
-                ))}
-                <Button variant="ghost" size="sm" dotted onPress={() => field.pushValue("")}>
-                  {t("pets:createPetDrawer.addChronicCondition")}
-                </Button>
-                <FieldError errors={field.state.meta.errors} />
-              </View>
-            )}
-          </form.Field>
-        </DrawerScrollView>
+            <form.Field name="birthDate">
+              {(field) => (
+                <View style={styles.field}>
+                  <DateTimeField
+                    mode="date"
+                    label={t("pets:createPetDrawer.fields.birthDate")}
+                    placeholder={t("pets:createPetDrawer.placeholders.birthDate")}
+                    value={field.state.value ? new Date(field.state.value) : null}
+                    display={(date) => dayjs(date).format("MMM D, YYYY")}
+                    maximumDate={new Date()}
+                    error={field.state.meta.errors.length > 0}
+                    onChange={(date) => field.handleChange(date.toISOString())}
+                    onBlur={field.handleBlur}
+                  />
+                  <FieldError errors={field.state.meta.errors} />
+                </View>
+              )}
+            </form.Field>
+          </DrawerScrollView>
+        </DrawerKeyboardDismiss>
 
         <DrawerFooter style={styles.footer}>
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
@@ -312,10 +245,6 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     gap: theme.spacing(1),
   },
-  title: {
-    fontSize: theme.fontSize.xl,
-    letterSpacing: 0,
-  },
   scroll: {
     flex: 1,
   },
@@ -328,8 +257,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   label: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   selectContainer: {

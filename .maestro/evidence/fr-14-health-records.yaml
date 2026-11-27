@@ -12,14 +12,7 @@ env:
       text: "Home"
       selected: true
     timeout: 20000
-- tapOn: "Pets"
-- extendedWaitUntil:
-    visible: "View ${PET_NAME}"
-    timeout: 15000
-- tapOn: "View ${PET_NAME}"
-- extendedWaitUntil:
-    visible: "Overview"
-    timeout: 15000
+- runFlow: ../subflows/open-pet-profile.yaml
 - tapOn: "Health"
 - assertVisible:
     text: "Health"

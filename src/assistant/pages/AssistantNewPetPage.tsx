@@ -11,10 +11,14 @@ export default function AssistantNewPetPage() {
   const router = useRouter();
   const [openCreatePetDrawer, setOpenCreatePetDrawer] = useState(true);
   const createdRef = useRef(false);
+  const hasLeftRef = useRef(false);
 
+  // The sheet can report its own dismiss after a close the X already made, so this can run twice.
   const handleOpenChange = (open: boolean) => {
     setOpenCreatePetDrawer(open);
-    if (!open && !createdRef.current) router.back();
+    if (open || createdRef.current || hasLeftRef.current) return;
+    hasLeftRef.current = true;
+    router.back();
   };
 
   const handleCreated = (pet: PetResponseDto) => {

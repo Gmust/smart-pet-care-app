@@ -5,14 +5,22 @@ description: "Warm, reassuring mobile design system for everyday pet care."
 colors:
   primary: "#2d5e4e"
   primary-dark: "#1a3a2e"
+  primary-mid: "#7bb290"
   primary-soft: "#a3d9b8"
   primary-extra-soft: "#e1f5ee"
+  toast: "#e2a04f"
   success: "#285a3f"
   warning: "#c98a3e"
+  warning-soft: "#f5c98a"
   danger: "#b84a3e"
+  danger-dark: "#8a372e"
   danger-background: "#fae6da"
+  danger-background-mid: "#eec8bc"
   peach: "#7a3a1a"
+  peach-mid: "#c97a4a"
   peach-soft: "#fff8ec"
+  peach-icon-background: "#fff2d3"
+  peach-tint: "#faeada"
   page: "#f5f1ea"
   surface: "#ffffff"
   surface-sunken: "#ede6da"
@@ -23,51 +31,77 @@ colors:
   text-faint: "#b8c3be"
   text-on-dark: "#f5f1ea"
 typography:
-  display-lg:
+  display:
     fontFamily: "Fraunces"
-    fontSize: 48px
-    fontWeight: 700
-    lineHeight: 56px
-  display-md:
-    fontFamily: "Fraunces"
-    fontSize: 36px
-    fontWeight: 700
-    lineHeight: 44px
-  heading-lg:
+    fontSize: 32px
+    fontWeight: 600
+    lineHeight: 40px
+    letterSpacing: -0.256px
+  title-l:
     fontFamily: "Fraunces"
     fontSize: 24px
-    fontWeight: 700
-    lineHeight: 32px
-  heading-md:
+    fontWeight: 400
+    lineHeight: 30px
+    letterSpacing: -0.12px
+  title-m:
     fontFamily: "Fraunces"
-    fontSize: 20px
-    fontWeight: 700
-    lineHeight: 28px
-  body-lg:
-    fontFamily: "Inter"
-    fontSize: 18px
+    fontSize: 19px
     fontWeight: 400
-    lineHeight: 26px
-  body-md:
+    lineHeight: 23.75px
+  body:
     fontFamily: "Inter"
-    fontSize: 16px
+    fontSize: 15px
     fontWeight: 400
-    lineHeight: 24px
-  body-sm:
+    lineHeight: 21px
+  body-s:
     fontFamily: "Inter"
-    fontSize: 14px
+    fontSize: 13px
     fontWeight: 400
-    lineHeight: 20px
-  label-md:
-    fontFamily: "Inter"
-    fontSize: 16px
-    fontWeight: 600
-    lineHeight: 20px
-  label-sm:
+    lineHeight: 18.2px
+  body-semibold:
     fontFamily: "Inter"
     fontSize: 14px
     fontWeight: 600
-    lineHeight: 18px
+    lineHeight: 19.6px
+  label:
+    fontFamily: "Inter"
+    fontSize: 12px
+    fontWeight: 600
+    lineHeight: 16.8px
+  label-caps:
+    fontFamily: "Inter"
+    fontSize: 12px
+    fontWeight: 600
+    lineHeight: 16.8px
+    letterSpacing: 0.036px
+  caption:
+    fontFamily: "Inter"
+    fontSize: 11px
+    fontWeight: 400
+    lineHeight: 15.4px
+  control-s:
+    fontFamily: "Inter"
+    fontSize: 11px
+    fontWeight: 500
+  control-m:
+    fontFamily: "Inter"
+    fontSize: 12px
+    fontWeight: 600
+  control-l:
+    fontFamily: "Inter"
+    fontSize: 17px
+    fontWeight: 600
+    letterSpacing: -0.034px
+  tab-label-active:
+    fontFamily: "Inter"
+    fontSize: 10px
+    fontWeight: 600
+    lineHeight: 14px
+  tab-label-inactive:
+    fontFamily: "Inter"
+    fontSize: 10px
+    fontWeight: 500
+    lineHeight: 14px
 rounded:
   xs: 2px
   sm: 4px
@@ -98,7 +132,7 @@ components:
   button-primary:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.text-on-dark}"
-    typography: "{typography.label-md}"
+    typography: "{typography.control-l}"
     rounded: "{rounded.lg}"
     height: 54px
   button-primary-pressed:
@@ -107,30 +141,30 @@ components:
   button-secondary:
     backgroundColor: "{colors.primary-soft}"
     textColor: "{colors.primary-dark}"
-    typography: "{typography.label-md}"
+    typography: "{typography.control-l}"
     rounded: "{rounded.lg}"
     height: 54px
   button-danger:
     backgroundColor: "{colors.danger-background}"
     textColor: "{colors.danger}"
-    typography: "{typography.label-md}"
+    typography: "{typography.control-l}"
     rounded: "{rounded.lg}"
     height: 54px
   input:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.text-primary}"
-    typography: "{typography.body-md}"
+    typography: "{typography.body}"
     rounded: "{rounded.lg}"
     height: 52px
   chip-primary:
     backgroundColor: "{colors.primary-soft}"
     textColor: "{colors.primary-dark}"
-    typography: "{typography.label-sm}"
+    typography: "{typography.control-m}"
     rounded: "{rounded.full}"
   chip-danger:
     backgroundColor: "{colors.danger-background}"
     textColor: "{colors.danger}"
-    typography: "{typography.label-sm}"
+    typography: "{typography.control-m}"
     rounded: "{rounded.full}"
 ---
 
@@ -150,11 +184,11 @@ Text uses softened green-gray tones instead of pure black. Maintain strong contr
 
 Fraunces gives page titles and major section headings a friendly editorial character. Inter carries body text, labels, controls, and dense information. Use Fraunces selectively; operational UI should remain highly legible in Inter.
 
-The native font identifiers are `Fraunces_700Bold`, `Fraunces_400Regular`, and `Inter` in the Unistyles theme. The family names above describe their visual roles across platforms.
+The native font identifiers are `Fraunces_600SemiBold` and `Fraunces_400Regular` for Fraunces, and `Inter_400Regular`, `Inter_500Medium` and `Inter_600SemiBold` for Inter. The token names above match `theme.textStyles`; set text through `Text` with a `variant` or spread a `theme.textStyles` entry, never assemble family and size by hand. Line heights are 1.25× for Fraunces and 1.4× for Inter; the control styles leave line height automatic, as Figma does. Letter spacing is stored in the theme in pixels and is 0.3% of the size for `label-caps`.
 
 ## Layout
 
-Spacing follows a 4 px base unit through `theme.spacing(value)`. Prefer the named values represented above for common layout decisions, while allowing half-step values when compact native controls require them.
+Spacing follows a 4 px base unit through `theme.spacing(value)`; the named `spacing` scale above is a reference for common decisions, and code uses the multiplier directly (including half steps such as `spacing(2.5)` for compact controls).
 
 Mobile pages generally use 16–20 px horizontal padding, clear vertical grouping, and generous bottom space around tab or gesture areas. Cards group related information rather than serving as decoration.
 

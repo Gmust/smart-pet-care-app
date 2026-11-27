@@ -292,7 +292,7 @@ describe("AssistantPage – consent & pet selection (task 4.5)", () => {
     expect(setAiUsingConsentMock).toHaveBeenCalledWith(true);
   });
 
-  it("routes home when consent is declined on first use", async () => {
+  it("goes back when consent is declined on first use", async () => {
     getAiUsingConsentMock.mockResolvedValue({ ok: true, value: null });
     const { getByText } = await renderPetSelectionPage();
     await waitFor(() => expect(getByText("consent.decline")).toBeTruthy());
@@ -300,10 +300,23 @@ describe("AssistantPage – consent & pet selection (task 4.5)", () => {
       fireEvent.press(getByText("consent.decline"));
     });
     expect(clearAiUsingConsentMock).toHaveBeenCalled();
+    expect(mockRouter.back).toHaveBeenCalled();
+    expect(mockRouter.replace).not.toHaveBeenCalledWith("/(tabs)/home");
+  });
+
+  it("routes home when consent is declined and there is nothing to go back to", async () => {
+    mockRouter.canGoBack.mockReturnValueOnce(false);
+    getAiUsingConsentMock.mockResolvedValue({ ok: true, value: null });
+    const { getByText } = await renderPetSelectionPage();
+    await waitFor(() => expect(getByText("consent.decline")).toBeTruthy());
+    await act(async () => {
+      fireEvent.press(getByText("consent.decline"));
+    });
+    expect(mockRouter.back).not.toHaveBeenCalled();
     expect(mockRouter.replace).toHaveBeenCalledWith("/(tabs)/home");
   });
 
-  it("routes home when reviewed consent is declined without mutating messages", async () => {
+  it("goes back when reviewed consent is declined without mutating messages", async () => {
     mockSearchParams = { petId: "pet-milo" };
     const { getByLabelText, getByText, queryByText } = await renderPage();
     await waitFor(() => expect(getByLabelText("consent.review")).toBeTruthy());
@@ -314,7 +327,7 @@ describe("AssistantPage – consent & pet selection (task 4.5)", () => {
       fireEvent.press(getByText("consent.decline"));
     });
     expect(clearAiUsingConsentMock).toHaveBeenCalled();
-    expect(mockRouter.replace).toHaveBeenCalledWith("/(tabs)/home");
+    expect(mockRouter.back).toHaveBeenCalled();
     expect(queryByText("consent.information")).toBeNull();
   });
 

@@ -239,7 +239,7 @@ export const FeedingTabContent = ({
 
 const styles = StyleSheet.create((theme) => ({
   root: {
-    gap: theme.spacing(4),
+    gap: theme.spacing(6),
   },
   block: {
     gap: theme.spacing(2),

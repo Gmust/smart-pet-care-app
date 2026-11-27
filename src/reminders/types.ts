@@ -8,6 +8,7 @@ export type Reminder = {
   icon: Icon;
   tone: ReminderTone;
   title: string;
+  petName?: string;
   time: string;
   status: ReminderStatus;
 };

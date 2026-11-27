@@ -1,7 +1,8 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import type { Icon } from "@/icons/icons";
+import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
 export type FabActionTone = "primary" | "peach" | "warm" | "neutral";
@@ -42,8 +43,12 @@ export function FabMenuItem({
         <IconComponent width={theme.iconSize.lg} height={theme.iconSize.lg} color={colors.fg} />
       </View>
       <View style={styles.texts}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <Text variant="body" style={styles.title}>
+          {title}
+        </Text>
+        <Text variant="caption" style={styles.subtitle}>
+          {subtitle}
+        </Text>
       </View>
     </Pressable>
   );
@@ -72,14 +77,10 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   title: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textPrimary,
   },
   subtitle: {
     marginTop: theme.spacing(0.25),
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
     color: theme.palette.brand.textSecondary,
   },
 }));

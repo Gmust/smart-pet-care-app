@@ -40,21 +40,25 @@ export function ChatResponseView({
         accessibilityLiveRegion="assertive"
         style={styles.emergency}
       >
-        <Text accessibilityRole="header" style={styles.title}>
+        <Text accessibilityRole="header" variant="titleM" style={styles.title}>
           ⚠ {t("emergency.title")}
         </Text>
         {localEmergency && response.urgency !== ClassifierUrgency.EMERGENCY && (
-          <Text style={styles.emergencyText}>{t("emergency.body")}</Text>
+          <Text variant="bodySemiBold" style={styles.emergencyText}>
+            {t("emergency.body")}
+          </Text>
         )}
-        <Text selectable style={styles.emergencyText}>
+        <Text selectable variant="bodySemiBold" style={styles.emergencyText}>
           {response.answer}
         </Text>
         {(response.homeAdvice ?? []).map((advice) => (
-          <Text key={advice} style={styles.emergencyText}>
+          <Text key={advice} variant="bodySemiBold" style={styles.emergencyText}>
             • {advice}
           </Text>
         ))}
-        <Text style={styles.emergencyDisclaimer}>{response.disclaimer}</Text>
+        <Text variant="caption" style={styles.emergencyDisclaimer}>
+          {response.disclaimer}
+        </Text>
         {/* TODO: Restore the emergency-vet finder when its destination is finalized. */}
       </View>
     );
@@ -72,32 +76,29 @@ export function ChatResponseView({
           urgencyBorder,
         ]}
       >
-        <Text selectable style={styles.answerText}>
+        <Text selectable variant="body" style={styles.answerText}>
           {response.answer}
         </Text>
         {response.urgency && (
-          <Text accessibilityLiveRegion="polite" style={styles.urgency}>
+          <Text accessibilityLiveRegion="polite" variant="bodySemiBold" style={styles.urgency}>
             ⚕ {t("assessment.urgency", { urgency: t(`urgency.${response.urgency}`) })}
           </Text>
         )}
         {(response.homeAdvice ?? []).map((advice) => (
-          <Text key={advice} style={styles.advice}>
+          <Text key={advice} variant="bodyS" style={styles.advice}>
             • {advice}
           </Text>
         ))}
-        <Text style={styles.disclaimer}>{response.disclaimer}</Text>
+        <Text variant="caption" style={styles.disclaimer}>
+          {response.disclaimer}
+        </Text>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  title: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize.xl,
-    lineHeight: theme.fontSize.xl * 1.3,
-    color: theme.palette.brand.textPrimary,
-  },
+  title: { color: theme.palette.brand.danger },
   assistantRow: {
     maxWidth: "94%",
     flexDirection: "row",
@@ -127,16 +128,10 @@ const styles = StyleSheet.create((theme) => ({
   consultSoonBorder: { borderColor: theme.palette.brand.warn },
   urgentBorder: { borderColor: theme.palette.orange["600"] },
   emergencyBorder: { borderColor: theme.palette.brand.danger },
-  answerText: {
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.55,
-    color: theme.palette.brand.textBody,
-  },
-  urgency: { fontFamily: theme.fonts.bold, color: theme.palette.brand.primaryDark },
-  advice: { lineHeight: theme.fontSize.base * 1.45, color: theme.palette.brand.textBody },
+  answerText: { color: theme.palette.brand.textBody },
+  urgency: { color: theme.palette.brand.primaryDark },
+  advice: { color: theme.palette.brand.textBody },
   disclaimer: {
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.45,
     color: theme.palette.brand.textSecondary,
     marginTop: theme.spacing(1),
   },
@@ -150,14 +145,6 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.dangerBg,
     padding: theme.spacing(4),
   },
-  emergencyText: {
-    fontFamily: theme.fonts.bold,
-    color: theme.palette.brand.danger,
-    lineHeight: theme.fontSize.base * 1.5,
-  },
-  emergencyDisclaimer: {
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.fontSize.xs * 1.45,
-    color: theme.palette.brand.danger,
-  },
+  emergencyText: { color: theme.palette.brand.peachDefault },
+  emergencyDisclaimer: { color: theme.palette.brand.textSecondary },
 }));

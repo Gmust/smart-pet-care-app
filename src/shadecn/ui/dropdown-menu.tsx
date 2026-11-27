@@ -1,6 +1,6 @@
 import React from "react";
 import type { StyleProp, ViewStyle } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import * as DropdownMenuPrimitive from "@rn-primitives/dropdown-menu";
@@ -12,9 +12,6 @@ const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
-
-const overlayEntering = FadeIn.duration(100);
-const overlayExiting = FadeOut.duration(120);
 
 function DropdownMenuContent({
   children,
@@ -43,12 +40,9 @@ function DropdownMenuContent({
           an accessible Pressable, and Android folds its children into it, so a
           nested menu never reached TalkBack or UI automation. */}
       <DropdownMenuPrimitive.Overlay style={StyleSheet.absoluteFill} />
-      <Animated.View
-        style={StyleSheet.absoluteFill}
-        pointerEvents="box-none"
-        entering={overlayEntering}
-        exiting={overlayExiting}
-      >
+      {/* No fade in or out on purpose: on Android the card's shadow and fill fade apart, which
+          shows as a flash. */}
+      <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
         <DropdownMenuPrimitive.Content
           align={align}
           sideOffset={sideOffset}
@@ -58,7 +52,7 @@ function DropdownMenuContent({
         >
           {children}
         </DropdownMenuPrimitive.Content>
-      </Animated.View>
+      </View>
     </DropdownMenuPortal>
   );
 }
@@ -130,11 +124,9 @@ const styles = StyleSheet.create((theme) => ({
   label: {
     paddingHorizontal: theme.spacing(3),
     paddingVertical: theme.spacing(2),
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
+    ...theme.textStyles.labelCaps,
     color: theme.palette.brand.textSecondary,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
   },
   separator: {
     height: 1,

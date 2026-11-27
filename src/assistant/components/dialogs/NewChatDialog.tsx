@@ -25,7 +25,7 @@ export function NewChatDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle style={styles.dialogTitle}>{t("conversation.newChatTitle")}</DialogTitle>
+          <DialogTitle>{t("conversation.newChatTitle")}</DialogTitle>
           <DialogDescription style={styles.dialogDescription}>
             {t("conversation.confirmReset")}
           </DialogDescription>
@@ -42,14 +42,8 @@ export function NewChatDialog({
 }
 
 const styles = StyleSheet.create((theme) => ({
-  dialogTitle: {
-    fontFamily: theme.fonts.display,
-    textTransform: "none",
-    color: theme.palette.brand.textPrimary,
-  },
   dialogDescription: {
+    ...theme.textStyles.body,
     textAlign: "center",
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.5,
   },
 }));

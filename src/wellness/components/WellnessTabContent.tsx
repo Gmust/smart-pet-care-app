@@ -213,7 +213,7 @@ export const WellnessTabContent = ({ petId }: WellnessTabContentProps) => {
 
 const styles = StyleSheet.create((theme) => ({
   root: {
-    gap: theme.spacing(4),
+    gap: theme.spacing(6),
   },
   section: {
     gap: theme.spacing(2),

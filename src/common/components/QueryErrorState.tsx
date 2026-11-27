@@ -16,11 +16,12 @@ type Props = {
   /** Where to go when there is no history to pop — a screen opened by deep
    * link or a push has none, and would otherwise be a dead end. */
   fallbackHref?: Href;
+  onBackPress?: () => void;
 };
 
 // Shared fallback for a failed query (isError), as opposed to
 // RouteErrorFallback, which catches JS render errors via ErrorBoundary.
-export const QueryErrorState = ({ onRetry, fallbackHref }: Props) => {
+export const QueryErrorState = ({ onRetry, fallbackHref, onBackPress }: Props) => {
   const { t } = useTranslation(["common"]);
   const isOnline = useIsOnline();
   const insets = useSafeAreaInsets();
@@ -29,6 +30,10 @@ export const QueryErrorState = ({ onRetry, fallbackHref }: Props) => {
   const canGoBack = router.canGoBack();
 
   const handleBack = () => {
+    if (onBackPress) {
+      onBackPress();
+      return;
+    }
     if (canGoBack) {
       router.back();
       return;
@@ -41,7 +46,7 @@ export const QueryErrorState = ({ onRetry, fallbackHref }: Props) => {
   return (
     <View style={styles.root}>
       {/* Stack screens draw their own header (headerShown: false). */}
-      {canGoBack || fallbackHref ? (
+      {canGoBack || fallbackHref || onBackPress ? (
         <View style={[styles.topBar, styles.topBarInset(insets.top)]}>
           <BackButton onBackPress={handleBack} />
         </View>

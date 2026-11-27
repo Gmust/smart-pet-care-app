@@ -1,21 +1,10 @@
 import { useTranslation } from "react-i18next";
 import Toast from "react-native-toast-message";
-import { StyleSheet } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 
-import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { DeleteConfirmDialog } from "@/common/components/DeleteConfirmDialog";
 import { useDeletePet } from "@/pets/queries/useDeletePet";
-import { Button } from "@/shadecn/ui/button";
 import type { DialogHandler } from "@/shadecn/ui/dialog";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/shadecn/ui/dialog";
 
 type Props = DialogHandler & {
   petName: string;
@@ -24,9 +13,7 @@ type Props = DialogHandler & {
 
 export const DeletePetConfirmation = ({ isOpen, setIsOpen, petId, petName }: Props) => {
   const { t } = useTranslation(["common", "pets"]);
-
   const router = useRouter();
-
   const { mutateAsync: deletePet, isPending: isPetDeleting } = useDeletePet();
 
   const handleDeletePet = async () => {
@@ -35,53 +22,19 @@ export const DeletePetConfirmation = ({ isOpen, setIsOpen, petId, petName }: Pro
       return;
     }
 
-    try {
-      await deletePet(petId);
-      Toast.show({ type: "success", text1: t("pets:deleteSuccessMessage") });
-      setIsOpen(false);
-      router.replace("/(tabs)/pets");
-    } catch (e) {
-      console.error(e);
-      Toast.show({ type: "error", text1: getApiErrorMessage(e) });
-    }
+    await deletePet(petId);
+    Toast.show({ type: "success", text1: t("pets:deleteSuccessMessage") });
+    router.replace("/(tabs)/pets");
   };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{t("pets:petProfilePage.deleteDialog.title")}</DialogTitle>
-          <DialogDescription style={styles.deleteDialogDescription}>
-            {t("pets:petProfilePage.deleteDialog.description", { name: petName })}
-          </DialogDescription>
-        </DialogHeader>
-
-        <DialogFooter>
-          <Button
-            variant="danger"
-            size="md"
-            isLoading={isPetDeleting}
-            disabled={isPetDeleting}
-            onPress={handleDeletePet}
-          >
-            {t("pets:petProfilePage.deleteDialog.confirm")}
-          </Button>
-
-          <DialogClose asChild>
-            <Button variant="ghost" size="md" disabled={isPetDeleting}>
-              {t("pets:petProfilePage.deleteDialog.cancel")}
-            </Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <DeleteConfirmDialog
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      title={t("pets:petProfilePage.deleteDialog.title")}
+      description={t("pets:petProfilePage.deleteDialog.description", { name: petName })}
+      isDeleting={isPetDeleting}
+      onConfirm={handleDeletePet}
+    />
   );
 };
-
-const styles = StyleSheet.create((theme) => ({
-  deleteDialogDescription: {
-    textAlign: "center",
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.base,
-    lineHeight: theme.fontSize.base * 1.45,
-  },
-}));

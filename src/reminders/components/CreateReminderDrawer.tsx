@@ -212,7 +212,7 @@ export const CreateReminderDrawer = ({
         <DrawerCloseButton />
 
         <DrawerHeader style={styles.header}>
-          <DrawerTitle style={styles.title}>
+          <DrawerTitle>
             {t(
               isEditMode
                 ? "reminders:editReminderDrawer.title"
@@ -243,7 +243,7 @@ export const CreateReminderDrawer = ({
                 const selected = pets?.find((pet) => pet.id === field.state.value);
                 return (
                   <View style={styles.field}>
-                    <Text style={styles.label}>
+                    <Text variant="bodyS" style={styles.label}>
                       {t("reminders:createReminderDrawer.fields.pet")}
                     </Text>
                     {isPetsLoading ? (
@@ -263,7 +263,7 @@ export const CreateReminderDrawer = ({
                             placeholder={t("reminders:createReminderDrawer.placeholders.pet")}
                           />
                         </SelectTrigger>
-                        <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
+                        <SelectContent portalHost={SELECT_PORTAL_HOST}>
                           {pets?.map((pet) =>
                             pet.id != null ? (
                               <SelectItem key={pet.id} value={pet.id} label={pet.name ?? ""} />
@@ -320,7 +320,7 @@ export const CreateReminderDrawer = ({
             <form.Field name="type">
               {(field) => (
                 <View style={styles.field}>
-                  <Text style={styles.label}>
+                  <Text variant="bodyS" style={styles.label}>
                     {t("reminders:createReminderDrawer.fields.type")}
                   </Text>
                   <Select
@@ -339,7 +339,7 @@ export const CreateReminderDrawer = ({
                         placeholder={t("reminders:createReminderDrawer.placeholders.type")}
                       />
                     </SelectTrigger>
-                    <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
+                    <SelectContent portalHost={SELECT_PORTAL_HOST}>
                       {REMINDER_TYPES.map((type) => (
                         <SelectItem key={type} value={type} label={t(`reminders:types.${type}`)} />
                       ))}
@@ -354,7 +354,7 @@ export const CreateReminderDrawer = ({
           <form.Field name="repeatType">
             {(field) => (
               <View style={styles.field}>
-                <Text style={styles.label}>
+                <Text variant="bodyS" style={styles.label}>
                   {t("reminders:createReminderDrawer.fields.repeat")}
                 </Text>
                 <Select
@@ -380,7 +380,7 @@ export const CreateReminderDrawer = ({
                       placeholder={t("reminders:createReminderDrawer.placeholders.repeat")}
                     />
                   </SelectTrigger>
-                  <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
+                  <SelectContent portalHost={SELECT_PORTAL_HOST}>
                     {REPEAT_TYPES.map((type) => (
                       <SelectItem
                         key={type}
@@ -416,7 +416,7 @@ export const CreateReminderDrawer = ({
                             error={field.state.meta.errors.length > 0}
                             containerStyle={styles.inputSurface}
                           />
-                          <Text style={styles.hint}>
+                          <Text variant="caption" style={styles.hint}>
                             {t(`reminders:intervalUnits.${intervalUnit}`, {
                               count: Number(field.state.value) || 1,
                             })}
@@ -431,7 +431,7 @@ export const CreateReminderDrawer = ({
                     <form.Field name="recalcStrategy">
                       {(field) => (
                         <View style={styles.field}>
-                          <Text style={styles.label}>
+                          <Text variant="bodyS" style={styles.label}>
                             {t("reminders:createReminderDrawer.fields.recalcStrategy")}
                           </Text>
                           <Select
@@ -454,7 +454,7 @@ export const CreateReminderDrawer = ({
                                 )}
                               />
                             </SelectTrigger>
-                            <SelectContent portalHost={SELECT_PORTAL_HOST} sideOffset={6}>
+                            <SelectContent portalHost={SELECT_PORTAL_HOST}>
                               {rules.recalcStrategies.map((strategy) => (
                                 <SelectItem
                                   key={strategy}
@@ -464,7 +464,7 @@ export const CreateReminderDrawer = ({
                               ))}
                             </SelectContent>
                           </Select>
-                          <Text style={styles.hint}>
+                          <Text variant="caption" style={styles.hint}>
                             {t(`reminders:recalcStrategyHints.${field.state.value}`)}
                           </Text>
                           <FieldError errors={field.state.meta.errors} />
@@ -479,7 +479,7 @@ export const CreateReminderDrawer = ({
                         const selectedDays = field.state.value ?? [];
                         return (
                           <View style={styles.field}>
-                            <Text style={styles.label}>
+                            <Text variant="bodyS" style={styles.label}>
                               {t("reminders:createReminderDrawer.fields.days")}
                             </Text>
                             <View style={styles.chips}>
@@ -584,10 +584,6 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     gap: theme.spacing(1),
   },
-  title: {
-    fontSize: theme.fontSize.xl,
-    letterSpacing: 0,
-  },
   subtitle: {
     textAlign: "center",
     color: theme.palette.brand.textSecondary,
@@ -604,13 +600,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   label: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   hint: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
     color: theme.palette.brand.textSecondary,
   },
   inputSurface: {

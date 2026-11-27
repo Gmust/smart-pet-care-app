@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import dayjs from "dayjs";
 
 import { HeartPulseIcon } from "@/icons/heart";
@@ -19,19 +19,30 @@ type AiInsightCardProps = {
 //TODO add real data
 export function AiInsightCard({ onAsk, onDismiss }: AiInsightCardProps) {
   const { t } = useTranslation(["home"]);
+  const { theme } = useUnistyles();
 
   return (
     <View style={styles.card}>
       <View style={styles.icon}>
-        <HeartPulseIcon width={18} height={18} color={palette.brand.textOnDark} />
+        <HeartPulseIcon
+          width={theme.iconSize.lg}
+          height={theme.iconSize.lg}
+          color={palette.brand.textOnDark}
+        />
       </View>
       <View style={styles.body}>
         <View style={styles.insightContainer}>
-          <Text style={styles.eyebrow}>{t("aiInsight.title")}</Text>
+          <Text variant="labelCaps" style={styles.eyebrow}>
+            {t("aiInsight.title")}
+          </Text>
           <View style={styles.dot} />
-          <Text style={styles.eyebrow}>{dayjs(new Date()).fromNow()}</Text>
+          <Text variant="labelCaps" style={styles.eyebrow}>
+            {dayjs(new Date()).fromNow()}
+          </Text>
         </View>
-        <Text style={styles.text}>Test ai reposnse</Text>
+        <Text variant="bodyS" style={styles.text}>
+          Test ai reposnse
+        </Text>
         <View style={styles.actions}>
           <Chip
             label={t("aiInsight.askAssistantBtn")}
@@ -85,17 +96,11 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   eyebrow: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
-    letterSpacing: 1.1,
     textTransform: "uppercase",
     color: theme.palette.brand.peachDefault,
     marginBottom: theme.spacing(1),
   },
   text: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.textSizing(1.25),
     color: theme.palette.brand.textPrimary,
     marginBottom: theme.spacing(2.5),
   },

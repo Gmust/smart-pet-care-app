@@ -3,7 +3,9 @@ import { ActivityIndicator, Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import type { ReminderStatus } from "@/api";
+import { PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
 import { hexToRGBA } from "@/common/utils/colors";
+import { cardVariants } from "@/shadecn/ui/card";
 import { Chip } from "@/shadecn/ui/chip";
 import {
   DropdownMenu,
@@ -63,23 +65,25 @@ export function ReminderRow({
 }: ReminderRowProps) {
   const { t } = useTranslation(["reminders"]);
   const { theme } = useUnistyles();
-  const { icon: IconComponent, tone, title, time, status } = reminder;
+  const { icon: IconComponent, tone, title, petName, time, status } = reminder;
   const colors = toneColors[tone];
   const isOverdue = status === "Missed";
+  const timeLine = petName ? t("reminders:row.petAndTime", { petName, time }) : time;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`${title}, ${time}`}
+          accessibilityLabel={`${title}, ${timeLine}`}
           accessibilityState={{ selected: status === "Completed", disabled: isDeleting }}
           disabled={isDeleting}
+          unstable_pressDelay={PRESS_HIGHLIGHT_DELAY_MS}
           style={({ pressed }) => [
             styles.card,
             isOverdue && styles.cardOverdue,
             muted && styles.cardMuted,
-            pressed && styles.cardPressed,
+            pressed && cardVariants.pressed,
           ]}
         >
           <View style={styles.row}>
@@ -88,7 +92,9 @@ export function ReminderRow({
             </View>
             <View style={styles.text}>
               <Text style={styles.title}>{title}</Text>
-              <Text style={[styles.time, isOverdue && styles.timeOverdue]}>{time}</Text>
+              <Text variant="bodyS" style={[styles.time, isOverdue && styles.timeOverdue]}>
+                {timeLine}
+              </Text>
             </View>
             <StatusChip status={status} />
           </View>
@@ -101,19 +107,27 @@ export function ReminderRow({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={-theme.spacing(5)}>
         <DropdownMenuItem onPress={onEdit}>
-          <Text style={styles.menuItemText}>{t("reminders:actionsDrawer.edit")}</Text>
+          <Text variant="bodySemiBold" style={styles.menuItemText}>
+            {t("reminders:actionsDrawer.edit")}
+          </Text>
         </DropdownMenuItem>
         <DropdownMenuItem onPress={onChangeStatus}>
-          <Text style={styles.menuItemText}>{t("reminders:actionsDrawer.changeStatus")}</Text>
+          <Text variant="bodySemiBold" style={styles.menuItemText}>
+            {t("reminders:actionsDrawer.changeStatus")}
+          </Text>
         </DropdownMenuItem>
         <DropdownMenuItem onPress={onShowDescription}>
-          <Text style={styles.menuItemText}>{t("reminders:actionsDrawer.showDescription")}</Text>
+          <Text variant="bodySemiBold" style={styles.menuItemText}>
+            {t("reminders:actionsDrawer.showDescription")}
+          </Text>
         </DropdownMenuItem>
         <DropdownMenuItem onPress={onShowHistory}>
-          <Text style={styles.menuItemText}>{t("reminders:actionsDrawer.showHistory")}</Text>
+          <Text variant="bodySemiBold" style={styles.menuItemText}>
+            {t("reminders:actionsDrawer.showHistory")}
+          </Text>
         </DropdownMenuItem>
         <DropdownMenuItem onPress={onDelete}>
-          <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>
+          <Text variant="bodySemiBold" style={[styles.menuItemText, styles.menuItemTextDanger]}>
             {t("reminders:actionsDrawer.delete")}
           </Text>
         </DropdownMenuItem>
@@ -149,9 +163,6 @@ const styles = StyleSheet.create((theme) => ({
   cardMuted: {
     opacity: 0.55,
   },
-  cardPressed: {
-    backgroundColor: theme.palette.brand.surfaceSunken,
-  },
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -168,23 +179,17 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   title: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.textPrimary,
   },
   time: {
     marginTop: theme.spacing(0.5),
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
     color: theme.palette.brand.textSecondary,
   },
   timeOverdue: {
-    fontFamily: theme.fonts.medium,
     color: theme.palette.brand.danger,
   },
   menuItemText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textPrimary,
   },
   menuItemTextDanger: {

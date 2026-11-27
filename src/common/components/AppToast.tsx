@@ -1,9 +1,10 @@
 import type { ComponentProps } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import Toast, { type ToastConfig, type ToastConfigParams } from "react-native-toast-message";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Ionicons } from "@expo/vector-icons";
 
+import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
 import { hexToRGBA } from "../utils/colors";
@@ -24,16 +25,25 @@ function ThemedToast({
   text1,
   text2,
 }: { variant: AppToastVariant } & ToastConfigParams<unknown>) {
+  const { theme } = useUnistyles();
   const tone = palette.toastAccent[variant];
 
   return (
     <Pressable accessibilityRole="button" onPress={() => Toast.hide()} style={styles.container}>
       <View style={styles.badge}>
-        <Ionicons name={ICON[variant]} size={20} color={tone} />
+        <Ionicons name={ICON[variant]} size={theme.iconSize.xl} color={tone} />
       </View>
       <View style={styles.textWrap}>
-        {!!text1 && <Text style={styles.title}>{text1}</Text>}
-        {!!text2 && <Text style={styles.message}>{text2}</Text>}
+        {!!text1 && (
+          <Text variant="bodySemiBold" style={styles.title}>
+            {text1}
+          </Text>
+        )}
+        {!!text2 && (
+          <Text variant="bodyS" style={styles.message}>
+            {text2}
+          </Text>
+        )}
       </View>
     </Pressable>
   );
@@ -68,17 +78,11 @@ const styles = StyleSheet.create((theme) => ({
   title: {
     color: theme.palette.brand.textOnDark,
     flexShrink: 1,
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.textSizing(1.25),
   },
   message: {
     color: theme.palette.brand.textOnDark,
     opacity: 0.72,
     flexShrink: 1,
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
-    lineHeight: theme.textSizing(1.1),
   },
 }));
 

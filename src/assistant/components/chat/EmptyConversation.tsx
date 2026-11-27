@@ -26,8 +26,12 @@ export function EmptyConversation({
       <View style={styles.emptyIcon}>
         <AiIcon width={24} height={24} color={styles.emptyIconGlyph.color} />
       </View>
-      <Text style={styles.emptyTitle}>{t("empty.title", { name: petName })}</Text>
-      <Text style={styles.emptyBody}>{t("empty.body", { name: petName })}</Text>
+      <Text variant="titleL" style={styles.emptyTitle}>
+        {t("empty.title", { name: petName })}
+      </Text>
+      <Text variant="bodyS" style={styles.emptyBody}>
+        {t("empty.body", { name: petName })}
+      </Text>
       <View style={styles.promptList}>
         {promptList.map((prompt) => (
           <Pressable
@@ -37,7 +41,9 @@ export function EmptyConversation({
             onPress={() => onSelectPrompt(prompt)}
             style={({ pressed }) => [styles.promptChip, pressed && styles.pressed]}
           >
-            <Text style={styles.promptText}>{prompt}</Text>
+            <Text variant="body" style={styles.promptText}>
+              {prompt}
+            </Text>
             <ChevronIcon
               direction="right"
               width={16}
@@ -53,7 +59,9 @@ export function EmptyConversation({
         onPress={onReviewSafety}
         style={styles.safetyLink}
       >
-        <Text style={styles.safetyLinkText}>{t("empty.safety")}</Text>
+        <Text variant="controlM" style={styles.safetyLinkText}>
+          {t("empty.safety")}
+        </Text>
       </Pressable>
     </View>
   );
@@ -77,19 +85,11 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.primaryXsoft,
   },
   emptyIconGlyph: { color: theme.palette.brand.primaryDark },
-  emptyTitle: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
-    lineHeight: theme.fontSize["2xl"] * 1.3,
-    textAlign: "center",
-    color: theme.palette.brand.textPrimary,
-  },
+  emptyTitle: { textAlign: "center", color: theme.palette.brand.textBody },
   emptyBody: {
     maxWidth: 310,
     textAlign: "center",
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.5,
-    color: theme.palette.brand.textBody,
+    color: theme.palette.brand.textSecondary,
   },
   promptList: { width: "100%", gap: theme.spacing(2), marginTop: theme.spacing(1) },
   promptChip: {
@@ -105,12 +105,8 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(2.5),
     backgroundColor: theme.palette.white,
   },
-  promptText: { flex: 1, fontSize: theme.fontSize.sm, color: theme.palette.brand.textPrimary },
+  promptText: { flex: 1, color: theme.palette.brand.textPrimary },
   promptChevron: { color: theme.palette.brand.primaryDefault },
   safetyLink: { minHeight: 44, justifyContent: "center", paddingHorizontal: theme.spacing(3) },
-  safetyLinkText: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
-    color: theme.palette.brand.primaryDefault,
-  },
+  safetyLinkText: { color: theme.palette.brand.primaryDefault },
 }));

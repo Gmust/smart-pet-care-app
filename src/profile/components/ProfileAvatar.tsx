@@ -1,34 +1,17 @@
 import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Image } from "expo-image";
 
 import { PhotoViewer } from "@/common/components/PhotoViewer";
-import { useProfileMeQuery } from "@/home/queries/useProfileMeQuery";
 import { UserIcon } from "@/icons/user";
-import { useGetAvatarById } from "@/profile/queries/useGetAvatarById";
 import { Text } from "@/shadecn/ui/text";
 import { palette } from "@/styles/palette";
 
-const getInitials = (displayName?: string | null, email?: string | null): string => {
-  const source = displayName?.trim() || email?.trim();
-  if (!source) return "";
-
-  const parts = source.split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) {
-    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-  }
-
-  return source.slice(0, 2).toUpperCase();
-};
+import { useProfileAvatar } from "../hooks/useProfileAvatar";
 
 export function ProfileAvatar() {
-  const { data: profile } = useProfileMeQuery();
-
-  const hasCustomAvatar = !!profile?.customAvatarUrl;
-  const { data: customAvatarUri } = useGetAvatarById(hasCustomAvatar ? profile?.id : undefined);
-
-  const avatarUrl = hasCustomAvatar ? customAvatarUri : profile?.googleAvatarUrl;
-  const initials = getInitials(profile?.displayName, profile?.email);
+  const { theme } = useUnistyles();
+  const { avatarUrl, initials } = useProfileAvatar();
 
   if (avatarUrl) {
     return (
@@ -41,9 +24,15 @@ export function ProfileAvatar() {
   return (
     <View style={[styles.avatar, styles.fallback]}>
       {initials ? (
-        <Text style={styles.initials}>{initials}</Text>
+        <Text variant="titleL" style={styles.initials}>
+          {initials}
+        </Text>
       ) : (
-        <UserIcon width={32} height={32} color={palette.brand.primaryDefault} />
+        <UserIcon
+          width={theme.iconSize["3xl"]}
+          height={theme.iconSize["3xl"]}
+          color={palette.brand.primaryDefault}
+        />
       )}
     </View>
   );
@@ -64,8 +53,6 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.palette.brand.primaryXsoft,
   },
   initials: {
-    fontFamily: theme.fonts.display,
-    fontSize: theme.fontSize["2xl"],
     color: theme.palette.brand.primaryDefault,
   },
 }));

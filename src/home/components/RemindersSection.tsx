@@ -9,6 +9,7 @@ import { SectionHeader } from "@/common/components/SectionHeader";
 import { CirclePlusIcon } from "@/icons/plus";
 import { ReminderDrawers } from "@/reminders/components/ReminderDrawers";
 import { ReminderRow } from "@/reminders/components/ReminderRow";
+import { usePetNames } from "@/reminders/hooks/usePetNames";
 import { useReminderActions } from "@/reminders/hooks/useReminderActions";
 import { useGetReminders } from "@/reminders/queries/useGetReminders";
 import { RemindersSectionSkeleton } from "@/reminders/skeletons/RemindersSectionSkeleton";
@@ -22,7 +23,8 @@ export function RemindersSection() {
   const { t } = useTranslation(["home", "reminders", "common"]);
   const router = useRouter();
   const { data: reminders, isLoading } = useGetReminders();
-  const groups = useMemo(() => toReminderGroups(reminders ?? []), [reminders]);
+  const petNames = usePetNames();
+  const groups = useMemo(() => toReminderGroups(reminders ?? [], petNames), [reminders, petNames]);
 
   const {
     drawerProps,
@@ -115,9 +117,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2),
   },
   groupTitle: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
-    letterSpacing: 0.4,
+    ...theme.textStyles.labelCaps,
     textTransform: "uppercase",
     color: theme.palette.brand.textSecondary,
   },
@@ -128,9 +128,7 @@ const styles = StyleSheet.create((theme) => ({
     width: "100%",
   },
   addButtonText: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.4,
+    ...theme.textStyles.bodySemiBold,
     color: theme.palette.brand.textSecondary,
   },
 }));

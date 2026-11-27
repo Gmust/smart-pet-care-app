@@ -128,7 +128,7 @@ export function RecordSearchRow({
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={t("health:recordList.clearSearch")}
-                hitSlop={8}
+                hitSlop={(theme.minTouchTarget - theme.iconSize.sm) / 2}
                 onPress={() => onChangeText("")}
               >
                 <CrossIcon

@@ -205,7 +205,9 @@ export const CreateActivityDrawer = ({ isOpen, setIsOpen, petId, activity }: Pro
           <form.Field name="type">
             {(field) => (
               <View style={styles.field}>
-                <Text style={styles.label}>{t("activity:forms.activity.fields.type")}</Text>
+                <Text variant="bodyS" style={styles.label}>
+                  {t("activity:forms.activity.fields.type")}
+                </Text>
                 <View style={styles.chips}>
                   {ACTIVITY_TYPES.map((type) => {
                     const isSelected = field.state.value === type;
@@ -235,7 +237,9 @@ export const CreateActivityDrawer = ({ isOpen, setIsOpen, petId, activity }: Pro
 
               return (
                 <View style={styles.field}>
-                  <Text style={styles.label}>{t("activity:forms.activity.fields.recordedAt")}</Text>
+                  <Text variant="bodyS" style={styles.label}>
+                    {t("activity:forms.activity.fields.recordedAt")}
+                  </Text>
                   <View style={styles.row}>
                     <View style={styles.rowItem}>
                       <DateTimeField
@@ -287,7 +291,9 @@ export const CreateActivityDrawer = ({ isOpen, setIsOpen, petId, activity }: Pro
           <form.Field name="intensity">
             {(field) => (
               <View style={styles.field}>
-                <Text style={styles.label}>{t("activity:forms.activity.fields.intensity")}</Text>
+                <Text variant="bodyS" style={styles.label}>
+                  {t("activity:forms.activity.fields.intensity")}
+                </Text>
                 <View style={styles.chips}>
                   {ACTIVITY_INTENSITIES.map((intensity) => {
                     const isSelected = field.state.value === intensity;
@@ -409,8 +415,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1.5),
   },
   label: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
   },
   chips: {

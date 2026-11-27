@@ -4,6 +4,8 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import dayjs from "dayjs";
 
 import type { ActivityLogResponseDto } from "@/api/generated";
+import { PRESS_HIGHLIGHT_DELAY_MS } from "@/common/constants";
+import { cardVariants } from "@/shadecn/ui/card";
 import { Text } from "@/shadecn/ui/text";
 
 import { ACTIVITY_TYPE_ICON } from "../constants";
@@ -40,7 +42,8 @@ export const ActivityCard = ({ activity, onPress }: Props) => {
       accessibilityRole="button"
       accessibilityLabel={t("activity:list.openActions", { type: typeLabel })}
       onPress={() => onPress(activity)}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      unstable_pressDelay={PRESS_HIGHLIGHT_DELAY_MS}
+      style={({ pressed }) => [styles.card, pressed && cardVariants.pressed]}
     >
       <View style={styles.iconCircle}>
         {!!TypeIcon && (
@@ -78,11 +81,10 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     gap: theme.spacing(3),
     backgroundColor: theme.palette.white,
+    borderWidth: 1,
+    borderColor: theme.palette.brand.surfaceBorder,
     borderRadius: theme.borderRadius["2xl"],
     padding: theme.spacing(4),
-  },
-  pressed: {
-    opacity: 0.75,
   },
   iconCircle: {
     width: theme.spacing(10),

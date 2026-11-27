@@ -25,9 +25,13 @@ export const PetSelectorChip = ({ selectedPet }: Props) => {
       style={styles.petContext}
     >
       <View style={styles.contextAvatar}>
-        <PetSpeciesImage photoUrl={selectedPet.photoUrl} species={selectedPet.species} />
+        <PetSpeciesImage
+          photoUrl={selectedPet.photoUrl}
+          species={selectedPet.species}
+          variant="avatar"
+        />
       </View>
-      <Text style={styles.contextName} numberOfLines={1}>
+      <Text variant="titleM" style={styles.contextName} numberOfLines={1}>
         {selectedPet.name}
       </Text>
       <ChevronIcon direction="right" width={16} height={16} color={styles.contextChevron.color} />
@@ -58,9 +62,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   contextName: {
     maxWidth: theme.spacing(28),
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
-    lineHeight: theme.fontSize.sm * 1.3,
     color: theme.palette.brand.textPrimary,
   },
   contextChevron: { color: theme.palette.brand.primaryDefault },

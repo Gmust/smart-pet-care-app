@@ -32,13 +32,10 @@ export function HealthTabContent({ pet }: Props) {
     records?.filter((record) => record.type === HealthRecordType.Symptom) ?? [];
   const monthAgo = dayjs().subtract(1, "month");
 
-  const allergies = (pet.allergies ?? []).filter(Boolean);
-  const chronicConditions = (pet.chronicConditions ?? []).filter(Boolean);
-
   return (
     <View style={styles.stack}>
       <HealthSection title={t("pets:petProfilePage.basics.title")}>
-        <BasicsCard allergies={allergies} chronicConditions={chronicConditions} />
+        <BasicsCard key={pet.id} pet={pet} />
       </HealthSection>
 
       <HealthSection title={t("health:history.title")}>

@@ -48,8 +48,12 @@ export const ReminderRunsDrawer = ({ reminderId, onClose }: Props) => {
         <DrawerCloseButton />
 
         <DrawerHeader style={styles.header}>
-          <DrawerTitle style={styles.title}>{t("reminders:runsDrawer.title")}</DrawerTitle>
-          {!!reminder?.title && <Text style={styles.meta}>{reminder.title}</Text>}
+          <DrawerTitle>{t("reminders:runsDrawer.title")}</DrawerTitle>
+          {!!reminder?.title && (
+            <Text variant="bodyS" style={styles.meta}>
+              {reminder.title}
+            </Text>
+          )}
         </DrawerHeader>
 
         {isLoading ? (
@@ -58,24 +62,30 @@ export const ReminderRunsDrawer = ({ reminderId, onClose }: Props) => {
           </View>
         ) : ordered.length === 0 ? (
           <View style={styles.body}>
-            <Text style={styles.empty}>{t("reminders:runsDrawer.empty")}</Text>
+            <Text variant="bodyS" style={styles.empty}>
+              {t("reminders:runsDrawer.empty")}
+            </Text>
           </View>
         ) : (
           <DrawerScrollView contentContainerStyle={styles.list}>
             {ordered.map((run) => (
               <View key={run.id} style={styles.run}>
                 <View style={styles.runText}>
-                  <Text style={styles.runDate}>
+                  <Text variant="bodySemiBold" style={styles.runDate}>
                     {dayjs(run.scheduledFor).format("MMM D, YYYY HH:mm")}
                   </Text>
                   {!!run.performedAt && (
-                    <Text style={styles.runNote}>
+                    <Text variant="caption" style={styles.runNote}>
                       {t("reminders:runsDrawer.performedAt", {
                         value: dayjs(run.performedAt).format("MMM D, HH:mm"),
                       })}
                     </Text>
                   )}
-                  {!!run.note && <Text style={styles.runNote}>{run.note}</Text>}
+                  {!!run.note && (
+                    <Text variant="caption" style={styles.runNote}>
+                      {run.note}
+                    </Text>
+                  )}
                 </View>
                 {!!run.status && (
                   <Chip
@@ -97,13 +107,7 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     gap: theme.spacing(1),
   },
-  title: {
-    fontSize: theme.fontSize.xl,
-    letterSpacing: 0,
-  },
   meta: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
     textAlign: "center",
   },
@@ -112,8 +116,6 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
   },
   empty: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textSecondary,
     textAlign: "center",
   },
@@ -136,13 +138,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(0.5),
   },
   runDate: {
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textPrimary,
   },
   runNote: {
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.xs,
     color: theme.palette.brand.textSecondary,
   },
 }));

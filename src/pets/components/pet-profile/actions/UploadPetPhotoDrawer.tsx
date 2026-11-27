@@ -6,6 +6,7 @@ import { useForm } from "@tanstack/react-form";
 
 import { ImagePicker, type ImagePickerValue } from "@/common/components/ImagePicker";
 import { getApiErrorMessage } from "@/errors/utils/getApiErrorMessage";
+import { PET_PHOTO_ASPECT } from "@/pets/constants";
 import { useUploadPetPhoto } from "@/pets/queries/useUploadPetPhoto";
 import { uploadPetPhotoSchema } from "@/pets/schemas/upload-pet-photo.schema";
 import { Button } from "@/shadecn/ui/button";
@@ -55,7 +56,7 @@ export const UploadPetPhotoDrawer = ({ isOpen, setIsOpen, petId }: Props) => {
     >
       <DrawerContent snapPoints={["55%"]} enableDynamicSizing={false} enablePanDownToClose={false}>
         <DrawerHeader style={styles.header}>
-          <DrawerTitle style={styles.title}>{t("uploadPhotoDrawer.title")}</DrawerTitle>
+          <DrawerTitle>{t("uploadPhotoDrawer.title")}</DrawerTitle>
         </DrawerHeader>
 
         <View style={styles.content}>
@@ -63,7 +64,7 @@ export const UploadPetPhotoDrawer = ({ isOpen, setIsOpen, petId }: Props) => {
             {(field) => (
               <ImagePicker
                 shape="square"
-                aspect={[16, 9]}
+                aspect={PET_PHOTO_ASPECT}
                 onChange={(value) => field.handleChange(value)}
                 value={field.state.value}
               />
@@ -92,10 +93,6 @@ export const UploadPetPhotoDrawer = ({ isOpen, setIsOpen, petId }: Props) => {
 const styles = StyleSheet.create((theme) => ({
   header: {
     gap: theme.spacing(1),
-  },
-  title: {
-    fontSize: theme.fontSize.xl,
-    letterSpacing: 0,
   },
   content: {
     gap: theme.spacing(5),

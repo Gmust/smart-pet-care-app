@@ -32,7 +32,8 @@ const styles = StyleSheet.create((theme) => ({
   hero: {
     alignItems: "center",
     gap: theme.spacing(3),
-    paddingVertical: theme.spacing(4),
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(4),
   },
   heroCopy: {
     alignItems: "center",
@@ -44,6 +45,7 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.palette.brand.surfaceBorder,
     borderRadius: theme.borderRadius["2xl"],
     backgroundColor: theme.palette.white,
+    marginBottom: theme.spacing(4),
   },
   infoRow: {
     flexDirection: "row",

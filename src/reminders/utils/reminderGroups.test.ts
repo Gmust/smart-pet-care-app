@@ -96,6 +96,21 @@ describe("toReminderGroups", () => {
     expect(group.reminders[0].time).toContain("Sep 14");
   });
 
+  it("names the pet a reminder belongs to, and leaves the name out when it is unknown", () => {
+    const petNames = new Map([["pet-1", "Miso"]]);
+
+    const [group] = toReminderGroups(
+      [
+        reminder({ id: "a", petId: "pet-1", nextTriggerAt: "2026-09-14T19:55:00.000Z" }),
+        reminder({ id: "b", petId: "pet-gone", nextTriggerAt: "2026-09-14T19:56:00.000Z" }),
+        reminder({ id: "c", nextTriggerAt: "2026-09-14T19:57:00.000Z" }),
+      ],
+      petNames
+    );
+
+    expect(group.reminders.map((item) => item.petName)).toEqual(["Miso", undefined, undefined]);
+  });
+
   it("buckets a reminder with no next trigger as passed", () => {
     const [group] = toReminderGroups([reminder({ status: ReminderStatus.Completed })]);
 

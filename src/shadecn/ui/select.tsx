@@ -68,7 +68,7 @@ function SelectTrigger({
 function SelectValue({ placeholder }: { placeholder?: string }) {
   const { value } = SelectPrimitive.useRootContext();
   return (
-    <Text style={value ? styles.valueText : styles.valuePlaceholder}>
+    <Text variant="bodySemiBold" style={value ? styles.valueText : styles.valuePlaceholder}>
       {value?.label ?? placeholder}
     </Text>
   );
@@ -91,6 +91,7 @@ function SelectContent({
   portalHost?: SelectPrimitive.PortalProps["hostName"];
   ref?: React.RefObject<SelectPrimitive.ContentRef>;
 }) {
+  const { theme } = useUnistyles();
   const { width } = useContext(SelectWidthContext);
   const safeAreaInsets = useSafeAreaInsets();
   const { height: windowHeight } = useWindowDimensions();
@@ -126,6 +127,7 @@ function SelectContent({
           onStartShouldSetResponder={returnFalse}
           insets={collisionInsets}
           style={mergedContentStyle}
+          sideOffset={theme.spacing(1.5)}
           {...props}
         >
           <SelectPrimitive.Viewport>
@@ -210,14 +212,10 @@ const styles = StyleSheet.create((theme) => ({
   },
   valueText: {
     flexShrink: 1,
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textPrimary,
   },
   valuePlaceholder: {
     flexShrink: 1,
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.sm,
     color: theme.palette.brand.textFaint,
   },
   content: {
@@ -233,11 +231,9 @@ const styles = StyleSheet.create((theme) => ({
   label: {
     paddingHorizontal: theme.spacing(4),
     paddingVertical: theme.spacing(2),
-    fontFamily: theme.fonts.semiBold,
-    fontSize: theme.fontSize.xs,
+    ...theme.textStyles.labelCaps,
     color: theme.palette.brand.textSecondary,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
   },
   item: {
     flexDirection: "row",
@@ -251,8 +247,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   itemText: {
     flex: 1,
-    fontFamily: theme.fonts.regular,
-    fontSize: theme.fontSize.sm,
+    ...theme.textStyles.body,
     color: theme.palette.brand.textPrimary,
   },
   separator: {
